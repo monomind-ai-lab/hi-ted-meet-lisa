@@ -61,5 +61,23 @@ cp assets/tedlisaidea.jpg assets/tedmeetslisa.jpg assets/monomind-mark-white.svg
 sed 's/currentColor/#ffffff/g' assets/monomind-mark-white.svg \
   > site/assets/monomind-mark-solid-white.svg
 
+# Favicon: the white mark on the brand's dark-olive tile, so it reads on
+# light and dark tab strips alike. Derived, like the mark above.
+python3 - <<'PY'
+import pathlib, re
+mark = pathlib.Path("assets/monomind-mark-white.svg").read_text()
+mark = mark.replace("currentColor", "#ffffff")
+inner = re.sub(r"^.*?<svg[^>]*>", "", mark, flags=re.S)
+inner = inner.replace("</svg>", "")
+fav = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">'
+       '<rect width="512" height="512" rx="96" fill="#15160f"/>'
+       '<g transform="translate(56 56) scale(0.78125)">' + inner + "</g></svg>")
+pathlib.Path("site/assets/favicon.svg").write_text(fav)
+print("site/assets/favicon.svg written")
+PY
+
+# Social/SEO meta image — page one of the Canva brand deck.
+cp assets/tedlisa-cover-og.jpg site/assets/
+
 echo "site/ assembled:"
 find site -type f | sort
