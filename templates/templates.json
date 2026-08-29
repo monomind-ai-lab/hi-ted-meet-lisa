@@ -68,7 +68,7 @@
     {
       "id": "architecture",
       "name": "Architecture diagram",
-      "tagline": "One system diagram on slate, where colour means something.",
+      "tagline": "System diagrams on slate, where colour means something — one view or several.",
       "file": "assets/tedandlisa-template-architecture.html",
       "patterns": "references/slide-patterns-architecture.md",
       "thumb": "templates/thumbs/architecture.png",

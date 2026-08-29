@@ -167,8 +167,8 @@ repository builds it — see [when a template is the wrong shape](#-when-a-templ
 | --- | --- | --- | --- |
 | **MonoMind deck** | Horizontal slides, one idea each, read across a room | Google Translate, loaded only when a reader picks another language | Google Fonts |
 | **Web document** | Hash-routed pages that scroll, read at desk distance | English and Korean written inline, toggled instantly — works offline | Google Fonts, mermaid from a CDN |
-| **Mermaid master** | Diagram-first on light paper, one drawing per slide | Every slide written twice, so diagram labels translate too | Google Fonts |
-| **Architecture diagram** | One system diagram on slate, where colour means something | Both languages inline, including the labels inside the drawing | Google Fonts |
+| **Multi-page Diagrams** | Diagram-first on light paper, one drawing per slide | Every slide written twice, so diagram labels translate too | Google Fonts |
+| **Architecture diagram** | System diagrams on slate, where colour means something — one view or several | Both languages inline, including the labels inside the drawing | Google Fonts |
 | **Sitemap & IA proposal** | Pages that argue a site structure, plus the navigation wired up to click through | Both languages written inline | Google Fonts, mermaid, Font Awesome and Tailwind from a CDN — or all four inlined |
 | **Slide design** — *a handoff, not a template* | Twelve style presets and animated HTML | One language per deck — the presets carry no toggle | Vendored Slides AI Plugin |
 

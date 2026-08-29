@@ -69,6 +69,11 @@ body[data-lang="ko"] { font-family: 'Noto Sans KR', var(--mono); }
 body[data-lang="en"] .ko { display: none !important; }
 body[data-lang="ko"] .en { display: none !important; }
 .container { max-width: 1200px; margin: 0 auto; }
+/* One view at a time. An architecture document is often a single diagram —
+   that is just this file with one .view and no #viewNav. */
+.view { display: none; }
+.view.active { display: block; }
+#viewNav { margin-top: 1.25rem; width: fit-content; }
 
 /* ── header ─────────────────────────────────────────────────────── */
 .header { margin-bottom: 1.75rem; }
@@ -147,6 +152,17 @@ footer a { color: inherit; }
 </head>
 <body data-lang="en">
 
+<!-- Markers and the grid pattern live here rather than inside a diagram, so
+     every view can reference them without colliding on ids. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="currentColor"/>
+  </marker>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40"/>
+  </pattern>
+</defs></svg>
+
 <div class="container">
   <div class="header">
     <div class="header-row">
@@ -180,23 +196,27 @@ footer a { color: inherit; }
         </div>
       </div>
     </div>
-    <p class="subtitle"><span class="en">How a brief becomes a finished HTML deck: the intake panel collects the answers, the skill resolves them against a template, and the review pass runs before anything is handed over.</span><span class="ko">요청이 완성된 HTML 덱이 되는 과정: 인테이크 패널이 답변을 모으고, 스킬이 템플릿에 대해 해석하며, 인계 전 검토를 거친다.</span></p>
+    <p class="subtitle"><span class="en">Three views of the same system: how a brief becomes one finished HTML file, where the skill actually runs, and what does and does not leave your browser.</span><span class="ko">같은 시스템을 보는 세 가지 관점: 요청이 완성된 HTML 파일 하나가 되는 과정, 스킬이 실제로 실행되는 곳, 그리고 내 브라우저를 떠나는 것과 떠나지 않는 것.</span></p>
+
+    <!-- View switcher. Delete this block for a single-diagram document; the
+         script leaves view 1 showing when it finds no nav. -->
+    <div class="seg" id="viewNav">
+      <button class="active" data-view="1"><span class="en">Pipeline</span><span class="ko">파이프라인</span></button>
+      <button data-view="2"><span class="en">Where it runs</span><span class="ko">실행 위치</span></button>
+      <button data-view="3"><span class="en">What travels</span><span class="ko">전달되는 것</span></button>
+    </div>
   </div>
 
+  <!-- Views. Each is one diagram plus its legend; the switcher shows one
+       at a time. A single-view document just keeps the first and deletes
+       the #viewNav block, which the script tolerates. -->
+  <section class="view active" id="v-1" data-view="1">
   <!-- THE DIAGRAM.
        Node colour is semantic, set by class, never by a fill attribute:
        frontend · backend · data · cloud · security · bus · generic.
        Draw links before nodes — SVG has no z-index. -->
   <div class="diagram">
     <svg viewBox="0 0 1000 620" role="img" aria-label="Hi Ted, Meet Lisa build pipeline">
-      <defs>
-        <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-          <polygon points="0 0, 10 3.5, 0 7" fill="currentColor"/>
-        </marker>
-        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-          <path d="M 40 0 L 0 0 0 40"/>
-        </pattern>
-      </defs>
       <rect class="grid-fill" width="100%" height="100%"/>
 
       <!-- links first -->
@@ -296,6 +316,199 @@ footer a { color: inherit; }
       </ul>
     </div>
   </div>
+  </section>
+
+  <section class="view" id="v-2" data-view="2">
+  <div class="diagram">
+    <svg viewBox="0 0 1000 560" role="img" aria-label="Where the skill runs">
+      <rect class="grid-fill" width="100%" height="100%"/>
+
+      <!-- links first -->
+      <g class="link-layer" color="currentColor">
+        <path class="link" d="M 250 132 L 386 132" marker-end="url(#arrow)"/>
+        <path class="link" d="M 250 380 L 386 380" marker-end="url(#arrow)"/>
+        <path class="link dashed" d="M 636 132 L 720 132 L 720 236 L 636 236" marker-end="url(#arrow)"/>
+        <path class="link" d="M 636 380 L 760 380" marker-end="url(#arrow)"/>
+        <path class="link dashed" d="M 511 168 L 511 344" marker-end="url(#arrow)"/>
+        <text class="link-label en" x="318" y="124" text-anchor="middle">PASTE</text>
+        <text class="link-label ko" x="318" y="124" text-anchor="middle">붙여넣기</text>
+        <text class="link-label en" x="318" y="372" text-anchor="middle">COMMAND</text>
+        <text class="link-label ko" x="318" y="372" text-anchor="middle">명령</text>
+        <text class="link-label en" x="726" y="188" text-anchor="middle">READS</text>
+        <text class="link-label ko" x="726" y="188" text-anchor="middle">읽기</text>
+        <text class="link-label en" x="560" y="262" text-anchor="middle">SAME SKILL</text>
+        <text class="link-label ko" x="560" y="262" text-anchor="middle">같은 스킬</text>
+      </g>
+
+      <g class="boundary">
+        <rect x="360" y="300" width="620" height="216" rx="12"/>
+        <text class="en" x="376" y="326">ON YOUR MACHINE</text>
+        <text class="ko" x="376" y="326">내 컴퓨터 안</text>
+      </g>
+
+      <g class="node generic">
+        <rect x="40" y="104" width="210" height="56" rx="6"/>
+        <text class="t en" x="145" y="128" text-anchor="middle">A visitor</text>
+        <text class="t ko" x="145" y="128" text-anchor="middle">방문자</text>
+        <text class="s en" x="145" y="144" text-anchor="middle">no install</text>
+        <text class="s ko" x="145" y="144" text-anchor="middle">설치 없음</text>
+      </g>
+      <g class="node generic">
+        <rect x="40" y="352" width="210" height="56" rx="6"/>
+        <text class="t en" x="145" y="376" text-anchor="middle">You, installed</text>
+        <text class="t ko" x="145" y="376" text-anchor="middle">설치한 사용자</text>
+        <text class="s en" x="145" y="392" text-anchor="middle">/tedandlisa</text>
+        <text class="s ko" x="145" y="392" text-anchor="middle">/tedandlisa</text>
+      </g>
+      <g class="node cloud">
+        <rect x="386" y="104" width="250" height="56" rx="6"/>
+        <text class="t en" x="511" y="128" text-anchor="middle">GitHub</text>
+        <text class="t ko" x="511" y="128" text-anchor="middle">GitHub</text>
+        <text class="s en" x="511" y="144" text-anchor="middle">raw SKILL.md</text>
+        <text class="s ko" x="511" y="144" text-anchor="middle">raw SKILL.md</text>
+      </g>
+      <g class="node cloud">
+        <rect x="386" y="208" width="250" height="56" rx="6"/>
+        <text class="t en" x="511" y="232" text-anchor="middle">html.monomind.one</text>
+        <text class="t ko" x="511" y="232" text-anchor="middle">html.monomind.one</text>
+        <text class="s en" x="511" y="248" text-anchor="middle">the intake panel</text>
+        <text class="s ko" x="511" y="248" text-anchor="middle">인테이크 패널</text>
+      </g>
+      <g class="node backend">
+        <rect x="386" y="352" width="250" height="56" rx="6"/>
+        <text class="t en" x="511" y="376" text-anchor="middle">Your agent</text>
+        <text class="t ko" x="511" y="376" text-anchor="middle">내 에이전트</text>
+        <text class="s en" x="511" y="392" text-anchor="middle">reads the local clone</text>
+        <text class="s ko" x="511" y="392" text-anchor="middle">로컬 클론을 읽음</text>
+      </g>
+      <g class="node data">
+        <rect x="760" y="352" width="200" height="56" rx="6"/>
+        <text class="t en" x="860" y="376" text-anchor="middle">~/.claude/skills</text>
+        <text class="t ko" x="860" y="376" text-anchor="middle">~/.claude/skills</text>
+        <text class="s en" x="860" y="392" text-anchor="middle">one clone, every project</text>
+        <text class="s ko" x="860" y="392" text-anchor="middle">클론 하나, 모든 프로젝트</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-head"><span class="dot cloud"></span><h3><span class="en">Nothing installed</span><span class="ko">설치하지 않은 경우</span></h3></div>
+      <ul>
+        <li><span class="en">The agent fetches SKILL.md from GitHub each time.</span><span class="ko">에이전트가 매번 GitHub에서 SKILL.md를 받아온다.</span></li>
+        <li><span class="en">Always the current version; needs a connection.</span><span class="ko">항상 최신 버전이지만 연결이 필요하다.</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot data"></span><h3><span class="en">Installed</span><span class="ko">설치한 경우</span></h3></div>
+      <ul>
+        <li><span class="en">One clone under your skills directory serves every project.</span><span class="ko">스킬 디렉터리의 클론 하나가 모든 프로젝트에서 쓰인다.</span></li>
+        <li><span class="en">Works offline, and takes your own templates.</span><span class="ko">오프라인에서 동작하며, 나만의 템플릿을 추가할 수 있다.</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot backend"></span><h3><span class="en">Either way</span><span class="ko">어느 쪽이든</span></h3></div>
+      <ul>
+        <li><span class="en">The same skill file, so the output is identical.</span><span class="ko">같은 스킬 파일이므로 결과물은 동일하다.</span></li>
+      </ul>
+    </div>
+  </div>
+  </section>
+
+  <section class="view" id="v-3" data-view="3">
+  <div class="diagram">
+    <svg viewBox="0 0 1000 520" role="img" aria-label="What crosses the boundary">
+      <rect class="grid-fill" width="100%" height="100%"/>
+
+      <g class="link-layer" color="currentColor">
+        <path class="link" d="M 250 152 L 370 152" marker-end="url(#arrow)"/>
+        <path class="link" d="M 250 336 L 370 336" marker-end="url(#arrow)"/>
+        <path class="link" d="M 620 152 L 740 152" marker-end="url(#arrow)"/>
+        <path class="link dashed" d="M 620 336 L 740 336" marker-end="url(#arrow)"/>
+        <text class="link-label en" x="310" y="144" text-anchor="middle">ANSWERS</text>
+        <text class="link-label ko" x="310" y="144" text-anchor="middle">답변</text>
+        <text class="link-label en" x="310" y="328" text-anchor="middle">ATTACHED</text>
+        <text class="link-label ko" x="310" y="328" text-anchor="middle">첨부</text>
+        <text class="link-label en" x="680" y="144" text-anchor="middle">IN THE PROMPT</text>
+        <text class="link-label ko" x="680" y="144" text-anchor="middle">프롬프트에 포함</text>
+        <text class="link-label en" x="680" y="328" text-anchor="middle">NAME ONLY</text>
+        <text class="link-label ko" x="680" y="328" text-anchor="middle">이름만</text>
+      </g>
+
+      <g class="boundary">
+        <rect x="20" y="60" width="600" height="420" rx="12"/>
+        <text class="en" x="36" y="86">YOUR BROWSER — NOTHING IS UPLOADED</text>
+        <text class="ko" x="36" y="86">내 브라우저 — 아무것도 업로드되지 않음</text>
+      </g>
+
+      <g class="node frontend">
+        <rect x="40" y="124" width="210" height="56" rx="6"/>
+        <text class="t en" x="145" y="148" text-anchor="middle">The intake panel</text>
+        <text class="t ko" x="145" y="148" text-anchor="middle">인테이크 패널</text>
+        <text class="s en" x="145" y="164" text-anchor="middle">answers you type</text>
+        <text class="s ko" x="145" y="164" text-anchor="middle">직접 입력한 답변</text>
+      </g>
+      <g class="node security">
+        <rect x="40" y="308" width="210" height="56" rx="6"/>
+        <text class="t en" x="145" y="332" text-anchor="middle">Your files</text>
+        <text class="t ko" x="145" y="332" text-anchor="middle">내 파일</text>
+        <text class="s en" x="145" y="348" text-anchor="middle">logo, notes, images</text>
+        <text class="s ko" x="145" y="348" text-anchor="middle">로고, 메모, 이미지</text>
+      </g>
+      <g class="node data">
+        <rect x="370" y="124" width="250" height="56" rx="6"/>
+        <text class="t en" x="495" y="148" text-anchor="middle">The payload</text>
+        <text class="t ko" x="495" y="148" text-anchor="middle">페이로드</text>
+        <text class="s en" x="495" y="164" text-anchor="middle">one JSON object</text>
+        <text class="s ko" x="495" y="164" text-anchor="middle">JSON 객체 하나</text>
+      </g>
+      <g class="node security">
+        <rect x="370" y="308" width="250" height="56" rx="6"/>
+        <text class="t en" x="495" y="332" text-anchor="middle">A file manifest</text>
+        <text class="t ko" x="495" y="332" text-anchor="middle">파일 목록</text>
+        <text class="s en" x="495" y="348" text-anchor="middle">name, type, size</text>
+        <text class="s ko" x="495" y="348" text-anchor="middle">이름, 형식, 크기</text>
+      </g>
+      <g class="node backend">
+        <rect x="740" y="124" width="230" height="56" rx="6"/>
+        <text class="t en" x="855" y="148" text-anchor="middle">Your agent</text>
+        <text class="t ko" x="855" y="148" text-anchor="middle">내 에이전트</text>
+        <text class="s en" x="855" y="164" text-anchor="middle">builds from the answers</text>
+        <text class="s ko" x="855" y="164" text-anchor="middle">답변으로 생성</text>
+      </g>
+      <g class="node generic">
+        <rect x="740" y="308" width="230" height="56" rx="6"/>
+        <text class="t en" x="855" y="332" text-anchor="middle">It asks you</text>
+        <text class="t ko" x="855" y="332" text-anchor="middle">직접 요청</text>
+        <text class="s en" x="855" y="348" text-anchor="middle">share the file yourself</text>
+        <text class="s ko" x="855" y="348" text-anchor="middle">파일은 직접 전달</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-head"><span class="dot data"></span><h3><span class="en">The answers travel</span><span class="ko">답변은 전달된다</span></h3></div>
+      <ul>
+        <li><span class="en">Everything you pick is written into the prompt you copy.</span><span class="ko">선택한 모든 항목이 복사하는 프롬프트에 담긴다.</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot security"></span><h3><span class="en">Your files do not</span><span class="ko">파일은 전달되지 않는다</span></h3></div>
+      <ul>
+        <li><span class="en">On the website the payload lists attachments by name only.</span><span class="ko">웹에서는 첨부 파일을 이름만으로 나열한다.</span></li>
+        <li><span class="en">One photo inlined would exceed what a chat box accepts.</span><span class="ko">사진 한 장만 넣어도 채팅창이 받을 수 있는 크기를 넘는다.</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot backend"></span><h3><span class="en">So the agent asks</span><span class="ko">그래서 에이전트가 묻는다</span></h3></div>
+      <ul>
+        <li><span class="en">It names the files it is waiting on rather than guessing.</span><span class="ko">추측하지 않고, 기다리는 파일을 이름으로 알려 준다.</span></li>
+        <li><span class="en">Installed, the runner passes them from disk instead.</span><span class="ko">설치한 경우에는 러너가 디스크에서 바로 전달한다.</span></li>
+      </ul>
+    </div>
+  </div>
+  </section>
 
   <footer>
     <span class="en">HI TED, MEET LISA · PREVIEW · 2026-08</span><span class="ko">HI TED, MEET LISA · 미리보기 · 2026-08</span>
@@ -376,6 +589,25 @@ footer a { color: inherit; }
     });
   }
 })();
+
+  /* View switcher. Null-guarded like every other control here, so deleting
+     the nav markup is the supported way to make this a one-diagram document. */
+  var viewNav = document.getElementById('viewNav');
+  if (viewNav) {
+    viewNav.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-view]');
+      if (!b) return;
+      var want = b.dataset.view;
+      viewNav.querySelectorAll('button').forEach(function (x) {
+        x.classList.toggle('active', x === b);
+      });
+      document.querySelectorAll('.view').forEach(function (v) {
+        v.classList.toggle('active', v.dataset.view === want);
+      });
+      window.scrollTo(0, 0);
+    });
+  }
+
 </script>
 </body>
 </html>

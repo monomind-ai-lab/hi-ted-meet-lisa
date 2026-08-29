@@ -125,7 +125,7 @@ template's pattern reference before writing anything.
 | `monomind-deck` | Horizontal slides, one idea each | Google Translate on demand | Yes, fonts aside |
 | `web-document` | Hash-routed pages, each scrolls | Both languages written inline | No — mermaid loads from a CDN |
 | `mermaid-master` | Diagram-first slides on light paper | Every slide written twice, diagram labels included | Yes, fonts aside |
-| `architecture` | One system diagram on slate, colour is semantic | Both languages inline, labels included | Yes, fonts aside |
+| `architecture` | System diagrams on slate, colour is semantic; one view or several, switchable | Both languages inline, labels included | Yes, fonts aside |
 | `sitemap-ia` | Hash-routed pages, plus a clickable navigation prototype | Both languages written inline | Only if `delivery: standalone` — otherwise mermaid, Font Awesome and Tailwind load from a CDN |
 | `project-website` | Hash-routed pages behind a sticky nav, one shared footer | Both languages written inline | Yes, fonts aside |
 
