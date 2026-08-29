@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "s=\"${CLAUDE_PROJECT_DIR:-$PWD}/.agents/skills/project-context/scripts/context_triggers.py\"; [ -f \"$s\" ] && python3 \"$s\" report || true",
+            "timeout": 15,
+            "statusMessage": "Checking project context"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "s=\"${CLAUDE_PROJECT_DIR:-$PWD}/.agents/skills/project-context/scripts/context_triggers.py\"; [ -f \"$s\" ] && python3 \"$s\" gate || true",
+            "timeout": 15,
+            "statusMessage": "Checking project context triggers"
+          }
+        ]
+      }
+    ]
+  }
+}

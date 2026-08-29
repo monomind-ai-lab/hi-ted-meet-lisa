@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "templates": [
+    {
+      "id": "monomind-deck",
+      "name": "MonoMind deck",
+      "tagline": "Horizontal presentation deck, dark ink and accent halos.",
+      "file": "assets/tedandlisa-template.html",
+      "patterns": "references/slide-patterns.md",
+      "thumb": "templates/thumbs/monomind-deck.png",
+      "kind": "slides",
+      "best_for": "A talk. One idea per slide, read across a room.",
+      "navigation": "Horizontal scroll-snap, arrow keys, swipe; vertical on phones.",
+      "languages": "Google Translate, loaded only when a reader picks a non-English language.",
+      "dependencies": "Google Fonts only.",
+      "features": [
+        "cover and closing photography",
+        "deck menu",
+        "progress and counter",
+        "position memory"
+      ],
+      "preview": "previews/monomind-deck.html",
+      "thumb_source": "previews/monomind-deck.html"
+    },
+    {
+      "id": "web-document",
+      "name": "Web document",
+      "tagline": "Reads like a website page: top nav, sections, diagrams.",
+      "file": "assets/tedandlisa-template-web-document.html",
+      "patterns": "references/slide-patterns-web-document.md",
+      "thumb": "templates/thumbs/web-document.png",
+      "kind": "document",
+      "best_for": "Anything read at desk distance and linked to — an overview, a guide, decision records, a handbook.",
+      "navigation": "Top nav with hash routing (#/lang/page); each page scrolls.",
+      "languages": "English and Korean written inline and toggled instantly — no translation service, works offline.",
+      "dependencies": "Google Fonts, and mermaid from a CDN for diagrams.",
+      "features": [
+        "mermaid diagrams",
+        "pan and zoom fullscreen viewer",
+        "decision records",
+        "checklists",
+        "per-page contents"
+      ],
+      "preview": "previews/web-document.html",
+      "thumb_source": "previews/web-document.html"
+    },
+    {
+      "id": "mermaid-master",
+      "name": "Mermaid master",
+      "tagline": "Diagram-first deck on light paper, one drawing per slide.",
+      "file": "assets/tedandlisa-template-mermaid-master.html",
+      "patterns": "references/slide-patterns-mermaid-master.md",
+      "thumb": "templates/thumbs/mermaid-master.png",
+      "kind": "slides",
+      "best_for": "Architecture and system diagrams that need to be read closely, printed, and linked to.",
+      "navigation": "Hash routing (#lang/route) with an index page; arrows, Esc for index, L for language.",
+      "languages": "Every slide written twice, English and Korean, so diagram labels translate too.",
+      "dependencies": "Google Fonts only — diagrams are inline SVG, no mermaid runtime.",
+      "features": [
+        "inline SVG diagrams",
+        "visual index",
+        "shared arrow markers",
+        "prints one slide per page"
+      ],
+      "preview": "previews/mermaid-master.html",
+      "thumb_source": "previews/mermaid-master.html#en/01"
+    },
+    {
+      "id": "architecture",
+      "name": "Architecture diagram",
+      "tagline": "One system diagram on slate, where colour means something.",
+      "file": "assets/tedandlisa-template-architecture.html",
+      "patterns": "references/slide-patterns-architecture.md",
+      "thumb": "templates/thumbs/architecture.png",
+      "kind": "document",
+      "best_for": "A system, cloud, or network diagram that will be reviewed closely and pasted into a doc.",
+      "navigation": "Single page; the diagram scrolls horizontally on narrow screens.",
+      "languages": "English and Korean written inline — the labels inside the drawing translate too.",
+      "dependencies": "Google Fonts only — inline SVG, no diagram runtime.",
+      "features": [
+        "semantic component palette",
+        "region boundaries",
+        "legend cards",
+        "light and dark"
+      ],
+      "preview": "previews/architecture.html",
+      "thumb_source": "previews/architecture.html"
+    },
+    {
+      "id": "slide-design",
+      "name": "Slide design",
+      "tagline": "Not a MonoMind template — twelve style presets, animated HTML, or editable .pptx.",
+      "kind": "external",
+      "skill": "/tedandlisa-design",
+      "best_for": "A deck the house style cannot shape, or a deliverable that has to be editable in PowerPoint.",
+      "navigation": "Whatever the chosen preset provides.",
+      "languages": "One deck per language for .pptx — PowerPoint has no toggle.",
+      "dependencies": "Submodule vendor/slides-ai-plugin; bun is needed for .pptx.",
+      "preview": "previews/slide-design.html",
+      "features": [
+        "12 style presets",
+        "animated HTML",
+        "editable .pptx",
+        "converts an existing deck"
+      ],
+      "thumb_source": "previews/slide-design.html",
+      "thumb": "templates/thumbs/slide-design.png"
+    },
+    {
+      "id": "sitemap-ia",
+      "name": "Sitemap & IA proposal",
+      "tagline": "Argue an information architecture, with the navigation wired up to click through.",
+      "file": "assets/tedandlisa-template-sitemap-ia.html",
+      "patterns": "references/slide-patterns-sitemap-ia.md",
+      "thumb": "templates/thumbs/sitemap-ia.png",
+      "kind": "document",
+      "best_for": "Proposing or defending a site structure — a redesign's IA, a consolidation, a new build's first map. Read at desk distance by people who will approve it.",
+      "navigation": "Top nav with hash routing (#/lang/page); each page scrolls. The prototype page embeds a second, independent document.",
+      "languages": "English and Traditional Chinese written inline and toggled instantly — no translation service, works offline.",
+      "dependencies": "Google Fonts and mermaid from a CDN for the document; Font Awesome and Tailwind from a CDN for the prototype. The delivery answer can inline all four.",
+      "features": [
+        "clickable mega-menu prototype at 1440px",
+        "mobile navigation prototype in its own tab",
+        "mermaid diagrams with a pan and zoom viewer",
+        "decision records and open questions",
+        "diagnosis table with phasing"
+      ],
+      "preview": "previews/sitemap-ia.html",
+      "thumb_source": "previews/sitemap-ia.html"
+    }
+  ]
+}

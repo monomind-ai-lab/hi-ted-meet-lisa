@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[DOC TITLE] · [SUBTITLE]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<style>
+:root{
+  --primary:#0007cd; --primary-active:#0005a3; --primary-glow:#1a26ff;
+  --ink:#ffffff; --body:#a8a8a8; --body-strong:#ffffff; --muted:#888888; --muted-soft:#666666;
+  --hairline:#222222; --hairline-soft:#1a1a1a; --hairline-strong:#333333;
+  --canvas:#0f0f0f; --canvas-deep:#000000; --card:#181818; --card-elev:#222222; --strong:#2a2a2a;
+  --cyan:#00d4ff; --violet:#7b3aed; --success:#33d17a; --error:#ff4d4d;
+  --sans:'Inter','Noto Sans KR',ui-sans-serif,system-ui,sans-serif;
+  --mono:'JetBrains Mono','Fira Code',monospace;
+  --r-md:8px; --r-lg:12px; --r-xl:16px;
+}
+/* ---------- light theme ----------
+   Set by the intake answer `theme`. Only the palette changes; every rule
+   below consumes these variables, so nothing else needs touching.
+   theme: dark   -> delete this block and the nav toggle.
+   theme: light  -> put data-theme="light" on <html> and drop the toggle.
+   theme: toggle -> keep both; the choice persists to localStorage.
+   Diagram surfaces stay dark on purpose: mermaid renders to a fixed
+   palette configured at init, and a dark figure card on a light page
+   reads as deliberate rather than broken. */
+html[data-theme="light"]{
+  --ink:#0b0d12; --body:#4a5061; --body-strong:#0b0d12; --muted:#6b7280; --muted-soft:#9aa1ae;
+  --hairline:#e3e6eb; --hairline-soft:#eceef2; --hairline-strong:#d3d8e0;
+  --canvas:#ffffff; --canvas-deep:#f7f8fa; --card:#f5f6f8; --card-elev:#e9ebef; --strong:#dfe3e8;
+}
+html[data-theme="light"] .nav{background:rgba(255,255,255,.92)}
+/* Contrast repairs for light ground, measured rather than eyeballed:
+   --muted/--muted-soft are tuned for a near-black canvas and land at 2.4-4.5:1
+   on white, and --cyan (#00d4ff) is 1.77:1 there. Cyan stays untouched as a
+   token because the dark surfaces below still use it correctly. */
+html[data-theme="light"]{--muted:#656c7a; --muted-soft:#767d8b}
+html[data-theme="light"] .chk .cid,
+html[data-theme="light"] .dcard .did,
+html[data-theme="light"] .tbl code,
+html[data-theme="light"] .tcard .icon{color:#0b6a86}
+html[data-theme="light"] .pill-p2{color:#0b6a86}
+/* These sit on the figure/terminal cards, which stay dark on purpose. */
+/* Both are small text on light ground, so they take --muted rather than the
+   dimmer --muted-soft; the size and weight still carry the hierarchy. */
+html[data-theme="light"] .toc a .n,
+html[data-theme="light"] footer .mono{color:var(--muted)}
+html[data-theme="light"] .lang-toggle button.active,
+html[data-theme="light"] .btn-primary{color:#fff}
+/* Figures, terminals, and code blocks follow the theme like everything else.
+   Leaving them near-black on a white page read as unfinished rather than
+   deliberate. Mermaid is re-themed in the script and re-rendered on toggle. */
+html[data-theme="light"] .term-pane,
+html[data-theme="light"] .fig,
+html[data-theme="light"] .codeblk{background:#fbfbfc;border-color:#e3e6eb;color:#3a4150}
+html[data-theme="light"] .fig .fig-bar{border-color:#eceef2;background:#f5f6f8}
+html[data-theme="light"] .term-pane .tp-head{color:#0b0d12}
+html[data-theme="light"] .term-pane .c{color:#7c8494}
+html[data-theme="light"] .term-pane .k{color:#0b6a86}
+html[data-theme="light"] .term-pane .b{color:#0007cd}
+html[data-theme="light"] .fig .fig-title,
+html[data-theme="light"] .fig .cap{color:#656c7a}
+html[data-theme="light"] .term-grid{background:#f0f1f4;border-color:#e3e6eb}
+
+/* ---------- print / PDF ----------
+   The reader's own print-to-PDF. Only the open page prints, which matches
+   what they are looking at. Delete if the intake said no PDF. */
+@media print{
+  .nav,.viewer,.burger,.lang-toggle,.figbtn,.ctas{display:none!important}
+  .page{display:none!important;padding-top:0}
+  .page.active{display:block!important}
+  .band{padding:28px 0;break-inside:avoid}
+  .fig,.tbl,.callout,.decision{break-inside:avoid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{margin:14mm}
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--canvas);color:var(--body);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body[data-lang="ko"]{font-family:'Noto Sans KR','Inter',ui-sans-serif,system-ui,sans-serif}
+body[data-lang="en"] .ko{display:none!important}
+body[data-lang="ko"] .en{display:none!important}
+a{color:var(--body-strong);text-decoration:none}
+code,.mono{font-family:var(--mono);font-size:13px}
+::selection{background:var(--primary);color:#fff}
+
+/* ---------- top nav ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;background:rgba(15,15,15,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--hairline-soft);display:flex;align-items:center;gap:16px;padding:0 20px}
+.nav .mark{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.2px;white-space:nowrap}
+.nav .mark svg{width:19px;height:19px;flex:none;color:var(--ink)}
+.nav .links{display:flex;gap:4px;flex:1;justify-content:center;overflow:visible;scrollbar-width:none}
+.nav .links::-webkit-scrollbar{display:none}
+.nav .links a{font-size:14px;font-weight:500;color:var(--muted);padding:7px 12px;border-radius:var(--r-md);white-space:nowrap;line-height:1.4}
+.nav .links a:hover{color:var(--body-strong);background:var(--card)}
+.nav .links a.active{color:var(--body-strong);background:var(--card-elev)}
+.utilbar{display:flex;align-items:stretch;border:1px solid var(--hairline-strong);
+  border-radius:var(--r-md);overflow:hidden;flex-shrink:0}
+.utilbar button{display:inline-flex;align-items:center;gap:6px;background:transparent;border:0;
+  border-right:1px solid var(--hairline-strong);color:var(--muted);font-family:var(--sans);
+  font-size:12px;font-weight:500;letter-spacing:.02em;padding:0 10px;height:34px;cursor:pointer;
+  transition:background .15s,color .15s}
+.utilbar button:last-child{border-right:0}
+.utilbar button:hover{background:var(--card);color:var(--body-strong)}
+.utilbar button:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--primary)}
+.utilbar svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round;flex:none}
+.lang-toggle{display:flex;border:1px solid var(--hairline-strong);border-radius:var(--r-md);overflow:hidden;flex-shrink:0}
+.lang-toggle button{background:transparent;border:0;color:var(--muted);font-family:var(--sans);
+  font-size:12px;font-weight:500;padding:0 12px;height:34px;cursor:pointer;line-height:1;
+  transition:background .15s,color .15s}
+.lang-toggle button:hover:not(.active){background:var(--card);color:var(--body-strong)}
+.lang-toggle button.active{background:var(--primary);color:#fff}
+.burger{display:none;background:transparent;border:1px solid var(--hairline-strong);border-radius:var(--r-md);color:var(--ink);width:40px;height:40px;font-size:16px;cursor:pointer;flex-shrink:0}
+@media(max-width:1120px){
+  .nav .links{position:fixed;top:64px;left:0;right:0;background:var(--canvas);border-bottom:1px solid var(--hairline);flex-direction:column;padding:12px;display:none;max-height:calc(100vh - 64px);overflow-y:auto}
+  .nav .links.open{display:flex}
+  .burger{display:block}
+}
+
+/* ---------- narrow-screen nav ----------
+   The rule above collapses .links into the burger at 1120px, but the mark's
+   text, the utilbar, the language pair and the burger still share one 64px
+   row. Together they are wider than a phone, and because .nav is fixed it
+   clips instead of widening the document -- so a horizontal-overflow check
+   passes while the burger, the only way into the navigation on a phone, sits
+   off screen. Measured on the shipped file: a 590px row in a 375px viewport.
+   Below 640px the mark falls back to its logo and the utilbar to its icons.
+   Nothing is removed; every control stays reachable and tappable. */
+@media(max-width:640px){
+  .nav{gap:10px;padding:0 14px}
+  .nav .mark>span{display:none}
+  .utilbar button>span{display:none}
+  .utilbar button{padding:0 9px}
+  .lang-toggle button{padding:0 9px}
+}
+
+/* ---------- layout ---------- */
+.page{display:none;padding-top:64px;min-height:100vh}
+.page.active{display:block}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+.band{padding:72px 0}
+.band+.band{border-top:1px solid var(--hairline-soft)}
+.eyebrow{display:inline-block;background:var(--card-elev);color:var(--body-strong);font-size:11px;font-weight:600;letter-spacing:.88px;text-transform:uppercase;border-radius:9999px;padding:5px 12px;margin-bottom:20px}
+h1.mega{color:var(--ink);font-size:clamp(36px,6vw,72px);font-weight:500;line-height:1.05;letter-spacing:-.03em;max-width:900px}
+h2.sec{color:var(--ink);font-size:clamp(28px,4vw,44px);font-weight:500;line-height:1.1;letter-spacing:-.03em;margin-bottom:16px}
+h3.sub{color:var(--ink);font-size:24px;font-weight:500;line-height:1.25;letter-spacing:-.5px;margin:40px 0 12px}
+.lede{font-size:18px;max-width:760px;margin-top:20px}
+p{max-width:760px}
+p+p{margin-top:12px}
+strong{color:var(--body-strong);font-weight:600}
+
+/* ---------- hero ---------- */
+.hero{position:relative;padding:96px 0 72px;overflow:hidden}
+.hero .glow{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);width:900px;height:600px;background:radial-gradient(closest-side,rgba(26,38,255,.28),rgba(26,38,255,.08) 55%,transparent 75%);pointer-events:none}
+.hero .ctas{display:flex;gap:12px;margin-top:32px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;height:40px;padding:0 18px;border-radius:var(--r-md);font-size:14px;font-weight:500;cursor:pointer;border:0;font-family:var(--sans)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:active{background:var(--primary-active)}
+.btn-secondary{background:var(--card-elev);color:var(--body-strong)}
+.term-grid{position:relative;margin-top:56px;background:var(--canvas-deep);border:1px solid var(--hairline);border-radius:var(--r-xl);padding:32px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.term-pane{background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-lg);padding:20px;font-family:var(--mono);font-size:13px;line-height:1.6}
+.term-pane .tp-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;color:var(--ink);font-weight:500}
+.term-pane .led{width:8px;height:8px;border-radius:50%;background:var(--success)}
+.term-pane .c{color:var(--muted)}
+.term-pane .k{color:var(--cyan)}
+.term-pane .b{color:var(--primary-glow)}
+@media(max-width:640px){.term-grid{grid-template-columns:1fr}}
+
+/* ---------- cards ---------- */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:40px}
+@media(max-width:1024px){.grid4{grid-template-columns:repeat(2,1fr)}.grid3{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+@media(max-width:640px){.grid4{grid-template-columns:1fr}}
+.fcard{background:var(--card);border:1px solid var(--hairline-soft);border-radius:var(--r-xl);padding:28px}
+.fcard h4{color:var(--ink);font-size:18px;font-weight:600;margin-bottom:8px;line-height:1.4}
+.fcard p{font-size:14px}
+.tcard{background:var(--card);border:1px solid var(--hairline-soft);border-radius:var(--r-lg);padding:20px}
+.tcard .icon{width:40px;height:40px;border-radius:var(--r-md);background:var(--card-elev);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:500;color:var(--cyan);margin-bottom:14px}
+.tcard h4{color:var(--ink);font-size:16px;font-weight:600;line-height:1.4}
+.tcard p{font-size:13px;margin-top:4px;color:var(--muted)}
+.statrow{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.stat{background:var(--card);border:1px solid var(--hairline-soft);border-radius:var(--r-lg);padding:14px 18px;font-family:var(--mono);font-size:13px}
+.stat b{color:var(--ink);font-weight:500;display:block;font-size:18px;letter-spacing:-.3px}
+
+/* ---------- tables ---------- */
+.tbl{width:100%;border-collapse:collapse;margin-top:24px;font-size:14px;background:var(--card);border:1px solid var(--hairline-soft);border-radius:var(--r-lg);overflow:hidden}
+.tbl th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.88px;text-transform:uppercase;color:var(--muted);padding:12px 16px;border-bottom:1px solid var(--hairline);background:var(--canvas-deep)}
+.tbl td{padding:12px 16px;border-bottom:1px solid var(--hairline-soft);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td:first-child{color:var(--body-strong);font-weight:500}
+.tbl code{background:var(--canvas-deep);border:1px solid var(--hairline-soft);border-radius:4px;padding:1px 6px;color:var(--cyan)}
+.tblwrap{overflow-x:auto}
+.pill-ok{color:var(--success);font-family:var(--mono);font-size:12px}
+.pill-p2{color:var(--cyan);font-family:var(--mono);font-size:12px}
+
+/* ---------- mermaid figures ---------- */
+.fig{margin-top:32px;background:var(--canvas-deep);border:1px solid var(--hairline);border-radius:var(--r-xl);overflow:hidden}
+.fig .fig-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--hairline-soft)}
+.fig .fig-title{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.4px}
+.fig .fig-actions{display:flex;gap:8px}
+.figbtn{background:var(--card-elev);border:0;border-radius:6px;color:var(--body-strong);font-family:var(--sans);font-size:12px;font-weight:500;padding:6px 12px;cursor:pointer}
+.figbtn:hover{background:var(--strong)}
+.fig .fig-body{padding:24px;overflow-x:auto;display:flex;justify-content:center}
+.fig .fig-body svg{max-width:100%;height:auto}
+.fig .cap{padding:0 20px 16px;font-size:13px;color:var(--muted);max-width:none}
+
+/* ---------- viewer modal ---------- */
+.viewer{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.92);display:none;flex-direction:column}
+.viewer.open{display:flex}
+.viewer .vbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--hairline);background:var(--canvas)}
+.viewer .vtitle{font-family:var(--mono);font-size:13px;color:var(--body)}
+.viewer .vtools{display:flex;gap:8px}
+.viewer .vstage{flex:1;overflow:hidden;cursor:grab;position:relative}
+.viewer .vstage.grabbing{cursor:grabbing}
+.viewer .vcanvas{position:absolute;left:50%;top:50%;transform-origin:0 0}
+.viewer .vcanvas svg{display:block}
+.vhint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;color:var(--muted-soft);pointer-events:none}
+
+/* ---------- doc pages ---------- */
+.navdiv{width:1px;height:20px;background:var(--hairline-strong);align-self:center;margin:0 8px;flex-shrink:0}
+.navdrop{position:relative;flex-shrink:0}
+.navdrop>button{background:transparent;border:0;color:var(--muted);font-family:var(--sans);font-size:14px;font-weight:500;padding:7px 12px;border-radius:var(--r-md);cursor:pointer;line-height:1.4;white-space:nowrap}
+.navdrop>button:hover,.navdrop.open>button{color:var(--body-strong);background:var(--card)}
+.navdrop.oncur>button{color:var(--body-strong);background:var(--card-elev)}
+.dropmenu{display:none;position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);min-width:230px;background:var(--strong);border:1px solid var(--hairline-strong);border-radius:var(--r-lg);padding:8px;flex-direction:column;gap:2px;z-index:120}
+.navdrop.open .dropmenu{display:flex}
+.dropmenu a{font-size:14px;font-weight:500;color:var(--muted);padding:8px 12px;border-radius:var(--r-md);white-space:nowrap;line-height:1.4}
+.dropmenu a:hover{color:var(--body-strong);background:var(--card-elev)}
+.dropmenu a.active{color:var(--body-strong);background:var(--card)}
+@media(max-width:1120px){
+  .navdiv{width:100%;height:1px;margin:8px 0}
+  .navdrop{width:100%}
+  .navdrop>button{display:none}
+  .dropmenu{display:flex;position:static;transform:none;background:transparent;border:0;padding:0;min-width:0}
+}
+.docmeta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.docmeta span.tag{background:var(--card-elev);color:var(--body-strong);font-family:var(--mono);font-size:11px;letter-spacing:.4px;border-radius:9999px;padding:5px 12px}
+.decision{background:var(--card);border:1px solid var(--hairline);border-left:3px solid var(--success);border-radius:var(--r-md);padding:18px 22px;margin-top:24px;font-size:15px;max-width:900px}
+.decision b{color:var(--ink)}
+.codeblk{background:var(--canvas-deep);border:1px solid var(--hairline);border-radius:var(--r-lg);padding:20px;margin-top:24px;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--body);overflow-x:auto;white-space:pre}
+.dlink{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:var(--r-md);background:var(--card-elev);color:var(--body-strong);font-size:14px;font-weight:500;margin-top:32px}
+.dlink:hover{background:var(--strong)}
+ul.bul{margin:16px 0 0 20px;max-width:820px;font-size:15px}
+ul.bul li{margin-bottom:8px}
+ul.bul li::marker{color:var(--muted-soft)}
+.dcard{display:block;background:var(--card);border:1px solid var(--hairline-soft);border-radius:var(--r-lg);padding:20px}
+.dcard:hover{background:var(--card-elev);border-color:var(--hairline-strong)}
+.dcard .did{font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:.6px}
+.dcard h4{color:var(--ink);font-size:16px;font-weight:600;line-height:1.4;margin:8px 0 4px}
+.dcard p{font-size:13px;color:var(--muted)}
+.pill-warn{color:#ffb454;font-family:var(--mono);font-size:12px}
+.dlink{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:var(--r-md);background:var(--primary);color:#fff;font-size:14px;font-weight:500;margin-top:8px}
+.dlink:hover{background:var(--primary-active)}
+.deck{display:grid;grid-template-columns:1.05fr .95fr;gap:24px;margin-top:32px;align-items:start}
+@media(max-width:1024px){.deck{grid-template-columns:1fr}}
+.toc{background:var(--card);border:1px solid var(--hairline-soft);border-radius:var(--r-xl);padding:24px 28px}
+.toc h5{font-size:11px;font-weight:600;letter-spacing:.88px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.toc a{display:block;font-size:14px;color:var(--body);padding:6px 0;cursor:pointer;border-bottom:1px solid var(--hairline-soft)}
+.toc a:last-child{border-bottom:0}
+.toc a:hover{color:var(--body-strong)}
+.toc a .n{display:inline-block;min-width:20px;font-family:var(--mono);font-size:12px;color:var(--muted-soft)}
+h3.sub,h4.subsub{scroll-margin-top:96px}
+h4.subsub{color:var(--ink);font-size:18px;font-weight:600;line-height:1.4;margin:32px 0 10px}
+.chk{list-style:none;margin:16px 0 0;max-width:900px;font-size:14.5px}
+.chk li{position:relative;padding-left:30px;margin-bottom:9px}
+.chk li:before{content:"☐";position:absolute;left:0;top:-1px;color:var(--muted-soft);font-family:var(--mono);font-size:15px}
+.chk li.done:before{content:"☑";color:var(--success)}
+.chk .cid{font-family:var(--mono);font-size:12px;color:var(--cyan);margin-right:10px}
+
+/* ---------- callout ---------- */
+.callout{background:var(--card);border:1px solid var(--hairline);border-left:3px solid var(--primary);border-radius:var(--r-md);padding:16px 20px;margin-top:24px;font-size:14px;max-width:820px}
+.callout b{color:var(--ink)}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--hairline-soft);padding:48px 0 64px;margin-top:48px}
+footer .frow{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+footer .mono{color:var(--muted-soft)}
+.cta-band{position:relative;text-align:center;padding:96px 24px;overflow:hidden}
+.cta-band .glow{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:700px;height:400px;background:radial-gradient(closest-side,rgba(26,38,255,.25),transparent 70%);pointer-events:none}
+.cta-band h2{position:relative;color:var(--ink);font-size:clamp(28px,4vw,44px);font-weight:500;letter-spacing:-.03em;line-height:1.1}
+.cta-band p{position:relative;margin:16px auto 0;max-width:640px}
+</style>
+</head>
+<body data-lang="en">
+
+<!-- ================================================================
+     NAV. One entry per page; `data-page` must match a `section.page`
+     id and the PAGES array in the script at the foot of this file.
+     Every visible string carries both languages: .en and .zh.
+     ================================================================ -->
+<nav class="nav">
+  <a class="mark" href="#/en/overview" id="markLink"><svg viewBox="0 0 512 512" aria-hidden="true" fill="currentColor"><path d="M0 0 C21.12 0 42.24 0 64 0 C64.33 9.24 64.66 18.48 65 28 C67.31 28.825 69.62 29.65 72 30.5 C80.67855394 33.70320466 88.83987436 37.66197192 97 42 C98.13824219 42.59296875 99.27648437 43.1859375 100.44921875 43.796875 C114.11283709 51.2237895 126.32645153 60.78564509 138 71 C138.33 53.51 138.66 36.02 139 18 C147.41726708 18 155.23771035 18.11320702 163.5 19.1875 C165.04349121 19.38714355 165.04349121 19.38714355 166.61816406 19.59082031 C209.08178959 25.42223064 247.55036699 43.98420048 278.48925781 73.55664062 C279.51252583 74.53426838 280.54069027 75.50679224 281.57324219 76.47460938 C316.21868127 109.03500379 337.95056536 156.61339058 341 204 C341 209.28 341 214.56 341 220 C319.88 220 298.76 220 277 220 C276.34 213.07 275.68 206.14 275 199 C274.38439297 195.37078182 273.77803562 191.97121696 272.875 188.4375 C272.66327148 187.58655762 272.45154297 186.73561523 272.23339844 185.85888672 C266.69864116 164.72016184 256.75707174 146.80424072 243 130 C242.33226562 129.17757812 241.66453125 128.35515625 240.9765625 127.5078125 C235.93066496 121.55571295 230.17510386 116.74552502 224 112 C223.10023438 111.30777344 222.20046875 110.61554688 221.2734375 109.90234375 C203.20851766 96.39269908 177.88565782 83.53645418 154.625 83.9375 C153.42875 83.958125 152.2325 83.97875 151 84 C151.58265625 84.66902344 152.1653125 85.33804688 152.765625 86.02734375 C185.07129092 123.86967253 203 170.1014647 203 220 C181.88 220 160.76 220 139 220 C138.01 211.75 137.02 203.5 136 195 C129.68082068 166.91475858 117.85438519 144.07221923 98 123 C97.45085937 122.39800781 96.90171875 121.79601562 96.3359375 121.17578125 C86.97145584 111.2807994 75.80572295 104.7461274 64 98 C64 138.26 64 178.52 64 220 C42.88 220 21.76 220 0 220 C0 147.4 0 74.8 0 0 Z" transform="translate(74,141)"/><path d="M0 0 C6.93122125 2.33191353 11.59348712 6.73609933 15 13.15234375 C17.3325015 19.79450622 17.26381755 27.06296996 14.3125 33.5 C10.66303794 39.55276634 5.78715496 43.90906429 -1 46 C-7.43466397 46.85737784 -13.48798557 46.74360867 -19.18359375 43.40234375 C-24.96806721 38.93648145 -29.37878226 33.62316781 -30.37109375 26.23828125 C-30.53935564 18.82486011 -29.62715748 12.97497629 -25 7 C-17.06174054 0.27985277 -10.33089416 -1.10531813 0 0 Z" transform="translate(450,315)"/></svg><span>[PRODUCT] <span style="color:var(--muted-soft)">/</span> <span style="color:var(--muted)">[SECTION]</span></span></a>
+  <div class="links" id="navLinks">
+    <a data-page="overview"><span class="en">Overview</span><span class="ko">개요</span></a>
+    <a data-page="section"><span class="en">[PAGE 2]</span><span class="ko">[페이지 2]</span></a>
+    <a data-page="diagrams"><span class="en">[PAGE 3]</span><span class="ko">[페이지 3]</span></a>
+    <span class="navdiv"></span>
+    <div class="navdrop" id="navDrop">
+      <button onclick="toggleDocs(event)"><span class="en">Documents ▾</span><span class="ko">문서 ▾</span></button>
+      <div class="dropmenu">
+        <a data-page="doc1"><span class="en">[DOC-001 · TITLE]</span><span class="ko">[DOC-001 · 제목]</span></a>
+      </div>
+    </div>
+  </div>
+  <!-- Intake-driven controls, in one segmented cluster so the nav's right
+       side reads as a single object. Each is guarded in the script, so
+       deleting one here is the supported way to switch that answer off. -->
+  <div class="utilbar">
+    <button id="btnTheme" title="Theme" aria-label="Theme">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg>
+    </button>
+    <button id="btnPdf" title="Download as PDF">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9.5V4h10v5.5M7 18H5.2v-6h13.6v6H17M8.4 15h7.2v5H8.4z"/></svg>
+      <span>PDF</span>
+    </button>
+    <button id="btnHtml" title="Download the HTML">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 3.6-3.6M12 15l-3.6-3.6M5 19h14"/></svg>
+      <span>HTML</span>
+    </button>
+  </div>
+  <div class="lang-toggle">
+    <button id="btnEn" onclick="setLang('en')">EN</button>
+    <button id="btnKo" onclick="setLang('ko')">한국어</button>
+  </div>
+  <button class="burger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</nav>
+
+<!-- ================= PAGE 1: OVERVIEW ================= -->
+<section class="page" id="page-overview">
+
+  <div class="hero"><div class="wrap">
+    <div class="glow"></div>
+    <span class="eyebrow"><span class="en">[EYEBROW]</span><span class="ko">[레이블]</span></span>
+    <h1 class="mega"><span class="en">[THE ONE-SENTENCE CLAIM THIS DOCUMENT MAKES.]</span><span class="ko">[이 문서가 말하려는 한 문장.]</span></h1>
+    <p class="lede"><span class="en">[Two or three sentences of support. What this covers, who it is for, and what a reader should be able to decide after reading it.]</span><span class="ko">[두세 문장의 보충 설명.]</span></p>
+    <div class="ctas">
+      <button class="btn btn-primary" onclick="go('section')"><span class="en">[PRIMARY ACTION]</span><span class="ko">[주요 동작]</span></button>
+      <button class="btn btn-secondary" onclick="go('doc1')"><span class="en">[SECONDARY]</span><span class="ko">[보조]</span></button>
+    </div>
+
+    <!-- Terminal panes. Delete the whole .term-grid if the document has no
+         command-line story to tell; do not fill it with decoration. -->
+    <div class="term-grid">
+      <div class="term-pane">
+        <div class="tp-head"><span class="led"></span><span>[PANE 1 TITLE]</span></div>
+        <div><span class="c"># [comment]</span><br><span class="k">[command]</span> [argument]<br><span class="b">[output line]</span></div>
+      </div>
+      <div class="term-pane">
+        <div class="tp-head"><span class="led"></span><span>[PANE 2 TITLE]</span></div>
+        <div><span class="c"># [comment]</span><br><span class="k">[command]</span> [argument]<br><span class="b">[output line]</span></div>
+      </div>
+    </div>
+
+    <div class="statrow">
+      <div class="stat"><b>[VALUE]</b><span class="en">[label]</span><span class="ko">[레이블]</span></div>
+      <div class="stat"><b>[VALUE]</b><span class="en">[label]</span><span class="ko">[레이블]</span></div>
+      <div class="stat"><b>[VALUE]</b><span class="en">[label]</span><span class="ko">[레이블]</span></div>
+    </div>
+  </div></div>
+
+  <div class="band"><div class="wrap">
+    <h2 class="sec"><span class="en">[SECTION HEADLINE AS A SENTENCE.]</span><span class="ko">[섹션 제목.]</span></h2>
+    <p><span class="en">[Supporting paragraph.]</span><span class="ko">[보충 문단.]</span></p>
+    <div class="grid3">
+      <div class="fcard">
+        <h4><span class="en">[CARD 1]</span><span class="ko">[카드 1]</span></h4>
+        <p><span class="en">[What it is, in one or two sentences.]</span><span class="ko">[설명.]</span></p>
+      </div>
+      <div class="fcard">
+        <h4><span class="en">[CARD 2]</span><span class="ko">[카드 2]</span></h4>
+        <p><span class="en">[What it is.]</span><span class="ko">[설명.]</span></p>
+      </div>
+      <div class="fcard">
+        <h4><span class="en">[CARD 3]</span><span class="ko">[카드 3]</span></h4>
+        <p><span class="en">[What it is.]</span><span class="ko">[설명.]</span></p>
+      </div>
+    </div>
+  </div></div>
+
+  <footer><div class="wrap"><div class="frow">
+    <div><span class="en">[DOC TITLE] · [SUBTITLE]</span><span class="ko">[문서 제목] · [부제]</span></div>
+    <div class="mono">[OWNER] · [YYYY-MM]</div>
+  </div></div></footer>
+</section>
+
+<!-- ================= PAGE 2: CARDS, TABLE, CALLOUT ================= -->
+<section class="page" id="page-section">
+  <div class="band"><div class="wrap">
+    <span class="eyebrow"><span class="en">[EYEBROW]</span><span class="ko">[레이블]</span></span>
+    <h2 class="sec"><span class="en">[HEADLINE.]</span><span class="ko">[제목.]</span></h2>
+    <p class="lede"><span class="en">[Lede.]</span><span class="ko">[리드 문장.]</span></p>
+
+    <div class="grid4">
+      <div class="tcard">
+        <div class="icon">[AB]</div>
+        <h4>[NAME]</h4>
+        <p><span class="en">[role]</span><span class="ko">[역할]</span></p>
+      </div>
+      <div class="tcard">
+        <div class="icon">[CD]</div>
+        <h4>[NAME]</h4>
+        <p><span class="en">[role]</span><span class="ko">[역할]</span></p>
+      </div>
+      <div class="tcard">
+        <div class="icon">[EF]</div>
+        <h4>[NAME]</h4>
+        <p><span class="en">[role]</span><span class="ko">[역할]</span></p>
+      </div>
+      <div class="tcard">
+        <div class="icon">[GH]</div>
+        <h4>[NAME]</h4>
+        <p><span class="en">[role]</span><span class="ko">[역할]</span></p>
+      </div>
+    </div>
+
+    <h3 class="sub" id="s-table"><span class="en">[SUBSECTION]</span><span class="ko">[하위 섹션]</span></h3>
+    <div class="tblwrap"><table class="tbl">
+      <thead><tr>
+        <th><span class="en">[COLUMN]</span><span class="ko">[열]</span></th>
+        <th><span class="en">[COLUMN]</span><span class="ko">[열]</span></th>
+        <th><span class="en">Status</span><span class="ko">상태</span></th>
+      </tr></thead>
+      <tbody>
+        <tr><td>[ROW]</td><td><code>[value]</code></td><td><span class="pill-ok">[ok]</span></td></tr>
+        <tr><td>[ROW]</td><td><code>[value]</code></td><td><span class="pill-p2">[phase 2]</span></td></tr>
+        <tr><td>[ROW]</td><td><code>[value]</code></td><td><span class="pill-warn">[at risk]</span></td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="callout"><b><span class="en">[Callout heading.]</span><span class="ko">[콜아웃 제목.]</span></b>
+      <span class="en">[The qualification a reader needs so they do not misread the table above.]</span><span class="ko">[오해를 막는 보충 설명.]</span></div>
+  </div></div>
+</section>
+
+<!-- ================= PAGE 3: DIAGRAMS =================
+     Each .fig needs a unique data-fig id, a matching #fig-ID body, and a
+     script.mmd holding the mermaid source. Diagrams render lazily on first
+     visit to the page and are cached for the fullscreen viewer.
+     ==================================================== -->
+<section class="page" id="page-diagrams">
+  <div class="band"><div class="wrap">
+    <span class="eyebrow"><span class="en">[EYEBROW]</span><span class="ko">[레이블]</span></span>
+    <h2 class="sec"><span class="en">[HEADLINE.]</span><span class="ko">[제목.]</span></h2>
+
+    <div class="fig" data-fig="f1">
+      <div class="fig-bar">
+        <span class="fig-title">[FIG 1 · CAPTION]</span>
+        <div class="fig-actions"><button class="figbtn" onclick="openViewer('f1')"><span class="en">Expand</span><span class="ko">확대</span></button></div>
+      </div>
+      <div class="fig-body" id="fig-f1"></div>
+      <div class="cap"><span class="en">[What the reader should take from this diagram.]</span><span class="ko">[그림 설명.]</span></div>
+      <script type="text/plain" class="mmd">flowchart LR
+  A["[NODE A]"] --> B["[NODE B]"]
+  B --> C["[NODE C]"]</script>
+    </div>
+
+    <div class="fig" data-fig="f2">
+      <div class="fig-bar">
+        <span class="fig-title">[FIG 2 · CAPTION]</span>
+        <div class="fig-actions"><button class="figbtn" onclick="openViewer('f2')"><span class="en">Expand</span><span class="ko">확대</span></button></div>
+      </div>
+      <div class="fig-body" id="fig-f2"></div>
+      <div class="cap"><span class="en">[Caption.]</span><span class="ko">[그림 설명.]</span></div>
+      <script type="text/plain" class="mmd">stateDiagram-v2
+  [*] --> Draft
+  Draft --> Review
+  Review --> [*]</script>
+    </div>
+  </div></div>
+</section>
+
+<!-- ================= PAGE 4: DOCUMENT / DECISION RECORD ================= -->
+<section class="page" id="page-doc1">
+  <div class="band"><div class="wrap">
+    <div class="docmeta">
+      <span class="tag">[DOC-001]</span>
+      <span class="tag">[STATUS]</span>
+      <span class="tag">[YYYY-MM-DD]</span>
+    </div>
+    <h2 class="sec"><span class="en">[DECISION TITLE.]</span><span class="ko">[결정 제목.]</span></h2>
+
+    <div class="deck">
+      <div>
+        <p class="lede"><span class="en">[The question this document answers.]</span><span class="ko">[이 문서가 답하는 질문.]</span></p>
+        <div class="decision"><b><span class="en">Decision.</span><span class="ko">결정.</span></b>
+          <span class="en">[What was decided, in one sentence.]</span><span class="ko">[결정 내용, 한 문장으로.]</span></div>
+      </div>
+      <div class="toc">
+        <h5><span class="en">On this page</span><span class="ko">이 페이지 목차</span></h5>
+        <a onclick="jump('d-context')"><span class="n">01</span><span class="en">[Context]</span><span class="ko">[배경]</span></a>
+        <a onclick="jump('d-options')"><span class="n">02</span><span class="en">[Options]</span><span class="ko">[선택지]</span></a>
+        <a onclick="jump('d-consequences')"><span class="n">03</span><span class="en">[Consequences]</span><span class="ko">[결과]</span></a>
+      </div>
+    </div>
+
+    <h3 class="sub" id="d-context"><span class="en">[Context]</span><span class="ko">[배경]</span></h3>
+    <p><span class="en">[Why this needed deciding.]</span><span class="ko">[설명.]</span></p>
+
+    <h3 class="sub" id="d-options"><span class="en">[Options]</span><span class="ko">[선택지]</span></h3>
+    <ul class="bul">
+      <li><span class="en"><strong>[Option A.]</strong> [Why it was or was not chosen.]</span><span class="ko"><strong>[선택지 A.]</strong>[설명.]</span></li>
+      <li><span class="en"><strong>[Option B.]</strong> [Why.]</span><span class="ko"><strong>[선택지 B.]</strong>[설명.]</span></li>
+    </ul>
+
+    <h4 class="subsub"><span class="en">[Sub-point]</span><span class="ko">[소제목]</span></h4>
+    <div class="codeblk">[command or configuration]
+[second line]</div>
+
+    <h3 class="sub" id="d-consequences"><span class="en">[Consequences]</span><span class="ko">[결과]</span></h3>
+    <ul class="chk">
+      <li class="done"><span class="cid">[C-01]</span><span class="en">[Something already true.]</span><span class="ko">[이미 완료된 항목.]</span></li>
+      <li><span class="cid">[C-02]</span><span class="en">[Something still outstanding.]</span><span class="ko">[아직 남은 항목.]</span></li>
+    </ul>
+
+    <div class="grid2">
+      <a class="dcard" onclick="go('doc1')">
+        <span class="did">[DOC-002]</span>
+        <h4><span class="en">[Related document]</span><span class="ko">[관련 문서]</span></h4>
+        <p><span class="en">[One line on what it covers.]</span><span class="ko">[설명.]</span></p>
+      </a>
+      <a class="dcard" onclick="go('overview')">
+        <span class="did">[INDEX]</span>
+        <h4><span class="en">[Back to overview]</span><span class="ko">[개요로 돌아가기]</span></h4>
+        <p><span class="en">[One line.]</span><span class="ko">[설명.]</span></p>
+      </a>
+    </div>
+  </div></div>
+
+  <div class="cta-band">
+    <div class="glow"></div>
+    <h2><span class="en">[CLOSING LINE.]</span><span class="ko">[맺음말.]</span></h2>
+    <p><span class="en">[One sentence on what happens next.]</span><span class="ko">[다음 단계.]</span></p>
+  </div>
+</section>
+
+<div class="viewer" id="viewer">
+  <div class="vbar">
+    <span class="vtitle" id="vtitle">diagram</span>
+    <div class="vtools">
+      <button class="figbtn" onclick="vzoom(1.25)">＋</button>
+      <button class="figbtn" onclick="vzoom(0.8)">－</button>
+      <button class="figbtn" onclick="vfit()"><span class="en">Fit</span><span class="ko">화면 맞춤</span></button>
+      <button class="figbtn" onclick="vnative()"><span class="en">⛶ Native</span><span class="ko">⛶ 전체화면</span></button>
+      <button class="figbtn" onclick="closeViewer()"><span class="en">✕ Close</span><span class="ko">✕ 닫기</span></button>
+    </div>
+  </div>
+  <div class="vstage" id="vstage"><div class="vcanvas" id="vcanvas"></div><div class="vhint"><span class="en">drag to pan · scroll to zoom · Esc to close</span><span class="ko">드래그로 이동 · 스크롤로 확대 · Esc로 닫기</span></div></div>
+</div>
+
+
+<script>
+/* ---------- mermaid init ---------- */
+/* Mermaid renders to a fixed palette chosen at init, so a theme toggle has to
+   re-initialise it and re-render. Both palettes live here; nothing else in the
+   document needs to know which one is active. */
+var MERMAID_DARK = {
+  background:'transparent', primaryColor:'#181818', primaryTextColor:'#ffffff', primaryBorderColor:'#333333',
+  secondaryColor:'#181818', tertiaryColor:'#0f0f0f', lineColor:'#888888', textColor:'#a8a8a8',
+  clusterBkg:'transparent', clusterBorder:'#333333', edgeLabelBackground:'#0f0f0f',
+  nodeTextColor:'#ffffff', mainBkg:'#181818', titleColor:'#ffffff',
+  actorBkg:'#181818', actorBorder:'#333333', actorTextColor:'#ffffff', signalColor:'#888888', signalTextColor:'#a8a8a8',
+  labelBoxBkgColor:'#181818', labelBoxBorderColor:'#333333', labelTextColor:'#ffffff', loopTextColor:'#a8a8a8',
+  noteBkgColor:'#222222', noteTextColor:'#ffffff', noteBorderColor:'#333333',
+  taskBkgColor:'#0007cd', taskBorderColor:'#1a26ff', taskTextColor:'#ffffff', taskTextLightColor:'#ffffff',
+  activeTaskBkgColor:'#0007cd', activeTaskBorderColor:'#1a26ff', gridColor:'#222222', sectionBkgColor:'transparent',
+  altSectionBkgColor:'transparent', sectionBkgColor2:'transparent', todayLineColor:'#00d4ff',
+  transitionColor:'#888888', stateLabelColor:'#ffffff', stateBkg:'#181818', compositeBackground:'#0f0f0f',
+  compositeTitleBackground:'#181818', innerEndBackground:'#333333', specialStateColor:'#888888'
+};
+var MERMAID_LIGHT = {
+  background:'transparent', primaryColor:'#ffffff', primaryTextColor:'#0b0d12', primaryBorderColor:'#d3d8e0',
+  secondaryColor:'#f5f6f8', tertiaryColor:'#fbfbfc', lineColor:'#7c8494', textColor:'#3a4150',
+  clusterBkg:'transparent', clusterBorder:'#d3d8e0', edgeLabelBackground:'#fbfbfc',
+  nodeTextColor:'#0b0d12', mainBkg:'#ffffff', titleColor:'#0b0d12',
+  actorBkg:'#ffffff', actorBorder:'#d3d8e0', actorTextColor:'#0b0d12', signalColor:'#7c8494', signalTextColor:'#3a4150',
+  labelBoxBkgColor:'#ffffff', labelBoxBorderColor:'#d3d8e0', labelTextColor:'#0b0d12', loopTextColor:'#3a4150',
+  noteBkgColor:'#f0f1f4', noteTextColor:'#0b0d12', noteBorderColor:'#d3d8e0',
+  taskBkgColor:'#0007cd', taskBorderColor:'#1a26ff', taskTextColor:'#ffffff', taskTextLightColor:'#0b0d12',
+  activeTaskBkgColor:'#0007cd', activeTaskBorderColor:'#1a26ff', gridColor:'#e3e6eb', sectionBkgColor:'transparent',
+  altSectionBkgColor:'transparent', sectionBkgColor2:'transparent', todayLineColor:'#0b6a86',
+  transitionColor:'#7c8494', stateLabelColor:'#0b0d12', stateBkg:'#ffffff', compositeBackground:'#fbfbfc',
+  compositeTitleBackground:'#f5f6f8', innerEndBackground:'#d3d8e0', specialStateColor:'#7c8494'
+};
+
+function initMermaid(mode){
+  mermaid.initialize({
+    startOnLoad:false, securityLevel:'loose', theme:'base',
+    fontFamily:"'Inter','Noto Sans KR',sans-serif",
+    themeVariables: mode === 'light' ? MERMAID_LIGHT : MERMAID_DARK,
+    gantt:{barHeight:24, barGap:6, topPadding:48, leftPadding:120, fontSize:12}
+  });
+}
+initMermaid(document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
+
+var rendered = {};
+var svgCache = {};
+function renderFigsIn(pageEl){
+  var figs = pageEl.querySelectorAll('.fig');
+  figs.forEach(function(f){
+    var id = f.getAttribute('data-fig');
+    if(rendered[id]) return;
+    rendered[id] = true;
+    var src = f.querySelector('.mmd').textContent;
+    mermaid.render('mmd-'+id, src).then(function(out){
+      svgCache[id] = out.svg;
+      document.getElementById('fig-'+id).innerHTML = out.svg;
+    }).catch(function(e){
+      document.getElementById('fig-'+id).innerHTML = '<pre style="color:#ff4d4d;font-size:12px">'+String(e)+'</pre>';
+    });
+  });
+}
+
+/* ---------- routing: #/{lang}/{page} ---------- */
+var PAGES = ['overview','section','diagrams','doc1'];
+function parseHash(){
+  var m = location.hash.match(/^#\/(en|ko)\/([a-z0-9]+)/);
+  return { lang: m ? m[1] : 'en', page: (m && PAGES.indexOf(m[2])>=0) ? m[2] : 'overview' };
+}
+function apply(){
+  var s = parseHash();
+  document.body.setAttribute('data-lang', s.lang);
+  document.getElementById('btnEn').classList.toggle('active', s.lang==='en');
+  document.getElementById('btnKo').classList.toggle('active', s.lang==='ko');
+  document.documentElement.lang = s.lang==='ko' ? 'ko' : 'en';
+  PAGES.forEach(function(p){
+    var el = document.getElementById('page-'+p);
+    var on = p===s.page;
+    el.classList.toggle('active', on);
+    if(on) renderFigsIn(el);
+  });
+  document.querySelectorAll('#navLinks a').forEach(function(a){
+    a.classList.toggle('active', a.getAttribute('data-page')===s.page);
+    a.href = '#/'+s.lang+'/'+a.getAttribute('data-page');
+  });
+  document.getElementById('markLink').href = '#/'+s.lang+'/overview';
+  var drop = document.getElementById('navDrop');
+  drop.classList.remove('open');
+  drop.classList.toggle('oncur', ['doc1'].indexOf(s.page)>=0);
+  document.getElementById('navLinks').classList.remove('open');
+  window.scrollTo(0,0);
+}
+function jump(id){
+  var el = document.getElementById(id);
+  if(!el) return;
+  window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 88, behavior:'smooth' });
+}
+function toggleDocs(e){ e.stopPropagation(); document.getElementById('navDrop').classList.toggle('open'); }
+document.addEventListener('click', function(e){
+  var d = document.getElementById('navDrop');
+  if(d && !d.contains(e.target)) d.classList.remove('open');
+});
+function setLang(l){ var s = parseHash(); location.hash = '#/'+l+'/'+s.page; }
+function go(p){ var s = parseHash(); location.hash = '#/'+s.lang+'/'+p; }
+window.addEventListener('hashchange', apply);
+if(!location.hash) location.hash = '#/en/overview';
+apply();
+
+/* ---------- fullscreen viewer ---------- */
+var vScale=1, vX=0, vY=0, vDrag=null;
+function openViewer(id){
+  if(!svgCache[id]) return;
+  var v = document.getElementById('viewer');
+  document.getElementById('vcanvas').innerHTML = svgCache[id];
+  document.getElementById('vtitle').textContent = document.querySelector('[data-fig="'+id+'"] .fig-title').textContent;
+  v.classList.add('open');
+  document.body.style.overflow='hidden';
+  requestAnimationFrame(vfit);
+}
+function closeViewer(){
+  document.getElementById('viewer').classList.remove('open');
+  document.body.style.overflow='';
+  if(document.fullscreenElement) document.exitFullscreen();
+}
+function vApply(){
+  document.getElementById('vcanvas').style.transform = 'translate('+vX+'px,'+vY+'px) scale('+vScale+')';
+}
+function vfit(){
+  var stage = document.getElementById('vstage');
+  var svg = document.querySelector('#vcanvas svg');
+  if(!svg) return;
+  var sw = svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width ? svg.viewBox.baseVal.width : svg.getBoundingClientRect().width/vScale;
+  var sh = svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.height ? svg.viewBox.baseVal.height : svg.getBoundingClientRect().height/vScale;
+  svg.style.width = sw+'px'; svg.style.height = sh+'px'; svg.style.maxWidth='none';
+  var pad = 48;
+  vScale = Math.min((stage.clientWidth-pad)/sw, (stage.clientHeight-pad)/sh, 2.5);
+  if(vScale<=0||!isFinite(vScale)) vScale=1;
+  vX = -sw*vScale/2; vY = -sh*vScale/2;
+  vApply();
+}
+function vzoom(f){
+  vScale = Math.min(Math.max(vScale*f, .1), 8);
+  vApply();
+}
+function vnative(){
+  var v = document.getElementById('viewer');
+  if(!document.fullscreenElement){ if(v.requestFullscreen) v.requestFullscreen(); }
+  else document.exitFullscreen();
+}
+(function(){
+  var stage = document.getElementById('vstage');
+  stage.addEventListener('pointerdown', function(e){ vDrag={x:e.clientX,y:e.clientY,ox:vX,oy:vY}; stage.classList.add('grabbing'); stage.setPointerCapture(e.pointerId); });
+  stage.addEventListener('pointermove', function(e){ if(!vDrag) return; vX=vDrag.ox+(e.clientX-vDrag.x); vY=vDrag.oy+(e.clientY-vDrag.y); vApply(); });
+  stage.addEventListener('pointerup', function(){ vDrag=null; stage.classList.remove('grabbing'); });
+  stage.addEventListener('wheel', function(e){
+    e.preventDefault();
+    var f = e.deltaY<0 ? 1.12 : 0.89;
+    var r = stage.getBoundingClientRect();
+    var cx = e.clientX-r.left-r.width/2, cy = e.clientY-r.top-r.height/2;
+    vX = cx-(cx-vX)*f; vY = cy-(cy-vY)*f;
+    vScale = Math.min(Math.max(vScale*f,.1),8);
+    vApply();
+  }, {passive:false});
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeViewer(); });
+})();
+
+/* ---------- intake-driven controls ----------
+   Theme, PDF, and self-download. Separate from the routing above so it
+   cannot disturb it; every control is optional and guarded. */
+(function () {
+  var root = document.documentElement;
+  var KEY = 'monomind-doc-theme';
+  var tBtn = document.getElementById('btnTheme');
+
+  function applyTheme(t) {
+    if (t === 'light') { root.setAttribute('data-theme', 'light'); }
+    else { root.removeAttribute('data-theme'); }
+    /* The control is an icon, so the affordance lives in its label rather than
+       visible text: announce the theme it switches TO. */
+    if (tBtn) {
+      var next = t === 'light' ? 'dark' : 'light';
+      tBtn.setAttribute('title', next === 'dark' ? 'Switch to dark' : 'Switch to light');
+      tBtn.setAttribute('aria-label', next === 'dark' ? 'Switch to dark theme' : 'Switch to light theme');
+    }
+  }
+  if (tBtn) {
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    applyTheme(saved || (root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'));
+    tBtn.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      applyTheme(next);
+      try { localStorage.setItem(KEY, next); } catch (e) {}
+      /* Re-theme the diagrams: they are SVG already painted with the old
+         palette, so they have to be thrown away and drawn again. */
+      initMermaid(next);
+      rendered = {}; svgCache = {};
+      var active = document.querySelector('.page.active');
+      if (active) { renderFigsIn(active); }
+    });
+  }
+
+  var pBtn = document.getElementById('btnPdf');
+  if (pBtn) { pBtn.addEventListener('click', function () { window.print(); }); }
+
+  var hBtn = document.getElementById('btnHtml');
+  if (hBtn) {
+    hBtn.addEventListener('click', function () {
+      /* Rendered diagram SVGs are dropped so the saved copy re-renders them
+         from the mermaid source it already carries, exactly like the original. */
+      var clone = document.documentElement.cloneNode(true);
+      clone.querySelectorAll('.fig-body').forEach(function (b) { b.innerHTML = ''; });
+      var v = clone.querySelector('#vcanvas'); if (v) { v.innerHTML = ''; }
+      var vw = clone.querySelector('#viewer'); if (vw) { vw.classList.remove('open'); }
+      var name = (document.title || 'document').trim().replace(/[^\w.-]+/g, '-').toLowerCase();
+      var blob = new Blob(['<!doctype html>\n', clone.outerHTML], { type: 'text/html' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = name + '.html';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    });
+  }
+})();
+</script>
+</body>
+</html>

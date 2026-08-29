@@ -1,0 +1,3 @@
+[submodule "vendor/slides-ai-plugin"]
+	path = vendor/slides-ai-plugin
+	url = https://github.com/proyecto26/slides-ai-plugin.git

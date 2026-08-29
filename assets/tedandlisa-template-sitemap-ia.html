@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[DOCUMENT NAME] · [PROJECT] sitemap and IA proposal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<style>
+:root{
+  --primary:#0007cd; --primary-active:#0005a3; --primary-glow:#1a26ff;
+  --ink:#ffffff; --body:#a8a8a8; --body-strong:#ffffff; --muted:#888888; --muted-soft:#666666;
+  --hairline:#222222; --hairline-soft:#1a1a1a; --hairline-strong:#333333;
+  --canvas:#0f0f0f; --canvas-deep:#000000; --card:#181818; --card-elev:#222222; --strong:#2a2a2a;
+  --cyan:#00d4ff; --violet:#7b3aed; --success:#33d17a; --error:#ff4d4d;
+  --sans:'Inter','Noto Sans TC',ui-sans-serif,system-ui,sans-serif;
+  --mono:'JetBrains Mono','Fira Code',monospace;
+  --r-md:8px; --r-lg:12px; --r-xl:16px;
+}
+/* ---------- light theme ----------
+   Set by the intake answer `theme`. Only the palette changes; every rule
+   below consumes these variables, so nothing else needs touching.
+   theme: dark   -> delete this block and the nav toggle.
+   theme: light  -> put data-theme="light" on <html> and drop the toggle.
+   theme: toggle -> keep both; the choice persists to localStorage.
+   Diagram surfaces stay dark on purpose: mermaid renders to a fixed
+   palette configured at init, and a dark figure card on a light page
+   reads as deliberate rather than broken. */
+html[data-theme="light"]{
+  --ink:#0b0d12; --body:#4a5061; --body-strong:#0b0d12; --muted:#6b7280; --muted-soft:#9aa1ae;
+  --hairline:#e3e6eb; --hairline-soft:#eceef2; --hairline-strong:#d3d8e0;
+  --canvas:#ffffff; --canvas-deep:#f7f8fa; --card:#f5f6f8; --card-elev:#e9ebef; --strong:#dfe3e8;
+}
+html[data-theme="light"] .nav{background:rgba(255,255,255,.92)}
+/* Contrast repairs for light ground, measured rather than eyeballed:
+   --muted/--muted-soft are tuned for a near-black canvas and land at 2.4-4.5:1
+   on white, and --cyan (#00d4ff) is 1.77:1 there. Cyan stays untouched as a
+   token because the dark surfaces below still use it correctly. */
+html[data-theme="light"]{--muted:#656c7a; --muted-soft:#767d8b}
+html[data-theme="light"] .chk .cid,
+html[data-theme="light"] .dcard .did,
+html[data-theme="light"] .tbl code,
+html[data-theme="light"] .tcard .icon{color:#0b6a86}
+html[data-theme="light"] .pill-p2{color:#0b6a86}
+/* These sit on the figure/terminal cards, which stay dark on purpose. */
+/* Both are small text on light ground, so they take --muted rather than the
+   dimmer --muted-soft; the size and weight still carry the hierarchy. */
+html[data-theme="light"] .toc a .n,
+html[data-theme="light"] footer .mono{color:var(--muted)}
+html[data-theme="light"] .lang-toggle button.active,
+html[data-theme="light"] .btn-primary{color:#fff}
+/* Figures, terminals, and code blocks follow the theme like everything else.
+   Leaving them near-black on a white page read as unfinished rather than
+   deliberate. Mermaid is re-themed in the script and re-rendered on toggle. */
+html[data-theme="light"] .term-pane,
+html[data-theme="light"] .fig,
+html[data-theme="light"] .codeblk{background:#fbfbfc;border-color:#e3e6eb;color:#3a4150}
+html[data-theme="light"] .fig .fig-bar{border-color:#eceef2;background:#f5f6f8}
+html[data-theme="light"] .term-pane .tp-head{color:#0b0d12}
+html[data-theme="light"] .term-pane .c{color:#7c8494}
+html[data-theme="light"] .term-pane .k{color:#0b6a86}
+html[data-theme="light"] .term-pane .b{color:#0007cd}
+html[data-theme="light"] .fig .fig-title,
+html[data-theme="light"] .fig .cap{color:#656c7a}
+html[data-theme="light"] .term-grid{background:#f0f1f4;border-color:#e3e6eb}
+
+/* ---------- print / PDF ----------
+   The reader's own print-to-PDF. Only the open page prints, which matches
+   what they are looking at. Delete if the intake said no PDF. */
+@media print{
+  .nav,.viewer,.burger,.lang-toggle,.figbtn,.ctas{display:none!important}
+  .page{display:none!important;padding-top:0}
+  .page.active{display:block!important}
+  .band{padding:28px 0;break-inside:avoid}
+  .fig,.tbl,.callout,.decision{break-inside:avoid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{margin:14mm}
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--canvas);color:var(--body);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body[data-lang="zh"]{font-family:'Noto Sans TC','Inter',ui-sans-serif,system-ui,sans-serif}
+body[data-lang="en"] .zh{display:none!important}
+body[data-lang="zh"] .en{display:none!important}
+a{color:var(--body-strong);text-decoration:none}
+code,.mono{font-family:var(--mono);font-size:13px}
+::selection{background:var(--primary);color:#fff}
+
+/* ---------- top nav ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;background:rgba(15,15,15,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--hairline-soft);display:flex;align-items:center;gap:16px;padding:0 20px}
+.nav .mark{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.2px;white-space:nowrap}
+.nav .mark svg{width:19px;height:19px;flex:none;color:var(--ink)}
+.nav .links{display:flex;gap:4px;flex:1;justify-content:center;overflow:visible;scrollbar-width:none}
+.nav .links::-webkit-scrollbar{display:none}
+.nav .links a{font-size:14px;font-weight:500;color:var(--muted);padding:7px 12px;border-radius:var(--r-md);white-space:nowrap;line-height:1.4}
+.nav .links a:hover{color:var(--body-strong);background:var(--card)}
+.nav .links a.active{color:var(--body-strong);background:var(--card-elev)}
+.utilbar{display:flex;align-items:stretch;border:1px solid var(--hairline-strong);
+  border-radius:var(--r-md);overflow:hidden;flex-shrink:0}
+.utilbar button{display:inline-flex;align-items:center;gap:6px;background:transparent;border:0;
+  border-right:1px solid var(--hairline-strong);color:var(--muted);font-family:var(--sans);
+  font-size:12px;font-weight:500;letter-spacing:.02em;padding:0 10px;height:34px;cursor:pointer;
+  transition:background .15s,color .15s}
+.utilbar button:last-child{border-right:0}
+.utilbar button:hover{background:var(--card);color:var(--body-strong)}
+.utilbar button:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--primary)}
+.utilbar svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round;flex:none}
+.lang-toggle{display:flex;border:1px solid var(--hairline-strong);border-radius:var(--r-md);overflow:hidden;flex-shrink:0}
+.lang-toggle button{background:transparent;border:0;color:var(--muted);font-family:var(--sans);
+  font-size:12px;font-weight:500;padding:0 12px;height:34px;cursor:pointer;line-height:1;
+  transition:background .15s,color .15s}
+.lang-toggle button:hover:not(.active){background:var(--card);color:var(--body-strong)}
+.lang-toggle button.active{background:var(--primary);color:#fff}
+.burger{display:none;background:transparent;border:1px solid var(--hairline-strong);border-radius:var(--r-md);color:var(--ink);width:40px;height:40px;font-size:16px;cursor:pointer;flex-shrink:0}
+@media(max-width:1120px){
+  .nav .links{position:fixed;top:64px;left:0;right:0;background:var(--canvas);border-bottom:1px solid var(--hairline);flex-direction:column;padding:12px;display:none;max-height:calc(100vh - 64px);overflow-y:auto}
+  .nav .links.open{display:flex}
+  .burger{display:block}
+}
+/* ---------- narrow-screen nav (added for this document) ----------
+   The shipped nav assumes a wide viewport: the mark's text, a three-button
+   utilbar, the language pair and the burger all share one 64px row. Below
+   roughly 560px that row overruns the viewport and pushes the burger — the
+   only way into the navigation on a phone — off screen entirely. Below 640px
+   the mark falls back to its logo and the utilbar to its icons. Nothing is
+   removed: every control the intake asked for stays reachable. */
+/* ---------- reduced motion (added for this document) ----------
+   Only travel is removed, never feedback: the smooth scroll goes, the colour
+   transitions on the nav controls stay, because they signal state rather than
+   move anything. The matching override for the script's own smooth jump()
+   sits in the added script block at the foot of the file. */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+}
+
+@media(max-width:640px){
+  .nav{gap:10px;padding:0 14px}
+  .nav .mark>span{display:none}
+  .utilbar button>span{display:none}
+  .utilbar button{padding:0 9px}
+  .lang-toggle button{padding:0 9px}
+}
+
+/* ---------- layout ---------- */
+.page{display:none;padding-top:64px;min-height:100vh}
+.page.active{display:block}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+.band{padding:72px 0}
+.band+.band{border-top:1px solid var(--hairline-soft)}
+.eyebrow{display:inline-block;background:var(--card-elev);color:var(--body-strong);font-size:11px;font-weight:600;letter-spacing:.88px;text-transform:uppercase;border-radius:9999px;padding:5px 12px;margin-bottom:20px}
+h1.mega{color:var(--ink);font-size:clamp(36px,6vw,72px);font-weight:500;line-height:1.05;letter-spacing:-.03em;max-width:900px}
+h2.sec{color:var(--ink);font-size:clamp(28px,4vw,44px);font-weight:500;line-height:1.1;letter-spacing:-.03em;margin-bottom:16px}
+h3.sub{color:var(--ink);font-size:24px;font-weight:500;line-height:1.25;letter-spacing:-.5px;margin:40px 0 12px}
+.lede{font-size:18px;max-width:760px;margin-top:20px}
+p{max-width:760px}
+p+p{margin-top:12px}
+strong{color:var(--body-strong);font-weight:600}
+
+/* ---------- hero ---------- */
+.hero{position:relative;padding:96px 0 72px;overflow:hidden}
+.hero .glow{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);width:900px;height:600px;background:radial-gradient(closest-side,rgba(26,38,255,.28),rgba(26,38,255,.08) 55%,transparent 75%);pointer-events:none}
+.hero .ctas{display:flex;gap:12px;margin-top:32px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;height:40px;padding:0 18px;border-radius:var(--r-md);font-size:14px;font-weight:500;cursor:pointer;border:0;font-family:var(--sans)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:active{background:var(--primary-active)}
+.btn-secondary{background:var(--card-elev);color:var(--body-strong)}
+.term-grid{position:relative;margin-top:56px;background:var(--canvas-deep);border:1px solid var(--hairline);border-radius:var(--r-xl);padding:32px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.term-pane{background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-lg);padding:20px;font-family:var(--mono);font-size:13px;line-height:1.6}
+.term-pane .tp-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;color:var(--ink);font-weight:500}
+.term-pane .led{width:8px;height:8px;border-radius:50%;background:var(--success)}
+.term-pane .c{color:var(--muted)}
+.term-pane .k{color:var(--cyan)}
+.term-pane .b{color:var(--primary-glow)}
+@media(max-width:640px){.term-grid{grid-template-columns:1fr}}
+
+/* ---------- cards ---------- */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:40px}
+@media(max-width:1024px){.grid4{grid-template-columns:repeat(2,1fr)}.grid3{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+@media(max-width:640px){.grid4{grid-template-columns:1fr}}
+.fcard{background:var(--card);border:1px solid var(--hairline-soft);border-radius:var(--r-xl);padding:28px}
+.fcard h4{color:var(--ink);font-size:18px;font-weight:600;margin-bottom:8px;line-height:1.4}
+.fcard p{font-size:14px}
+.tcard{background:var(--card);border:1px solid var(--hairline-soft);border-radius:var(--r-lg);padding:20px}
+.tcard .icon{width:40px;height:40px;border-radius:var(--r-md);background:var(--card-elev);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:500;color:var(--cyan);margin-bottom:14px}
+.tcard h4{color:var(--ink);font-size:16px;font-weight:600;line-height:1.4}
+.tcard p{font-size:13px;margin-top:4px;color:var(--muted)}
+.statrow{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.stat{background:var(--card);border:1px solid var(--hairline-soft);border-radius:var(--r-lg);padding:14px 18px;font-family:var(--mono);font-size:13px}
+.stat b{color:var(--ink);font-weight:500;display:block;font-size:18px;letter-spacing:-.3px}
+
+/* ---------- tables ---------- */
+.tbl{width:100%;border-collapse:collapse;margin-top:24px;font-size:14px;background:var(--card);border:1px solid var(--hairline-soft);border-radius:var(--r-lg);overflow:hidden}
+.tbl th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.88px;text-transform:uppercase;color:var(--muted);padding:12px 16px;border-bottom:1px solid var(--hairline);background:var(--canvas-deep)}
+.tbl td{padding:12px 16px;border-bottom:1px solid var(--hairline-soft);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td:first-child{color:var(--body-strong);font-weight:500}
+.tbl code{background:var(--canvas-deep);border:1px solid var(--hairline-soft);border-radius:4px;padding:1px 6px;color:var(--cyan)}
+.tblwrap{overflow-x:auto}
+.pill-ok{color:var(--success);font-family:var(--mono);font-size:12px}
+.pill-p2{color:var(--cyan);font-family:var(--mono);font-size:12px}
+
+/* ---------- mermaid figures ---------- */
+.fig{margin-top:32px;background:var(--canvas-deep);border:1px solid var(--hairline);border-radius:var(--r-xl);overflow:hidden}
+.fig .fig-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--hairline-soft)}
+.fig .fig-title{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.4px}
+.fig .fig-actions{display:flex;gap:8px}
+.figbtn{background:var(--card-elev);border:0;border-radius:6px;color:var(--body-strong);font-family:var(--sans);font-size:12px;font-weight:500;padding:6px 12px;cursor:pointer}
+.figbtn:hover{background:var(--strong)}
+.fig .fig-body{padding:24px;overflow-x:auto;display:flex;justify-content:center}
+.fig .fig-body svg{max-width:100%;height:auto}
+.fig .cap{padding:0 20px 16px;font-size:13px;color:var(--muted);max-width:none}
+
+/* ---------- viewer modal ---------- */
+.viewer{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.92);display:none;flex-direction:column}
+.viewer.open{display:flex}
+.viewer .vbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--hairline);background:var(--canvas)}
+.viewer .vtitle{font-family:var(--mono);font-size:13px;color:var(--body)}
+.viewer .vtools{display:flex;gap:8px}
+.viewer .vstage{flex:1;overflow:hidden;cursor:grab;position:relative}
+.viewer .vstage.grabbing{cursor:grabbing}
+.viewer .vcanvas{position:absolute;left:50%;top:50%;transform-origin:0 0}
+.viewer .vcanvas svg{display:block}
+.vhint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;color:var(--muted-soft);pointer-events:none}
+
+/* ---------- doc pages ---------- */
+.navdiv{width:1px;height:20px;background:var(--hairline-strong);align-self:center;margin:0 8px;flex-shrink:0}
+.navdrop{position:relative;flex-shrink:0}
+.navdrop>button{background:transparent;border:0;color:var(--muted);font-family:var(--sans);font-size:14px;font-weight:500;padding:7px 12px;border-radius:var(--r-md);cursor:pointer;line-height:1.4;white-space:nowrap}
+.navdrop>button:hover,.navdrop.open>button{color:var(--body-strong);background:var(--card)}
+.navdrop.oncur>button{color:var(--body-strong);background:var(--card-elev)}
+.dropmenu{display:none;position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);min-width:230px;background:var(--strong);border:1px solid var(--hairline-strong);border-radius:var(--r-lg);padding:8px;flex-direction:column;gap:2px;z-index:120}
+.navdrop.open .dropmenu{display:flex}
+.dropmenu a{font-size:14px;font-weight:500;color:var(--muted);padding:8px 12px;border-radius:var(--r-md);white-space:nowrap;line-height:1.4}
+.dropmenu a:hover{color:var(--body-strong);background:var(--card-elev)}
+.dropmenu a.active{color:var(--body-strong);background:var(--card)}
+@media(max-width:1120px){
+  .navdiv{width:100%;height:1px;margin:8px 0}
+  .navdrop{width:100%}
+  .navdrop>button{display:none}
+  .dropmenu{display:flex;position:static;transform:none;background:transparent;border:0;padding:0;min-width:0}
+}
+.docmeta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.docmeta span.tag{background:var(--card-elev);color:var(--body-strong);font-family:var(--mono);font-size:11px;letter-spacing:.4px;border-radius:9999px;padding:5px 12px}
+.decision{background:var(--card);border:1px solid var(--hairline);border-left:3px solid var(--success);border-radius:var(--r-md);padding:18px 22px;margin-top:24px;font-size:15px;max-width:900px}
+.decision b{color:var(--ink)}
+.codeblk{background:var(--canvas-deep);border:1px solid var(--hairline);border-radius:var(--r-lg);padding:20px;margin-top:24px;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--body);overflow-x:auto;white-space:pre}
+.dlink{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:var(--r-md);background:var(--card-elev);color:var(--body-strong);font-size:14px;font-weight:500;margin-top:32px}
+.dlink:hover{background:var(--strong)}
+ul.bul{margin:16px 0 0 20px;max-width:820px;font-size:15px}
+ul.bul li{margin-bottom:8px}
+ul.bul li::marker{color:var(--muted-soft)}
+.dcard{display:block;background:var(--card);border:1px solid var(--hairline-soft);border-radius:var(--r-lg);padding:20px}
+.dcard:hover{background:var(--card-elev);border-color:var(--hairline-strong)}
+.dcard .did{font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:.6px}
+.dcard h4{color:var(--ink);font-size:16px;font-weight:600;line-height:1.4;margin:8px 0 4px}
+.dcard p{font-size:13px;color:var(--muted)}
+.pill-warn{color:#ffb454;font-family:var(--mono);font-size:12px}
+.dlink{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:var(--r-md);background:var(--primary);color:#fff;font-size:14px;font-weight:500;margin-top:8px}
+.dlink:hover{background:var(--primary-active)}
+.deck{display:grid;grid-template-columns:1.05fr .95fr;gap:24px;margin-top:32px;align-items:start}
+@media(max-width:1024px){.deck{grid-template-columns:1fr}}
+.toc{background:var(--card);border:1px solid var(--hairline-soft);border-radius:var(--r-xl);padding:24px 28px}
+.toc h5{font-size:11px;font-weight:600;letter-spacing:.88px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.toc a{display:block;font-size:14px;color:var(--body);padding:6px 0;cursor:pointer;border-bottom:1px solid var(--hairline-soft)}
+.toc a:last-child{border-bottom:0}
+.toc a:hover{color:var(--body-strong)}
+.toc a .n{display:inline-block;min-width:20px;font-family:var(--mono);font-size:12px;color:var(--muted-soft)}
+h3.sub,h4.subsub{scroll-margin-top:96px}
+h4.subsub{color:var(--ink);font-size:18px;font-weight:600;line-height:1.4;margin:32px 0 10px}
+.chk{list-style:none;margin:16px 0 0;max-width:900px;font-size:14.5px}
+.chk li{position:relative;padding-left:30px;margin-bottom:9px}
+.chk li:before{content:"☐";position:absolute;left:0;top:-1px;color:var(--muted-soft);font-family:var(--mono);font-size:15px}
+.chk li.done:before{content:"☑";color:var(--success)}
+.chk .cid{font-family:var(--mono);font-size:12px;color:var(--cyan);margin-right:10px}
+
+/* ---------- callout ---------- */
+.callout{background:var(--card);border:1px solid var(--hairline);border-left:3px solid var(--primary);border-radius:var(--r-md);padding:16px 20px;margin-top:24px;font-size:14px;max-width:820px}
+.callout b{color:var(--ink)}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--hairline-soft);padding:48px 0 64px;margin-top:48px}
+footer .frow{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+footer .mono{color:var(--muted-soft)}
+.cta-band{position:relative;text-align:center;padding:96px 24px;overflow:hidden}
+.cta-band .glow{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:700px;height:400px;background:radial-gradient(closest-side,rgba(26,38,255,.25),transparent 70%);pointer-events:none}
+.cta-band h2{position:relative;color:var(--ink);font-size:clamp(28px,4vw,44px);font-weight:500;letter-spacing:-.03em;line-height:1.1}
+.cta-band p{position:relative;margin:16px auto 0;max-width:640px}
+/* ---------- navigation prototype (added when the three decks were merged) ----------
+   .mmfig mirrors .fig, but under its own name so renderFigsIn() — which
+   expects a .mmd source node inside every .fig — never sees these cards.
+   The stage keeps the prototype's own near-black ground in both themes: it is
+   the product canvas, not document chrome, and matching it to the frame avoids
+   a seam along the top edge of the iframe. */
+.mmfig{margin-top:32px;background:var(--canvas-deep);border:1px solid var(--hairline);border-radius:var(--r-xl);overflow:hidden}
+.mmfig .fig-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--hairline-soft);flex-wrap:wrap}
+.mmfig .cap{padding:0 20px 16px;font-size:13px;color:var(--muted);max-width:none}
+.mmstage{position:relative;background:#0f0f0f;overflow:hidden}
+.mmstage iframe{width:1440px;height:1240px;border:0;display:block;transform-origin:top left;background:#0f0f0f}
+.mmstage.loading::after{content:'';position:absolute;inset:0;background:#0f0f0f}
+.mmfallback{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:32px;background:#0f0f0f}
+/* A class rule beats the UA's [hidden]{display:none}, so say it explicitly —
+   otherwise the panel paints over a perfectly working prototype. */
+.mmfallback[hidden]{display:none}
+.mmfallback p{font-size:14px;color:#a8a8a8;max-width:420px}
+/* The mobile card frames a 390px viewport, so it gets a plate rather than a
+   scaled stage: the button hands the reader a real tab at real width. */
+.mmphone{display:flex;align-items:center;gap:24px;padding:24px;flex-wrap:wrap}
+.mmphone .mmphone-art{flex:0 0 auto;width:132px;height:236px;border:1px solid var(--hairline-strong);border-radius:18px;background:#0f0f0f;position:relative;overflow:hidden}
+.mmphone .mmphone-art::before{content:'';position:absolute;left:50%;transform:translateX(-50%);top:8px;width:44px;height:5px;border-radius:5px;background:#2a2a2a}
+.mmphone .mmphone-art i{position:absolute;left:12px;right:12px;height:7px;border-radius:3px;background:#1e1e1e}
+.mmphone .mmphone-art i:nth-child(1){top:28px;background:#0007cd;width:26px;right:auto}
+.mmphone .mmphone-art i:nth-child(2){top:48px}
+.mmphone .mmphone-art i:nth-child(3){top:64px;right:52px}
+.mmphone .mmphone-art i:nth-child(4){top:88px}
+.mmphone .mmphone-art i:nth-child(5){top:104px;right:44px}
+.mmphone .mmphone-art i:nth-child(6){top:128px}
+.mmphone .mmphone-art i:nth-child(7){top:144px;right:60px}
+.mmphone .mmphone-art i:nth-child(8){top:176px;height:20px;border-radius:6px;background:#0007cd}
+.mmphone .mmphone-copy{flex:1 1 320px;min-width:280px}
+.mmphone .mmphone-copy p{font-size:14px;color:var(--body);max-width:520px;margin-bottom:18px}
+.mmnote{font-family:var(--mono);font-size:12px;color:var(--muted-soft);margin-top:10px}
+@media(max-width:900px){
+  .mmfig .fig-bar{gap:8px}
+  .mmphone{padding:20px;gap:20px}
+}
+
+</style>
+</head>
+<body data-lang="en">
+
+<!-- ================================================================
+     NAV. One entry per page; `data-page` must match a `section.page`
+     id AND the PAGES array in the script at the foot of this file.
+     Change one and you must change all three.
+     ================================================================ -->
+<nav class="nav">
+  <a class="mark" href="#/en/overview" id="markLink"><span>[PROJECT] <span style="color:var(--muted-soft)">/</span> <span style="color:var(--muted)"><span class="en">[Document name]</span><span class="zh">[文件名稱]</span></span></span></a>
+  <div class="links" id="navLinks">
+    <a data-page="overview"><span class="en">Overview</span><span class="zh">總覽</span></a>
+    <a data-page="today"><span class="en">Today</span><span class="zh">現況</span></a>
+    <a data-page="structure"><span class="en">Structure</span><span class="zh">架構</span></a>
+    <a data-page="megamenu"><span class="en">Prototype</span><span class="zh">原型</span></a>
+    <span class="navdiv"></span>
+    <div class="navdrop" id="navDrop">
+      <button onclick="toggleDocs(event)"><span class="en">Records ▾</span><span class="zh">紀錄 ▾</span></button>
+      <div class="dropmenu">
+        <a data-page="records"><span class="en">DEC · Decision records</span><span class="zh">DEC · 決策紀錄</span></a>
+      </div>
+    </div>
+  </div>
+  <!-- Intake-driven controls. Each is guarded in the script, so deleting one
+       here is the supported way to switch that answer off. -->
+  <div class="utilbar">
+    <button id="btnTheme" title="Theme" aria-label="Theme">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg>
+    </button>
+    <button id="btnPdf" title="Download as PDF">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9.5V4h10v5.5M7 18H5.2v-6h13.6v6H17M8.4 15h7.2v5H8.4z"/></svg>
+      <span>PDF</span>
+    </button>
+    <button id="btnHtml" title="Download the HTML">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 3.6-3.6M12 15l-3.6-3.6M5 19h14"/></svg>
+      <span>HTML</span>
+    </button>
+  </div>
+  <div class="lang-toggle">
+    <button id="btnEn" onclick="setLang('en')">EN</button>
+    <button id="btnZh" onclick="setLang('zh')">繁中</button>
+  </div>
+  <button class="burger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</nav>
+
+<main>
+
+<!-- ================= PAGE 1: OVERVIEW =================
+     The argument in one screen: what is being proposed and why it is credible.
+     Replace the numbers with the real counts before showing this to anyone. -->
+<section class="page" id="page-overview">
+
+  <div class="hero"><div class="wrap">
+    <div class="glow"></div>
+    <span class="eyebrow"><span class="en">[STATUS · e.g. Draft for review]</span><span class="zh">[狀態 · 例如 草案審閱中]</span></span>
+    <h1 class="mega"><span class="en">[The one-sentence claim this proposal rests on.]</span><span class="zh">[本提案賴以成立的一句話主張。]</span></h1>
+    <p class="lede"><span class="en">[Two or three sentences: what the site is for, who it is for, and what this document argues should change. Say what the reader gets, not what you did.]</span><span class="zh">[兩三句話：這個網站為誰而做、要解決什麼，以及本文主張應該改變什麼。]</span></p>
+    <div class="ctas">
+      <button class="btn btn-primary" onclick="go('today')"><span class="en">[Start with the diagnosis]</span><span class="zh">[從現況診斷開始]</span></button>
+      <button class="btn btn-secondary" onclick="go('structure')"><span class="en">[Jump to the structure]</span><span class="zh">[直接看架構]</span></button>
+    </div>
+
+    <div class="statrow">
+      <div class="stat"><b>[000]</b><span class="en">[pages on the site today]</span><span class="zh">[現有網站頁面總數]</span></div>
+      <div class="stat"><b>[000]</b><span class="en">[nodes in the proposed map]</span><span class="zh">[提案架構節點數]</span></div>
+      <div class="stat"><b>[000]</b><span class="en">[of them live at phase 1]</span><span class="zh">[第一期上線節點數]</span></div>
+    </div>
+  </div></div>
+
+  <div class="band"><div class="wrap">
+    <h2 class="sec"><span class="en">[The structural claim, stated as a sentence.]</span><span class="zh">[以一句話陳述結構主張。]</span></h2>
+    <p><span class="en">[Why the current structure produces the problem, and what the proposed one does differently. One paragraph.]</span><span class="zh">[現行架構為何造成這個問題，提案架構的做法有何不同。一段即可。]</span></p>
+
+    <div class="fig" data-fig="l1">
+      <div class="fig-bar">
+        <span class="fig-title">FIG 1 · [Top-level structure]</span>
+        <div class="fig-actions"><button class="figbtn" onclick="openViewer('l1')"><span class="en">Expand</span><span class="zh">放大</span></button></div>
+      </div>
+      <div class="fig-body" id="fig-l1"></div>
+      <div class="cap"><span class="en">[What the reader should take from this diagram.]</span><span class="zh">[讀者應從這張圖看出什麼。]</span></div>
+      <script type="text/plain" class="mmd">flowchart TD
+  ROOT["[SITE ROOT]"] --> S1["[SECTION 1]<br/>00 nodes"]
+  ROOT --> S2["[SECTION 2]<br/>00 nodes"]
+  ROOT --> S3["[SECTION 3]<br/>00 nodes"]
+  ROOT --> S4["[SECTION 4]<br/>00 nodes"]
+  ROOT -.-> F["[Footer utility]<br/>00 nodes"]
+  classDef hi fill:#0007cd,stroke:#1a26ff,color:#fff;
+  class S1,S2 hi;
+</script>
+    </div>
+  </div></div>
+
+  <div class="band"><div class="wrap">
+    <h3 class="sub"><span class="en">How to read this document</span><span class="zh">如何閱讀本文件</span></h3>
+    <div class="grid2">
+      <div class="fcard">
+        <h4><span class="en">[If you are approving the structure]</span><span class="zh">[若您負責核定架構]</span></h4>
+        <p><span class="en">[Which pages to read, in which order, and where the contested calls are argued.]</span><span class="zh">[該讀哪幾頁、順序為何，以及爭議點在何處論述。]</span></p>
+      </div>
+      <div class="fcard">
+        <h4><span class="en">[If you are scoping the build]</span><span class="zh">[若您負責評估開發範圍]</span></h4>
+        <p><span class="en">[Which pages carry counts, phasing, and dependencies.]</span><span class="zh">[哪幾頁載有數量、分期與相依關係。]</span></p>
+      </div>
+    </div>
+  </div></div>
+
+  <footer><div class="wrap"><div class="frow">
+    <span class="mono">[PROJECT] · [DOCUMENT NAME]</span>
+    <span class="mono">[VERSION] · [DATE]</span>
+  </div></div></footer>
+</section>
+
+
+<!-- ================= PAGE 2: TODAY =================
+     The evidence. A proposal without a diagnosis reads as taste. -->
+<section class="page" id="page-today">
+  <div class="band"><div class="wrap">
+    <span class="eyebrow"><span class="en">Diagnosis</span><span class="zh">現況診斷</span></span>
+    <h2 class="sec"><span class="en">[What is wrong with the structure today.]</span><span class="zh">[現行架構的問題所在。]</span></h2>
+    <p class="lede"><span class="en">[Name the failure in terms a visitor would recognise, not in terms of internal org charts.]</span><span class="zh">[以訪客能理解的方式描述問題，而非以內部組織架構描述。]</span></p>
+
+    <div class="tblwrap">
+      <table class="tbl">
+        <thead><tr>
+          <th><span class="en">Problem</span><span class="zh">問題</span></th>
+          <th><span class="en">Evidence</span><span class="zh">證據</span></th>
+          <th><span class="en">Consequence</span><span class="zh">後果</span></th>
+          <th><span class="en">Phase</span><span class="zh">期別</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td>[Problem one]</td><td><span class="en">[What shows it — analytics, search logs, interviews]</span><span class="zh">[佐證來源 — 分析數據、站內搜尋、訪談]</span></td><td><span class="en">[Who fails to find what]</span><span class="zh">[誰因此找不到什麼]</span></td><td><span class="pill-ok">P1</span></td></tr>
+          <tr><td>[Problem two]</td><td><span class="en">[Evidence]</span><span class="zh">[佐證]</span></td><td><span class="en">[Consequence]</span><span class="zh">[後果]</span></td><td><span class="pill-p2">P2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <span class="en">[The caveat a careful reader will raise — say it before they do, and say what would settle it.]</span>
+      <span class="zh">[謹慎的讀者會提出的疑慮 —— 先說出來，並說明如何驗證。]</span>
+    </div>
+  </div></div>
+</section>
+
+
+<!-- ================= PAGE 3: STRUCTURE =================
+     Two diagrams: the axes the structure is organised on, and one section
+     expanded far enough to show the depth rule holding. -->
+<section class="page" id="page-structure">
+  <div class="band"><div class="wrap">
+    <h2 class="sec"><span class="en">[The proposed structure.]</span><span class="zh">[提案架構。]</span></h2>
+    <p><span class="en">[The organising principle in one paragraph — what decides which section a page belongs to.]</span><span class="zh">[以一段說明組織原則 —— 什麼決定一個頁面歸屬哪個區塊。]</span></p>
+
+    <div class="fig" data-fig="axes">
+      <div class="fig-bar">
+        <span class="fig-title">FIG 2 · [Routes into the same content]</span>
+        <div class="fig-actions"><button class="figbtn" onclick="openViewer('axes')"><span class="en">Expand</span><span class="zh">放大</span></button></div>
+      </div>
+      <div class="fig-body" id="fig-axes"></div>
+      <div class="cap"><span class="en">[Why more than one route to the same page is a feature, not duplication.]</span><span class="zh">[為何同一頁面有多條路徑是設計，而非重複。]</span></div>
+      <script type="text/plain" class="mmd">flowchart LR
+  A["[By audience]"] --> P["[Destination page]"]
+  B["[By need]"] --> P
+  C["[By size or stage]"] --> P
+</script>
+    </div>
+
+    <h3 class="sub"><span class="en">[One section, expanded]</span><span class="zh">[展開其中一個區塊]</span></h3>
+    <ul class="bul">
+      <li><span class="en">[The rule this section follows.]</span><span class="zh">[本區塊遵循的規則。]</span></li>
+      <li><span class="en">[The exception, and why it is allowed.]</span><span class="zh">[例外情況，以及為何允許。]</span></li>
+    </ul>
+
+    <div class="fig" data-fig="l2">
+      <div class="fig-bar">
+        <span class="fig-title">FIG 3 · [Section 1 expanded]</span>
+        <div class="fig-actions"><button class="figbtn" onclick="openViewer('l2')"><span class="en">Expand</span><span class="zh">放大</span></button></div>
+      </div>
+      <div class="fig-body" id="fig-l2"></div>
+      <div class="cap"><span class="en">[How deep the tree goes and where it deliberately stops.]</span><span class="zh">[層級深度，以及刻意止於何處。]</span></div>
+      <script type="text/plain" class="mmd">flowchart TD
+  S1["[SECTION 1]"] --> G1["[GROUP 1.1]"]
+  S1 --> G2["[GROUP 1.2]"]
+  G1 --> P1["[PAGE 1.1.1]"]
+  G1 --> P2["[PAGE 1.1.2]"]
+  G2 --> P3["[PAGE 1.2.1]"]
+</script>
+    </div>
+  </div></div>
+</section>
+
+
+<!-- ================= PAGE 4: PROTOTYPE =================
+     What separates this template from a plain document: the sitemap wired up
+     as a working navigation. The desktop view mounts in an iframe on this
+     page; the mobile view opens in its own tab so it gets a real viewport.
+     Both run in their own document — see the mount script at the foot of the
+     file for why that is not negotiable. -->
+<section class="page" id="page-megamenu">
+  <div class="band"><div class="wrap">
+    <span class="eyebrow"><span class="en">Interactive prototype · click anything</span><span class="zh">互動原型 · 可直接點擊</span></span>
+    <h2 class="sec"><span class="en">[The same structure, as a navigation you can use.]</span><span class="zh">[同樣的架構，做成可以操作的導覽。]</span></h2>
+    <p class="lede"><span class="en">[Everything above is a map; this is the map wired up. Use it to test whether a label reads correctly and whether a page is reachable in the number of clicks the structure promises.]</span><span class="zh">[前面是地圖，這一頁是把地圖接上線。可用來驗證標籤是否讀得懂，以及頁面是否能在架構承諾的點擊次數內抵達。]</span></p>
+
+    <div class="statrow">
+      <div class="stat"><b>[0]</b><span class="en">[top-level menus]</span><span class="zh">[第一層選單數]</span></div>
+      <div class="stat"><b>1440 / 390</b><span class="en">breakpoints covered</span><span class="zh">涵蓋斷點</span></div>
+      <div class="stat"><b>[LANG / LANG]</b><span class="en">[both label sets, toggled in the prototype]</span><span class="zh">[雙語標籤，於原型內切換]</span></div>
+    </div>
+
+    <div class="callout">
+      <span class="en">The prototype carries its own language toggle, independent of this document's switch — they are separate documents. Nothing inside it is a live page; every destination is a labelled placeholder that reports its own route.</span>
+      <span class="zh">原型有自己的語言切換，與本文件的切換各自獨立 —— 兩者是不同的文件。原型內沒有實際頁面，所有目的地都是標示路徑的示意頁。</span>
+    </div>
+
+    <!-- .mmfig, not .fig: renderFigsIn() walks every .fig on the active page and
+         dereferences its .mmd child, so a mermaid-less .fig would throw. -->
+    <div class="mmfig">
+      <div class="fig-bar">
+        <span class="fig-title">FIG 4 · Desktop mega-menu · 1440px</span>
+        <div class="fig-actions">
+          <button class="figbtn" id="mmReload"><span class="en">Reset</span><span class="zh">重設</span></button>
+          <button class="figbtn" id="mmOpenDesktop"><span class="en">Open in new tab ↗</span><span class="zh">另開分頁 ↗</span></button>
+        </div>
+      </div>
+      <div class="mmstage" id="mmStage">
+        <iframe id="mmFrame" title="[Desktop navigation prototype]" scrolling="no"></iframe>
+        <!-- Shown only if the browser refuses to let the prototype run in-page;
+             an empty black rectangle would read as a broken document. -->
+        <div class="mmfallback" id="mmFallback" hidden>
+          <p>
+            <span class="en">This browser will not run the prototype inside the page. Open it in its own tab instead.</span>
+            <span class="zh">此瀏覽器不允許原型在頁面內執行，請改以獨立分頁開啟。</span>
+          </p>
+          <button class="btn btn-primary" id="mmFallbackOpen"><span class="en">Open the desktop view ↗</span><span class="zh">開啟桌面版檢視 ↗</span></button>
+        </div>
+      </div>
+      <div class="cap">
+        <span class="en">[Hover a top-level item to open its menu. Scaled to fit this column — open it in a new tab for true 1440px.]</span>
+        <span class="zh">[將游標移至第一層項目即可展開選單。此處已依欄寬縮放，另開分頁可看到實際 1440px 尺寸。]</span>
+      </div>
+    </div>
+
+    <div class="mmfig">
+      <div class="fig-bar"><span class="fig-title">FIG 5 · Mobile navigation · 390px</span></div>
+      <div class="mmphone">
+        <div class="mmphone-art" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="mmphone-copy">
+          <p>
+            <span class="en">[The same structure as a full-screen accordion. It opens in its own tab so it gets a real viewport rather than a scaled-down box.]</span>
+            <span class="zh">[相同架構改以全螢幕手風琴呈現。此原型會另開分頁，以取得實際的可視區寬度。]</span>
+          </p>
+          <button class="btn btn-primary" id="mmOpenMobile">
+            <span class="en">Open the mobile view ↗</span><span class="zh">開啟行動版檢視 ↗</span>
+          </button>
+          <div class="mmnote" id="mmMobileNote"></div>
+        </div>
+      </div>
+      <div class="cap"><span class="en">Opens in a new tab.</span><span class="zh">另開分頁。</span></div>
+    </div>
+  </div></div>
+</section>
+
+
+<!-- ================= PAGE 5: RECORDS =================
+     Decision records and open questions. The contested calls live here so the
+     rest of the document can stay declarative. -->
+<section class="page" id="page-records">
+  <div class="band"><div class="wrap">
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <span class="tag"><span class="en">Proposed</span><span class="zh">提案中</span></span>
+      <span class="tag">WIP</span>
+    </div>
+    <h2 class="sec"><span class="en">[The decisions that shape everything else.]</span><span class="zh">[形塑其餘一切的決策。]</span></h2>
+
+    <div class="deck">
+      <div>
+        <p class="lede"><span class="en">[Most of the sitemap follows mechanically once these calls are made. Each is recorded with the alternative that was considered and why it lost.]</span><span class="zh">[這幾項決策一旦確定，其餘架構大多隨之確立。每項均記錄曾考慮的替代方案及未採用的原因。]</span></p>
+        <div class="decision"><b><span class="en">In short.</span><span class="zh">摘要。</span></b><span class="en"> [One sentence summarising all of them.]</span><span class="zh"> [以一句話總結所有決策。]</span></div>
+      </div>
+      <div class="toc">
+        <h5><span class="en">On this page</span><span class="zh">本頁目錄</span></h5>
+        <a onclick="jump('dec-01')"><span class="n">01</span><span class="en">[First decision]</span><span class="zh">[第一項決策]</span></a>
+        <a onclick="jump('dec-02')"><span class="n">02</span><span class="en">[Second decision]</span><span class="zh">[第二項決策]</span></a>
+      </div>
+    </div>
+
+    <h3 class="sub" id="dec-01"><span class="en">DEC-01 · [First decision, as a claim]</span><span class="zh">DEC-01 · [第一項決策，以主張陳述]</span></h3>
+    <div class="decision"><b><span class="en">Decision.</span><span class="zh">決策。</span></b><span class="en"> [What was decided, in one sentence.]</span><span class="zh"> [決定了什麼，一句話。]</span></div>
+    <ul class="bul">
+      <li><span class="en"><b>Why.</b> [The reasoning, and the evidence behind it.]</span><span class="zh"><b>理由。</b> [推論過程與支持證據。]</span></li>
+      <li><span class="en"><b>Considered instead.</b> [The alternative, and why it lost.]</span><span class="zh"><b>曾考慮。</b> [替代方案，以及未採用的原因。]</span></li>
+      <li><span class="en"><b>Cost.</b> [What this decision makes harder.]</span><span class="zh"><b>代價。</b> [這項決策讓什麼變得更困難。]</span></li>
+    </ul>
+
+    <h3 class="sub" id="dec-02"><span class="en">DEC-02 · [Second decision, as a claim]</span><span class="zh">DEC-02 · [第二項決策，以主張陳述]</span></h3>
+    <div class="decision"><b><span class="en">Decision.</span><span class="zh">決策。</span></b><span class="en"> [What was decided.]</span><span class="zh"> [決定了什麼。]</span></div>
+    <ul class="bul">
+      <li><span class="en"><b>Why.</b> [Reasoning.]</span><span class="zh"><b>理由。</b> [推論。]</span></li>
+    </ul>
+
+    <h3 class="sub"><span class="en">Open questions</span><span class="zh">待確認事項</span></h3>
+    <p><span class="en">[What is not yet settled, and what would settle it. A proposal that hides its gaps is harder to trust than one that lists them.]</span><span class="zh">[尚未定案的事項，以及如何驗證。隱藏缺口的提案比列出缺口的提案更難取信於人。]</span></p>
+    <ul class="chk">
+      <li><span class="cid">Q-01</span><span class="en">[An assumption that has not been tested, and the test that would settle it.]</span><span class="zh">[尚未驗證的假設，以及可以驗證它的方法。]</span></li>
+      <li><span class="cid">Q-02</span><span class="en">[A dependency owned by someone outside this document.]</span><span class="zh">[由本文件以外的人負責的相依項目。]</span></li>
+    </ul>
+
+    <footer><div class="wrap"><div class="frow">
+      <span class="mono">[PROJECT] · [DOCUMENT NAME]</span>
+      <span class="mono">[VERSION] · [DATE]</span>
+    </div></div></footer>
+  </div></div>
+</section>
+
+</main>
+
+<div class="viewer" id="viewer">
+  <div class="vbar">
+    <span class="vtitle" id="vtitle">diagram</span>
+    <div class="vtools">
+      <button class="figbtn" onclick="vzoom(1.25)">＋</button>
+      <button class="figbtn" onclick="vzoom(0.8)">－</button>
+      <button class="figbtn" onclick="vfit()"><span class="en">Fit</span><span class="zh">符合畫面</span></button>
+      <button class="figbtn" onclick="vnative()"><span class="en">⛶ Native</span><span class="zh">⛶ 全螢幕</span></button>
+      <button class="figbtn" onclick="closeViewer()"><span class="en">✕ Close</span><span class="zh">✕ 關閉</span></button>
+    </div>
+  </div>
+  <div class="vstage" id="vstage"><div class="vcanvas" id="vcanvas"></div><div class="vhint"><span class="en">drag to pan · scroll to zoom · Esc to close</span><span class="zh">拖曳平移 · 滾輪縮放 · Esc 關閉</span></div></div>
+</div>
+
+
+<script>
+/* ---------- mermaid init ---------- */
+/* Mermaid renders to a fixed palette chosen at init, so a theme toggle has to
+   re-initialise it and re-render. Both palettes live here; nothing else in the
+   document needs to know which one is active. */
+var MERMAID_DARK = {
+  background:'transparent', primaryColor:'#181818', primaryTextColor:'#ffffff', primaryBorderColor:'#333333',
+  secondaryColor:'#181818', tertiaryColor:'#0f0f0f', lineColor:'#888888', textColor:'#a8a8a8',
+  clusterBkg:'transparent', clusterBorder:'#333333', edgeLabelBackground:'#0f0f0f',
+  nodeTextColor:'#ffffff', mainBkg:'#181818', titleColor:'#ffffff',
+  actorBkg:'#181818', actorBorder:'#333333', actorTextColor:'#ffffff', signalColor:'#888888', signalTextColor:'#a8a8a8',
+  labelBoxBkgColor:'#181818', labelBoxBorderColor:'#333333', labelTextColor:'#ffffff', loopTextColor:'#a8a8a8',
+  noteBkgColor:'#222222', noteTextColor:'#ffffff', noteBorderColor:'#333333',
+  taskBkgColor:'#0007cd', taskBorderColor:'#1a26ff', taskTextColor:'#ffffff', taskTextLightColor:'#ffffff',
+  activeTaskBkgColor:'#0007cd', activeTaskBorderColor:'#1a26ff', gridColor:'#222222', sectionBkgColor:'transparent',
+  altSectionBkgColor:'transparent', sectionBkgColor2:'transparent', todayLineColor:'#00d4ff',
+  transitionColor:'#888888', stateLabelColor:'#ffffff', stateBkg:'#181818', compositeBackground:'#0f0f0f',
+  compositeTitleBackground:'#181818', innerEndBackground:'#333333', specialStateColor:'#888888'
+};
+var MERMAID_LIGHT = {
+  background:'transparent', primaryColor:'#ffffff', primaryTextColor:'#0b0d12', primaryBorderColor:'#d3d8e0',
+  secondaryColor:'#f5f6f8', tertiaryColor:'#fbfbfc', lineColor:'#7c8494', textColor:'#3a4150',
+  clusterBkg:'transparent', clusterBorder:'#d3d8e0', edgeLabelBackground:'#fbfbfc',
+  nodeTextColor:'#0b0d12', mainBkg:'#ffffff', titleColor:'#0b0d12',
+  actorBkg:'#ffffff', actorBorder:'#d3d8e0', actorTextColor:'#0b0d12', signalColor:'#7c8494', signalTextColor:'#3a4150',
+  labelBoxBkgColor:'#ffffff', labelBoxBorderColor:'#d3d8e0', labelTextColor:'#0b0d12', loopTextColor:'#3a4150',
+  noteBkgColor:'#f0f1f4', noteTextColor:'#0b0d12', noteBorderColor:'#d3d8e0',
+  taskBkgColor:'#0007cd', taskBorderColor:'#1a26ff', taskTextColor:'#ffffff', taskTextLightColor:'#0b0d12',
+  activeTaskBkgColor:'#0007cd', activeTaskBorderColor:'#1a26ff', gridColor:'#e3e6eb', sectionBkgColor:'transparent',
+  altSectionBkgColor:'transparent', sectionBkgColor2:'transparent', todayLineColor:'#0b6a86',
+  transitionColor:'#7c8494', stateLabelColor:'#0b0d12', stateBkg:'#ffffff', compositeBackground:'#fbfbfc',
+  compositeTitleBackground:'#f5f6f8', innerEndBackground:'#d3d8e0', specialStateColor:'#7c8494'
+};
+
+function initMermaid(mode){
+  mermaid.initialize({
+    startOnLoad:false, securityLevel:'loose', theme:'base',
+    fontFamily:"'Inter','Noto Sans TC',sans-serif",
+    themeVariables: mode === 'light' ? MERMAID_LIGHT : MERMAID_DARK,
+    gantt:{barHeight:24, barGap:6, topPadding:48, leftPadding:120, fontSize:12}
+  });
+}
+initMermaid(document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
+
+var rendered = {};
+var svgCache = {};
+function renderFigsIn(pageEl){
+  var figs = pageEl.querySelectorAll('.fig');
+  figs.forEach(function(f){
+    var id = f.getAttribute('data-fig');
+    if(rendered[id]) return;
+    rendered[id] = true;
+    var src = f.querySelector('.mmd').textContent;
+    mermaid.render('mmd-'+id, src).then(function(out){
+      svgCache[id] = out.svg;
+      document.getElementById('fig-'+id).innerHTML = out.svg;
+    }).catch(function(e){
+      document.getElementById('fig-'+id).innerHTML = '<pre style="color:#ff4d4d;font-size:12px">'+String(e)+'</pre>';
+    });
+  });
+}
+
+/* ---------- routing: #/{lang}/{page} ---------- */
+var PAGES = ['overview','today','structure','megamenu','records'];
+function parseHash(){
+  var m = location.hash.match(/^#\/(en|zh)\/([a-z0-9]+)/);
+  return { lang: m ? m[1] : 'en', page: (m && PAGES.indexOf(m[2])>=0) ? m[2] : 'overview' };
+}
+function apply(){
+  var s = parseHash();
+  document.body.setAttribute('data-lang', s.lang);
+  document.getElementById('btnEn').classList.toggle('active', s.lang==='en');
+  document.getElementById('btnZh').classList.toggle('active', s.lang==='zh');
+  document.documentElement.lang = s.lang==='zh' ? 'zh-Hant-TW' : 'en';
+  PAGES.forEach(function(p){
+    var el = document.getElementById('page-'+p);
+    var on = p===s.page;
+    el.classList.toggle('active', on);
+    if(on) renderFigsIn(el);
+  });
+  document.querySelectorAll('#navLinks a').forEach(function(a){
+    a.classList.toggle('active', a.getAttribute('data-page')===s.page);
+    a.href = '#/'+s.lang+'/'+a.getAttribute('data-page');
+  });
+  document.getElementById('markLink').href = '#/'+s.lang+'/overview';
+  var drop = document.getElementById('navDrop');
+  drop.classList.remove('open');
+  drop.classList.toggle('oncur', ['records'].indexOf(s.page)>=0);
+  document.getElementById('navLinks').classList.remove('open');
+  window.scrollTo(0,0);
+}
+function jump(id){
+  var el = document.getElementById(id);
+  if(!el) return;
+  window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 88, behavior:'smooth' });
+}
+function toggleDocs(e){ e.stopPropagation(); document.getElementById('navDrop').classList.toggle('open'); }
+document.addEventListener('click', function(e){
+  var d = document.getElementById('navDrop');
+  if(d && !d.contains(e.target)) d.classList.remove('open');
+});
+function setLang(l){ var s = parseHash(); location.hash = '#/'+l+'/'+s.page; }
+function go(p){ var s = parseHash(); location.hash = '#/'+s.lang+'/'+p; }
+window.addEventListener('hashchange', apply);
+if(!location.hash) location.hash = '#/en/overview';
+apply();
+
+/* ---------- fullscreen viewer ---------- */
+var vScale=1, vX=0, vY=0, vDrag=null;
+function openViewer(id){
+  if(!svgCache[id]) return;
+  var v = document.getElementById('viewer');
+  document.getElementById('vcanvas').innerHTML = svgCache[id];
+  document.getElementById('vtitle').textContent = document.querySelector('[data-fig="'+id+'"] .fig-title').textContent;
+  v.classList.add('open');
+  document.body.style.overflow='hidden';
+  requestAnimationFrame(vfit);
+}
+function closeViewer(){
+  document.getElementById('viewer').classList.remove('open');
+  document.body.style.overflow='';
+  if(document.fullscreenElement) document.exitFullscreen();
+}
+function vApply(){
+  document.getElementById('vcanvas').style.transform = 'translate('+vX+'px,'+vY+'px) scale('+vScale+')';
+}
+function vfit(){
+  var stage = document.getElementById('vstage');
+  var svg = document.querySelector('#vcanvas svg');
+  if(!svg) return;
+  var sw = svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width ? svg.viewBox.baseVal.width : svg.getBoundingClientRect().width/vScale;
+  var sh = svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.height ? svg.viewBox.baseVal.height : svg.getBoundingClientRect().height/vScale;
+  svg.style.width = sw+'px'; svg.style.height = sh+'px'; svg.style.maxWidth='none';
+  var pad = 48;
+  vScale = Math.min((stage.clientWidth-pad)/sw, (stage.clientHeight-pad)/sh, 2.5);
+  if(vScale<=0||!isFinite(vScale)) vScale=1;
+  vX = -sw*vScale/2; vY = -sh*vScale/2;
+  vApply();
+}
+function vzoom(f){
+  vScale = Math.min(Math.max(vScale*f, .1), 8);
+  vApply();
+}
+function vnative(){
+  var v = document.getElementById('viewer');
+  if(!document.fullscreenElement){ if(v.requestFullscreen) v.requestFullscreen(); }
+  else document.exitFullscreen();
+}
+(function(){
+  var stage = document.getElementById('vstage');
+  stage.addEventListener('pointerdown', function(e){ vDrag={x:e.clientX,y:e.clientY,ox:vX,oy:vY}; stage.classList.add('grabbing'); stage.setPointerCapture(e.pointerId); });
+  stage.addEventListener('pointermove', function(e){ if(!vDrag) return; vX=vDrag.ox+(e.clientX-vDrag.x); vY=vDrag.oy+(e.clientY-vDrag.y); vApply(); });
+  stage.addEventListener('pointerup', function(){ vDrag=null; stage.classList.remove('grabbing'); });
+  stage.addEventListener('wheel', function(e){
+    e.preventDefault();
+    var f = e.deltaY<0 ? 1.12 : 0.89;
+    var r = stage.getBoundingClientRect();
+    var cx = e.clientX-r.left-r.width/2, cy = e.clientY-r.top-r.height/2;
+    vX = cx-(cx-vX)*f; vY = cy-(cy-vY)*f;
+    vScale = Math.min(Math.max(vScale*f,.1),8);
+    vApply();
+  }, {passive:false});
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeViewer(); });
+})();
+
+/* ---------- intake-driven controls ----------
+   Theme, PDF, and self-download. Separate from the routing above so it
+   cannot disturb it; every control is optional and guarded. */
+(function () {
+  var root = document.documentElement;
+  var KEY = 'monomind-doc-theme';
+  var tBtn = document.getElementById('btnTheme');
+
+  function applyTheme(t) {
+    if (t === 'light') { root.setAttribute('data-theme', 'light'); }
+    else { root.removeAttribute('data-theme'); }
+    /* The control is an icon, so the affordance lives in its label rather than
+       visible text: announce the theme it switches TO. */
+    if (tBtn) {
+      var next = t === 'light' ? 'dark' : 'light';
+      tBtn.setAttribute('title', next === 'dark' ? 'Switch to dark' : 'Switch to light');
+      tBtn.setAttribute('aria-label', next === 'dark' ? 'Switch to dark theme' : 'Switch to light theme');
+    }
+  }
+  if (tBtn) {
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    applyTheme(saved || (root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'));
+    tBtn.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      applyTheme(next);
+      try { localStorage.setItem(KEY, next); } catch (e) {}
+      /* Re-theme the diagrams: they are SVG already painted with the old
+         palette, so they have to be thrown away and drawn again. */
+      initMermaid(next);
+      rendered = {}; svgCache = {};
+      var active = document.querySelector('.page.active');
+      if (active) { renderFigsIn(active); }
+    });
+  }
+
+  var pBtn = document.getElementById('btnPdf');
+  if (pBtn) { pBtn.addEventListener('click', function () { window.print(); }); }
+
+  var hBtn = document.getElementById('btnHtml');
+  if (hBtn) {
+    hBtn.addEventListener('click', function () {
+      /* Rendered diagram SVGs are dropped so the saved copy re-renders them
+         from the mermaid source it already carries, exactly like the original. */
+      var clone = document.documentElement.cloneNode(true);
+      clone.querySelectorAll('.fig-body').forEach(function (b) { b.innerHTML = ''; });
+      var v = clone.querySelector('#vcanvas'); if (v) { v.innerHTML = ''; }
+      var vw = clone.querySelector('#viewer'); if (vw) { vw.classList.remove('open'); }
+      var name = (document.title || 'document').trim().replace(/[^\w.-]+/g, '-').toLowerCase();
+      var blob = new Blob(['<!doctype html>\n', clone.outerHTML], { type: 'text/html' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = name + '.html';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    });
+  }
+})();
+</script>
+
+<script>
+/* ---------- reduced motion for in-page jumps (added for this document) ----------
+   The routing block above is left untouched: this wraps its jump() rather than
+   editing it, so a reader who asks for reduced motion lands on the anchor
+   instantly instead of travelling there. CSS cannot do this on its own —
+   scroll-behavior:auto does not override an explicit behavior:'smooth'. */
+(function () {
+  var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var smoothJump = window.jump;
+  window.jump = function (id) {
+    if (!mq.matches) { return smoothJump(id); }
+    var el = document.getElementById(id);
+    if (!el) { return; }
+    window.scrollTo(0, el.getBoundingClientRect().top + window.pageYOffset - 88);
+  };
+})();
+</script>
+
+<!-- ================================================================
+     PROTOTYPE PAYLOAD. Inert text nodes, not executable script: the mount
+     script below reassembles them into whole documents at runtime. Font
+     Awesome and Tailwind load from a CDN here; the `delivery: standalone`
+     answer is what swaps them for inlined copies.
+     ================================================================ -->
+<script type="text/plain" id="mmStyleDesktop">    body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;letter-spacing:-0.01em}
+    .mono{font-family:'JetBrains Mono',monospace}
+    .menu-scroll::-webkit-scrollbar{width:6px}
+    .menu-scroll::-webkit-scrollbar-thumb{background:#333;border-radius:6px}
+    .nav-trigger.open{color:#fff;background:#181818}
+    .nav-trigger.open .nav-dot{transform:scaleX(1)}
+    .nav-dot{transform:scaleX(0);transition:transform .18s ease}
+    .l2-item.active{background:#232323;color:#fff}
+    .l2-item.active .arrow{opacity:1}
+    #megaRoot{opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .16s ease,transform .16s ease}
+    #megaRoot.open{opacity:1;pointer-events:auto;transform:translateY(0)}
+    #scrim{opacity:0;pointer-events:none;transition:opacity .2s ease}
+    #scrim.open{opacity:1;pointer-events:auto}</script>
+<script type="text/plain" id="mmBodyDesktop"><body class="w-[1440px] bg-[#0f0f0f] text-white antialiased">
+
+  <div id="navShell" class="relative z-50">
+    <header data-design-id="header-main-dw8k2p" class="relative z-50 h-16 border-b border-[#2a2a2a] bg-[#0f0f0f]">
+      <div class="mx-auto flex h-full max-w-[1320px] items-center px-6">
+        <a href="#" data-nav="home" class="mr-7 flex items-center gap-3" aria-label="[BRAND] home">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0007CD] text-sm font-semibold">[B]</span>
+          <span class="text-[18px] font-semibold tracking-[-0.4px]">[BRAND]<span class="text-[#5b61ff]">.</span></span>
+        </a>
+        <nav data-design-id="nav-primary-k4v9m2" class="flex h-full flex-1 items-center gap-0.5" aria-label="Primary navigation">
+          <button data-design-id="nav-s1-btn-p7c3x1" type="button" class="nav-trigger relative flex h-full items-center gap-2 px-3.5 text-sm font-medium text-[#a8a8a8]" data-menu="s1"><span data-nl="s1">[SECTION 1]</span><i class="fa-solid fa-chevron-down text-[9px]"></i><span class="nav-dot absolute inset-x-3 bottom-0 h-[2px] origin-left bg-[#2563EB]"></span></button>
+          <button data-design-id="nav-s2-btn-q6h2a8" type="button" class="nav-trigger relative flex h-full items-center gap-2 px-3.5 text-sm font-medium text-[#a8a8a8]" data-menu="s2"><span data-nl="s2">[SECTION 2]</span><i class="fa-solid fa-chevron-down text-[9px]"></i><span class="nav-dot absolute inset-x-3 bottom-0 h-[2px] origin-left bg-[#059669]"></span></button>
+          <button data-design-id="nav-s3-btn-y5r8n4" type="button" class="nav-trigger relative flex h-full items-center gap-2 px-3.5 text-sm font-medium text-[#a8a8a8]" data-menu="s3"><span data-nl="s3">[SECTION 3]</span><i class="fa-solid fa-chevron-down text-[9px]"></i><span class="nav-dot absolute inset-x-3 bottom-0 h-[2px] origin-left bg-[#7C3AED]"></span></button>
+          <button data-design-id="nav-s4-btn-t2j7b5" type="button" class="nav-trigger relative flex h-full items-center gap-2 px-3.5 text-sm font-medium text-[#a8a8a8]" data-menu="s4"><span data-nl="s4">[SECTION 4]</span><i class="fa-solid fa-chevron-down text-[9px]"></i><span class="nav-dot absolute inset-x-3 bottom-0 h-[2px] origin-left bg-[#EA580C]"></span></button>
+          <button data-design-id="nav-s5-btn-u9e4w2" type="button" class="nav-trigger relative flex h-full items-center gap-2 px-3.5 text-sm font-medium text-[#a8a8a8]" data-menu="s5"><span data-nl="s5">[SECTION 5]</span><i class="fa-solid fa-chevron-down text-[9px]"></i><span class="nav-dot absolute inset-x-3 bottom-0 h-[2px] origin-left bg-[#0891B2]"></span></button>
+          <button data-design-id="nav-s6-btn-f3s6d9" type="button" class="nav-trigger relative flex h-full items-center gap-2 px-3.5 text-sm font-medium text-[#a8a8a8]" data-menu="s6"><span data-nl="s6">[SECTION 6]</span><i class="fa-solid fa-chevron-down text-[9px]"></i><span class="nav-dot absolute inset-x-3 bottom-0 h-[2px] origin-left bg-[#4B5563]"></span></button>
+          <button data-design-id="nav-s7-btn-m8z1g4" type="button" class="nav-trigger relative flex h-full items-center gap-2 px-3.5 text-sm font-medium text-[#a8a8a8]" data-menu="s7"><span data-nl="s7">[SECTION 7]</span><i class="fa-solid fa-chevron-down text-[9px]"></i><span class="nav-dot absolute inset-x-3 bottom-0 h-[2px] origin-left bg-[#DC2626]"></span></button>
+        </nav>
+        <div class="ml-4 flex items-center gap-2">
+          <button data-design-id="search-btn-h5n7c2" type="button" class="flex h-10 w-10 items-center justify-center rounded-lg text-[#a8a8a8] hover:bg-[#222] hover:text-white" aria-label="Search"><i class="fa-solid fa-magnifying-glass text-sm"></i></button>
+          <button data-design-id="language-toggle-btn-v4p8k6" type="button" id="langToggle" class="flex h-10 items-center gap-2 rounded-lg border border-[#333] px-3 text-xs font-medium text-white hover:bg-[#222]"><i class="fa-solid fa-globe text-[#a8a8a8]"></i><span id="langLabel">zh-TW</span><i class="fa-solid fa-arrows-rotate text-[10px] text-[#666]"></i></button>
+          <button data-design-id="consultation-cta-btn-r6x2j9" type="button" class="h-10 rounded-lg bg-[#0007CD] px-[18px] text-sm font-medium text-white hover:bg-[#0005A3]" data-nav="s7|0|-1" data-nl="cta">[CALL TO ACTION]</button>
+        </div>
+      </div>
+    </header>
+    <div class="relative">
+      <div id="megaRoot" class="absolute inset-x-0 top-0 z-40"></div>
+    </div>
+  </div>
+
+  <div id="scrim" class="fixed inset-0 z-30 bg-black/55"></div>
+
+  <main data-design-id="main-placeholder-b3m9q7" class="relative z-10 bg-[#0f0f0f]">
+    <section data-design-id="page-breadcrumb-section-x7f2q4" class="border-b border-[#1c1c1c] bg-[#121212]">
+      <div class="mx-auto flex h-14 max-w-[1200px] items-center justify-between px-6">
+        <div id="breadcrumb" class="flex items-center gap-2 text-xs text-[#888]"></div>
+        <div id="routePath" class="mono text-[11px] text-[#555]"></div>
+      </div>
+    </section>
+
+    <section data-design-id="page-placeholder-section-k8d4v1" class="mx-auto max-w-[1200px] px-6 pb-28 pt-16">
+      <div class="mb-10 flex items-start gap-5">
+        <span id="pageAccent" class="mt-2 h-14 w-[3px] rounded-full bg-[#2563EB]"></span>
+        <div>
+          <div id="pageKicker" class="text-[11px] font-semibold uppercase tracking-[.14em] text-[#2563EB]"></div>
+          <h1 id="pageTitle" class="mt-2 text-[44px] font-medium leading-[1.1] tracking-[-1.32px]"></h1>
+          <p id="pageSub" class="mt-3 max-w-[640px] text-base leading-7 text-[#a8a8a8]"></p>
+        </div>
+      </div>
+
+      <section data-design-id="page-summary-section-s5g1y7" id="pageDesc" class="mb-10 hidden max-w-[880px] rounded-2xl border border-[#222] bg-[#181818] p-7">
+        <div class="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[.16em] text-[#666]"><i class="fa-regular fa-lightbulb text-xs"></i><span>[Page summary]</span></div>
+        <p id="pageDescBody" class="mt-4 text-[15px] leading-7 text-[#a8a8a8]"></p>
+      </section>
+
+      <div class="grid grid-cols-3 gap-6">
+        <article data-design-id="placeholder-card-1-c4h8r2" class="rounded-2xl border border-[#222] bg-[#181818] p-7">
+          <span class="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-[#222] text-[#888]"><i class="fa-regular fa-file-lines"></i></span>
+          <h2 class="text-[18px] font-semibold text-white" data-nl="ph1t">[Page content placeholder]</h2>
+          <p class="mt-2 text-sm leading-6 text-[#8f8f8f]" data-nl="ph1b">[This prototype demonstrates navigation only.]</p>
+        </article>
+        <article data-design-id="placeholder-card-2-n9t3b6" class="rounded-2xl border border-[#222] bg-[#181818] p-7">
+          <span class="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-[#222] text-[#888]"><i class="fa-solid fa-sitemap"></i></span>
+          <h2 class="text-[18px] font-semibold text-white" data-nl="ph2t">[Sibling pages]</h2>
+          <div id="siblingList" class="mt-3 space-y-2"></div>
+        </article>
+        <article data-design-id="placeholder-card-3-q2v7m5" class="rounded-2xl border border-[#222] bg-[#181818] p-7">
+          <span class="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-[#222] text-[#888]"><i class="fa-solid fa-compass"></i></span>
+          <h2 class="text-[18px] font-semibold text-white" data-nl="ph3t">[How to use this]</h2>
+          <p class="mt-2 text-sm leading-6 text-[#8f8f8f]" data-nl="ph3b">[Hover any top-level menu above to open it; every item routes to its page.]</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer data-design-id="footer-main-a2w6f8" class="relative z-10 border-t border-[#222] bg-[#0f0f0f] px-12 pb-8 pt-16 text-sm text-[#a8a8a8]">
+    <div class="mx-auto max-w-[1200px]">
+      <div class="grid grid-cols-6 gap-10 pb-14">
+        <div class="col-span-1">
+          <div class="mb-5 flex items-center gap-3 text-white"><span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0007CD] text-sm font-semibold">[B]</span><span class="text-lg font-semibold">[BRAND].</span></div>
+          <p class="max-w-[210px] leading-6" data-nl="companyBlurb">[One line about the organisation.]</p>
+          <div class="mt-5 text-xs text-[#666]">[example.com]</div>
+        </div>
+        <div><h2 class="mb-5 text-sm font-semibold text-white" data-nl="s1">[SECTION 1]</h2><div class="space-y-3" id="footerS1"></div></div>
+        <div><h2 class="mb-5 text-sm font-semibold text-white" data-nl="s2">[SECTION 2]</h2><div class="space-y-3" id="footerS2"></div></div>
+        <div><h2 class="mb-5 text-sm font-semibold text-white" data-nl="s3">[SECTION 3]</h2><div class="space-y-3" id="footerS3"></div></div>
+        <div><h2 class="mb-5 text-sm font-semibold text-white" data-nl="s5">[SECTION 5]</h2><div class="space-y-3" id="footerS5"></div></div>
+        <div><h2 class="mb-5 text-sm font-semibold text-white" data-nl="s6">[SECTION 6]</h2><div class="space-y-3" id="footerS6"></div></div>
+      </div>
+      <div class="flex items-center justify-between border-t border-[#222] pt-7 text-xs text-[#888]">
+        <div class="flex items-center gap-6"><span>© [YEAR] [ORGANISATION]</span><a href="#" class="hover:text-white" data-nl="privacy">[Privacy]</a><a href="#" class="hover:text-white" data-nl="sitemap">[Sitemap]</a></div>
+        <div class="flex items-center gap-5"><span class="text-[#a8a8a8]"><i class="fa-solid fa-phone mr-2"></i><span data-nl="hotline">[Hotline]</span> [0000-000-000]</span><a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a><a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a><a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a></div>
+      </div>
+    </div>
+  </footer></script>
+<script type="text/plain" id="mmScriptDesktop">const nl={s1:['[區塊 1]','[SECTION 1]'],s2:['[區塊 2]','[SECTION 2]'],s3:['[區塊 3]','[SECTION 3]'],s4:['[區塊 4]','[SECTION 4]'],s5:['[區塊 5]','[SECTION 5]'],s6:['[區塊 6]','[SECTION 6]'],s7:['[區塊 7]','[SECTION 7]'],cta:['[行動呼籲]','[CALL TO ACTION]'],companyBlurb:['[一句話介紹這個組織]','[One line about the organisation]'],privacy:['[隱私權]','[Privacy]'],sitemap:['[網站地圖]','[Sitemap]'],hotline:['[服務專線]','[Hotline]'],home:['[首頁]','[Home]'],overview:['[總覽]','[Overview]'],explore:['[開始探索]','[Explore]'],pageSub:['[一句話說明這個頁面的用途。]','[One line describing what this page is for.]'],ph1t:['[頁面內容預留區]','[Page content placeholder]'],ph1b:['[這個原型只示範導覽結構，實際內容後續填入。]','[This prototype demonstrates navigation only; real content comes later.]'],ph2t:['[同層頁面]','[Sibling pages]'],ph3t:['[導覽提示]','[How to use this]'],ph3b:['[將游標移到上方任一主選單即可展開。]','[Hover any top-level menu above to open it.]'],search:['[站內搜尋]','[Search this site]'],homeTitle:['[導覽原型標題]','[Navigation prototype title]'],homeSub:['[一兩句說明這份原型涵蓋的範圍。]','[A line or two on what this prototype covers.]']};
+const site={
+s1:{accent:'#2563EB',large:true,title:['[區塊 1]','[SECTION 1]'],groups:[
+[['[群組 1.1]','[GROUP 1.1]'],[['[頁面 1.1.1]','[PAGE 1.1.1]'],['[頁面 1.1.2]','[PAGE 1.1.2]'],['[頁面 1.1.3]','[PAGE 1.1.3]'],['[頁面 1.1.4]','[PAGE 1.1.4]'],['[頁面 1.1.5]','[PAGE 1.1.5]']]],
+[['[群組 1.2]','[GROUP 1.2]'],[['[頁面 1.2.1]','[PAGE 1.2.1]'],['[頁面 1.2.2]','[PAGE 1.2.2]'],['[頁面 1.2.3]','[PAGE 1.2.3]'],['[頁面 1.2.4]','[PAGE 1.2.4]'],['[頁面 1.2.5]','[PAGE 1.2.5]']]],
+[['[群組 1.3]','[GROUP 1.3]'],[['[頁面 1.3.1]','[PAGE 1.3.1]'],['[頁面 1.3.2]','[PAGE 1.3.2]'],['[頁面 1.3.3]','[PAGE 1.3.3]'],['[頁面 1.3.4]','[PAGE 1.3.4]'],['[頁面 1.3.5]','[PAGE 1.3.5]']]],
+[['[群組 1.4]','[GROUP 1.4]'],[['[頁面 1.4.1]','[PAGE 1.4.1]'],['[頁面 1.4.2]','[PAGE 1.4.2]'],['[頁面 1.4.3]','[PAGE 1.4.3]'],['[頁面 1.4.4]','[PAGE 1.4.4]'],['[頁面 1.4.5]','[PAGE 1.4.5]']]],
+[['[群組 1.5]','[GROUP 1.5]'],[['[頁面 1.5.1]','[PAGE 1.5.1]'],['[頁面 1.5.2]','[PAGE 1.5.2]'],['[頁面 1.5.3]','[PAGE 1.5.3]'],['[頁面 1.5.4]','[PAGE 1.5.4]'],['[頁面 1.5.5]','[PAGE 1.5.5]']]],
+[['[群組 1.6]','[GROUP 1.6]'],[['[頁面 1.6.1]','[PAGE 1.6.1]'],['[頁面 1.6.2]','[PAGE 1.6.2]'],['[頁面 1.6.3]','[PAGE 1.6.3]'],['[頁面 1.6.4]','[PAGE 1.6.4]'],['[頁面 1.6.5]','[PAGE 1.6.5]']]]]},
+s2:{accent:'#059669',large:true,title:['[區塊 2]','[SECTION 2]'],groups:[
+[['[群組 2.1]','[GROUP 2.1]'],[['[頁面 2.1.1]','[PAGE 2.1.1]'],['[頁面 2.1.2]','[PAGE 2.1.2]'],['[頁面 2.1.3]','[PAGE 2.1.3]'],['[頁面 2.1.4]','[PAGE 2.1.4]']]],
+[['[群組 2.2]','[GROUP 2.2]'],[['[頁面 2.2.1]','[PAGE 2.2.1]'],['[頁面 2.2.2]','[PAGE 2.2.2]'],['[頁面 2.2.3]','[PAGE 2.2.3]'],['[頁面 2.2.4]','[PAGE 2.2.4]']]],
+[['[群組 2.3]','[GROUP 2.3]'],[['[頁面 2.3.1]','[PAGE 2.3.1]'],['[頁面 2.3.2]','[PAGE 2.3.2]'],['[頁面 2.3.3]','[PAGE 2.3.3]'],['[頁面 2.3.4]','[PAGE 2.3.4]']]],
+[['[群組 2.4]','[GROUP 2.4]'],[['[頁面 2.4.1]','[PAGE 2.4.1]'],['[頁面 2.4.2]','[PAGE 2.4.2]'],['[頁面 2.4.3]','[PAGE 2.4.3]'],['[頁面 2.4.4]','[PAGE 2.4.4]']]],
+[['[群組 2.5]','[GROUP 2.5]'],[['[頁面 2.5.1]','[PAGE 2.5.1]'],['[頁面 2.5.2]','[PAGE 2.5.2]'],['[頁面 2.5.3]','[PAGE 2.5.3]'],['[頁面 2.5.4]','[PAGE 2.5.4]']]]]},
+s3:{accent:'#7C3AED',large:false,title:['[區塊 3]','[SECTION 3]'],groups:[
+[['[群組 3.1]','[GROUP 3.1]'],[['[頁面 3.1.1]','[PAGE 3.1.1]'],['[頁面 3.1.2]','[PAGE 3.1.2]'],['[頁面 3.1.3]','[PAGE 3.1.3]'],['[頁面 3.1.4]','[PAGE 3.1.4]']]],
+[['[群組 3.2]','[GROUP 3.2]'],[['[頁面 3.2.1]','[PAGE 3.2.1]'],['[頁面 3.2.2]','[PAGE 3.2.2]'],['[頁面 3.2.3]','[PAGE 3.2.3]'],['[頁面 3.2.4]','[PAGE 3.2.4]']]],
+[['[群組 3.3]','[GROUP 3.3]'],[['[頁面 3.3.1]','[PAGE 3.3.1]'],['[頁面 3.3.2]','[PAGE 3.3.2]'],['[頁面 3.3.3]','[PAGE 3.3.3]'],['[頁面 3.3.4]','[PAGE 3.3.4]']]],
+[['[群組 3.4]','[GROUP 3.4]'],[['[頁面 3.4.1]','[PAGE 3.4.1]'],['[頁面 3.4.2]','[PAGE 3.4.2]'],['[頁面 3.4.3]','[PAGE 3.4.3]'],['[頁面 3.4.4]','[PAGE 3.4.4]']]]]},
+s4:{accent:'#EA580C',large:false,title:['[區塊 4]','[SECTION 4]'],groups:[
+[['[群組 4.1]','[GROUP 4.1]'],[['[頁面 4.1.1]','[PAGE 4.1.1]'],['[頁面 4.1.2]','[PAGE 4.1.2]'],['[頁面 4.1.3]','[PAGE 4.1.3]']]],
+[['[群組 4.2]','[GROUP 4.2]'],[['[頁面 4.2.1]','[PAGE 4.2.1]'],['[頁面 4.2.2]','[PAGE 4.2.2]'],['[頁面 4.2.3]','[PAGE 4.2.3]']]],
+[['[群組 4.3]','[GROUP 4.3]'],[['[頁面 4.3.1]','[PAGE 4.3.1]'],['[頁面 4.3.2]','[PAGE 4.3.2]'],['[頁面 4.3.3]','[PAGE 4.3.3]']]]]},
+s5:{accent:'#0891B2',large:false,title:['[區塊 5]','[SECTION 5]'],groups:[
+[['[群組 5.1]','[GROUP 5.1]'],[]],
+[['[群組 5.2]','[GROUP 5.2]'],[]],
+[['[群組 5.3]','[GROUP 5.3]'],[]]]},
+s6:{accent:'#4B5563',large:false,title:['[區塊 6]','[SECTION 6]'],groups:[
+[['[群組 6.1]','[GROUP 6.1]'],[]],
+[['[群組 6.2]','[GROUP 6.2]'],[]],
+[['[群組 6.3]','[GROUP 6.3]'],[]]]},
+s7:{accent:'#DC2626',large:false,title:['[區塊 7]','[SECTION 7]'],groups:[
+[['[群組 7.1]','[GROUP 7.1]'],[]],
+[['[群組 7.2]','[GROUP 7.2]'],[]]]}
+};
+let lang=0, openMenu=null, hovered={s1:0,s2:0}, page={cat:null,gi:0,li:-1};
+const t=p=>p[lang];
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const slug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,28)||'page';
+
+/* ---------- mega menu rendering ---------- */
+function largeHTML(key,cat){
+  const idx=hovered[key]||0, g=cat.groups[idx];
+  return '<div class="border-b border-[#2a2a2a] bg-[#181818] shadow-[0_24px_48px_rgba(0,0,0,.55)]"><div class="mx-auto grid max-w-[1320px] grid-cols-[300px_1fr] px-6">'
+  +'<div class="menu-scroll max-h-[520px] overflow-y-auto border-r border-[#2a2a2a] py-6 pr-5">'
+  +'<div class="mb-4 px-3 text-[11px] font-semibold uppercase tracking-[.14em] text-[#666]">'+esc(t(cat.title))+'</div>'
+  +cat.groups.map(function(x,i){return '<div role="button" tabindex="0" class="l2-item '+(i===idx?'active':'')+' mb-1 flex cursor-pointer items-center justify-between rounded-lg px-3 py-2.5 text-sm text-[#a8a8a8] hover:text-white" data-l2="'+key+'|'+i+'"><span>'+esc(t(x[0]))+'</span><i class="arrow fa-solid fa-chevron-right text-[10px] opacity-0" style="color:'+cat.accent+'"></i></div>'}).join('')
+  +'</div><div class="min-h-[460px] px-10 py-8">'
+  +'<div class="mb-6 flex items-end justify-between border-b border-[#252525] pb-5"><div class="border-l-2 pl-4" style="border-color:'+cat.accent+'"><div class="text-[11px] font-semibold uppercase tracking-[.14em]" style="color:'+cat.accent+'">'+esc(t(cat.title))+'</div><h2 class="mt-2 text-2xl font-medium tracking-[-.5px]">'+esc(t(g[0]))+'</h2></div>'
+  +'<a href="#" data-nav="'+key+'|'+idx+'|-1" class="flex items-center gap-2 rounded-lg border border-[#333] px-3.5 py-2 text-xs font-medium text-[#c4c4c4] hover:border-[#555] hover:text-white">'+esc(t(nl.overview))+' <i class="fa-solid fa-arrow-right text-[10px]"></i></a></div>'
+  +'<div class="grid grid-cols-3 gap-x-9 gap-y-1">'+g[1].map(function(x,j){return '<a href="#" data-nav="'+key+'|'+idx+'|'+j+'" class="group flex items-center justify-between border-b border-[#272727] py-3 text-sm text-[#c4c4c4] hover:text-white"><span>'+esc(t(x))+'</span><i class="fa-solid fa-arrow-right text-[10px] opacity-0 transition group-hover:opacity-100" style="color:'+cat.accent+'"></i></a>'}).join('')
+  +'</div></div></div></div>';
+}
+function simpleHTML(key,cat){
+  return '<div class="border-b border-[#2a2a2a] bg-[#181818] shadow-[0_24px_48px_rgba(0,0,0,.55)]"><div class="mx-auto max-w-[1320px] px-6 py-8">'
+  +'<div class="mb-7 border-l-2 pl-4" style="border-color:'+cat.accent+'"><div class="text-[11px] font-semibold uppercase tracking-[.14em]" style="color:'+cat.accent+'">'+esc(t(nl.explore))+'</div><h2 class="mt-2 text-2xl font-medium tracking-[-.5px]">'+esc(t(cat.title))+'</h2></div>'
+  +'<div class="grid '+(cat.groups.length<=4?'grid-cols-4':'grid-cols-5')+' gap-4">'
+  +cat.groups.map(function(g,i){return '<div class="rounded-xl border border-[#2a2a2a] bg-[#1c1c1c] p-4 hover:border-[#3a3a3a]"><a href="#" data-nav="'+key+'|'+i+'|-1" class="flex items-center justify-between text-sm font-semibold text-white"><span>'+esc(t(g[0]))+'</span><i class="fa-solid fa-arrow-right text-[10px]" style="color:'+cat.accent+'"></i></a>'
+  +(g[1].length?'<div class="mt-3 space-y-2 border-t border-[#2a2a2a] pt-3">'+g[1].map(function(x,j){return '<a href="#" data-nav="'+key+'|'+i+'|'+j+'" class="block text-xs leading-5 text-[#888] hover:text-white">'+esc(t(x))+'</a>'}).join('')+'</div>':'')
+  +'</div>'}).join('')+'</div></div></div>';
+}
+function renderMenu(){
+  const root=document.getElementById('megaRoot');
+  if(!openMenu){root.classList.remove('open');document.getElementById('scrim').classList.remove('open');root.innerHTML='';return}
+  const cat=site[openMenu];
+  root.innerHTML=cat.large?largeHTML(openMenu,cat):simpleHTML(openMenu,cat);
+  root.classList.add('open');document.getElementById('scrim').classList.add('open');
+}
+function setMenu(key){
+  openMenu=key;
+  document.querySelectorAll('.nav-trigger').forEach(function(b){b.classList.toggle('open',b.dataset.menu===key)});
+  renderMenu();
+}
+function closeMenu(){openMenu=null;document.querySelectorAll('.nav-trigger').forEach(function(b){b.classList.remove('open')});renderMenu()}
+
+/* ---------- optional per-page summaries ----------
+   [sectionIndex, 'L2 label', 'L3 label or empty string', 'summary'].
+   Matched fuzzily against the labels above, so the text here only has to be
+   close. Leave the array empty and the summary card simply never shows. */
+const DESC_L1={s1:0,s2:1,s3:2,s4:3,s5:4,s6:5,s7:6};
+const DESC=[
+[0,"[GROUP 1.1]","","[Why this group exists and what a visitor is looking for when they land here.]"],
+[0,"[GROUP 1.1]","[PAGE 1.1.1]","[What this page has to prove, and what it links on to.]"]];
+function dnorm(s){return String(s||'').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g,'')}
+function dgrams(s){const o={};for(let i=0;i<s.length-1;i++){o[s.slice(i,i+2)]=1}return o}
+function dsim(a,b){a=dnorm(a);b=dnorm(b);if(!a||!b)return 0;if(a===b)return 1;
+  if(a.length>=3&&b.length>=3&&(a.indexOf(b)>=0||b.indexOf(a)>=0))return .95;
+  const A=dgrams(a),B=dgrams(b);let hit=0;const na=Object.keys(A).length,nb=Object.keys(B).length;
+  Object.keys(A).forEach(function(k){if(B[k])hit++});return (na+nb)?2*hit/(na+nb):0}
+function lookupDesc(p){
+  if(!p||!p.cat)return null;
+  const code=DESC_L1[p.cat], cat=site[p.cat], g=cat.groups[p.gi], isL3=p.li>=0;
+  const zh=isL3?g[1][p.li][0]:g[0][0], en=isL3?g[1][p.li][1]:g[0][1];
+  let best=null,bs=0;
+  for(let i=0;i<DESC.length;i++){
+    const r=DESC[i];
+    if(r[0]!==code)continue;
+    if(isL3?!r[2]:!!r[2])continue;
+    const key=isL3?r[2]:r[1];
+    let s=Math.max(dsim(key,zh),dsim(key,en));
+    if(isL3)s=s*0.85+0.15*Math.max(dsim(r[1],g[0][0]),dsim(r[1],g[0][1]));
+    if(s>bs){bs=s;best=r}
+  }
+  return bs>=0.5?best[3]:null;
+}
+function setDesc(text){
+  const box=document.getElementById('pageDesc'), body=document.getElementById('pageDescBody');
+  if(!box||!body)return;
+  if(!text){box.classList.add('hidden');return}
+  box.classList.remove('hidden');body.textContent=text;
+}
+
+/* ---------- page rendering ---------- */
+function renderPage(){
+  const bc=document.getElementById('breadcrumb');
+  const sep='<i class="fa-solid fa-chevron-right text-[8px] text-[#444]"></i>';
+  if(!page.cat){
+    bc.innerHTML='<a href="#" data-nav="home" class="text-white">'+esc(t(nl.home))+'</a>';
+    document.getElementById('routePath').textContent='/';
+    document.getElementById('pageAccent').style.background='#0007CD';
+    document.getElementById('pageKicker').textContent='[BRAND]';
+    document.getElementById('pageKicker').style.color='#5b61ff';
+    document.getElementById('pageTitle').textContent=t(nl.homeTitle);
+    document.getElementById('pageSub').textContent=t(nl.homeSub);
+    setDesc(null);
+    document.getElementById('siblingList').innerHTML=Object.keys(site).map(function(k){return '<a href="#" data-nav="'+k+'|0|-1" class="block text-sm text-[#8f8f8f] hover:text-white">'+esc(t(site[k].title))+'</a>'}).join('');
+    return;
+  }
+  const cat=site[page.cat], g=cat.groups[page.gi];
+  const title=page.li>=0?t(g[1][page.li]):t(g[0]);
+  const parts=['<a href="#" data-nav="home" class="hover:text-white">'+esc(t(nl.home))+'</a>',sep,
+    '<a href="#" data-nav="'+page.cat+'|0|-1" class="hover:text-white">'+esc(t(cat.title))+'</a>',sep,
+    '<a href="#" data-nav="'+page.cat+'|'+page.gi+'|-1" class="hover:text-white">'+esc(t(g[0]))+'</a>'];
+  if(page.li>=0)parts.push(sep,'<span class="text-white">'+esc(title)+'</span>');
+  bc.innerHTML=parts.join('');
+  document.getElementById('routePath').textContent='/'+slug(cat.title[1])+'/'+slug(g[0][1])+(page.li>=0?'/'+slug(g[1][page.li][1]):'');
+  document.getElementById('pageAccent').style.background=cat.accent;
+  const kick=document.getElementById('pageKicker');
+  kick.textContent=t(cat.title)+' · '+t(g[0]);kick.style.color=cat.accent;
+  document.getElementById('pageTitle').textContent=title;
+  document.getElementById('pageSub').textContent=t(nl.pageSub);
+  setDesc(lookupDesc(page));
+  const sibs=page.li>=0?g[1]:cat.groups.map(function(x){return x[0]});
+  document.getElementById('siblingList').innerHTML=sibs.slice(0,8).map(function(x,j){
+    const target=page.li>=0?(page.cat+'|'+page.gi+'|'+j):(page.cat+'|'+j+'|-1');
+    const on=page.li>=0?j===page.li:j===page.gi;
+    return '<a href="#" data-nav="'+target+'" class="block text-sm '+(on?'text-white':'text-[#8f8f8f]')+' hover:text-white">'+esc(t(x))+'</a>'}).join('');
+}
+function go(token){
+  if(token==='home'){page={cat:null,gi:0,li:-1}}
+  else{const p=token.split('|');page={cat:p[0],gi:+p[1],li:+p[2]};if(site[p[0]].large)hovered[p[0]]=+p[1]}
+  closeMenu();renderPage();window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------- footer + i18n ---------- */
+function renderFooter(){
+  const sets={footerS1:['s1',[0,1,2,3,4,5]],footerS2:['s2',[0,1,2,3,4]],footerS3:['s3',[0,1,2,3]],footerS5:['s5',[0,1,2]],footerS6:['s6',[0,1,2]]};
+  Object.keys(sets).forEach(function(id){
+    const key=sets[id][0], idxs=sets[id][1];
+    document.getElementById(id).innerHTML=idxs.map(function(i){return '<a href="#" data-nav="'+key+'|'+i+'|-1" class="block hover:text-white">'+esc(t(site[key].groups[i][0]))+'</a>'}).join('');
+  });
+}
+function applyLanguage(){
+  document.documentElement.lang=lang?'en':'zh-Hant';
+  document.getElementById('langLabel').textContent=lang?'EN':'zh-TW';
+  document.querySelectorAll('[data-nl]').forEach(function(el){el.textContent=nl[el.dataset.nl][lang]});
+  renderFooter();renderPage();if(openMenu)renderMenu();
+}
+
+/* ---------- events ---------- */
+document.querySelectorAll('.nav-trigger').forEach(function(btn){
+  btn.addEventListener('mouseenter',function(){setMenu(btn.dataset.menu)});
+  btn.addEventListener('click',function(){openMenu===btn.dataset.menu?closeMenu():setMenu(btn.dataset.menu)});
+});
+document.getElementById('navShell').addEventListener('mouseleave',closeMenu);
+document.getElementById('scrim').addEventListener('click',closeMenu);
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMenu()});
+document.getElementById('megaRoot').addEventListener('mouseover',function(e){
+  const el=e.target.closest('[data-l2]');if(!el)return;
+  const p=el.dataset.l2.split('|');if(hovered[p[0]]===+p[1])return;hovered[p[0]]=+p[1];renderMenu();
+});
+document.addEventListener('click',function(e){
+  const l2=e.target.closest('[data-l2]');
+  if(l2){const p=l2.dataset.l2.split('|');go(p[0]+'|'+p[1]+'|-1');return}
+  const el=e.target.closest('[data-nav]');
+  if(el){e.preventDefault();go(el.dataset.nav)}
+});
+document.getElementById('langToggle').addEventListener('click',function(){lang=lang?0:1;applyLanguage()});
+applyLanguage();
+setMenu('s1');</script>
+<script type="text/plain" id="mmStyleMobile">    body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;letter-spacing:-0.01em}
+    .mono{font-family:'JetBrains Mono',monospace}
+    .menu-scroll::-webkit-scrollbar{width:4px}
+    .menu-scroll::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
+    #mobileNav{display:none}
+    #mobileNav.open{display:block}
+    .chev{transition:transform .18s}
+    .row-open .chev{transform:rotate(180deg)}</script>
+<script type="text/plain" id="mmBodyMobile"><body class="w-[390px] bg-[#0f0f0f] text-white antialiased">
+
+  <header data-design-id="header-mobile-main-c9r2k5" class="sticky top-0 z-40 h-16 border-b border-[#2a2a2a] bg-[#0f0f0f]">
+    <div class="flex h-full items-center justify-between px-4">
+      <a href="#" data-nav="home" class="flex items-center gap-2.5" aria-label="[BRAND] home"><span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0007CD] text-sm font-semibold">[B]</span><span class="text-[17px] font-semibold tracking-[-0.4px]">[BRAND]<span class="text-[#5b61ff]">.</span></span></a>
+      <div class="flex items-center gap-1.5">
+        <button data-design-id="language-toggle-mobile-btn-g4v8n1" type="button" id="langToggle" class="flex h-10 items-center gap-2 rounded-lg border border-[#333] px-3 text-xs font-medium"><i class="fa-solid fa-globe text-[#888]"></i><span id="langLabel">zh-TW</span></button>
+        <button data-design-id="hamburger-toggle-mobile-btn-j7x3m9" type="button" id="menuToggle" class="flex h-10 w-10 items-center justify-center rounded-lg bg-[#222] text-white" aria-label="Menu"><i id="menuIcon" class="fa-solid fa-bars text-lg"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <nav data-design-id="nav-mobile-accordion-p5d1w8" id="mobileNav" class="menu-scroll relative z-30 max-h-[700px] overflow-y-auto border-b border-[#2a2a2a] bg-[#141414]" aria-label="Mobile navigation">
+    <div class="border-b border-[#222] px-4 py-4">
+      <form data-design-id="mobile-search-form-e3w9k1" action="#" class="relative"><i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-xs text-[#666]"></i><input class="h-10 w-full rounded-lg border border-[#2a2a2a] bg-[#181818] pl-9 pr-3 text-sm text-white outline-none placeholder:text-[#666]" id="searchInput" placeholder="[Search this site]"></form>
+    </div>
+    <div id="navTree" class="px-3 py-2"></div>
+    <div class="p-4 pt-2"><button data-design-id="mobile-consultation-cta-btn-z6q2f4" type="button" data-nav="s7|0|-1" class="h-11 w-full rounded-lg bg-[#0007CD] text-sm font-medium hover:bg-[#0005A3]" data-nl="cta">[CALL TO ACTION]</button></div>
+  </nav>
+
+  <main data-design-id="main-mobile-placeholder-a8k4u7" class="bg-[#0f0f0f]">
+    <section data-design-id="page-breadcrumb-mobile-section-r7d2v9" class="border-b border-[#1c1c1c] bg-[#121212] px-4 py-3">
+      <div id="breadcrumb" class="flex flex-wrap items-center gap-1.5 text-[11px] leading-5 text-[#888]"></div>
+      <div id="routePath" class="mono mt-1 text-[10px] text-[#555]"></div>
+    </section>
+
+    <section data-design-id="page-placeholder-mobile-section-n3c7t2" class="px-4 pb-14 pt-8">
+      <div class="flex items-start gap-4">
+        <span id="pageAccent" class="mt-1.5 h-10 w-[3px] shrink-0 rounded-full bg-[#0007CD]"></span>
+        <div>
+          <div id="pageKicker" class="text-[10px] font-semibold uppercase tracking-[.14em] text-[#5b61ff]"></div>
+          <h1 id="pageTitle" class="mt-1.5 text-[28px] font-medium leading-[1.15] tracking-[-0.8px]"></h1>
+          <p id="pageSub" class="mt-2.5 text-sm leading-6 text-[#a8a8a8]"></p>
+        </div>
+      </div>
+      <section data-design-id="page-summary-mobile-section-w4t8p1" id="pageDesc" class="mb-7 hidden rounded-2xl border border-[#222] bg-[#181818] p-5">
+        <div class="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.16em] text-[#666]"><i class="fa-regular fa-lightbulb text-[11px]"></i><span>[Page summary]</span></div>
+        <p id="pageDescBody" class="mt-3 text-[13px] leading-6 text-[#a8a8a8]"></p>
+      </section>
+
+      <article data-design-id="mobile-placeholder-card-1-b6y3n8" class="mt-8 rounded-2xl border border-[#222] bg-[#181818] p-5">
+        <span class="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-[#222] text-[#888]"><i class="fa-regular fa-file-lines text-sm"></i></span>
+        <h2 class="text-base font-semibold text-white" data-nl="ph1t">[Page content placeholder]</h2>
+        <p class="mt-2 text-xs leading-6 text-[#8f8f8f]" data-nl="ph1b">[This prototype demonstrates navigation only.]</p>
+      </article>
+      <article data-design-id="mobile-placeholder-card-2-k9m4s2" class="mt-4 rounded-2xl border border-[#222] bg-[#181818] p-5">
+        <span class="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-[#222] text-[#888]"><i class="fa-solid fa-sitemap text-sm"></i></span>
+        <h2 class="text-base font-semibold text-white" data-nl="ph2t">[Sibling pages]</h2>
+        <div id="siblingList" class="mt-3 space-y-2.5"></div>
+      </article>
+    </section>
+  </main>
+
+  <footer data-design-id="footer-mobile-main-h2m9s6" class="border-t border-[#222] bg-[#0f0f0f] px-5 pb-8 pt-10 text-sm text-[#a8a8a8]">
+    <div class="mb-6 flex items-center gap-3 text-white"><span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0007CD] text-sm font-semibold">[B]</span><span class="text-lg font-semibold">[BRAND].</span></div>
+    <p class="mb-7 text-sm leading-6" data-nl="companyBlurb">[One line about the organisation.]</p>
+    <div id="footerTree" class="divide-y divide-[#222] border-y border-[#222]"></div>
+    <div class="mt-8 space-y-4 text-xs text-[#888]">
+      <div><i class="fa-solid fa-phone mr-2"></i><span data-nl="hotline">[Hotline]</span> [0000-000-000]</div>
+      <div class="flex items-center gap-5 text-[#a8a8a8]"><a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a><a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a><a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a></div>
+      <div class="flex gap-5"><a href="#" data-nl="privacy">[Privacy]</a><a href="#" data-nl="sitemap">[Sitemap]</a></div>
+      <div class="pt-2 text-[#555]">© [YEAR] [ORGANISATION]</div>
+    </div>
+  </footer>
+</script>
+<script type="text/plain" id="mmScriptMobile">const nl={s1:['[區塊 1]','[SECTION 1]'],s2:['[區塊 2]','[SECTION 2]'],s3:['[區塊 3]','[SECTION 3]'],s4:['[區塊 4]','[SECTION 4]'],s5:['[區塊 5]','[SECTION 5]'],s6:['[區塊 6]','[SECTION 6]'],s7:['[區塊 7]','[SECTION 7]'],cta:['[行動呼籲]','[CALL TO ACTION]'],companyBlurb:['[一句話介紹這個組織]','[One line about the organisation]'],privacy:['[隱私權]','[Privacy]'],sitemap:['[網站地圖]','[Sitemap]'],hotline:['[服務專線]','[Hotline]'],home:['[首頁]','[Home]'],overview:['[總覽]','[Overview]'],explore:['[開始探索]','[Explore]'],pageSub:['[一句話說明這個頁面的用途。]','[One line describing what this page is for.]'],ph1t:['[頁面內容預留區]','[Page content placeholder]'],ph1b:['[這個原型只示範導覽結構，實際內容後續填入。]','[This prototype demonstrates navigation only; real content comes later.]'],ph2t:['[同層頁面]','[Sibling pages]'],ph3t:['[導覽提示]','[How to use this]'],ph3b:['[將游標移到上方任一主選單即可展開。]','[Hover any top-level menu above to open it.]'],search:['[站內搜尋]','[Search this site]'],homeTitle:['[導覽原型標題]','[Navigation prototype title]'],homeSub:['[一兩句說明這份原型涵蓋的範圍。]','[A line or two on what this prototype covers.]']};
+const site={
+s1:{accent:'#2563EB',large:true,title:['[區塊 1]','[SECTION 1]'],groups:[
+[['[群組 1.1]','[GROUP 1.1]'],[['[頁面 1.1.1]','[PAGE 1.1.1]'],['[頁面 1.1.2]','[PAGE 1.1.2]'],['[頁面 1.1.3]','[PAGE 1.1.3]'],['[頁面 1.1.4]','[PAGE 1.1.4]'],['[頁面 1.1.5]','[PAGE 1.1.5]']]],
+[['[群組 1.2]','[GROUP 1.2]'],[['[頁面 1.2.1]','[PAGE 1.2.1]'],['[頁面 1.2.2]','[PAGE 1.2.2]'],['[頁面 1.2.3]','[PAGE 1.2.3]'],['[頁面 1.2.4]','[PAGE 1.2.4]'],['[頁面 1.2.5]','[PAGE 1.2.5]']]],
+[['[群組 1.3]','[GROUP 1.3]'],[['[頁面 1.3.1]','[PAGE 1.3.1]'],['[頁面 1.3.2]','[PAGE 1.3.2]'],['[頁面 1.3.3]','[PAGE 1.3.3]'],['[頁面 1.3.4]','[PAGE 1.3.4]'],['[頁面 1.3.5]','[PAGE 1.3.5]']]],
+[['[群組 1.4]','[GROUP 1.4]'],[['[頁面 1.4.1]','[PAGE 1.4.1]'],['[頁面 1.4.2]','[PAGE 1.4.2]'],['[頁面 1.4.3]','[PAGE 1.4.3]'],['[頁面 1.4.4]','[PAGE 1.4.4]'],['[頁面 1.4.5]','[PAGE 1.4.5]']]],
+[['[群組 1.5]','[GROUP 1.5]'],[['[頁面 1.5.1]','[PAGE 1.5.1]'],['[頁面 1.5.2]','[PAGE 1.5.2]'],['[頁面 1.5.3]','[PAGE 1.5.3]'],['[頁面 1.5.4]','[PAGE 1.5.4]'],['[頁面 1.5.5]','[PAGE 1.5.5]']]],
+[['[群組 1.6]','[GROUP 1.6]'],[['[頁面 1.6.1]','[PAGE 1.6.1]'],['[頁面 1.6.2]','[PAGE 1.6.2]'],['[頁面 1.6.3]','[PAGE 1.6.3]'],['[頁面 1.6.4]','[PAGE 1.6.4]'],['[頁面 1.6.5]','[PAGE 1.6.5]']]]]},
+s2:{accent:'#059669',large:true,title:['[區塊 2]','[SECTION 2]'],groups:[
+[['[群組 2.1]','[GROUP 2.1]'],[['[頁面 2.1.1]','[PAGE 2.1.1]'],['[頁面 2.1.2]','[PAGE 2.1.2]'],['[頁面 2.1.3]','[PAGE 2.1.3]'],['[頁面 2.1.4]','[PAGE 2.1.4]']]],
+[['[群組 2.2]','[GROUP 2.2]'],[['[頁面 2.2.1]','[PAGE 2.2.1]'],['[頁面 2.2.2]','[PAGE 2.2.2]'],['[頁面 2.2.3]','[PAGE 2.2.3]'],['[頁面 2.2.4]','[PAGE 2.2.4]']]],
+[['[群組 2.3]','[GROUP 2.3]'],[['[頁面 2.3.1]','[PAGE 2.3.1]'],['[頁面 2.3.2]','[PAGE 2.3.2]'],['[頁面 2.3.3]','[PAGE 2.3.3]'],['[頁面 2.3.4]','[PAGE 2.3.4]']]],
+[['[群組 2.4]','[GROUP 2.4]'],[['[頁面 2.4.1]','[PAGE 2.4.1]'],['[頁面 2.4.2]','[PAGE 2.4.2]'],['[頁面 2.4.3]','[PAGE 2.4.3]'],['[頁面 2.4.4]','[PAGE 2.4.4]']]],
+[['[群組 2.5]','[GROUP 2.5]'],[['[頁面 2.5.1]','[PAGE 2.5.1]'],['[頁面 2.5.2]','[PAGE 2.5.2]'],['[頁面 2.5.3]','[PAGE 2.5.3]'],['[頁面 2.5.4]','[PAGE 2.5.4]']]]]},
+s3:{accent:'#7C3AED',large:false,title:['[區塊 3]','[SECTION 3]'],groups:[
+[['[群組 3.1]','[GROUP 3.1]'],[['[頁面 3.1.1]','[PAGE 3.1.1]'],['[頁面 3.1.2]','[PAGE 3.1.2]'],['[頁面 3.1.3]','[PAGE 3.1.3]'],['[頁面 3.1.4]','[PAGE 3.1.4]']]],
+[['[群組 3.2]','[GROUP 3.2]'],[['[頁面 3.2.1]','[PAGE 3.2.1]'],['[頁面 3.2.2]','[PAGE 3.2.2]'],['[頁面 3.2.3]','[PAGE 3.2.3]'],['[頁面 3.2.4]','[PAGE 3.2.4]']]],
+[['[群組 3.3]','[GROUP 3.3]'],[['[頁面 3.3.1]','[PAGE 3.3.1]'],['[頁面 3.3.2]','[PAGE 3.3.2]'],['[頁面 3.3.3]','[PAGE 3.3.3]'],['[頁面 3.3.4]','[PAGE 3.3.4]']]],
+[['[群組 3.4]','[GROUP 3.4]'],[['[頁面 3.4.1]','[PAGE 3.4.1]'],['[頁面 3.4.2]','[PAGE 3.4.2]'],['[頁面 3.4.3]','[PAGE 3.4.3]'],['[頁面 3.4.4]','[PAGE 3.4.4]']]]]},
+s4:{accent:'#EA580C',large:false,title:['[區塊 4]','[SECTION 4]'],groups:[
+[['[群組 4.1]','[GROUP 4.1]'],[['[頁面 4.1.1]','[PAGE 4.1.1]'],['[頁面 4.1.2]','[PAGE 4.1.2]'],['[頁面 4.1.3]','[PAGE 4.1.3]']]],
+[['[群組 4.2]','[GROUP 4.2]'],[['[頁面 4.2.1]','[PAGE 4.2.1]'],['[頁面 4.2.2]','[PAGE 4.2.2]'],['[頁面 4.2.3]','[PAGE 4.2.3]']]],
+[['[群組 4.3]','[GROUP 4.3]'],[['[頁面 4.3.1]','[PAGE 4.3.1]'],['[頁面 4.3.2]','[PAGE 4.3.2]'],['[頁面 4.3.3]','[PAGE 4.3.3]']]]]},
+s5:{accent:'#0891B2',large:false,title:['[區塊 5]','[SECTION 5]'],groups:[
+[['[群組 5.1]','[GROUP 5.1]'],[]],
+[['[群組 5.2]','[GROUP 5.2]'],[]],
+[['[群組 5.3]','[GROUP 5.3]'],[]]]},
+s6:{accent:'#4B5563',large:false,title:['[區塊 6]','[SECTION 6]'],groups:[
+[['[群組 6.1]','[GROUP 6.1]'],[]],
+[['[群組 6.2]','[GROUP 6.2]'],[]],
+[['[群組 6.3]','[GROUP 6.3]'],[]]]},
+s7:{accent:'#DC2626',large:false,title:['[區塊 7]','[SECTION 7]'],groups:[
+[['[群組 7.1]','[GROUP 7.1]'],[]],
+[['[群組 7.2]','[GROUP 7.2]'],[]]]}
+};
+const order=['s1','s2','s3','s4','s5','s6','s7'];
+let lang=0, menuOpen=false, openL1=null, openL2=null, openFooter=null, page={cat:null,gi:0,li:-1};
+const t=p=>p[lang];
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const slug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,28)||'page';
+
+function renderTree(){
+  document.getElementById('navTree').innerHTML=order.map(function(key){
+    const cat=site[key], isOpen=openL1===key;
+    let html='<div class="mb-1"><div role="button" tabindex="0" data-l1="'+key+'" class="'+(isOpen?'row-open ':'')+'flex cursor-pointer items-center justify-between rounded-lg px-3 py-3.5 '+(isOpen?'bg-[#1d1d1d] text-white':'text-[#c4c4c4]')+'"><span class="flex items-center gap-2.5 text-[15px] font-medium"><span class="h-3.5 w-[3px] rounded-full" style="background:'+cat.accent+'"></span>'+esc(t(cat.title))+'</span><i class="chev fa-solid fa-chevron-down text-[10px] text-[#777]"></i></div>';
+    if(isOpen){
+      html+='<div class="mb-2 mt-1 space-y-1 border-l border-[#2a2a2a] pl-3">';
+      html+=cat.groups.map(function(g,i){
+        const key2=key+'|'+i, sub=openL2===key2, hasKids=g[1].length>0;
+        let s='<div><div class="'+(sub?'row-open ':'')+'flex items-center justify-between rounded-md px-3 py-2.5">'
+        +'<a href="#" data-nav="'+key+'|'+i+'|-1" class="flex-1 text-[13px] '+(sub?'text-white':'text-[#a0a0a0]')+'">'+esc(t(g[0]))+'</a>'
+        +(hasKids?'<span role="button" tabindex="0" data-l2="'+key2+'" class="ml-2 flex h-7 w-7 cursor-pointer items-center justify-center rounded-md bg-[#1d1d1d]"><i class="chev fa-solid fa-chevron-down text-[9px] text-[#777]"></i></span>':'<i class="fa-solid fa-arrow-right text-[9px] text-[#555]"></i>')
+        +'</div>';
+        if(sub&&hasKids){s+='<div class="mb-1 space-y-0.5 border-l border-[#242424] pb-1 pl-3">'+g[1].map(function(x,j){return '<a href="#" data-nav="'+key+'|'+i+'|'+j+'" class="block rounded px-3 py-2 text-[12.5px] leading-5 text-[#8a8a8a] active:bg-[#1d1d1d]">'+esc(t(x))+'</a>'}).join('')+'</div>'}
+        return s+'</div>';
+      }).join('');
+      html+='</div>';
+    }
+    return html+'</div>';
+  }).join('');
+}
+function renderFooterTree(){
+  document.getElementById('footerTree').innerHTML=order.map(function(key){
+    const cat=site[key], isOpen=openFooter===key;
+    let s='<div><div role="button" tabindex="0" data-f1="'+key+'" class="'+(isOpen?'row-open ':'')+'flex cursor-pointer items-center justify-between py-3.5 text-sm font-medium '+(isOpen?'text-white':'text-[#c4c4c4]')+'"><span>'+esc(t(cat.title))+'</span><i class="chev fa-solid fa-chevron-down text-[10px] text-[#666]"></i></div>';
+    if(isOpen){s+='<div class="space-y-2.5 pb-4">'+cat.groups.map(function(g,i){return '<a href="#" data-nav="'+key+'|'+i+'|-1" class="block text-[13px] text-[#8a8a8a]">'+esc(t(g[0]))+'</a>'}).join('')+'</div>'}
+    return s+'</div>';
+  }).join('');
+}
+/* ---------- optional per-page summaries ----------
+   [sectionIndex, 'L2 label', 'L3 label or empty string', 'summary'].
+   Matched fuzzily against the labels above, so the text here only has to be
+   close. Leave the array empty and the summary card simply never shows. */
+const DESC_L1={s1:0,s2:1,s3:2,s4:3,s5:4,s6:5,s7:6};
+const DESC=[
+[0,"[GROUP 1.1]","","[Why this group exists and what a visitor is looking for when they land here.]"],
+[0,"[GROUP 1.1]","[PAGE 1.1.1]","[What this page has to prove, and what it links on to.]"]];
+function dnorm(s){return String(s||'').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g,'')}
+function dgrams(s){const o={};for(let i=0;i<s.length-1;i++){o[s.slice(i,i+2)]=1}return o}
+function dsim(a,b){a=dnorm(a);b=dnorm(b);if(!a||!b)return 0;if(a===b)return 1;
+  if(a.length>=3&&b.length>=3&&(a.indexOf(b)>=0||b.indexOf(a)>=0))return .95;
+  const A=dgrams(a),B=dgrams(b);let hit=0;const na=Object.keys(A).length,nb=Object.keys(B).length;
+  Object.keys(A).forEach(function(k){if(B[k])hit++});return (na+nb)?2*hit/(na+nb):0}
+function lookupDesc(p){
+  if(!p||!p.cat)return null;
+  const code=DESC_L1[p.cat], cat=site[p.cat], g=cat.groups[p.gi], isL3=p.li>=0;
+  const zh=isL3?g[1][p.li][0]:g[0][0], en=isL3?g[1][p.li][1]:g[0][1];
+  let best=null,bs=0;
+  for(let i=0;i<DESC.length;i++){
+    const r=DESC[i];
+    if(r[0]!==code)continue;
+    if(isL3?!r[2]:!!r[2])continue;
+    const key=isL3?r[2]:r[1];
+    let s=Math.max(dsim(key,zh),dsim(key,en));
+    if(isL3)s=s*0.85+0.15*Math.max(dsim(r[1],g[0][0]),dsim(r[1],g[0][1]));
+    if(s>bs){bs=s;best=r}
+  }
+  return bs>=0.5?best[3]:null;
+}
+function setDesc(text){
+  const box=document.getElementById('pageDesc'), body=document.getElementById('pageDescBody');
+  if(!box||!body)return;
+  if(!text){box.classList.add('hidden');return}
+  box.classList.remove('hidden');body.textContent=text;
+}
+function renderPage(){
+  const bc=document.getElementById('breadcrumb');
+  const sep='<i class="fa-solid fa-chevron-right text-[7px] text-[#444]"></i>';
+  if(!page.cat){
+    bc.innerHTML='<span class="text-white">'+esc(t(nl.home))+'</span>';
+    document.getElementById('routePath').textContent='/';
+    document.getElementById('pageAccent').style.background='#0007CD';
+    const k=document.getElementById('pageKicker');k.textContent='[BRAND]';k.style.color='#5b61ff';
+    document.getElementById('pageTitle').textContent=t(nl.homeTitle);
+    document.getElementById('pageSub').textContent=t(nl.homeSub);
+    setDesc(null);
+    document.getElementById('siblingList').innerHTML=order.map(function(k2){return '<a href="#" data-nav="'+k2+'|0|-1" class="block text-[13px] text-[#8f8f8f]">'+esc(t(site[k2].title))+'</a>'}).join('');
+    return;
+  }
+  const cat=site[page.cat], g=cat.groups[page.gi];
+  const title=page.li>=0?t(g[1][page.li]):t(g[0]);
+  const parts=['<a href="#" data-nav="home">'+esc(t(nl.home))+'</a>',sep,'<a href="#" data-nav="'+page.cat+'|0|-1">'+esc(t(cat.title))+'</a>',sep,'<a href="#" data-nav="'+page.cat+'|'+page.gi+'|-1">'+esc(t(g[0]))+'</a>'];
+  if(page.li>=0)parts.push(sep,'<span class="text-white">'+esc(title)+'</span>');
+  bc.innerHTML=parts.join('');
+  document.getElementById('routePath').textContent='/'+slug(cat.title[1])+'/'+slug(g[0][1])+(page.li>=0?'/'+slug(g[1][page.li][1]):'');
+  document.getElementById('pageAccent').style.background=cat.accent;
+  const k=document.getElementById('pageKicker');k.textContent=t(cat.title)+' · '+t(g[0]);k.style.color=cat.accent;
+  document.getElementById('pageTitle').textContent=title;
+  document.getElementById('pageSub').textContent=t(nl.pageSub);
+  setDesc(lookupDesc(page));
+  const sibs=page.li>=0?g[1]:cat.groups.map(function(x){return x[0]});
+  document.getElementById('siblingList').innerHTML=sibs.slice(0,8).map(function(x,j){
+    const target=page.li>=0?(page.cat+'|'+page.gi+'|'+j):(page.cat+'|'+j+'|-1');
+    const on=page.li>=0?j===page.li:j===page.gi;
+    return '<a href="#" data-nav="'+target+'" class="block text-[13px] '+(on?'text-white':'text-[#8f8f8f]')+'">'+esc(t(x))+'</a>'}).join('');
+}
+function setMenu(open){
+  menuOpen=open;
+  document.getElementById('mobileNav').classList.toggle('open',open);
+  document.getElementById('menuIcon').className='fa-solid '+(open?'fa-xmark':'fa-bars')+' text-lg';
+}
+function go(token){
+  if(token==='home'){page={cat:null,gi:0,li:-1}}
+  else{const p=token.split('|');page={cat:p[0],gi:+p[1],li:+p[2]}}
+  setMenu(false);renderPage();window.scrollTo({top:0,behavior:'smooth'});
+}
+function applyLanguage(){
+  document.documentElement.lang=lang?'en':'zh-Hant';
+  document.getElementById('langLabel').textContent=lang?'EN':'zh-TW';
+  document.querySelectorAll('[data-nl]').forEach(function(el){el.textContent=nl[el.dataset.nl][lang]});
+  document.getElementById('searchInput').placeholder=t(nl.search);
+  renderTree();renderFooterTree();renderPage();
+}
+document.getElementById('menuToggle').addEventListener('click',function(){setMenu(!menuOpen)});
+document.getElementById('langToggle').addEventListener('click',function(){lang=lang?0:1;applyLanguage()});
+document.addEventListener('click',function(e){
+  const l1=e.target.closest('[data-l1]');
+  if(l1){openL1=openL1===l1.dataset.l1?null:l1.dataset.l1;openL2=null;renderTree();return}
+  const l2=e.target.closest('[data-l2]');
+  if(l2){openL2=openL2===l2.dataset.l2?null:l2.dataset.l2;renderTree();return}
+  const f1=e.target.closest('[data-f1]');
+  if(f1){openFooter=openFooter===f1.dataset.f1?null:f1.dataset.f1;renderFooterTree();return}
+  const el=e.target.closest('[data-nav]');
+  if(el){e.preventDefault();go(el.dataset.nav)}
+});
+document.querySelector('form[action="#"]').addEventListener('submit',function(e){e.preventDefault()});
+applyLanguage();
+openL1='s1';openL2='s1|1';setMenu(true);renderTree();</script>
+
+<script>
+/* ---------- navigation prototype mount (added when the three decks were merged) ----------
+   The desktop and mobile megamenus were standalone documents that each loaded
+   the Tailwind CDN runtime. Inlining either one here would have been wrong in
+   two ways: Tailwind's preflight resets h1-h6, a, ul and ol, which is most of
+   this document's typography, and both files define a global go(), which is
+   also the name of this document's router. So each keeps its own document.
+   The desktop view gets a same-origin iframe; the mobile view gets a tab.
+
+   Both are written with document.write rather than handed a blob: URL, because
+   this file is read from disk as often as from a server and top-level blob:
+   navigation from a file:// opener is blocked in current Chrome.
+
+   Font Awesome, Tailwind and the webfonts load from a CDN. The
+   `delivery: standalone` intake answer replaces those three tags with inlined
+   copies; nothing else in this script changes. */
+(function () {
+  var FRAME_W = 1440, FRAME_H = 1240;   /* design width; height is a first guess, corrected from the document */
+
+  function part(id) {
+    var el = document.getElementById(id);
+    return el ? el.textContent : '';
+  }
+
+  /* Assembled in the same order the original files used, minus their Cloudflare
+     beacon tag — an external request has no place in a standalone document. */
+  function buildDoc(view) {
+    var mobile = view === 'mobile';
+    return '<!doctype html>\n<html lang="zh-Hant">\n<head>\n'
+      + '<meta charset="utf-8">\n'
+      + '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+      + '<title>' + (mobile ? '[PROJECT] \u00B7 Mobile navigation prototype'
+                            : '[PROJECT] \u00B7 Desktop navigation prototype') + '</title>\n'
+      + '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">\n'
+      + '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">\n'
+      + '<' + 'script src="https://cdn.tailwindcss.com"></' + 'script>\n'
+      + '<style>' + part(mobile ? 'mmStyleMobile' : 'mmStyleDesktop') + '</style>\n'
+      + '</head>\n'
+      + part(mobile ? 'mmBodyMobile' : 'mmBodyDesktop') + '\n'
+      + '<' + 'script>' + part(mobile ? 'mmScriptMobile' : 'mmScriptDesktop') + '</' + 'script>\n'
+      + '</body>\n</html>';
+  }
+
+  function writeInto(win, html) {
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+  }
+
+  /* ---------- desktop, in an iframe scaled to the column ---------- */
+  /* Two numbers drive this: the prototype's own design width, which is fixed
+     at 1440, and its content height, which is not — it changes with the
+     language toggle and with which placeholder page is showing. So the height
+     is measured from the document rather than assumed, and the frame grows to
+     it. That keeps the whole prototype, footer included, on the page: the
+     frame never scrolls internally, so the reader's wheel is never captured. */
+  var stage = document.getElementById('mmStage');
+  var frame = document.getElementById('mmFrame');
+  var fallback = document.getElementById('mmFallback');
+  var frameH = FRAME_H;
+  var mounted = false;
+  var ro = null;
+
+  function fit() {
+    if (!stage || !frame) { return; }
+    var w = stage.getBoundingClientRect().width;
+    if (!w) { return; }                    /* page still display:none */
+    var s = w / FRAME_W;
+    frame.style.transform = 'scale(' + s + ')';
+    stage.style.height = Math.round(frameH * s) + 'px';
+  }
+
+  function sync() {
+    var h = 0;
+    try {
+      var d = frame.contentDocument;
+      if (d && d.body) { h = Math.ceil(d.body.getBoundingClientRect().height); }
+    } catch (e) { h = 0; }
+    if (h > 200 && h !== frameH) {
+      frameH = h;
+      frame.style.height = h + 'px';
+    }
+    fit();
+  }
+
+  /* document.open() clears the DOM but keeps the frame's Window, so the global
+     lexical bindings of a previous mount survive it. The prototype script
+     opens with `const nl = ...` / `const site = ...`, and re-running it in that
+     same realm is a redeclaration — a parse-time SyntaxError that silently
+     stops the whole script, leaving bare markup and no behaviour. Replacing
+     the element gives every mount a genuinely new realm. */
+  function freshFrame() {
+    var next = frame.cloneNode(false);
+    next.removeAttribute('style');
+    frame.parentNode.replaceChild(next, frame);
+    frame = next;
+  }
+
+  function mountDesktop() {
+    if (mounted || !frame) { return; }
+    mounted = true;
+    if (fallback) { fallback.hidden = true; }   /* a past failure must not stick */
+    if (ro) { ro.disconnect(); ro = null; }
+    freshFrame();
+    frameH = FRAME_H;
+    frame.style.height = FRAME_H + 'px';
+    fit();
+    write(2);
+  }
+
+  /* document.open() can refuse while the frame is still parsing an earlier
+     write — several megabytes of Tailwind take a moment — and that is
+     transient. A browser that will not give up the frame at all is not. One
+     retry tells them apart; only the second failure earns the fallback. */
+  function write(triesLeft) {
+    try {
+      writeInto(frame.contentWindow, buildDoc('desktop'));
+    } catch (e) {
+      if (triesLeft > 1) { setTimeout(function () { write(triesLeft - 1); }, 150); }
+      else if (fallback) { fallback.hidden = false; }
+      return;
+    }
+    afterWrite();
+  }
+
+  function afterWrite() {
+    /* Tailwind's runtime generates its stylesheet after parse, so the first
+       measurement is taken again once that has settled. */
+    if (ro) { ro.disconnect(); ro = null; }
+    try {
+      if (window.ResizeObserver && frame.contentDocument.body) {
+        ro = new ResizeObserver(sync);
+        ro.observe(frame.contentDocument.body);
+      }
+    } catch (e) {}
+    [0, 80, 400, 1200].forEach(function (t) { setTimeout(sync, t); });
+    /* The prototype changes its own height as the reader uses it — a page with
+       a summary card is taller than one without, and the English labels wrap
+       differently from the Chinese. ResizeObserver above catches that, but it
+       is the only thing that would, so clicks inside the frame re-measure too:
+       one belt for the common case, one pair of braces. */
+    try {
+      frame.contentDocument.addEventListener('click', function () {
+        setTimeout(sync, 60);
+      }, true);
+    } catch (e) {}
+  }
+
+  /* Deferred until the page is actually looked at: assembling and parsing the
+     document costs several megabytes of string and a full Tailwind pass, which
+     is not worth paying on load for a reader who never opens this page. */
+  function maybeMount() {
+    if (location.hash.indexOf('/megamenu') < 0) { return; }
+    mountDesktop();
+    fit();
+  }
+  window.addEventListener('hashchange', maybeMount);
+  window.addEventListener('resize', fit);
+  /* The card can be laid out at zero width — the page is display:none until
+     its route is active, and a background tab may report nothing until it is
+     first painted. fit() bails in that case, so the stage is watched too:
+     whenever it gains or changes width the scale is recomputed. Without this a
+     mount that happened while the column had no width would leave the frame
+     unscaled at its full 1440px inside a narrower card. */
+  if (window.ResizeObserver && stage) {
+    new ResizeObserver(fit).observe(stage);
+  }
+  maybeMount();
+
+  var reload = document.getElementById('mmReload');
+  if (reload) {
+    reload.addEventListener('click', function () {
+      mounted = false;
+      mountDesktop();
+    });
+  }
+
+  /* ---------- new tabs ---------- */
+  var note = document.getElementById('mmMobileNote');
+  function popup(view) {
+    var w = window.open('', '_blank');
+    if (!w) {
+      /* Nothing else can be done from here: the browser refused the window. */
+      if (note) {
+        note.textContent = document.body.getAttribute('data-lang') === 'zh'
+          ? '\u5206\u9801\u88AB\u700F\u89BD\u5668\u5C01\u9396\uFF0C\u8ACB\u5141\u8A31\u5F48\u51FA\u8996\u7A97\u5F8C\u518D\u8A66\u4E00\u6B21\u3002'
+          : 'The browser blocked the new tab \u2014 allow pop-ups for this page and try again.';
+      }
+      return;
+    }
+    if (note) { note.textContent = ''; }
+    writeInto(w, buildDoc(view));
+  }
+
+  var openMobile = document.getElementById('mmOpenMobile');
+  if (openMobile) {
+    openMobile.addEventListener('click', function () { popup('mobile'); });
+  }
+  ['mmOpenDesktop', 'mmFallbackOpen'].forEach(function (id) {
+    var b = document.getElementById(id);
+    if (b) { b.addEventListener('click', function () { popup('desktop'); }); }
+  });
+})();
+
+</script>
+</body>
+</html>

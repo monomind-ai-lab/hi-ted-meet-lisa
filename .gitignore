@@ -1,0 +1,7 @@
+.DS_Store
+__pycache__/
+*.pyc
+intake.json
+
+# project-context trigger state (session-local, not shared)
+.claude/project-context-state.json
