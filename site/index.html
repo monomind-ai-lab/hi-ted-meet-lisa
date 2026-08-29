@@ -498,7 +498,7 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
   <!-- ── hero ─────────────────────────────────────────────────── -->
   <div class="hero">
     <div>
-      <h1>Hi Ted,<br>Meet Lisa</h1>
+      <h1 class="notranslate" translate="no">Hi Ted,<br>Meet Lisa</h1>
       <hr class="rule">
       <p class="tagline">When Ted meets Lisa,<br>ideas come to life in <strong>HTML</strong></p>
       <p class="sub">Describe a deck. Answer a short visual intake. Your agent hands
@@ -1097,6 +1097,15 @@ function googleTranslateElementInit() {
 
   if (cur !== 'en') {
     protect();
+    /* The document title carries the brand name, which must never be
+       translated — pin it against Google Translate's rewrite. */
+    var titleEl = document.querySelector('title');
+    var fixedTitle = document.title;
+    if (titleEl) {
+      new MutationObserver(function () {
+        if (document.title !== fixedTitle) document.title = fixedTitle;
+      }).observe(titleEl, { childList: true, subtree: true, characterData: true });
+    }
     var sc = document.createElement('script');
     sc.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
     document.head.appendChild(sc);
