@@ -313,6 +313,10 @@ section { padding: clamp(64px, 10vh, 128px) var(--pad); }
 .copybtn:hover { background: #fff; }
 .copybtn.done { background: var(--terracotta); color: #fff; }
 .gen-note { margin-top: 14px; font-size: 13px; color: var(--cream-faint); }
+/* Path 01 has no prompt box, so the button takes the right column —
+   landing where Path 02's box sits, rather than trailing the copy. */
+.pane-cta { display: flex; align-items: flex-start; }
+@media (max-width: 880px) { .pane-cta { margin-top: 20px; } }
 .gen-side h3 { font-size: 20px; margin-bottom: 10px; }
 .gen-side > p { font-size: 14.5px; color: var(--cream-dim); max-width: 46ch; }
 .agents {
@@ -551,7 +555,7 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
       <div class="framed">
         <img src="assets/tedlisaidea.jpg" alt="Line illustration of Ted and Lisa standing together inside a white frame, over a blurred poppy photograph.">
       </div>
-      <p class="caption"><span>@monomind ai lab</span></p>
+      <p class="caption"><span class="notranslate" translate="no">@monomind ai lab</span></p>
     </div>
   </div>
 
@@ -595,12 +599,16 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
 
       <!-- path 01: try once -->
       <div class="pane on" id="pane-try" role="tabpanel" aria-labelledby="tab-try">
-        <div class="gen-side">
-          <p>Fill in the panel on this page — it asks what this is about, who it is
-          for, and what shape it should take. The last step hands back one prompt
-          with every answer baked in, so your agent asks nothing further and starts
-          building immediately.</p>
-          <button class="btn btn-primary js-open-intake" type="button">Open the intake panel</button>
+        <div class="gen-grid">
+          <div class="gen-side">
+            <p>Fill in the panel on this page — it asks what this is about, who it is
+            for, and what shape it should take. The last step hands back one prompt
+            with every answer baked in, so your agent asks nothing further and starts
+            building immediately.</p>
+          </div>
+          <div class="pane-cta">
+            <button class="btn btn-primary js-open-intake" type="button">Open the intake panel</button>
+          </div>
         </div>
       </div>
 
@@ -999,7 +1007,6 @@ function googleTranslateElementInit() {
     ['.hero .sub', '무엇이 필요한지 알려주세요 — 슬라이드, 문서, 다이어그램, 사이트. 짧은 비주얼 인테이크에 답하면 에이전트가 독립 실행형 HTML 파일 하나를 건네줍니다: 열고, 발표하고, 인쇄하고, 이메일로 보내세요. 빌드 과정도, 설치할 것도 없습니다.', '告訴我們你需要什麼 — 投影片、文件、圖表或網站。回答簡短的視覺化提問，你的 agent 就會交回一個獨立的 HTML 檔案：打開、簡報、列印、寄出都可以。沒有建置流程，也不用安裝任何東西。'],
     ['.hero .cta-row .btn-primary', '필요한 것 알려주기', '告訴我們你需要什麼'],
     ['.hero .cta-row .btn-ghost', '방법 선택하기', '選擇你的路徑'],
-    ['.hero-art .caption span:last-child', '그림 01 — 프레임', '圖 01 — 畫框'],
 
     ['#paths .section-head .kicker', '처음이신가요?', '第一次來嗎？'],
     ['#paths-h', '첫 파일을 만드는 세 가지 방법.', '做出第一個檔案的三種方式。'],
@@ -1019,7 +1026,7 @@ function googleTranslateElementInit() {
     ['#tab-both .pick', '내 것으로, 계속 확장', '擁有它，擴充它'],
 
     ['#pane-try .gen-side p', '이 페이지의 패널을 채우세요 — 무엇에 대한 것인지, 누구를 위한 것인지, 어떤 형태여야 하는지를 묻습니다. 마지막 단계에서 모든 답변이 담긴 프롬프트 하나를 돌려주므로, 에이전트는 더 묻지 않고 바로 만들기 시작합니다.', '在這一頁把面板填完 — 它會問這是關於什麼、給誰看、要做成什麼形態。最後一步會給你一段包含所有答案的提示詞，你的 agent 不會再多問，直接開始製作。'],
-    ['#pane-try .gen-side .btn', '인테이크 패널 열기', '打開 intake 面板'],
+    ['#pane-try .pane-cta .btn', '인테이크 패널 열기', '打開 intake 面板'],
     ['#pane-install .gen-side p', '짧은 프롬프트를 복사하세요 — 채워 넣을 것이 없습니다. 에이전트가 스킬을 받아와 같은 인테이크 패널을 내 브라우저에서 열어 주고, 거기서 답하면 됩니다. 가볍게 써보고 싶은 사람에게 보내기 좋을 만큼 짧습니다.', '複製這段短提示詞 — 沒有任何要填的地方。你的 agent 會抓取技能，並在你自己的瀏覽器裡打開同一份 intake 面板讓你作答。短到可以直接傳給任何想快速試試的人。'],
     ['#pane-install .gen-note', '수정할 것이 없습니다 — 가볍게 써보고 싶은 사람에게 이 프롬프트를 그대로 보내세요.', '沒有需要修改的地方 — 直接把這段提示詞分享給任何想快速試試的人。'],
     ['#pane-both .cmdstep:nth-child(1) b', '스킬 디렉터리에 클론하기', 'clone 到你的技能目錄'],
@@ -1120,7 +1127,7 @@ function googleTranslateElementInit() {
   }
 
   var LITERAL_BLOCKS = '.cmd, .promptbox, code, .file-card, .agents, .lang-panel, .wordmark';
-  var TERMS = /(MonoMind(?: AI Lab)?|MONOMIND(?: AI LAB)?|Hi Ted, Meet Lisa|Claude Code|Gemini CLI|OpenCode|Codex|Hermes|claude\.ai|GitHub|Cloudflare|\bTed\b|\bLisa\b|\/tedandlisa(?:-[a-z-]+)?|[A-Za-z0-9_.-]+\.(?:html|md|json|pptx)\b)/g;
+  var TERMS = /(MonoMind(?: AI Lab)?|MONOMIND(?: AI LAB)?|monomind(?: ai lab)?|Hi Ted, Meet Lisa|Claude Code|Gemini CLI|OpenCode|Codex|Hermes|claude\.ai|GitHub|Cloudflare|\bTed\b|\bLisa\b|\/tedandlisa(?:-[a-z-]+)?|[A-Za-z0-9_.-]+\.(?:html|md|json|pptx)\b)/g;
   var SKIP = /^(SCRIPT|STYLE|CODE|TEXTAREA|NOSCRIPT|IFRAME)$/;
 
   function protect() {
