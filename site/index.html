@@ -545,7 +545,7 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
       <div class="framed">
         <img src="assets/tedlisaidea.jpg" alt="Line illustration of Ted and Lisa standing together inside a white frame, over a blurred poppy photograph.">
       </div>
-      <p class="caption"><span>@monomind ai lab</span><span>fig. 01 — the frame</span></p>
+      <p class="caption"><span>@monomind ai lab</span></p>
     </div>
   </div>
 
@@ -562,25 +562,28 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
       <div class="choices" role="tablist" aria-label="Choose your path">
         <button class="choice" role="tab" id="tab-try" aria-selected="true" aria-controls="pane-try" type="button">
           <span class="n">PATH 01</span>
-          <h3>Just try it once</h3>
-          <p>Get a ready-made prompt, paste it to your agent, get a finished file
-          back. Nothing downloaded, nothing configured.</p>
-          <span class="pick">Fastest — 2 minutes</span>
+          <h3>Answer here, then paste</h3>
+          <p>Fill in the panel on this page. It hands back one prompt with all
+          your answers baked in — your agent asks nothing further and starts
+          building immediately.</p>
+          <span class="pick">Ready in minutes</span>
         </button>
         <button class="choice" role="tab" id="tab-install" aria-selected="false" aria-controls="pane-install" type="button">
           <span class="n">PATH 02</span>
+          <h3>Paste first, answer in your browser</h3>
+          <p>Copy the short prompt — nothing to fill in. Your agent fetches the
+          skill and opens the same intake panel in your own browser, where you
+          answer the questions. Short enough to send to anyone who wants a
+          quick try.</p>
+          <span class="pick">Share and try</span>
+        </button>
+        <button class="choice" role="tab" id="tab-both" aria-selected="false" aria-controls="pane-both" type="button">
+          <span class="n">PATH 03</span>
           <h3>Make it yours</h3>
           <p>Install the skill so <code>/tedandlisa</code> is a standing command —
           and teach it templates of your own: any page you like becomes a
           permanent choice in the gallery.</p>
-          <span class="pick">One install, yours for good</span>
-        </button>
-        <button class="choice" role="tab" id="tab-both" aria-selected="false" aria-controls="pane-both" type="button">
-          <span class="n">PATH 03</span>
-          <h3>Do both</h3>
-          <p>Paste the prompt now — and install while your first file is being
-          built. The best first hour with Ted and Lisa.</p>
-          <span class="pick">Try now, keep forever</span>
+          <span class="pick">Own it, extend it</span>
         </button>
       </div>
 
@@ -588,26 +591,10 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
       <div class="pane on" id="pane-try" role="tabpanel" aria-labelledby="tab-try">
         <div class="gen-grid">
           <div class="gen-side">
-            <p class="waylead">Either way you answer the same intake panel — the only
-            question is <em>where</em>. Both end with one standalone HTML file.</p>
-
-            <div class="way">
-              <span class="wayn">WAY 01</span>
-              <h3>Answer here, then paste</h3>
-              <p>Fill in the panel on this page. It hands back one prompt with all
-              your answers baked in — your agent asks nothing further and starts
-              building immediately.</p>
-              <button class="btn btn-primary js-open-intake" type="button">Open the intake panel</button>
-            </div>
-
-            <div class="way">
-              <span class="wayn">WAY 02</span>
-              <h3>Paste first, answer in your browser</h3>
-              <p>Copy the short prompt — nothing to fill in. Your agent fetches the
-              skill and opens the same intake panel in your own browser, where you
-              answer the questions. Short enough to send to anyone who wants a
-              quick try.</p>
-            </div>
+            <p>Fill in the panel on this page. It hands back one prompt with all
+            your answers baked in — your agent asks nothing further and starts
+            building immediately.</p>
+            <button class="btn btn-primary js-open-intake" type="button">Open the intake panel</button>
           </div>
           <div>
             <div class="promptbox" id="prompt-text">Build me a standalone HTML page using
@@ -623,26 +610,41 @@ Read and follow `SKILL.md`, starting with its intake panel.<button class="copybt
         </div>
       </div>
 
-      <!-- path 02: install -->
+      <!-- path 02: paste first -->
       <div class="pane" id="pane-install" role="tabpanel" aria-labelledby="tab-install">
+        <div class="gen-grid">
+          <div class="gen-side">
+            <p>Copy the short prompt — nothing to fill in. Your agent fetches the skill
+            and opens the same intake panel in your own browser, where you
+            answer the questions. Short enough to send to anyone who wants a
+            quick try.</p>
+          </div>
+          <div>
+            <div class="promptbox" id="prompt-text-paste">Build me a standalone HTML page using
+https://github.com/monomind-ai-lab/hi-ted-meet-lisa.
+Read and follow `SKILL.md`, starting with its intake panel.<button class="copybtn" data-copy="prompt-text-paste" type="button">Copy</button></div>
+            <p class="gen-note">Nothing to edit — share this prompt directly with anyone
+            who wants to give it a quick try.</p>
+          </div>
+        </div>
+      </div>
+
+<!-- path 03: make it yours -->
+      <div class="pane" id="pane-both" role="tabpanel" aria-labelledby="tab-both">
         <div class="install-grid">
           <div>
             <div class="cmdstep">
               <div class="lbl"><span class="n">01</span><b>Clone it into your skills directory</b></div>
               <p class="why">One clone, available in every project. Other agents have their
               own skills directory — the layout is the same.</p>
-              <div class="cmd">git clone --recurse-submodules \
-  https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git \
-  ~/.claude/skills/tedandlisa<button class="copybtn" data-copy-raw="git clone --recurse-submodules https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git ~/.claude/skills/tedandlisa" type="button">Copy</button></div>
+              <div class="cmd">git clone --recurse-submodules   https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git   ~/.claude/skills/tedandlisa<button class="copybtn" data-copy-raw="git clone --recurse-submodules https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git ~/.claude/skills/tedandlisa" type="button">Copy</button></div>
             </div>
             <div class="cmdstep">
               <div class="lbl"><span class="n">02</span><b>Link the two companion skills</b></div>
               <p class="why">They ride along in the clone — the links just make them
               commands of their own.</p>
-              <div class="cmd">ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-design \
-      ~/.claude/skills/tedandlisa-design
-ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
-      ~/.claude/skills/tedandlisa-new-template<button class="copybtn" data-copy-raw="ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-design ~/.claude/skills/tedandlisa-design && ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template ~/.claude/skills/tedandlisa-new-template" type="button">Copy</button></div>
+              <div class="cmd">ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-design       ~/.claude/skills/tedandlisa-design
+ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template       ~/.claude/skills/tedandlisa-new-template<button class="copybtn" data-copy-raw="ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-design ~/.claude/skills/tedandlisa-design && ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template ~/.claude/skills/tedandlisa-new-template" type="button">Copy</button></div>
             </div>
             <div class="cmdstep">
               <div class="lbl"><span class="n">03</span><b>Use it, whenever</b></div>
@@ -673,36 +675,6 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
             (Settings → Capabilities → Skills) are coming soon.</p>
           </div>
         </div>
-      </div>
-
-      <!-- path 03: both -->
-      <div class="pane" id="pane-both" role="tabpanel" aria-labelledby="tab-both">
-        <div class="both-flow">
-          <div class="both-step">
-            <span class="n">FIRST · MINUTE 0</span>
-            <h3>Send the prompt</h3>
-            <p>Open the intake panel, answer it, and paste the finished prompt to
-            your agent. Your first file starts building immediately.</p>
-            <button class="btn btn-primary js-open-intake" type="button">Open the intake panel</button>
-          </div>
-          <div class="both-step">
-            <span class="n">WHILE IT BUILDS</span>
-            <h3>Install in parallel</h3>
-            <p>It takes a few minutes to arrive. That's exactly how long the install
-            takes — run the clone from Path 02 while you wait.</p>
-            <button class="btn btn-ghost js-goto-install" type="button">See the install steps</button>
-          </div>
-          <div class="both-step">
-            <span class="n">EVER AFTER</span>
-            <h3>It's a command now</h3>
-            <p><code>/tedandlisa</code> from any project, the panel opens itself, and
-            your own templates join the gallery. Ted and Lisa live here now.</p>
-            <a class="btn btn-ghost" href="#templates">Browse the templates</a>
-          </div>
-        </div>
-        <p class="both-note">The two paths don't conflict — the prompt reads the skill
-        from GitHub, the install puts the same skill on your machine. What you get is
-        identical either way.</p>
       </div>
     </div>
   </section>
@@ -879,11 +851,7 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
           </div>
         </div>
         <div class="scene" aria-hidden="true">
-          <img class="ted" src="assets/ted-figure-cream.png" alt="">
-          <div class="empty-frame">
-            <img class="lisa" src="assets/lisa-figure-cream.png" alt="">
-            <span class="cap">fig. 02 — ideas come to life in html</span>
-          </div>
+          <img src="assets/ted-and-lisa-in-frame.svg" alt="Ted and Lisa together in a white frame">
         </div>
       </div>
     </div>
