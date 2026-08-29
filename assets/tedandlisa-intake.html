@@ -444,8 +444,8 @@ var TEMPLATES = CTX.templates || [
     tagline: "One system diagram on slate, where colour means something." },
   { id: "sitemap-ia", name: "Sitemap & IA proposal", kind: "document",
     tagline: "Argue an information architecture, with the navigation wired up to click through." },
-  { id: "slide-design", name: "Slide design", kind: "external", badge: "HTML · PPTX",
-    tagline: "Not a MonoMind template — style presets, animated HTML, or editable .pptx." }
+  { id: "slide-design", name: "Slide design", kind: "external", badge: "HTML",
+    tagline: "Not a MonoMind template — style presets and animated HTML slides." }
 ];
 
 var QUESTIONS = [
@@ -1130,8 +1130,31 @@ function show(title, lead, needsCopy, json) {
   document.getElementById("fallback").open = !!needsCopy;
 }
 
+/* Web mode (CTX.mode === "web", injected by the public site's deploy step):
+   there is no runner and never will be, so the end state is not a fallback —
+   it is the product. The payload becomes one complete paste-ready prompt:
+   preamble plus answers, so a single copy is the whole job. */
+function webPrompt(json) {
+  return "Build me a deck using https://github.com/monomind-ai-lab/hi-ted-meet-lisa.\n" +
+         "Read and follow `SKILL.md`. My intake answers are below — apply them\n" +
+         "instead of asking again, and hand back one standalone HTML file.\n\n" + json;
+}
+
 function submit() {
   var json = JSON.stringify(payload(), null, 2);
+  if (CTX.mode === "web") {
+    document.getElementById("copy").textContent = "Copy the prompt";
+    document.querySelector("#fallback .fb-title").textContent = "The full prompt";
+    document.getElementById("copytip").textContent =
+      "Paste it into your agent's chat — that is the whole job.";
+    show("Prompt is ready.",
+         "Copy it and paste it to any coding agent — Claude Code, Codex, Pi, " +
+         "OpenCode, Hermes, or anything else that can read a public URL. " +
+         "The agent reads the skill from GitHub, builds your deck, and hands " +
+         "back one HTML file. Nothing to install.",
+         true, webPrompt(json));
+    return;
+  }
   /* Preferred path: the skill's runner is serving this page and listening on
      /intake. Fall back to copy-paste whenever that is not true — file://,
      a plain static server, or the runner already gone. */
@@ -1168,9 +1191,10 @@ document.getElementById("skip").addEventListener("click", function () {
 });
 document.getElementById("copy").addEventListener("click", function () {
   var btn = this;
+  var label = CTX.mode === "web" ? "Copy the prompt" : "Copy answers";
   navigator.clipboard.writeText(document.getElementById("payload").textContent).then(function () {
     btn.textContent = "Copied \u2713";
-    setTimeout(function () { btn.textContent = "Copy answers"; }, 1800);
+    setTimeout(function () { btn.textContent = label; }, 1800);
   });
 });
 document.getElementById("back").addEventListener("click", function () {

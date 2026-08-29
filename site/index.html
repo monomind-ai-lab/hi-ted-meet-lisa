@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hi Ted, Meet Lisa — decks that come to life in HTML</title>
+<meta name="description" content="Describe a deck, answer a short visual intake, and your agent hands you one standalone HTML file. Works with any coding agent — nothing to install.">
+<meta property="og:title" content="Hi Ted, Meet Lisa">
+<meta property="og:description" content="When Ted meets Lisa, ideas come to life in HTML. An agent skill that turns a brief into a finished deck — one file, no build step.">
+<meta property="og:image" content="https://html.monomind.one/assets/tedlisaidea.jpg">
+<link rel="icon" href="assets/monomind-mark-white.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── tokens ─────────────────────────────────────────────────────────
+   Lifted from the Canva brand deck (hitedmeetlisa, pp.1–9) and the
+   intake panel's own token sheet. Dark cinematic ground; cream ink;
+   the blurred-poppy rust and sage; white frame device. */
+:root {
+  --bg: #15160f;            /* near-black olive */
+  --bg-lift: #1c1d15;
+  --sage: #7a7f6c;
+  --sage-deep: #4c5142;
+  --cream: #ece9dd;
+  --cream-dim: color-mix(in srgb, var(--cream) 62%, transparent);
+  --cream-faint: color-mix(in srgb, var(--cream) 34%, transparent);
+  --rust: #b0492e;
+  --terracotta: #d29873;
+  --frame: #ffffff;
+  --hair: color-mix(in srgb, var(--cream) 16%, transparent);
+  --hair-strong: color-mix(in srgb, var(--cream) 30%, transparent);
+  --font-display: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
+  --measure: 62ch;
+  --pad: clamp(20px, 5vw, 64px);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--cream);
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+::selection { background: var(--terracotta); color: var(--bg); }
+
+/* ── atmosphere: blurred blooms + film grain ───────────────────── */
+.atmosphere {
+  position: fixed; inset: 0; z-index: -2; overflow: hidden;
+  background:
+    radial-gradient(52vw 44vw at 78% 30%, color-mix(in srgb, var(--rust) 34%, transparent), transparent 62%),
+    radial-gradient(40vw 36vw at 66% 60%, color-mix(in srgb, var(--terracotta) 16%, transparent), transparent 60%),
+    radial-gradient(70vw 55vw at 18% 82%, color-mix(in srgb, var(--sage-deep) 52%, transparent), transparent 68%),
+    radial-gradient(46vw 40vw at 8% 12%, color-mix(in srgb, var(--sage) 20%, transparent), transparent 60%),
+    var(--bg);
+  filter: saturate(0.92);
+}
+.grain {
+  position: fixed; inset: -50%; z-index: -1; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  opacity: 0.055;
+  animation: grain 9s steps(6) infinite;
+}
+@keyframes grain {
+  0%,100% { transform: translate(0,0); } 20% { transform: translate(-2%,3%); }
+  40% { transform: translate(3%,-2%); } 60% { transform: translate(-3%,-3%); }
+  80% { transform: translate(2%,2%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grain { animation: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* ── type ──────────────────────────────────────────────────────── */
+h1, h2, h3 { font-weight: 700; letter-spacing: -0.015em; line-height: 1.08; }
+.kicker {
+  font-size: 12px; font-weight: 500; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--cream-dim);
+}
+.rule { width: 88px; height: 1px; background: var(--cream); opacity: 0.85; border: 0; }
+a { color: inherit; }
+code { font-family: var(--font-mono); font-size: 0.9em; }
+
+/* ── topbar ────────────────────────────────────────────────────── */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 18px var(--pad);
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--hair);
+}
+.wordmark { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+.wordmark img { width: 30px; height: 30px; display: block; }
+.wordmark span {
+  font-size: 12px; font-weight: 500; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--cream);
+}
+.topnav { display: flex; align-items: center; gap: clamp(14px, 3vw, 32px); }
+.topnav a {
+  font-size: 13px; text-decoration: none; color: var(--cream-dim);
+  transition: color 200ms var(--ease);
+}
+.topnav a:hover { color: var(--cream); }
+.topnav .gh {
+  color: var(--cream); border: 1px solid var(--hair-strong);
+  padding: 8px 16px; border-radius: 9999px;
+  transition: border-color 200ms var(--ease), background 200ms var(--ease);
+}
+.topnav .gh:hover { border-color: var(--cream); background: color-mix(in srgb, var(--cream) 8%, transparent); }
+@media (max-width: 640px) { .topnav a:not(.gh) { display: none; } }
+
+/* ── hero ──────────────────────────────────────────────────────── */
+.hero {
+  display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(32px, 5vw, 72px); align-items: center;
+  padding: clamp(56px, 10vh, 120px) var(--pad) clamp(64px, 10vh, 120px);
+  max-width: 1280px; margin: 0 auto;
+}
+.hero h1 {
+  font-size: clamp(46px, 7vw, 88px); font-weight: 800; color: var(--cream);
+}
+.hero .rule { margin: 28px 0; }
+.hero .tagline {
+  font-size: clamp(15px, 1.6vw, 18px); letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--cream-dim); line-height: 1.8;
+  max-width: 40ch;
+}
+.hero .tagline strong { color: var(--cream); font-weight: 700; }
+.hero .sub {
+  margin-top: 22px; color: var(--cream-dim); max-width: 46ch; font-size: 16px;
+}
+.cta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-display); font-size: 15px; font-weight: 700;
+  text-decoration: none; border-radius: 9999px; padding: 15px 28px;
+  cursor: pointer; border: 1px solid transparent;
+  transition: transform 240ms var(--ease), background 200ms var(--ease),
+              border-color 200ms var(--ease), color 200ms var(--ease);
+}
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--cream); color: #1c1d15; }
+.btn-primary:hover { background: #ffffff; }
+.btn-ghost { border-color: var(--hair-strong); color: var(--cream); background: transparent; }
+.btn-ghost:hover { border-color: var(--cream); }
+
+/* the white frame device — the source photograph carries the frame
+   itself, so we crop to its right half rather than adding a border */
+.hero-art { position: relative; }
+.framed {
+  position: relative; aspect-ratio: 1 / 1; overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.5); background: var(--bg-lift);
+}
+.framed img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: 100% 50%; display: block;
+}
+.hero-art .caption {
+  margin-top: 18px; display: flex; justify-content: space-between;
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--cream-faint);
+}
+@media (max-width: 880px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-art { max-width: 420px; }
+}
+
+/* ── shared section shell ──────────────────────────────────────── */
+section { padding: clamp(64px, 10vh, 128px) var(--pad); }
+.shell { max-width: 1280px; margin: 0 auto; }
+.section-head { max-width: var(--measure); margin-bottom: clamp(36px, 6vh, 64px); }
+.section-head h2 { font-size: clamp(30px, 4vw, 46px); margin: 14px 0 18px; }
+.section-head p { color: var(--cream-dim); }
+
+/* ── path chooser ──────────────────────────────────────────────── */
+.paths-section { border-top: 1px solid var(--hair); background: color-mix(in srgb, var(--bg-lift) 55%, transparent); }
+.choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, 2vw, 24px); margin-bottom: clamp(32px, 5vh, 48px); }
+@media (max-width: 880px) { .choices { grid-template-columns: 1fr; } }
+.choice {
+  text-align: left; font-family: inherit; color: inherit; cursor: pointer;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  border: 1px solid var(--hair); padding: clamp(20px, 2.5vw, 30px);
+  display: flex; flex-direction: column; gap: 8px; position: relative;
+  transition: border-color 220ms var(--ease), background 220ms var(--ease), transform 220ms var(--ease);
+}
+.choice:hover { border-color: var(--hair-strong); transform: translateY(-2px); }
+.choice .n { font-family: var(--font-mono); font-size: 12px; color: var(--terracotta); letter-spacing: 0.1em; }
+.choice h3 { font-size: 19px; }
+.choice p { font-size: 13.5px; color: var(--cream-dim); }
+.choice .pick {
+  margin-top: 10px; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  font-weight: 700; color: var(--cream-faint); transition: color 200ms var(--ease);
+}
+.choice[aria-selected="true"] {
+  border-color: var(--terracotta);
+  background: color-mix(in srgb, var(--terracotta) 8%, var(--bg));
+}
+.choice[aria-selected="true"] .pick { color: var(--terracotta); }
+.choice[aria-selected="true"] .pick::after { content: " ✓"; }
+.choice:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--terracotta) 45%, transparent); }
+
+.pane { display: none; }
+.pane.on { display: block; animation: fadeup 360ms var(--ease); }
+@keyframes fadeup { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* try pane */
+.gen-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(32px, 5vw, 80px); align-items: start; }
+@media (max-width: 880px) { .gen-grid { grid-template-columns: 1fr; } }
+.ministeps { list-style: none; display: flex; flex-direction: column; gap: 18px; margin: 22px 0 28px; }
+.ministeps li { display: flex; gap: 16px; align-items: baseline; }
+.ministeps .n { font-family: var(--font-mono); font-size: 12px; color: var(--terracotta); flex: none; }
+.ministeps b { display: block; font-size: 15px; }
+.ministeps span { font-size: 13.5px; color: var(--cream-dim); }
+.promptbox {
+  border: 1px solid var(--hair-strong); background: #101109;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.75;
+  padding: 24px 100px 24px 24px; color: var(--cream); position: relative;
+  white-space: pre-wrap; word-break: break-word;
+}
+.promptbox .ph { color: var(--terracotta); }
+.copybtn {
+  position: absolute; top: 12px; right: 12px;
+  font-family: var(--font-display); font-size: 12px; font-weight: 700;
+  background: var(--cream); color: #1c1d15; border: 0; border-radius: 9999px;
+  padding: 7px 16px; cursor: pointer; transition: background 200ms var(--ease);
+}
+.copybtn:hover { background: #fff; }
+.copybtn.done { background: var(--terracotta); color: #fff; }
+.gen-note { margin-top: 14px; font-size: 13px; color: var(--cream-faint); }
+.gen-side h3 { font-size: 20px; margin-bottom: 10px; }
+.gen-side > p { font-size: 14.5px; color: var(--cream-dim); max-width: 46ch; }
+.agents {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px;
+}
+.agents span {
+  font-family: var(--font-mono); font-size: 11px; color: var(--cream-dim);
+  border: 1px solid var(--hair); border-radius: 9999px; padding: 5px 12px;
+}
+.or {
+  display: flex; align-items: center; gap: 14px; margin: 30px 0;
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--cream-faint);
+}
+.or::before, .or::after { content: ""; height: 1px; flex: 1; background: var(--hair); }
+
+/* install pane */
+.install-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: clamp(32px, 5vw, 80px); align-items: start; }
+@media (max-width: 880px) { .install-grid { grid-template-columns: 1fr; } }
+.cmdstep { margin-bottom: 26px; }
+.cmdstep .lbl { display: flex; gap: 14px; align-items: baseline; margin-bottom: 10px; }
+.cmdstep .n { font-family: var(--font-mono); font-size: 12px; color: var(--terracotta); }
+.cmdstep b { font-size: 15px; }
+.cmdstep .why { font-size: 13px; color: var(--cream-dim); margin: 4px 0 10px 30px; }
+.cmd {
+  position: relative; border: 1px solid var(--hair-strong); background: #101109;
+  font-family: var(--font-mono); font-size: 12px; line-height: 1.7;
+  padding: 16px 90px 16px 18px; color: var(--cream);
+  white-space: pre; overflow-x: auto;
+}
+.getlist { list-style: none; display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+.getlist li { display: flex; gap: 12px; font-size: 14px; color: var(--cream-dim); }
+.getlist li::before { content: "—"; color: var(--terracotta); flex: none; }
+.getlist b { color: var(--cream); font-weight: 700; }
+.soon { margin-top: 24px; font-size: 12.5px; color: var(--cream-faint); font-style: italic; }
+
+/* both pane */
+.both-flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--hair); border: 1px solid var(--hair); margin-bottom: 28px; }
+@media (max-width: 880px) { .both-flow { grid-template-columns: 1fr; } }
+.both-step { background: var(--bg); padding: clamp(22px, 3vw, 36px); display: flex; flex-direction: column; gap: 10px; }
+.both-step .n { font-family: var(--font-mono); font-size: 12px; color: var(--terracotta); }
+.both-step h3 { font-size: 17px; }
+.both-step p { font-size: 13.5px; color: var(--cream-dim); flex: 1; }
+.both-step .btn { align-self: flex-start; padding: 11px 20px; font-size: 13px; }
+.both-note { font-size: 13.5px; color: var(--cream-dim); max-width: 62ch; }
+
+/* ── gallery ───────────────────────────────────────────────────── */
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: clamp(24px, 3vw, 40px); }
+.card { text-decoration: none; display: block; }
+.card .frame {
+  border: 8px solid var(--frame); background: var(--bg-lift);
+  aspect-ratio: 16 / 10; overflow: hidden; position: relative;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.42);
+  transition: transform 320ms var(--ease), box-shadow 320ms var(--ease);
+}
+.card:hover .frame { transform: translateY(-6px); box-shadow: 0 30px 70px rgba(0,0,0,0.55); }
+.card .frame img {
+  width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block;
+  transition: transform 500ms var(--ease);
+}
+.card:hover .frame img { transform: scale(1.03); }
+.card .frame .open {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  background: color-mix(in srgb, #15160f 55%, transparent);
+  opacity: 0; transition: opacity 240ms var(--ease);
+  font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--cream); font-weight: 700;
+}
+.card:hover .frame .open, .card:focus-visible .frame .open { opacity: 1; }
+.card .meta { padding: 18px 2px 0; }
+.card .meta h3 { font-size: 17px; display: flex; align-items: baseline; gap: 10px; }
+.card .meta h3 .kind {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 400;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--terracotta);
+}
+.card .meta p { margin-top: 6px; font-size: 13.5px; color: var(--cream-dim); }
+.card:focus-visible { outline: none; }
+.card:focus-visible .frame { outline: 3px solid var(--terracotta); outline-offset: 3px; }
+.card.handoff .frame { border-style: dashed; border-width: 2px; border-color: var(--hair-strong); }
+
+/* ── features grid ─────────────────────────────────────────────── */
+.feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--hair); border: 1px solid var(--hair); }
+@media (max-width: 880px) { .feats { grid-template-columns: 1fr; } }
+.feat { background: var(--bg); padding: clamp(24px, 3vw, 40px); }
+.feat .n { font-family: var(--font-mono); font-size: 12px; color: var(--terracotta); letter-spacing: 0.1em; }
+.feat h3 { font-size: 18px; margin: 14px 0 10px; }
+.feat p { font-size: 13.5px; color: var(--cream-dim); }
+
+/* ── the file: Lisa and the frame ──────────────────────────────── */
+.file-section { border-top: 1px solid var(--hair); background: color-mix(in srgb, var(--bg-lift) 55%, transparent); overflow: hidden; }
+.file-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(32px, 5vw, 80px); align-items: center; }
+@media (max-width: 880px) { .file-grid { grid-template-columns: 1fr; } }
+.file-copy h2 { font-size: clamp(30px, 4vw, 46px); margin: 14px 0 18px; }
+.file-copy > p { color: var(--cream-dim); max-width: 48ch; }
+.file-scene { position: relative; display: flex; align-items: flex-end; justify-content: center; height: clamp(320px, 34vw, 440px); }
+.file-card {
+  width: clamp(220px, 24vw, 300px); border: 9px solid var(--frame);
+  background: #101109; box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  font-family: var(--font-mono); padding: 26px 24px; align-self: center;
+  margin-right: -34px; position: relative; z-index: 3;
+}
+.file-card .fname { font-size: 15px; color: var(--cream); font-weight: 500; }
+.file-card hr { border: 0; height: 1px; background: var(--hair-strong); margin: 14px 0 16px; }
+.file-card ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.file-card li { font-size: 12px; color: var(--cream-dim); display: flex; justify-content: space-between; gap: 12px; }
+.file-card li b { color: var(--terracotta); font-weight: 500; }
+.file-scene .lisa-fig {
+  height: 82%; width: auto; position: relative; z-index: 2; opacity: 0.96;
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.4));
+}
+.file-scene .cap {
+  position: absolute; top: calc(100% - 2px); left: 0; right: 0; text-align: center;
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--cream-faint);
+}
+
+/* ── closing scene: Ted, the frame, and Lisa ───────────────────── */
+.scene-section { border-top: 1px solid var(--hair); overflow: hidden; }
+.scene-grid {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 72px); align-items: end;
+}
+@media (max-width: 880px) { .scene-grid { grid-template-columns: 1fr; align-items: start; } }
+.scene-copy { padding-bottom: clamp(24px, 5vh, 56px); }
+.scene-copy h2 { font-size: clamp(30px, 4vw, 46px); margin: 14px 0 18px; }
+.scene-copy p { color: var(--cream-dim); max-width: 44ch; }
+.scene {
+  position: relative; height: clamp(300px, 36vw, 430px);
+  display: flex; align-items: flex-end; justify-content: center; gap: 0;
+}
+.scene .ted {
+  height: 72%; width: auto; position: relative; z-index: 2;
+  margin-right: -30px; opacity: 0.96;
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.4));
+}
+.scene .empty-frame {
+  position: relative; width: clamp(200px, 22vw, 280px); height: clamp(200px, 22vw, 280px);
+  border: 9px solid var(--frame); box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  overflow: hidden; background: color-mix(in srgb, var(--bg) 40%, transparent);
+}
+.scene .lisa {
+  position: absolute; bottom: -2px; right: 8%; height: 88%; width: auto;
+  opacity: 0.96;
+}
+.scene .cap {
+  position: absolute; top: calc(100% + 14px); left: 0; right: 0;
+  text-align: center; font-size: 11px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--cream-faint); white-space: nowrap;
+}
+
+/* ── footer ────────────────────────────────────────────────────── */
+footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
+.foot { max-width: 1280px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: space-between; }
+.foot .left { display: flex; align-items: center; gap: 14px; }
+.foot img { width: 24px; height: 24px; }
+.foot span, .foot a { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cream-faint); text-decoration: none; }
+.foot a:hover { color: var(--cream); }
+
+/* ── intake overlay ────────────────────────────────────────────── */
+.overlay {
+  position: fixed; inset: 0; z-index: 100; display: none;
+  background: color-mix(in srgb, #000 68%, transparent);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  padding: clamp(8px, 2vh, 28px);
+}
+.overlay.on { display: grid; place-items: center; }
+.overlay .sheet {
+  width: min(1160px, 100%); height: min(1040px, 100%);
+  border: 10px solid var(--frame); background: #15160f;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.6); position: relative;
+}
+.overlay iframe { width: 100%; height: 100%; border: 0; display: block; }
+.overlay .close {
+  position: absolute; top: -10px; right: -10px; transform: translate(50%, -50%);
+  width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--cream); color: #1c1d15; font-size: 20px; font-weight: 700;
+  display: grid; place-items: center; line-height: 1; z-index: 2;
+}
+@media (max-width: 720px) {
+  .overlay { padding: 0; }
+  .overlay .sheet { border-width: 0; height: 100%; }
+  .overlay .close { top: 12px; right: 12px; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="atmosphere" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <a class="wordmark" href="#top" aria-label="Hi Ted, Meet Lisa — home">
+    <img src="assets/monomind-mark-white.svg" alt="">
+    <span>Hi Ted, Meet Lisa</span>
+  </a>
+  <nav class="topnav" aria-label="Primary">
+    <a href="#paths" data-path="try">Try it</a>
+    <a href="#paths" data-path="install">Install</a>
+    <a href="#templates">Templates</a>
+    <a class="gh" href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa" rel="noopener">GitHub</a>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- ── hero ─────────────────────────────────────────────────── -->
+  <div class="hero">
+    <div>
+      <h1>Hi Ted,<br>Meet Lisa</h1>
+      <hr class="rule">
+      <p class="tagline">When Ted meets Lisa,<br>ideas come to life in <strong>HTML</strong></p>
+      <p class="sub">Describe a deck. Answer a short visual intake. Your agent hands
+      back one standalone HTML file — open it, present it, print it, email it.
+      No build step. Nothing to install.</p>
+      <div class="cta-row">
+        <button class="btn btn-primary js-open-intake" type="button">Describe your deck</button>
+        <a class="btn btn-ghost" href="#paths">Choose your path</a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="framed">
+        <img src="assets/tedlisaidea.jpg" alt="Line illustration of Ted and Lisa standing together inside a white frame, over a blurred poppy photograph.">
+      </div>
+      <p class="caption"><span>@monomind ai lab</span><span>fig. 01 — the frame</span></p>
+    </div>
+  </div>
+
+  <!-- ── choose your path ─────────────────────────────────────── -->
+  <section class="paths-section" id="paths" aria-labelledby="paths-h">
+    <div class="shell">
+      <div class="section-head">
+        <p class="kicker">New here?</p>
+        <h2 id="paths-h">Three ways to your first deck.</h2>
+        <p>Pick what fits. Every path ends the same way: one finished HTML file,
+        handed to you by your own agent.</p>
+      </div>
+
+      <div class="choices" role="tablist" aria-label="Choose your path">
+        <button class="choice" role="tab" id="tab-try" aria-selected="true" aria-controls="pane-try" type="button">
+          <span class="n">PATH 01</span>
+          <h3>Just try it once</h3>
+          <p>Get a ready-made prompt, paste it to your agent, get a deck back.
+          Nothing downloaded, nothing configured.</p>
+          <span class="pick">Fastest — 2 minutes</span>
+        </button>
+        <button class="choice" role="tab" id="tab-install" aria-selected="false" aria-controls="pane-install" type="button">
+          <span class="n">PATH 02</span>
+          <h3>Make it yours</h3>
+          <p>Install the skill so <code>/tedandlisa</code> is a standing command —
+          and teach it templates of your own: any deck you like becomes a
+          permanent choice in the gallery.</p>
+          <span class="pick">One install, yours for good</span>
+        </button>
+        <button class="choice" role="tab" id="tab-both" aria-selected="false" aria-controls="pane-both" type="button">
+          <span class="n">PATH 03</span>
+          <h3>Do both</h3>
+          <p>Paste the prompt now — and install while your first deck is being
+          built. The best first hour with Ted and Lisa.</p>
+          <span class="pick">Try now, keep forever</span>
+        </button>
+      </div>
+
+      <!-- path 01: try once -->
+      <div class="pane on" id="pane-try" role="tabpanel" aria-labelledby="tab-try">
+        <div class="gen-grid">
+          <div class="gen-side">
+            <h3>The thorough way</h3>
+            <p>Open the intake panel — the same one agents use. Pick a template,
+            answer the questions, and it hands you a complete, paste-ready prompt.</p>
+            <ol class="ministeps">
+              <li><span class="n">01</span><span><b>Describe it</b>
+                <span>Answer the panel — nine to sixteen questions, every one with a default.</span></span></li>
+              <li><span class="n">02</span><span><b>Copy the prompt</b>
+                <span>The last screen says “Prompt is ready.” One click copies everything.</span></span></li>
+              <li><span class="n">03</span><span><b>Paste it to your agent</b>
+                <span>It reads the skill from GitHub, builds the deck, and hands you the file.</span></span></li>
+            </ol>
+            <button class="btn btn-primary js-open-intake" type="button">Open the intake panel</button>
+            <div class="or">or keep it to one line</div>
+            <h3>The quick way</h3>
+            <p>Skip the panel. Copy the prompt on the right, replace the two
+            placeholders, and let the agent ask you the rest.</p>
+          </div>
+          <div>
+            <div class="promptbox" id="prompt-text">Build me a deck using https://github.com/monomind-ai-lab/hi-ted-meet-lisa.
+Read and follow `SKILL.md`, starting with its intake panel.
+The deck is about <span class="ph">[YOUR SUBJECT]</span>, for <span class="ph">[AUDIENCE]</span>.<button class="copybtn" data-copy="prompt-text" type="button">Copy</button></div>
+            <p class="gen-note">Works with any coding agent that can read a public URL:</p>
+            <div class="agents" aria-label="Agents this works with">
+              <span>Claude Code</span><span>Codex</span><span>Pi</span><span>OpenCode</span><span>Hermes</span><span>Gemini CLI</span><span>claude.ai</span><span>…and yours</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- path 02: install -->
+      <div class="pane" id="pane-install" role="tabpanel" aria-labelledby="tab-install">
+        <div class="install-grid">
+          <div>
+            <div class="cmdstep">
+              <div class="lbl"><span class="n">01</span><b>Clone it into your skills directory</b></div>
+              <p class="why">One clone, available in every project. Other agents have their
+              own skills directory — the layout is the same.</p>
+              <div class="cmd">git clone --recurse-submodules \
+  https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git \
+  ~/.claude/skills/tedandlisa<button class="copybtn" data-copy-raw="git clone --recurse-submodules https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git ~/.claude/skills/tedandlisa" type="button">Copy</button></div>
+            </div>
+            <div class="cmdstep">
+              <div class="lbl"><span class="n">02</span><b>Link the two companion skills</b></div>
+              <p class="why">They ride along in the clone — the links just make them
+              commands of their own.</p>
+              <div class="cmd">ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-design \
+      ~/.claude/skills/tedandlisa-design
+ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
+      ~/.claude/skills/tedandlisa-new-template<button class="copybtn" data-copy-raw="ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-design ~/.claude/skills/tedandlisa-design && ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template ~/.claude/skills/tedandlisa-new-template" type="button">Copy</button></div>
+            </div>
+            <div class="cmdstep">
+              <div class="lbl"><span class="n">03</span><b>Use it, whenever</b></div>
+              <div class="cmd">/tedandlisa a 12-slide deck on our Q3 roadmap, for the exec team</div>
+            </div>
+            <div class="cmdstep">
+              <div class="lbl"><span class="n">04</span><b>Teach it your own look</b></div>
+              <p class="why">This is the part people miss: hand it any finished HTML deck
+              you like, and its visual system becomes a reusable template — extracted,
+              stripped of its content, registered, thumbnailed. It's then one of your
+              choices in the gallery, permanently.</p>
+              <div class="cmd">/tedandlisa-new-template ./that-deck-i-like.html</div>
+            </div>
+          </div>
+          <div class="gen-side">
+            <h3>What installing gets you</h3>
+            <ul class="getlist">
+              <li><span><b>The intake panel, served locally.</b> Your agent opens it in
+              your browser and picks the answers up itself — no copying.</span></li>
+              <li><span><b>Your own templates.</b> Hand <code>/tedandlisa-new-template</code>
+              a deck you like and its look becomes a permanent choice in the gallery.</span></li>
+              <li><span><b>The design pipeline.</b> <code>/tedandlisa-design</code> for
+              twelve style presets and animated slides — still one HTML file.</span></li>
+              <li><span><b>Every agent you use.</b> The skill is plain Markdown and HTML —
+              Claude Code, Codex, Pi, OpenCode, Hermes all read the same files.</span></li>
+            </ul>
+            <p class="soon">Prefer no terminal at all? Packaged skill zips for claude.ai
+            (Settings → Capabilities → Skills) are coming soon.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- path 03: both -->
+      <div class="pane" id="pane-both" role="tabpanel" aria-labelledby="tab-both">
+        <div class="both-flow">
+          <div class="both-step">
+            <span class="n">FIRST · MINUTE 0</span>
+            <h3>Send the prompt</h3>
+            <p>Open the intake panel, answer it, and paste the finished prompt to
+            your agent. Your first deck starts building immediately.</p>
+            <button class="btn btn-primary js-open-intake" type="button">Open the intake panel</button>
+          </div>
+          <div class="both-step">
+            <span class="n">WHILE IT BUILDS</span>
+            <h3>Install in parallel</h3>
+            <p>The deck takes a few minutes to arrive. That's exactly how long the
+            install takes — run the clone from Path 02 while you wait.</p>
+            <button class="btn btn-ghost js-goto-install" type="button">See the install steps</button>
+          </div>
+          <div class="both-step">
+            <span class="n">EVER AFTER</span>
+            <h3>It's a command now</h3>
+            <p><code>/tedandlisa</code> from any project, the panel opens itself, and
+            your own templates join the gallery. Ted and Lisa live here now.</p>
+            <a class="btn btn-ghost" href="#templates">Browse the templates</a>
+          </div>
+        </div>
+        <p class="both-note">The two paths don't conflict — the prompt reads the skill
+        from GitHub, the install puts the same skill on your machine. Decks made either
+        way look identical.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── gallery ──────────────────────────────────────────────── -->
+  <section id="templates" aria-labelledby="tpl-h">
+    <div class="shell">
+      <div class="section-head">
+        <p class="kicker">The templates</p>
+        <h2 id="tpl-h">Six shapes, previewed for real.</h2>
+        <p>These are not mockups — every preview below is an actual generated file.
+        Open one, present it, resize it. What you see is what the agent ships.</p>
+      </div>
+      <div class="gallery">
+        <a class="card" href="previews/monomind-deck.html" rel="noopener">
+          <div class="frame"><img src="previews/monomind-deck.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
+          <div class="meta"><h3>MonoMind Deck <span class="kind">slides</span></h3>
+          <p>The presentation deck. Horizontal slides, deck menu, keyboard and touch
+          navigation, EN → KR / ZH translation on demand.</p></div>
+        </a>
+        <a class="card" href="previews/web-document.html" rel="noopener">
+          <div class="frame"><img src="previews/web-document.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
+          <div class="meta"><h3>Web Document <span class="kind">document</span></h3>
+          <p>Hash-routed pages that scroll. Both languages written inline —
+          a bilingual document that reads like a site.</p></div>
+        </a>
+        <a class="card" href="previews/mermaid-master.html" rel="noopener">
+          <div class="frame"><img src="previews/mermaid-master.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
+          <div class="meta"><h3>Mermaid Master <span class="kind">diagrams</span></h3>
+          <p>Diagram-first slides on light paper. Inline SVG, no CDN,
+          fully offline — even the diagrams translate.</p></div>
+        </a>
+        <a class="card" href="previews/architecture.html" rel="noopener">
+          <div class="frame"><img src="previews/architecture.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
+          <div class="meta"><h3>Architecture <span class="kind">diagram</span></h3>
+          <p>One system diagram on slate, colour used semantically.
+          For when the whole deck is a single picture.</p></div>
+        </a>
+        <a class="card" href="previews/sitemap-ia.html" rel="noopener">
+          <div class="frame"><img src="previews/sitemap-ia.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
+          <div class="meta"><h3>Sitemap &amp; IA <span class="kind">proposal</span></h3>
+          <p>A site structure argued in pages, ending in a clickable
+          navigation prototype at two breakpoints.</p></div>
+        </a>
+        <a class="card" href="previews/project-website.html" rel="noopener">
+          <div class="frame"><img src="previews/project-website.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
+          <div class="meta"><h3>Project Website <span class="kind">site</span></h3>
+          <p>A project's public face — sticky nav, eight hash-routed pages,
+          one shared footer. This very site's sibling.</p></div>
+        </a>
+        <a class="card handoff" href="previews/slide-design.html" rel="noopener">
+          <div class="frame"><img src="previews/slide-design.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
+          <div class="meta"><h3>Slide Design <span class="kind">handoff</span></h3>
+          <p>Beyond the house style — twelve style presets and animated slides
+          via the companion design pipeline. Still one HTML file.</p></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── features ─────────────────────────────────────────────── -->
+  <section id="features" aria-labelledby="feat-h">
+    <div class="shell">
+      <div class="section-head">
+        <p class="kicker">Inside every file</p>
+        <h2 id="feat-h">Small file. Big machinery.</h2>
+        <p>A deck from Ted and Lisa is not a static export — it carries its own
+        navigation, its own languages, and in some shapes, a working prototype.</p>
+      </div>
+      <div class="feats">
+        <div class="feat">
+          <span class="n">◐ LANGUAGE</span>
+          <h3>Two languages, one file</h3>
+          <p>English plus Korean or Traditional Chinese in the same deck, switched
+          in place. Filenames, commands, and product names are protected — they
+          never get machine-translated into nonsense.</p>
+        </div>
+        <div class="feat">
+          <span class="n">→ NAVIGATION</span>
+          <h3>It presents itself</h3>
+          <p>Scroll-snap slides, arrow keys, touch swipe, and a deck menu with
+          contents — plus optional PDF and HTML download entries, right in the
+          deck's own chrome.</p>
+        </div>
+        <div class="feat">
+          <span class="n">◑ THEMES</span>
+          <h3>Light and dark, measured</h3>
+          <p>Both themes ship in one file with a switch. A design review pass
+          measures contrast in each — and behaviour at phone width — before the
+          file is handed over.</p>
+        </div>
+        <div class="feat">
+          <span class="n">▣ PROTOTYPES</span>
+          <h3>Clickable website mockups</h3>
+          <p>The Sitemap &amp; IA shape doesn't just draw a site structure — it ends
+          in a navigation prototype you can actually click through, at desktop
+          and phone breakpoints.</p>
+        </div>
+        <div class="feat">
+          <span class="n">✎ RESEARCH</span>
+          <h3>Decks that argue</h3>
+          <p>Some shapes are guided research, not slideware: information
+          architecture proposals, system diagrams where colour means something,
+          documents with decision records.</p>
+        </div>
+        <div class="feat">
+          <span class="n">⧉ DIAGRAMS</span>
+          <h3>Diagrams that translate</h3>
+          <p>Diagram-first shapes carry inline SVG — no CDN, works offline, and
+          the labels inside the drawings switch language along with the rest of
+          the deck.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── the file ─────────────────────────────────────────────── -->
+  <section class="file-section" id="the-file" aria-labelledby="file-h">
+    <div class="shell">
+      <div class="file-grid">
+        <div class="file-copy">
+          <p class="kicker">The medium</p>
+          <h2 id="file-h">The beauty of one standalone HTML file.</h2>
+          <p>Everything Ted and Lisa make ships the same way — a single
+          <code>.html</code> file. It sounds humble. It's the whole point.</p>
+          <ul class="getlist">
+            <li><span><b>It opens anywhere.</b> Double-click it, email it, drop it on
+            any static host. Your audience installs nothing, signs into nothing.</span></li>
+            <li><span><b>It's three deliverables at once.</b> Present it as a talk,
+            print it as a handout, read it as a document — the same file.</span></li>
+            <li><span><b>Nothing in it can rot.</b> No build step, no framework, no
+            dependencies that expire. The file that works today opens the same
+            way in ten years.</span></li>
+            <li><span><b>It's yours to change.</b> Plain, human-readable HTML and
+            CSS — open it in any editor, or hand it back to any agent, and
+            change what you like.</span></li>
+          </ul>
+        </div>
+        <div class="file-scene" aria-hidden="true">
+          <div class="file-card">
+            <div class="fname">deck.html</div>
+            <hr>
+            <ul>
+              <li>files <b>1</b></li>
+              <li>dependencies <b>0</b></li>
+              <li>build step <b>none</b></li>
+              <li>languages <b>2</b></li>
+              <li>opens from <b>anywhere</b></li>
+            </ul>
+          </div>
+          <img class="lisa-fig" src="assets/lisa-figure-cream.png" alt="">
+          <span class="cap">lisa, presenting the file</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── closing scene ────────────────────────────────────────── -->
+  <section class="scene-section" aria-labelledby="scene-h">
+    <div class="shell">
+      <div class="scene-grid">
+        <div class="scene-copy">
+          <p class="kicker">The whole idea</p>
+          <h2 id="scene-h">Ted has the idea.<br>Lisa gives it a frame.</h2>
+          <p>You bring the brief; the agent does the building. What comes back
+          is one file that opens anywhere and looks like it came from one studio.</p>
+          <div class="cta-row">
+            <button class="btn btn-primary js-open-intake" type="button">Describe your deck</button>
+          </div>
+        </div>
+        <div class="scene" aria-hidden="true">
+          <img class="ted" src="assets/ted-figure-cream.png" alt="">
+          <div class="empty-frame">
+            <img class="lisa" src="assets/lisa-figure-cream.png" alt="">
+            <span class="cap">fig. 02 — ideas come to life in html</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot">
+    <div class="left">
+      <img src="assets/monomind-mark-white.svg" alt="">
+      <span>MonoMind AI Lab</span>
+    </div>
+    <div style="display:flex; gap:24px;">
+      <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa" rel="noopener">GitHub</a>
+      <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa/blob/main/SKILL.md" rel="noopener">The skill</a>
+      <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa/blob/main/LICENSE" rel="noopener">MIT license</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ── intake overlay ──────────────────────────────────────────── -->
+<div class="overlay" id="intake-overlay" role="dialog" aria-modal="true" aria-label="Deck intake panel">
+  <div class="sheet">
+    <button class="close" id="close-intake" type="button" aria-label="Close the intake panel">×</button>
+    <iframe id="intake-frame" title="Hi Ted, Meet Lisa intake panel" loading="lazy"></iframe>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---- intake overlay -------------------------------------------- */
+  var overlay = document.getElementById("intake-overlay");
+  var frame = document.getElementById("intake-frame");
+  var lastFocus = null;
+
+  function openIntake() {
+    lastFocus = document.activeElement;
+    if (!frame.src) frame.src = "intake.html";
+    overlay.classList.add("on");
+    document.body.style.overflow = "hidden";
+    document.getElementById("close-intake").focus();
+  }
+  function closeIntake() {
+    overlay.classList.remove("on");
+    document.body.style.overflow = "";
+    if (lastFocus) lastFocus.focus();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".js-open-intake"), function (b) {
+    b.addEventListener("click", openIntake);
+  });
+  document.getElementById("close-intake").addEventListener("click", closeIntake);
+  overlay.addEventListener("click", function (e) { if (e.target === overlay) closeIntake(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && overlay.classList.contains("on")) closeIntake();
+  });
+
+  /* ---- path chooser (tabs) --------------------------------------- */
+  var tabs = ["try", "install", "both"];
+  function selectPath(name) {
+    tabs.forEach(function (t) {
+      document.getElementById("tab-" + t).setAttribute("aria-selected", String(t === name));
+      document.getElementById("pane-" + t).classList.toggle("on", t === name);
+    });
+  }
+  tabs.forEach(function (t) {
+    document.getElementById("tab-" + t).addEventListener("click", function () {
+      selectPath(t);
+      history.replaceState(null, "", "#" + t);
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-path]"), function (a) {
+    a.addEventListener("click", function () { selectPath(a.getAttribute("data-path")); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".js-goto-install"), function (b) {
+    b.addEventListener("click", function () {
+      selectPath("install");
+      document.getElementById("paths").scrollIntoView({ behavior: "smooth" });
+    });
+  });
+  if (tabs.indexOf(location.hash.slice(1)) !== -1) {
+    selectPath(location.hash.slice(1));
+  }
+
+  /* ---- copy buttons ----------------------------------------------- */
+  Array.prototype.forEach.call(document.querySelectorAll(".copybtn"), function (btn) {
+    btn.addEventListener("click", function () {
+      var text = btn.getAttribute("data-copy-raw");
+      if (!text) {
+        var src = document.getElementById(btn.getAttribute("data-copy"));
+        text = src.innerText.replace(/Copy\s*$/, "").trim();
+      }
+      navigator.clipboard.writeText(text).then(function () {
+        btn.textContent = "Copied";
+        btn.classList.add("done");
+        setTimeout(function () {
+          btn.textContent = "Copy";
+          btn.classList.remove("done");
+        }, 1800);
+      });
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

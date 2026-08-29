@@ -5,3 +5,8 @@ intake.json
 
 # project-context trigger state (session-local, not shared)
 .claude/project-context-state.json
+
+# site/ is assembled at deploy time by site/sync.sh
+site/previews/
+site/intake.html
+site/assets/
