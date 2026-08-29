@@ -1,0 +1,37 @@
+# Deploys the public site (site/ → html.monomind.one) to Cloudflare Pages
+# on every push to main.
+#
+# The Pages project is a direct-upload project, so this workflow *is* the
+# git connection: it assembles site/ from the repository's canonical
+# artifacts (site/sync.sh) and ships it with wrangler.
+#
+# One repository secret is required:
+#   CLOUDFLARE_API_TOKEN — a Cloudflare API token with permission
+#   "Account · Cloudflare Pages · Edit" on the 1TM account.
+#   Create it at https://dash.cloudflare.com/profile/api-tokens, then:
+#   gh secret set CLOUDFLARE_API_TOKEN
+#
+# The account id is not a secret and is set inline below.
+
+name: Deploy site to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble the deployable site folder
+        run: bash site/sync.sh
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: e9ac0943443affe2bd7b18971265deee
+          command: pages deploy site --project-name hi-ted-meet-lisa --branch main --commit-hash ${{ github.sha }}
