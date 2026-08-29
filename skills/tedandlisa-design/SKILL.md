@@ -5,6 +5,11 @@ description: "Use when a deck needs more freedom than the MonoMind templates all
 
 # Hi Ted, Meet Lisa design
 
+> Every path below — `scripts/`, `assets/`, `references/`, `vendor/` — is
+> relative to the **Hi Ted, Meet Lisa repository root**, which is this skill's
+> own directory when installed as `~/.claude/skills/tedandlisa`. Resolve them
+> there, not against whatever project you happen to be working in.
+
 The fifth way to make a deck here, and the only one that is not built from a
 MonoMind template. Use it when the house templates are the wrong shape:
 

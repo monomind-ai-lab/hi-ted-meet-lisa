@@ -3,7 +3,12 @@ name: tedandlisa-new-template
 description: "Use when the user wants to turn an existing HTML deck, document, or page into a reusable Hi Ted, Meet Lisa template — including phrases like /tedandlisa-new-template, \"make a template from this\", \"add this design as a template\", or when they hand over an HTML file and ask for its style to be reusable. Extracts the visual system and machinery into a placeholder skeleton, registers it, and captures its gallery thumbnail."
 ---
 
-# New MonoMind template
+# New Hi Ted, Meet Lisa template
+
+> Every path below — `scripts/`, `assets/`, `references/`, `vendor/` — is
+> relative to the **Hi Ted, Meet Lisa repository root**, which is this skill's
+> own directory when installed as `~/.claude/skills/tedandlisa`. Resolve them
+> there, not against whatever project you happen to be working in.
 
 Turn one finished HTML file into a template `/tedandlisa` can build from.
 

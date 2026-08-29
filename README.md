@@ -26,26 +26,67 @@ edit at any time.
 
 ## ✅ Start here
 
-Paste this to any agent that can read a URL — Claude Code, Cursor, Codex, or your
-own. There is nothing to install, clone, or configure first.
+Install it once, then it is three commands you have for good.
 
-```text
-Build me a Hi Ted, Meet Lisa deck using
-https://github.com/monomind-ai-lab/hi-ted-meet-lisa. Read and follow `SKILL.md`,
-starting with its intake panel. The deck is about [YOUR SUBJECT], for [AUDIENCE].
+```sh
+git clone --recurse-submodules \
+  https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git \
+  ~/.claude/skills/tedandlisa
+
+ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-design \
+      ~/.claude/skills/tedandlisa-design
+ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
+      ~/.claude/skills/tedandlisa-new-template
 ```
 
-The agent reads the skill, opens the intake panel in your browser, asks eleven
-questions that all have defaults, builds from the template you picked, runs a
-design review, and hands back the file.
+`~/.claude/skills/` makes them available in every project. For one project only,
+clone into that project's `.claude/skills/` instead. Other agents have their own
+skills directory — the layout is the same: one directory per skill, each with a
+`SKILL.md` at its top.
+
+**Then, whenever you need something:**
+
+```text
+/tedandlisa a 12-slide deck on our Q3 roadmap, for the exec team
+```
+
+Opens the intake panel, asks its questions — nine to sixteen depending on the
+template, every one with a default — builds from the template you picked, runs a
+design review, and hands back one file.
+
+```text
+/tedandlisa-new-template ./that-deck-i-like.html
+```
+
+Turns a finished HTML file into a reusable template: extracts its stylesheet and
+machinery into a placeholder skeleton, strips the original's subject matter,
+registers it, and captures its gallery thumbnail. It is then one of your choices
+in the panel, permanently.
+
+```text
+/tedandlisa-design a launch deck, glassmorphism, as an editable .pptx
+```
+
+For when the house templates are the wrong shape — style presets, animated HTML,
+or PowerPoint.
+
+**Just trying it once?** You do not have to install anything. Paste this to any
+agent that can read a URL:
+
+```text
+Build me a deck using https://github.com/monomind-ai-lab/hi-ted-meet-lisa.
+Read and follow `SKILL.md`, starting with its intake panel. The deck is about
+[YOUR SUBJECT], for [AUDIENCE].
+```
 
 **What you get**
 
 - **One standalone `.html` file** — open it, present it, print it, email it. No
   build step and no dependencies to install.
-- **A choice of four shapes** — a presentation deck, a web document, a
-  diagram-first deck, or a single architecture diagram. Preview each one in the
-  intake gallery before you choose.
+- **A choice of five shapes** — a presentation deck, a web document, a
+  diagram-first deck, a single architecture diagram, or a sitemap and IA
+  proposal with a clickable navigation prototype. Preview each in the gallery
+  before you choose.
 - **Two languages in the file**, with filenames, commands, and product names
   protected from translation.
 - **Light and dark**, a deck menu, keyboard and touch navigation, and optional
@@ -53,9 +94,9 @@ design review, and hands back the file.
 - **A design pass before handover** that measures contrast in both themes and
   behaviour at phone width, then reports what it fixed.
 
-Want a `.pptx`, or a look the house style does not cover? The intake's last
-template hands off to [`tedandlisa-design`](skills/tedandlisa-design/),
-which drives a vendored Slides AI pipeline with MonoMind branding applied.
+Want a `.pptx`, or a look the house style does not cover? The gallery's last
+card hands off to [`tedandlisa-design`](skills/tedandlisa-design/), which drives
+a vendored Slides AI pipeline with MonoMind branding applied.
 
 
 ---
@@ -221,7 +262,8 @@ twelve style presets, animated single-file HTML decks, and `.pptx` generation
 with layout validation — with MonoMind branding applied unless you pick a
 preset. PPTX generation needs `bun`.
 
-After cloning, populate the submodule:
+The install above uses `--recurse-submodules`, so this is already populated. If
+you cloned without it:
 
 ```sh
 git submodule update --init --recursive
