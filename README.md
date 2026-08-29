@@ -31,7 +31,7 @@ own. There is nothing to install, clone, or configure first.
 
 ```text
 Build me a Hi Ted, Meet Lisa deck using
-https://github.com/monomind-ai-lab/tedandlisa. Read and follow `SKILL.md`,
+https://github.com/monomind-ai-lab/hi-ted-meet-lisa. Read and follow `SKILL.md`,
 starting with its intake panel. The deck is about [YOUR SUBJECT], for [AUDIENCE].
 ```
 
