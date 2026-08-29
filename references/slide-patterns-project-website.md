@@ -22,7 +22,10 @@ A page exists only if all three name it. Miss one and it is unreachable:
 3. an entry in the `PAGES` array at the head of the script
 
 `apply()` drives both nav lists from one loop, so their active states cannot
-drift — but only over the entries you actually added to each.
+drift — but only over the entries you actually added to each. A page reached
+through the More dropdown is named in a fourth place too, `DROP_PAGES`, which
+is only what lights the dropdown button as current — omitting it costs the
+highlight, not the page.
 
 ## Page shell
 
@@ -60,8 +63,19 @@ Every reader-visible string carries **both** languages as sibling spans:
 - No whitespace between the two spans, or the hidden one leaves a gap.
 - Identifiers that must not be translated — the project name, commands,
   filenames, the names in the compatibility strip — are written **once, outside
-  any language span**. There is no translation service to defend against, which
-  is why this template needs no `notranslate`.
+  any language span**, when they stand alone. There is no translation service to
+  defend against, which is why this template needs no `notranslate`.
+- **An identifier inside a sentence is the exception.** An inline `<code>` or
+  `<strong>` must sit *inside* each language span, not between them. An element
+  between `.en` and `.ko` belongs to neither, so nothing hides it and the reader
+  sees it twice — once in each language's sentence. Write it once per language:
+
+  ```html
+  <p><span class="en">Run <code class="inline-cmd">/build</code> first.</span><span class="ko"><code class="inline-cmd">/build</code>를 먼저 실행하세요.</span></p>
+  ```
+
+  This is worth grepping for: `</span><code` and `</span><strong` in page
+  content are almost always this bug.
 - Nav labels, buttons, card footnotes, and footer columns all follow the rule.
 
 ## Reveal on scroll
@@ -204,6 +218,70 @@ row that does not navigate.
 The one component the source design did not have, added because a project site
 always needs to say "note this". Built from existing tokens only.
 
+## Step list
+
+```html
+<ol class="steps">
+  <li class="step">
+    <h4>…</h4>
+    <p>…</p>
+    <div class="cmd cmd-sm" data-copy-root>…</div>
+  </li>
+</ol>
+```
+
+The number is a CSS counter, so inserting or deleting a step renumbers the
+rest. A step with no command simply has no `.cmd` block — do not invent one to
+fill the space.
+
+## Table
+
+```html
+<div class="tblwrap"><table class="tbl">
+  <thead><tr><th>Column</th></tr></thead>
+  <tbody><tr>
+    <td>Row</td>
+    <td><span class="pill pill-ok">yes</span></td>
+    <td><code>value</code></td>
+  </tr></tbody>
+</table></div>
+```
+
+Always keep `.tblwrap`: it is what makes a wide table scroll itself instead of
+the page. Pills are `.pill-ok` (green), `.pill-warn` (amber), `.pill-no`
+(faint). A comparison in which nothing loses is not read as a comparison — put
+a real `.pill-no` in your own column.
+
+## Checklist
+
+```html
+<ul class="chk">
+  <li class="done"><span class="cid">C-01</span>Done.</li>
+  <li><span class="cid">C-02</span>Outstanding.</li>
+</ul>
+```
+
+`.chk` renders ☐ / ☑ from `li.done`. Drop the `.cid` if nothing refers to these
+by id.
+
+## Dated entries
+
+```html
+<div class="releases">
+  <div class="release is-current">
+    <div class="rel-head"><span class="rel-ver">1.2.0</span><span class="rel-date">2026-08-29</span></div>
+    <p class="rel-note">…</p>
+    <ul class="rel-list"><li>…</li></ul>
+  </div>
+</div>
+```
+
+`is-current` lights the marker; give it to exactly one entry, the newest. The
+rule is drawn on the list rather than on each row, so the last entry needs no
+special case. `.rel-ver` is a label, not necessarily a version — the preview
+uses decision ids, because inventing a release history for a project that has
+no versions would be inventing a record.
+
 ## Chrome you must not rewrite
 
 - **Routing** — `#/{lang}/{page}`. `go(id)` changes page, `setLang(l)` changes
@@ -216,6 +294,27 @@ always needs to say "note this". Built from existing tokens only.
   and announces the theme it switches *to*, because the control is an icon.
 - **The footer** sits outside the pages, so it renders on all of them and is
   armed for reveal once, on its own.
+- **The More dropdown** absorbs pages that do not fit inline. It closes on an
+  outside click, on Escape, and on every route change, and its button is hidden
+  on mobile so the menu flattens into the burger list.
+
+## The nav width budget
+
+The nav row is capped by `--maxw` at 1120px on every viewport above 1168px, so
+a row that does not fit has **no wider screen to grow into**: it wraps a label
+mid-word or pushes the language toggle off the edge. The default spends roughly
+
+```
+brand 183 + five links 356 + More 68 + gaps 68
++ link icon 32 + utilbar 104 + language 82 + CTA 99 + padding 48  ≈ 1040
+```
+
+leaving about 80px. Longer labels and a longer project name eat that headroom.
+A sixth inline link does not fit — move one into the More dropdown instead.
+Two rules exist only to keep this honest: every nav label is `white-space:
+nowrap`, so a too-long row fails visibly rather than quietly wrapping, and the
+utilbar's PDF/HTML words are hidden by default because they cost 56px the row
+has not got. Measure before adding; do not eyeball.
 
 ## Colour and contrast
 

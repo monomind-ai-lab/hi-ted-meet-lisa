@@ -1,25 +1,17 @@
 <!DOCTYPE html>
 <!-- ===================================================================
-     PROJECT WEBSITE — MonoMind template `project-website`
-     ===================================================================
-     Shape:      a marketing/landing site. Sticky nav, hash-routed pages,
-                 each page scrolls. One shared footer for the whole site.
-     Language:   both languages written inline as sibling .en/.ko spans and
-                 toggled by body[data-lang]. No translation service, works
-                 offline. Never write a bare reader-visible string.
-     Deps:       Google Fonts only. Nothing else loads from the network.
-
-     Three registers must agree or a page becomes unreachable:
-       1. <section class="page" id="page-ID">
-       2. the nav entries' data-page="ID"  (desktop AND mobile lists)
-       3. the PAGES array in the script at the foot of this file
+     Hi Ted, Meet Lisa -- the project's own website.
+     Built from the `project-website` template as its gallery preview,
+     so every component here is the shipped one, filled with real
+     content rather than placeholders. Chrome, stylesheet and scripts
+     are the template's, verbatim; only PAGES and the content differ.
      =================================================================== -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>[PROJECT] · [ONE-LINE PROMISE]</title>
-<meta name="description" content="[One sentence describing the project, 140 characters or less.]">
+<title>Hi Ted, Meet Lisa · Decks that look like they came from one studio</title>
+<meta name="description" content="An agent skill that turns a brief into one self-contained HTML deck, document, or diagram set. No build step, MIT licensed.">
 <meta name="theme-color" content="#000000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -165,8 +157,7 @@ code,kbd{font-family:var(--font-mono);font-size:.9em}
    not eyeball: at 1120 the row fails silently by wrapping. */
 .nav-inner{display:flex;align-items:center;gap:18px;height:var(--nav-h)}
 /* min-width:0 lets the brand shrink instead of pushing the utility cluster
-   off the screen: [PROJECT] is a placeholder, and a real project name is
-   usually longer than the one it replaces. */
+   off the screen when the row runs out of room. */
 .brand{display:inline-flex;align-items:center;gap:9px;min-width:0;font-weight:600;letter-spacing:-.02em;font-size:.98rem;color:var(--fg-bright)}
 .brand-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .brand-mark{color:var(--accent);display:inline-flex}
@@ -431,55 +422,38 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
 <body data-lang="en">
 <a href="#main" class="skip-link"><span class="en">Skip to content</span><span class="ko">본문으로 건너뛰기</span></a>
 
-<!-- ==================================================================
-     NAV. One entry per page. `data-page` must match a section.page id
-     AND the PAGES array at the foot of the file. The desktop list and
-     the mobile list are separate DOM — add a page to both.
-     ================================================================== -->
 <header class="nav">
   <div class="nav-inner container">
-    <a class="brand" id="brandLink" aria-label="[PROJECT] home">
+    <a class="brand" id="brandLink" aria-label="Hi Ted, Meet Lisa home">
       <span class="brand-mark" aria-hidden="true">
-        <!-- Project mark. Swap this SVG for the project's own; keep it at
-             22px and on currentColor so it follows the accent token. -->
         <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
           <path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
           <path d="M12 3v18M4 7.5l8 4.5 8-4.5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" opacity="0.55"/>
         </svg>
       </span>
-      <!-- A product name is an identifier, not prose: written once, outside
-           any .en/.ko span, so it reads the same in both languages. -->
-      <span class="brand-name">[PROJECT]<span class="brand-dim">[-SUFFIX]</span></span>
+      <span class="brand-name">Hi Ted,<span class="brand-dim"> Meet Lisa</span></span>
     </a>
 
     <nav class="nav-links" id="navLinks" aria-label="Primary">
       <a class="nav-link" data-page="home"><span class="en">Home</span><span class="ko">홈</span></a>
-      <a class="nav-link" data-page="catalog"><span class="en">[PAGE 2]</span><span class="ko">[페이지 2]</span></a>
-      <a class="nav-link" data-page="how"><span class="en">[PAGE 3]</span><span class="ko">[페이지 3]</span></a>
-      <a class="nav-link" data-page="guides"><span class="en">Guides</span><span class="ko">가이드</span></a>
+      <a class="nav-link" data-page="templates"><span class="en">Templates</span><span class="ko">템플릿</span></a>
+      <a class="nav-link" data-page="how"><span class="en">How it works</span><span class="ko">작동 방식</span></a>
+      <a class="nav-link" data-page="guides"><span class="en">Install</span><span class="ko">설치</span></a>
       <a class="nav-link" data-page="docs"><span class="en">Docs</span><span class="ko">문서</span></a>
-      <!-- Secondary pages. Anything beyond about five inline links stops the
-           row shrinking and pushes the language toggle off the right edge, so
-           the overflow goes here rather than into the row. `oncur` is set by
-           apply() when the routed page is one of DROP_PAGES. -->
       <div class="navdrop" id="navDrop">
         <button onclick="toggleDrop(event)"><span class="en">More</span><span class="ko">더 보기</span></button>
         <div class="dropmenu">
           <a data-page="compare"><span class="en">Compare</span><span class="ko">비교</span></a>
-          <a data-page="changelog"><span class="en">Changelog</span><span class="ko">변경 이력</span></a>
+          <a data-page="decisions"><span class="en">Decision log</span><span class="ko">결정 기록</span></a>
           <a data-page="contribute"><span class="en">Contribute</span><span class="ko">참여하기</span></a>
         </div>
       </div>
     </nav>
 
     <div class="nav-actions">
-      <!-- Optional external link. Delete the anchor if the project has none. -->
-      <a href="[REPO OR EXTERNAL URL]" class="nav-icon" target="_blank" rel="noopener" aria-label="[EXTERNAL LINK LABEL]">
+      <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa" class="nav-icon" target="_blank" rel="noopener" aria-label="Repository on GitHub">
         <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
       </a>
-
-      <!-- Utility cluster. Every button is guarded in the script: deleting
-           one here turns that feature off cleanly. -->
       <div class="utilbar">
         <button id="btnTheme" title="Theme" aria-label="Theme">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg>
@@ -491,67 +465,56 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 3.6-3.6M12 15l-3.6-3.6M5 19h14"/></svg><span>HTML</span>
         </button>
       </div>
-
       <div class="lang-toggle">
         <button id="btnEn" onclick="setLang('en')">EN</button>
         <button id="btnKo" onclick="setLang('ko')">한국어</button>
       </div>
-
-      <a class="btn btn-primary nav-cta" onclick="go('docs')"><span class="en">[NAV CTA]</span><span class="ko">[내비 CTA]</span></a>
-
-      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false" data-nav-toggle>
-        <span></span><span></span>
-      </button>
+      <a class="btn btn-primary nav-cta" onclick="go('guides')"><span class="en">Install</span><span class="ko">설치</span></a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false" data-nav-toggle><span></span><span></span></button>
     </div>
   </div>
 
   <nav class="nav-mobile" aria-label="Mobile" data-nav-mobile>
     <a class="nav-mobile-link" data-page="home"><span class="en">Home</span><span class="ko">홈</span></a>
-    <a class="nav-mobile-link" data-page="catalog"><span class="en">[PAGE 2]</span><span class="ko">[페이지 2]</span></a>
-    <a class="nav-mobile-link" data-page="how"><span class="en">[PAGE 3]</span><span class="ko">[페이지 3]</span></a>
-    <a class="nav-mobile-link" data-page="guides"><span class="en">Guides</span><span class="ko">가이드</span></a>
+    <a class="nav-mobile-link" data-page="templates"><span class="en">Templates</span><span class="ko">템플릿</span></a>
+    <a class="nav-mobile-link" data-page="how"><span class="en">How it works</span><span class="ko">작동 방식</span></a>
+    <a class="nav-mobile-link" data-page="guides"><span class="en">Install</span><span class="ko">설치</span></a>
     <a class="nav-mobile-link" data-page="docs"><span class="en">Docs</span><span class="ko">문서</span></a>
     <a class="nav-mobile-link" data-page="compare"><span class="en">Compare</span><span class="ko">비교</span></a>
-    <a class="nav-mobile-link" data-page="changelog"><span class="en">Changelog</span><span class="ko">변경 이력</span></a>
+    <a class="nav-mobile-link" data-page="decisions"><span class="en">Decision log</span><span class="ko">결정 기록</span></a>
     <a class="nav-mobile-link" data-page="contribute"><span class="en">Contribute</span><span class="ko">참여하기</span></a>
-    <a href="[REPO OR EXTERNAL URL]" class="nav-mobile-link" target="_blank" rel="noopener">[EXTERNAL LINK] ↗</a>
+    <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa" class="nav-mobile-link" target="_blank" rel="noopener">GitHub ↗</a>
   </nav>
 </header>
 
 <main id="main">
 
-<!-- ======================== PAGE 1: HOME ======================== -->
+<!-- ======================== HOME ======================== -->
 <section class="page" id="page-home">
-
   <section class="hero">
     <div class="grid-bg"></div>
     <div class="hero-glow" aria-hidden="true"></div>
     <div class="container hero-inner">
-
-      <a href="[BADGE LINK]" target="_blank" rel="noopener" class="hero-badge">
+      <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa" target="_blank" rel="noopener" class="hero-badge">
         <span class="dot"></span>
-        <span class="en">[BADGE CLAIM]</span><span class="ko">[배지 문구]</span>
+        <span class="en">Open source</span><span class="ko">오픈 소스</span>
         <span class="hero-badge-sep">·</span>
-        <span class="text-muted"><span class="en">[BADGE DETAIL]</span><span class="ko">[배지 상세]</span></span>
+        <span class="text-muted"><span class="en">MIT, six templates</span><span class="ko">MIT, 템플릿 6종</span></span>
         <svg viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M5 3.5h7.5V11M12.5 3.5 3.5 12.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
 
       <h1 class="hero-title">
-        <span class="en">[THE PROMISE, IN ONE SENTENCE.]<br>[SECOND LINE IF IT NEEDS ONE.]</span><span class="ko">[한 문장으로 표현한 약속.]<br>[필요하면 둘째 줄.]</span>
+        <span class="en">Decks that look like they<br>came from one studio.</span><span class="ko">한 스튜디오에서<br>나온 것 같은 자료.</span>
       </h1>
 
-      <p class="hero-sub"><span class="en">[Two or three sentences of support. What this is, who it is for, and what changes for them once they have it.]</span><span class="ko">[두세 문장의 보충 설명. 무엇이고, 누구를 위한 것이며, 무엇이 달라지는지.]</span></p>
+      <p class="hero-sub"><span class="en">An agent skill that turns a brief into one self-contained HTML file — a deck, a document, or a diagram set. No build step, no bundler, nothing to install afterwards. The design system lives in the repository, so two decks made months apart still look related.</span><span class="ko">브리프를 하나의 독립 실행 HTML 파일로 바꿔 주는 에이전트 스킬입니다. 발표 자료, 문서, 다이어그램 중 무엇이든 빌드 과정도, 번들러도, 추가 설치도 없습니다. 디자인 시스템이 저장소 안에 있으므로 몇 달 간격으로 만든 자료도 서로 닮아 있습니다.</span></p>
 
-      <!-- Copy-to-clipboard. The three data attributes are a set: -root is the
-           container queried at load, -text is the string that gets copied, and
-           -btn is what flips to the tick. Change the command in ONE place —
-           data-copy-text is the source of truth; the aria-label repeats it. -->
       <div class="hero-cmd">
         <div class="cmd cmd-lg" data-copy-root>
           <div class="cmd-body">
             <span class="cmd-prompt" aria-hidden="true">$</span>
-            <code class="cmd-text" data-copy-text>[install or run command]</code>
-            <button class="cmd-btn" data-copy-btn aria-label="Copy: [install or run command]">
+            <code class="cmd-text" data-copy-text>/tedandlisa a 12-slide deck on our Q3 roadmap</code>
+            <button class="cmd-btn" data-copy-btn aria-label="Copy: /tedandlisa a 12-slide deck on our Q3 roadmap">
               <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
               <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
@@ -560,105 +523,95 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
       </div>
 
       <div class="hero-cta">
-        <a class="btn btn-primary" onclick="go('docs')">
-          <span class="en">[PRIMARY ACTION]</span><span class="ko">[주요 동작]</span>
+        <a class="btn btn-primary" onclick="go('guides')">
+          <span class="en">Install it</span><span class="ko">설치하기</span>
           <svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
-        <a class="btn btn-secondary" onclick="go('catalog')"><span class="en">[SECONDARY ACTION]</span><span class="ko">[보조 동작]</span></a>
+        <a class="btn btn-secondary" onclick="go('templates')"><span class="en">See the templates</span><span class="ko">템플릿 보기</span></a>
       </div>
 
-      <!-- Compatibility strip. Names of things are identifiers, so they are
-           written once, outside .en/.ko. Delete the block if there is no
-           ecosystem to claim; do not fill it with decoration. -->
       <div class="hero-compat">
-        <span class="hero-compat-label"><span class="en">[WHAT IT WORKS WITH]</span><span class="ko">[호환 대상]</span></span>
+        <span class="hero-compat-label"><span class="en">Six templates in the box</span><span class="ko">기본 제공 템플릿 6종</span></span>
         <div class="hero-compat-list">
-          <span class="hero-compat-item">[NAME 1]</span>
-          <span class="hero-compat-item">[NAME 2]</span>
-          <span class="hero-compat-item">[NAME 3]</span>
-          <span class="hero-compat-item">[NAME 4]</span>
-          <span class="hero-compat-item">[NAME 5]</span>
-          <span class="hero-compat-item">[NAME 6]</span>
+          <span class="hero-compat-item">monomind-deck</span>
+          <span class="hero-compat-item">web-document</span>
+          <span class="hero-compat-item">mermaid-master</span>
+          <span class="hero-compat-item">architecture</span>
+          <span class="hero-compat-item">sitemap-ia</span>
+          <span class="hero-compat-item">project-website</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ---- Band 01: the process diagram ---- -->
   <section class="section">
     <div class="container">
       <div class="sec-head reveal">
-        <span class="eyebrow"><span class="eyebrow-num">01</span> <span class="en">[EYEBROW]</span><span class="ko">[라벨]</span></span>
-        <h2 class="section-title"><span class="en">[SECTION HEADLINE AS A SENTENCE.]</span><span class="ko">[문장형 섹션 제목.]</span></h2>
-        <p class="section-lede"><span class="en">[Two sentences explaining the shape of the thing the diagram below shows.]</span><span class="ko">[아래 다이어그램이 무엇을 보여주는지 두 문장으로.]</span></p>
+        <span class="eyebrow"><span class="eyebrow-num">01</span> <span class="en">The build sequence</span><span class="ko">제작 순서</span></span>
+        <h2 class="section-title"><span class="en">You write the brief. The agent does the other five steps.</span><span class="ko">브리프만 쓰면, 나머지 다섯 단계는 에이전트가 합니다.</span></h2>
+        <p class="section-lede"><span class="en">Every deck goes through the same sequence, which is why the results are consistent. The intake only asks what the brief could not tell it, and every question has a default.</span><span class="ko">모든 자료가 같은 순서를 거치기 때문에 결과가 일정합니다. 인테이크는 브리프에서 알 수 없는 것만 묻고, 모든 질문에 기본값이 있습니다.</span></p>
       </div>
 
-      <!-- Six-step track. --h is the hue for that step and tints the label,
-           the node border, and its glow. Keep six steps or the animated
-           track's spacing has to be re-tuned; three fit on a phone. -->
       <div class="lifecycle-wrap reveal">
-        <div class="lifecycle" role="img" aria-label="[DIAGRAM DESCRIPTION FOR SCREEN READERS]">
+        <div class="lifecycle" role="img" aria-label="Build sequence: brief, intake, template, content, review, hand off">
           <div class="lc-track" aria-hidden="true"></div>
           <ol class="lc-steps">
             <li class="lc-step" style="--h:205">
-              <span class="lc-phase"><span class="en">[PHASE 1]</span><span class="ko">[단계 1]</span></span>
-              <div class="lc-node"><span class="lc-verb"><span class="en">[VERB]</span><span class="ko">[동사]</span></span><span class="lc-sub"><span class="en">[sub]</span><span class="ko">[보조]</span></span></div>
-              <code class="lc-cmd">[/cmd]</code>
+              <span class="lc-phase"><span class="en">Brief</span><span class="ko">브리프</span></span>
+              <div class="lc-node"><span class="lc-verb"><span class="en">Ask</span><span class="ko">요청</span></span><span class="lc-sub"><span class="en">one line</span><span class="ko">한 줄</span></span></div>
+              <code class="lc-cmd">/tedandlisa</code>
             </li>
             <li class="lc-step" style="--h:255">
-              <span class="lc-phase"><span class="en">[PHASE 2]</span><span class="ko">[단계 2]</span></span>
-              <div class="lc-node"><span class="lc-verb"><span class="en">[VERB]</span><span class="ko">[동사]</span></span><span class="lc-sub"><span class="en">[sub]</span><span class="ko">[보조]</span></span></div>
-              <code class="lc-cmd">[/cmd]</code>
+              <span class="lc-phase"><span class="en">Intake</span><span class="ko">인테이크</span></span>
+              <div class="lc-node"><span class="lc-verb"><span class="en">Answer</span><span class="ko">응답</span></span><span class="lc-sub"><span class="en">9–16 Qs</span><span class="ko">9~16문항</span></span></div>
+              <code class="lc-cmd">panel</code>
             </li>
             <li class="lc-step" style="--h:175">
-              <span class="lc-phase"><span class="en">[PHASE 3]</span><span class="ko">[단계 3]</span></span>
-              <div class="lc-node"><span class="lc-verb"><span class="en">[VERB]</span><span class="ko">[동사]</span></span><span class="lc-sub"><span class="en">[sub]</span><span class="ko">[보조]</span></span></div>
-              <code class="lc-cmd">[/cmd]</code>
+              <span class="lc-phase"><span class="en">Template</span><span class="ko">템플릿</span></span>
+              <div class="lc-node"><span class="lc-verb"><span class="en">Copy</span><span class="ko">복사</span></span><span class="lc-sub"><span class="en">never blank</span><span class="ko">백지 금지</span></span></div>
+              <code class="lc-cmd">registry</code>
             </li>
             <li class="lc-step" style="--h:40">
-              <span class="lc-phase"><span class="en">[PHASE 4]</span><span class="ko">[단계 4]</span></span>
-              <div class="lc-node"><span class="lc-verb"><span class="en">[VERB]</span><span class="ko">[동사]</span></span><span class="lc-sub"><span class="en">[sub]</span><span class="ko">[보조]</span></span></div>
-              <code class="lc-cmd">[/cmd]</code>
+              <span class="lc-phase"><span class="en">Content</span><span class="ko">내용</span></span>
+              <div class="lc-node"><span class="lc-verb"><span class="en">Fill</span><span class="ko">채우기</span></span><span class="lc-sub"><span class="en">patterns</span><span class="ko">패턴</span></span></div>
+              <code class="lc-cmd">patterns.md</code>
             </li>
             <li class="lc-step" style="--h:340">
-              <span class="lc-phase"><span class="en">[PHASE 5]</span><span class="ko">[단계 5]</span></span>
-              <div class="lc-node"><span class="lc-verb"><span class="en">[VERB]</span><span class="ko">[동사]</span></span><span class="lc-sub"><span class="en">[sub]</span><span class="ko">[보조]</span></span></div>
-              <code class="lc-cmd">[/cmd]</code>
+              <span class="lc-phase"><span class="en">Review</span><span class="ko">검토</span></span>
+              <div class="lc-node"><span class="lc-verb"><span class="en">Check</span><span class="ko">점검</span></span><span class="lc-sub"><span class="en">measured</span><span class="ko">측정</span></span></div>
+              <code class="lc-cmd">step 10</code>
             </li>
             <li class="lc-step" style="--h:145">
-              <span class="lc-phase"><span class="en">[PHASE 6]</span><span class="ko">[단계 6]</span></span>
-              <div class="lc-node"><span class="lc-verb"><span class="en">[VERB]</span><span class="ko">[동사]</span></span><span class="lc-sub"><span class="en">[sub]</span><span class="ko">[보조]</span></span></div>
-              <code class="lc-cmd">[/cmd]</code>
+              <span class="lc-phase"><span class="en">Hand off</span><span class="ko">전달</span></span>
+              <div class="lc-node"><span class="lc-verb"><span class="en">Ship</span><span class="ko">완료</span></span><span class="lc-sub"><span class="en">one file</span><span class="ko">파일 하나</span></span></div>
+              <code class="lc-cmd">.html</code>
             </li>
           </ol>
         </div>
       </div>
 
-      <!-- Two-column register. Rows are anchors so a row can route to a page;
-           drop the onclick and use a <div class="cmd-row"> for a static row. -->
       <div class="cmd-table reveal">
-        <a class="cmd-row" onclick="go('docs')"><code class="cmd-row-cmd">[/cmd-1]</code><span class="cmd-row-doing"><span class="en">[What it does]</span><span class="ko">[하는 일]</span></span><span class="cmd-row-principle"><span class="en">[Principle]</span><span class="ko">[원칙]</span></span></a>
-        <a class="cmd-row" onclick="go('docs')"><code class="cmd-row-cmd">[/cmd-2]</code><span class="cmd-row-doing"><span class="en">[What it does]</span><span class="ko">[하는 일]</span></span><span class="cmd-row-principle"><span class="en">[Principle]</span><span class="ko">[원칙]</span></span></a>
-        <a class="cmd-row" onclick="go('docs')"><code class="cmd-row-cmd">[/cmd-3]</code><span class="cmd-row-doing"><span class="en">[What it does]</span><span class="ko">[하는 일]</span></span><span class="cmd-row-principle"><span class="en">[Principle]</span><span class="ko">[원칙]</span></span></a>
-        <a class="cmd-row" onclick="go('docs')"><code class="cmd-row-cmd">[/cmd-4]</code><span class="cmd-row-doing"><span class="en">[What it does]</span><span class="ko">[하는 일]</span></span><span class="cmd-row-principle"><span class="en">[Principle]</span><span class="ko">[원칙]</span></span></a>
+        <a class="cmd-row" onclick="go('guides')"><code class="cmd-row-cmd">/tedandlisa</code><span class="cmd-row-doing"><span class="en">Build a deck, document, or diagram set</span><span class="ko">자료·문서·다이어그램 제작</span></span><span class="cmd-row-principle"><span class="en">One file, no build step</span><span class="ko">파일 하나, 빌드 없음</span></span></a>
+        <a class="cmd-row" onclick="go('contribute')"><code class="cmd-row-cmd">/tedandlisa-new-template</code><span class="cmd-row-doing"><span class="en">Turn an HTML file you like into a template</span><span class="ko">마음에 드는 HTML을 템플릿으로</span></span><span class="cmd-row-principle"><span class="en">The source never ships</span><span class="ko">원본은 커밋하지 않음</span></span></a>
+        <a class="cmd-row" onclick="go('templates')"><code class="cmd-row-cmd">/tedandlisa-design</code><span class="cmd-row-doing"><span class="en">Style presets, animated HTML, editable .pptx</span><span class="ko">스타일 프리셋, 애니메이션 HTML, .pptx</span></span><span class="cmd-row-principle"><span class="en">For shapes the house style has not got</span><span class="ko">하우스 스타일 밖의 형태용</span></span></a>
+        <a class="cmd-row" onclick="go('docs')"><code class="cmd-row-cmd">tedandlisa_thumbs.py</code><span class="cmd-row-doing"><span class="en">Re-capture the gallery thumbnails</span><span class="ko">갤러리 썸네일 재촬영</span></span><span class="cmd-row-principle"><span class="en">Chrome, used read-only</span><span class="ko">Chrome, 읽기 전용</span></span></a>
       </div>
     </div>
   </section>
 
   <hr class="hairline">
 
-  <!-- ---- Band 02: the final ask ---- -->
   <section class="section final-cta">
     <div class="hero-glow final-glow" aria-hidden="true"></div>
     <div class="container final-inner reveal">
-      <h2 class="final-title"><span class="en">[THE ONE THING YOU WANT THEM TO DO.]</span><span class="ko">[방문자가 해주길 바라는 한 가지.]</span></h2>
-      <p class="final-sub"><span class="en">[One sentence that removes the last objection.]</span><span class="ko">[마지막 망설임을 없애는 한 문장.]</span></p>
+      <h2 class="final-title"><span class="en">Install once. Then it is three commands you have for good.</span><span class="ko">한 번 설치하면, 세 개의 명령이 계속 남습니다.</span></h2>
+      <p class="final-sub"><span class="en">Clone into your agent's skills directory and it is available in every project.</span><span class="ko">에이전트의 스킬 디렉터리에 클론하면 모든 프로젝트에서 쓸 수 있습니다.</span></p>
       <div class="final-cmd">
         <div class="cmd cmd-lg" data-copy-root>
           <div class="cmd-body">
             <span class="cmd-prompt" aria-hidden="true">$</span>
-            <code class="cmd-text" data-copy-text>[install or run command]</code>
-            <button class="cmd-btn" data-copy-btn aria-label="Copy: [install or run command]">
+            <code class="cmd-text" data-copy-text>git clone --recurse-submodules https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git ~/.claude/skills/tedandlisa</code>
+            <button class="cmd-btn" data-copy-btn aria-label="Copy the clone command">
               <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
               <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
@@ -666,148 +619,120 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
         </div>
       </div>
       <div class="final-links">
-        <a class="btn btn-primary" onclick="go('docs')"><span class="en">[PRIMARY ACTION]</span><span class="ko">[주요 동작]</span></a>
-        <a href="[REPO OR EXTERNAL URL]" target="_blank" rel="noopener" class="btn btn-secondary"><span class="en">[SECONDARY ACTION]</span><span class="ko">[보조 동작]</span></a>
+        <a class="btn btn-primary" onclick="go('guides')"><span class="en">Full install</span><span class="ko">전체 설치 안내</span></a>
+        <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa" target="_blank" rel="noopener" class="btn btn-secondary"><span class="en">Read the source</span><span class="ko">소스 보기</span></a>
       </div>
     </div>
   </section>
 </section>
 
-<!-- ======================== PAGE 2: CATALOG ========================
-     The card grid. --h on each card is its category hue and tints the
-     chip, the dot, the hover edge, and the arrow from one number. -->
-<section class="page" id="page-catalog">
+<!-- ======================== TEMPLATES ======================== -->
+<section class="page" id="page-templates">
   <section class="section">
     <div class="container">
       <div class="sec-head sec-head-row reveal">
         <div>
-          <span class="eyebrow"><span class="eyebrow-num">02</span> <span class="en">[EYEBROW]</span><span class="ko">[라벨]</span></span>
-          <h2 class="section-title"><span class="en">[WHAT THIS PAGE LISTS.]</span><span class="ko">[이 페이지가 나열하는 것.]</span></h2>
-          <p class="section-lede"><span class="en">[Two sentences on what the items are and how to pick one.]</span><span class="ko">[항목이 무엇이고 어떻게 고르는지 두 문장으로.]</span></p>
+          <span class="eyebrow"><span class="eyebrow-num">02</span> <span class="en">Templates</span><span class="ko">템플릿</span></span>
+          <h2 class="section-title"><span class="en">Six shapes, not six skins</span><span class="ko">여섯 가지 스킨이 아니라, 여섯 가지 형태</span></h2>
+          <p class="section-lede"><span class="en">They differ in shape, navigation, and how they handle language — so the choice is about what the reader will do with it, not which one looks nicer.</span><span class="ko">형태와 내비게이션, 언어 처리 방식이 각각 다릅니다. 그래서 선택 기준은 &ldquo;어느 쪽이 예쁜가&rdquo;가 아니라 &ldquo;독자가 이것으로 무엇을 하는가&rdquo;입니다.</span></p>
         </div>
-        <a class="btn btn-secondary sec-head-cta" onclick="go('docs')">
-          <span class="en">[SECTION CTA]</span><span class="ko">[섹션 CTA]</span>
+        <a class="btn btn-secondary sec-head-cta" onclick="go('compare')">
+          <span class="en">Compare</span><span class="ko">비교하기</span>
           <svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
       </div>
 
       <div class="cards-grid reveal">
         <a class="card item-card" style="--h:205" onclick="go('docs')">
-          <div class="ic-top">
-            <span class="chip phase-chip"><span class="phase-dot"></span><span class="en">[CATEGORY]</span><span class="ko">[분류]</span></span>
-            <span class="ic-cmd mono">[/cmd]</span>
-          </div>
-          <h3 class="ic-name mono">[item-name]</h3>
-          <p class="ic-summary"><span class="en">[What it is, in one sentence.]</span><span class="ko">[한 문장 설명.]</span></p>
-          <div class="ic-foot">
-            <span class="ic-when"><span class="en">[When to reach for it.]</span><span class="ko">[언제 쓰는지.]</span></span>
-            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </div>
+          <div class="ic-top"><span class="chip phase-chip"><span class="phase-dot"></span><span class="en">Slides</span><span class="ko">슬라이드</span></span></div>
+          <h3 class="ic-name mono">monomind-deck</h3>
+          <p class="ic-summary"><span class="en">Horizontal scroll-snap slides, dark ink and accent halos. Google Translate loads only when a reader picks another language.</span><span class="ko">가로 스크롤 스냅 슬라이드. 어두운 배경과 강조 후광. 다른 언어를 고를 때만 Google 번역을 불러옵니다.</span></p>
+          <div class="ic-foot"><span class="ic-when"><span class="en">A talk. One idea per slide, read across a room.</span><span class="ko">발표용. 슬라이드 한 장에 하나의 메시지.</span></span>
+            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
         </a>
 
         <a class="card item-card" style="--h:255" onclick="go('docs')">
-          <div class="ic-top">
-            <span class="chip phase-chip"><span class="phase-dot"></span><span class="en">[CATEGORY]</span><span class="ko">[분류]</span></span>
-            <span class="ic-cmd mono">[/cmd]</span>
-          </div>
-          <h3 class="ic-name mono">[item-name]</h3>
-          <p class="ic-summary"><span class="en">[What it is, in one sentence.]</span><span class="ko">[한 문장 설명.]</span></p>
-          <div class="ic-foot">
-            <span class="ic-when"><span class="en">[When to reach for it.]</span><span class="ko">[언제 쓰는지.]</span></span>
-            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </div>
+          <div class="ic-top"><span class="chip phase-chip"><span class="phase-dot"></span><span class="en">Document</span><span class="ko">문서</span></span><span class="ic-cmd mono">mermaid</span></div>
+          <h3 class="ic-name mono">web-document</h3>
+          <p class="ic-summary"><span class="en">Reads like a website page: top nav, hash-routed sections, diagrams with a pan-and-zoom viewer.</span><span class="ko">웹페이지처럼 읽힙니다. 상단 내비게이션, 해시 라우팅, 확대·이동이 가능한 다이어그램 뷰어.</span></p>
+          <div class="ic-foot"><span class="ic-when"><span class="en">Read at desk distance and linked to — a guide, a handbook.</span><span class="ko">책상에서 읽고 링크로 공유하는 문서 — 가이드, 핸드북.</span></span>
+            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
         </a>
 
-        <!-- A card with no command chip: the .ic-cmd span is simply absent. -->
         <a class="card item-card" style="--h:175" onclick="go('docs')">
-          <div class="ic-top">
-            <span class="chip phase-chip"><span class="phase-dot"></span><span class="en">[CATEGORY]</span><span class="ko">[분류]</span></span>
-          </div>
-          <h3 class="ic-name mono">[item-name]</h3>
-          <p class="ic-summary"><span class="en">[What it is, in one sentence.]</span><span class="ko">[한 문장 설명.]</span></p>
-          <div class="ic-foot">
-            <span class="ic-when"><span class="en">[When to reach for it.]</span><span class="ko">[언제 쓰는지.]</span></span>
-            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </div>
+          <div class="ic-top"><span class="chip phase-chip"><span class="phase-dot"></span><span class="en">Slides</span><span class="ko">슬라이드</span></span><span class="ic-cmd mono">SVG</span></div>
+          <h3 class="ic-name mono">mermaid-master</h3>
+          <p class="ic-summary"><span class="en">Diagram-first slides on light paper, one drawing per slide. Every slide is written twice, so labels inside a diagram translate too.</span><span class="ko">밝은 배경의 다이어그램 중심 슬라이드. 한 장에 그림 하나. 모든 슬라이드를 두 언어로 작성해 도형 안 레이블까지 번역됩니다.</span></p>
+          <div class="ic-foot"><span class="ic-when"><span class="en">Architecture that gets read closely and printed.</span><span class="ko">자세히 읽고 인쇄하는 아키텍처 자료.</span></span>
+            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
         </a>
 
         <a class="card item-card" style="--h:40" onclick="go('docs')">
-          <div class="ic-top">
-            <span class="chip phase-chip"><span class="phase-dot"></span><span class="en">[CATEGORY]</span><span class="ko">[분류]</span></span>
-            <span class="ic-cmd mono">[/cmd]</span>
-          </div>
-          <h3 class="ic-name mono">[item-name]</h3>
-          <p class="ic-summary"><span class="en">[What it is, in one sentence.]</span><span class="ko">[한 문장 설명.]</span></p>
-          <div class="ic-foot">
-            <span class="ic-when"><span class="en">[When to reach for it.]</span><span class="ko">[언제 쓰는지.]</span></span>
-            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </div>
+          <div class="ic-top"><span class="chip phase-chip"><span class="phase-dot"></span><span class="en">Document</span><span class="ko">문서</span></span></div>
+          <h3 class="ic-name mono">architecture</h3>
+          <p class="ic-summary"><span class="en">One system diagram on slate, where colour carries meaning rather than decoration.</span><span class="ko">슬레이트 배경의 시스템 다이어그램 한 장. 색이 장식이 아니라 의미를 담습니다.</span></p>
+          <div class="ic-foot"><span class="ic-when"><span class="en">A diagram reviewed closely and pasted into a doc.</span><span class="ko">꼼꼼히 검토하고 문서에 붙여 넣는 다이어그램.</span></span>
+            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
         </a>
 
         <a class="card item-card" style="--h:340" onclick="go('docs')">
-          <div class="ic-top">
-            <span class="chip phase-chip"><span class="phase-dot"></span><span class="en">[CATEGORY]</span><span class="ko">[분류]</span></span>
-            <span class="ic-cmd mono">[/cmd]</span>
-          </div>
-          <h3 class="ic-name mono">[item-name]</h3>
-          <p class="ic-summary"><span class="en">[What it is, in one sentence.]</span><span class="ko">[한 문장 설명.]</span></p>
-          <div class="ic-foot">
-            <span class="ic-when"><span class="en">[When to reach for it.]</span><span class="ko">[언제 쓰는지.]</span></span>
-            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </div>
+          <div class="ic-top"><span class="chip phase-chip"><span class="phase-dot"></span><span class="en">Document</span><span class="ko">문서</span></span><span class="ic-cmd mono">prototype</span></div>
+          <h3 class="ic-name mono">sitemap-ia</h3>
+          <p class="ic-summary"><span class="en">Argues an information architecture, with the navigation wired up so reviewers can click through it at two breakpoints.</span><span class="ko">정보 구조를 설득하는 문서. 내비게이션이 실제로 동작해 두 가지 화면 폭에서 눌러 볼 수 있습니다.</span></p>
+          <div class="ic-foot"><span class="ic-when"><span class="en">Proposing or defending a site structure.</span><span class="ko">사이트 구조를 제안하거나 방어할 때.</span></span>
+            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
         </a>
 
-        <a class="card item-card" style="--h:145" onclick="go('docs')">
-          <div class="ic-top">
-            <span class="chip phase-chip"><span class="phase-dot"></span><span class="en">[CATEGORY]</span><span class="ko">[분류]</span></span>
-            <span class="ic-cmd mono">[/cmd]</span>
-          </div>
-          <h3 class="ic-name mono">[item-name]</h3>
-          <p class="ic-summary"><span class="en">[What it is, in one sentence.]</span><span class="ko">[한 문장 설명.]</span></p>
-          <div class="ic-foot">
-            <span class="ic-when"><span class="en">[When to reach for it.]</span><span class="ko">[언제 쓰는지.]</span></span>
-            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </div>
+        <a class="card item-card" style="--h:145" onclick="go('how')">
+          <div class="ic-top"><span class="chip phase-chip"><span class="phase-dot"></span><span class="en">Document</span><span class="ko">문서</span></span><span class="ic-cmd mono">this one</span></div>
+          <h3 class="ic-name mono">project-website</h3>
+          <p class="ic-summary"><span class="en">A project's public face: sticky nav, hash-routed pages, one shared footer. This page is it, filled in.</span><span class="ko">프로젝트의 공개 페이지. 고정 내비게이션, 해시 라우팅, 공용 푸터. 지금 보고 있는 이 페이지가 그 템플릿입니다.</span></p>
+          <div class="ic-foot"><span class="ic-when"><span class="en">A launch page, a tool's home, a programme's front door.</span><span class="ko">런치 페이지, 도구의 홈, 프로그램의 대문.</span></span>
+            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
         </a>
+      </div>
+
+      <div class="callout reveal">
+        <b><span class="en">Not on the list?</span><span class="ko">목록에 없다면?</span></b> <span class="en">A seventh entry, <code class="inline-cmd">slide-design</code>, is a handoff rather than a template — it drives a vendored pipeline for style presets and editable .pptx, which the house templates deliberately do not do.</span><span class="ko">일곱 번째 항목 <code class="inline-cmd">slide-design</code>은 템플릿이 아니라 인계 경로입니다. 하우스 템플릿이 일부러 다루지 않는 스타일 프리셋과 편집 가능한 .pptx를 별도 파이프라인으로 처리합니다.</span>
       </div>
     </div>
   </section>
 </section>
 
-<!-- ======================== PAGE 3: HOW IT WORKS ======================== -->
+<!-- ======================== HOW IT WORKS ======================== -->
 <section class="page" id="page-how">
   <section class="section">
     <div class="container">
       <div class="sec-head reveal">
-        <span class="eyebrow"><span class="eyebrow-num">03</span> <span class="en">[EYEBROW]</span><span class="ko">[라벨]</span></span>
-        <h2 class="section-title"><span class="en">[THE ARGUMENT, AS A SENTENCE.]<br>[THE TURN, IF IT NEEDS ONE.]</span><span class="ko">[문장으로 쓴 주장.]<br>[필요하면 반전 문장.]</span></h2>
-        <p class="section-lede"><span class="en">[Two sentences setting up the four pillars below.]</span><span class="ko">[아래 네 기둥을 소개하는 두 문장.]</span></p>
+        <span class="eyebrow"><span class="eyebrow-num">03</span> <span class="en">How it works</span><span class="ko">작동 방식</span></span>
+        <h2 class="section-title"><span class="en">An agent left alone invents a look every time.<br>Four things stop that.</span><span class="ko">그냥 두면 에이전트는 매번 새 디자인을 만들어 냅니다.<br>네 가지 장치가 그것을 막습니다.</span></h2>
+        <p class="section-lede"><span class="en">Consistency here is structural, not a matter of asking nicely in a prompt.</span><span class="ko">여기서의 일관성은 프롬프트로 부탁해서 얻는 것이 아니라 구조에서 나옵니다.</span></p>
       </div>
 
       <div class="pillars reveal">
         <article class="card pillar">
-          <div class="pillar-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 4.6 6.4v5.1c0 4.4 3.1 8.1 7.4 9.3 4.3-1.2 7.4-4.9 7.4-9.3V6.4Z"/></svg></div>
-          <span class="pillar-tag mono"><span class="en">[TAG]</span><span class="ko">[태그]</span></span>
-          <h3 class="pillar-title"><span class="en">[What this mechanism guarantees]</span><span class="ko">[이 장치가 보장하는 것]</span></h3>
-          <p class="pillar-body"><span class="en">[Two or three sentences. Say the mechanism, not the benefit.]</span><span class="ko">[두세 문장. 효과가 아니라 장치를 설명할 것.]</span></p>
+          <div class="pillar-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 6.5h15v11h-15zM4.5 10h15M9 10v7.5"/></svg></div>
+          <span class="pillar-tag mono"><span class="en">Copy, never author</span><span class="ko">백지 금지</span></span>
+          <h3 class="pillar-title"><span class="en">The look is a file, not a memory</span><span class="ko">디자인은 기억이 아니라 파일</span></h3>
+          <p class="pillar-body"><span class="en">Design tokens, the typographic scale, the component library and the navigation all ship in the repository. The agent copies a template and fills it; it never starts from a blank file, so there is nothing to reinvent.</span><span class="ko">디자인 토큰, 타이포그래피 스케일, 컴포넌트 라이브러리, 내비게이션이 모두 저장소에 들어 있습니다. 에이전트는 템플릿을 복사해 채울 뿐, 빈 파일에서 시작하지 않습니다.</span></p>
         </article>
         <article class="card pillar">
-          <div class="pillar-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5 9.5 17.5 19.5 7"/></svg></div>
-          <span class="pillar-tag mono"><span class="en">[TAG]</span><span class="ko">[태그]</span></span>
-          <h3 class="pillar-title"><span class="en">[What this mechanism guarantees]</span><span class="ko">[이 장치가 보장하는 것]</span></h3>
-          <p class="pillar-body"><span class="en">[Two or three sentences.]</span><span class="ko">[두세 문장.]</span></p>
+          <div class="pillar-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6a8.4 8.4 0 1 0 8.4 8.4"/><path d="M12 7.6v4.4l3 1.8"/></svg></div>
+          <span class="pillar-tag mono"><span class="en">Ask, then default</span><span class="ko">묻되, 기본값</span></span>
+          <h3 class="pillar-title"><span class="en">The intake only asks what it cannot infer</span><span class="ko">추론할 수 없는 것만 묻습니다</span></h3>
+          <p class="pillar-body"><span class="en">Nine to sixteen questions depending on the template, filtered by the shape you picked, every one carrying a default. A panel that asks irrelevant questions trains people to skim the relevant ones.</span><span class="ko">템플릿에 따라 9~16문항이며, 선택한 형태에 맞게 걸러집니다. 모든 문항에 기본값이 있습니다. 관계없는 질문을 하는 패널은 정작 중요한 질문까지 대충 넘기게 만듭니다.</span></p>
         </article>
         <article class="card pillar">
-          <div class="pillar-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="6.5" r="2.6"/><circle cx="5.5" cy="17.5" r="2.6"/><circle cx="18.5" cy="17.5" r="2.6"/><path d="M12 9.1v3.3M12 12.4 6.9 15.6M12 12.4l5.1 3.2"/></svg></div>
-          <span class="pillar-tag mono"><span class="en">[TAG]</span><span class="ko">[태그]</span></span>
-          <h3 class="pillar-title"><span class="en">[What this mechanism guarantees]</span><span class="ko">[이 장치가 보장하는 것]</span></h3>
-          <p class="pillar-body"><span class="en">[Two or three sentences.]</span><span class="ko">[두세 문장.]</span></p>
+          <div class="pillar-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5h7l4 4v11H7z"/><path d="M13.6 4.6v4.3h4.3"/></svg></div>
+          <span class="pillar-tag mono"><span class="en">One file</span><span class="ko">파일 하나</span></span>
+          <h3 class="pillar-title"><span class="en">What you get is a file, not a project</span><span class="ko">프로젝트가 아니라 파일을 받습니다</span></h3>
+          <p class="pillar-body"><span class="en">No build step, no bundler, no package manager, nothing to install to read it. Open it, present it, print it, or email it. The export button is the browser's own, never a bundled library.</span><span class="ko">빌드 과정도, 번들러도, 패키지 매니저도 없고, 읽기 위해 설치할 것도 없습니다. 열고, 발표하고, 인쇄하고, 메일로 보내면 됩니다. 내보내기는 브라우저 기본 기능만 씁니다.</span></p>
         </article>
         <article class="card pillar">
-          <div class="pillar-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5V9.8M9.8 19.5V4.5M15.2 19.5v-7.4M20.5 19.5v-11"/></svg></div>
-          <span class="pillar-tag mono"><span class="en">[TAG]</span><span class="ko">[태그]</span></span>
-          <h3 class="pillar-title"><span class="en">[What this mechanism guarantees]</span><span class="ko">[이 장치가 보장하는 것]</span></h3>
-          <p class="pillar-body"><span class="en">[Two or three sentences.]</span><span class="ko">[두세 문장.]</span></p>
+          <div class="pillar-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.2"/><path d="M15.6 15.6 20 20"/></svg></div>
+          <span class="pillar-tag mono"><span class="en">Reviewed, not assumed</span><span class="ko">가정이 아니라 검토</span></span>
+          <h3 class="pillar-title"><span class="en">A design review runs before hand-off</span><span class="ko">전달 전에 디자인 검토가 돌아갑니다</span></h3>
+          <p class="pillar-body"><span class="en">Step 10 of the skill. It prefers your own review tooling, falls back to the copy vendored here, and has a measured, tooling-free checklist as the floor — contrast ratios and 375px overflow are numbers, not opinions.</span><span class="ko">스킬의 10단계입니다. 사용자의 검토 도구를 우선 쓰고, 없으면 저장소에 포함된 사본을, 그것도 없으면 측정 기반 체크리스트를 씁니다. 명암비와 375px 넘침은 의견이 아니라 수치입니다.</span></p>
         </article>
       </div>
     </div>
@@ -815,49 +740,35 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
 
   <hr class="hairline">
 
-  <!-- Asymmetric split: argument on the left, evidence on the right. -->
   <section class="section">
     <div class="container">
       <div class="split-layout">
         <div class="reveal">
-          <span class="eyebrow"><span class="eyebrow-num">04</span> <span class="en">[EYEBROW]</span><span class="ko">[라벨]</span></span>
-          <h2 class="section-title"><span class="en">[THE CLAIM THE CARDS PROVE]</span><span class="ko">[카드가 뒷받침하는 주장]</span></h2>
-          <!-- An inline <code> or <strong> goes INSIDE each language span, never
-               between them: an element sitting between .en and .ko belongs to
-               neither, so it renders in both languages and the reader sees it
-               twice. The identifier is therefore written once per language. -->
-          <p class="section-lede"><span class="en">[Explain the claim. Use <code class="inline-cmd">[/cmd]</code> inline when naming a command — an identifier inside a sentence lives inside that sentence's span.]</span><span class="ko">[주장을 설명합니다. 문장 안에서 <code class="inline-cmd">[/cmd]</code> 처럼 명령을 언급할 때는, 식별자를 해당 언어 span 안에 넣습니다.]</span></p>
-          <a class="btn btn-secondary split-cta" onclick="go('docs')"><span class="en">[SECTION CTA]</span><span class="ko">[섹션 CTA]</span></a>
+          <span class="eyebrow"><span class="eyebrow-num">04</span> <span class="en">The moving parts</span><span class="ko">구성 요소</span></span>
+          <h2 class="section-title"><span class="en">Four files do the work</span><span class="ko">네 개의 파일이 일합니다</span></h2>
+          <p class="section-lede"><span class="en">Everything is plain HTML, CSS, and Python's standard library. Run <code class="inline-cmd">git clone</code> and you can read the whole thing in an afternoon.</span><span class="ko">전부 순수 HTML, CSS, 그리고 파이썬 표준 라이브러리입니다. <code class="inline-cmd">git clone</code> 한 번이면 반나절 만에 전체를 읽을 수 있습니다.</span></p>
+          <a class="btn btn-secondary split-cta" onclick="go('docs')"><span class="en">Read the docs</span><span class="ko">문서 읽기</span></a>
         </div>
-
         <div class="people-grid reveal">
           <div class="card person-card">
-            <div class="person-head">
-              <span class="person-avatar" aria-hidden="true">[AB]</span>
-              <div><h3 class="person-name mono">[name-or-role]</h3><span class="person-role"><span class="en">[Title]</span><span class="ko">[직함]</span></span></div>
-            </div>
-            <p class="person-note"><span class="en">[What this one contributes, in one sentence.]</span><span class="ko">[이 항목이 기여하는 바, 한 문장.]</span></p>
+            <div class="person-head"><span class="person-avatar" aria-hidden="true">SK</span>
+              <div><h3 class="person-name mono">SKILL.md</h3><span class="person-role"><span class="en">The protocol</span><span class="ko">진행 규약</span></span></div></div>
+            <p class="person-note"><span class="en">Drives the ten steps, from intake to hand-off, and holds the answer table.</span><span class="ko">인테이크부터 전달까지 열 단계를 이끌고, 응답 대응표를 담고 있습니다.</span></p>
           </div>
           <div class="card person-card">
-            <div class="person-head">
-              <span class="person-avatar" aria-hidden="true">[CD]</span>
-              <div><h3 class="person-name mono">[name-or-role]</h3><span class="person-role"><span class="en">[Title]</span><span class="ko">[직함]</span></span></div>
-            </div>
-            <p class="person-note"><span class="en">[What this one contributes.]</span><span class="ko">[기여하는 바.]</span></p>
+            <div class="person-head"><span class="person-avatar" aria-hidden="true">IN</span>
+              <div><h3 class="person-name mono">tedandlisa_intake.py</h3><span class="person-role"><span class="en">The panel</span><span class="ko">인테이크 패널</span></span></div></div>
+            <p class="person-note"><span class="en">Serves the visual intake on loopback and captures its answers as JSON. Standard library only.</span><span class="ko">로컬 루프백으로 인테이크 화면을 띄우고 응답을 JSON으로 저장합니다. 표준 라이브러리만 사용합니다.</span></p>
           </div>
           <div class="card person-card">
-            <div class="person-head">
-              <span class="person-avatar" aria-hidden="true">[EF]</span>
-              <div><h3 class="person-name mono">[name-or-role]</h3><span class="person-role"><span class="en">[Title]</span><span class="ko">[직함]</span></span></div>
-            </div>
-            <p class="person-note"><span class="en">[What this one contributes.]</span><span class="ko">[기여하는 바.]</span></p>
+            <div class="person-head"><span class="person-avatar" aria-hidden="true">TJ</span>
+              <div><h3 class="person-name mono">templates.json</h3><span class="person-role"><span class="en">The registry</span><span class="ko">템플릿 레지스트리</span></span></div></div>
+            <p class="person-note"><span class="en">One entry per template, pointing at its file, its pattern reference, and its thumbnail.</span><span class="ko">템플릿마다 한 항목씩, 파일·패턴 문서·썸네일 경로를 가리킵니다.</span></p>
           </div>
           <div class="card person-card">
-            <div class="person-head">
-              <span class="person-avatar" aria-hidden="true">[GH]</span>
-              <div><h3 class="person-name mono">[name-or-role]</h3><span class="person-role"><span class="en">[Title]</span><span class="ko">[직함]</span></span></div>
-            </div>
-            <p class="person-note"><span class="en">[What this one contributes.]</span><span class="ko">[기여하는 바.]</span></p>
+            <div class="person-head"><span class="person-avatar" aria-hidden="true">PT</span>
+              <div><h3 class="person-name mono">slide-patterns*.md</h3><span class="person-role"><span class="en">The components</span><span class="ko">컴포넌트 참조</span></span></div></div>
+            <p class="person-note"><span class="en">Verbatim, known-good markup for every component, plus the rules that are easy to get wrong.</span><span class="ko">모든 컴포넌트의 검증된 마크업 원문과, 틀리기 쉬운 규칙을 함께 담았습니다.</span></p>
           </div>
         </div>
       </div>
@@ -865,77 +776,24 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
   </section>
 </section>
 
-<!-- ======================== PAGE 4: DOCS ========================
-     The text-forward page. Prose is capped at --maxw-prose so a line
-     stays readable; the small copy blocks carry the commands. -->
-<section class="page" id="page-docs">
-  <section class="section">
-    <div class="container">
-      <div class="sec-head reveal">
-        <span class="eyebrow"><span class="eyebrow-num">05</span> <span class="en">Getting started</span><span class="ko">시작하기</span></span>
-        <h2 class="section-title"><span class="en">[HOW TO BEGIN, IN A SENTENCE.]</span><span class="ko">[시작 방법, 한 문장.]</span></h2>
-        <p class="section-lede"><span class="en">[What a reader will have working by the end of this page.]</span><span class="ko">[이 페이지를 끝내면 무엇이 동작하는지.]</span></p>
-      </div>
-
-      <div class="prose reveal">
-        <p><span class="en">[Opening paragraph. Prose carries both languages exactly like every other string; there is no translation service to fall back on.]</span><span class="ko">[도입 문단. 산문도 다른 문자열과 똑같이 두 언어를 함께 씁니다.]</span></p>
-        <p><span class="en">[Second paragraph. Mark the words that matter with <strong>strong</strong>, not with colour.]</span><span class="ko">[둘째 문단. 중요한 단어는 색이 아니라 <strong>굵게</strong>로 표시합니다.]</span></p>
-      </div>
-
-      <div class="callout reveal">
-        <b><span class="en">[Note.]</span><span class="ko">[참고.]</span></b> <span class="en">[The thing a reader will otherwise get wrong.]</span><span class="ko">[그냥 두면 틀리기 쉬운 지점.]</span>
-      </div>
-
-      <!-- Small copy blocks. Same three data attributes as the large one. -->
-      <div class="reveal" style="margin-top:28px;display:flex;flex-direction:column;gap:14px;max-width:var(--maxw-prose)">
-        <div class="cmd cmd-sm" data-copy-root>
-          <span class="cmd-label"><span class="en">[STEP 1 LABEL]</span><span class="ko">[1단계 라벨]</span></span>
-          <div class="cmd-body">
-            <span class="cmd-prompt" aria-hidden="true">$</span>
-            <code class="cmd-text" data-copy-text>[command one]</code>
-            <button class="cmd-btn" data-copy-btn aria-label="Copy: [command one]">
-              <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
-              <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="cmd cmd-sm" data-copy-root>
-          <span class="cmd-label"><span class="en">[STEP 2 LABEL]</span><span class="ko">[2단계 라벨]</span></span>
-          <div class="cmd-body">
-            <span class="cmd-prompt" aria-hidden="true">$</span>
-            <code class="cmd-text" data-copy-text>[command two]</code>
-            <button class="cmd-btn" data-copy-btn aria-label="Copy: [command two]">
-              <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
-              <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-</section>
-
-<!-- ======================== PAGE 5: GUIDES ========================
-     The walkthrough page. .steps numbers itself from the list, so
-     inserting or deleting a step renumbers the rest. -->
+<!-- ======================== INSTALL ======================== -->
 <section class="page" id="page-guides">
   <section class="section">
     <div class="container">
       <div class="sec-head reveal">
-        <span class="eyebrow"><span class="eyebrow-num">06</span> <span class="en">Guides</span><span class="ko">가이드</span></span>
-        <h2 class="section-title"><span class="en">[WHAT A READER WILL BE ABLE TO DO.]</span><span class="ko">[독자가 무엇을 할 수 있게 되는지.]</span></h2>
-        <p class="section-lede"><span class="en">[Who this walkthrough is for and roughly how long it takes.]</span><span class="ko">[누구를 위한 안내이며 대략 얼마나 걸리는지.]</span></p>
+        <span class="eyebrow"><span class="eyebrow-num">05</span> <span class="en">Install</span><span class="ko">설치</span></span>
+        <h2 class="section-title"><span class="en">Four steps, and it is available in every project</span><span class="ko">네 단계면 모든 프로젝트에서 쓸 수 있습니다</span></h2>
+        <p class="section-lede"><span class="en">For Claude Code the skills directory is <code class="inline-cmd">~/.claude/skills/</code>. Other agents use their own, but the layout is the same: one directory per skill, each with a SKILL.md at its top.</span><span class="ko">Claude Code의 스킬 디렉터리는 <code class="inline-cmd">~/.claude/skills/</code>입니다. 다른 에이전트는 경로만 다를 뿐 구조는 같습니다. 스킬마다 디렉터리 하나, 그 안에 SKILL.md 하나입니다.</span></p>
       </div>
 
       <ol class="steps reveal">
         <li class="step">
-          <h4><span class="en">[Do this first]</span><span class="ko">[가장 먼저 할 일]</span></h4>
-          <p><span class="en">[One or two sentences. Say what the reader should see when it worked.]</span><span class="ko">[한두 문장. 성공했을 때 무엇이 보이는지 쓸 것.]</span></p>
+          <h4><span class="en">Clone it, submodules included</span><span class="ko">서브모듈까지 함께 클론</span></h4>
+          <p><span class="en">The <code class="inline-cmd">--recurse-submodules</code> flag matters: without it the vendored pipeline directory is empty and the design handoff cannot run.</span><span class="ko"><code class="inline-cmd">--recurse-submodules</code> 옵션이 중요합니다. 빠뜨리면 벤더 파이프라인 디렉터리가 비어 있어 디자인 인계가 동작하지 않습니다.</span></p>
           <div class="cmd cmd-sm" data-copy-root>
-            <div class="cmd-body">
-              <span class="cmd-prompt" aria-hidden="true">$</span>
-              <code class="cmd-text" data-copy-text>[step one command]</code>
-              <button class="cmd-btn" data-copy-btn aria-label="Copy: [step one command]">
+            <div class="cmd-body"><span class="cmd-prompt" aria-hidden="true">$</span>
+              <code class="cmd-text" data-copy-text>git clone --recurse-submodules https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git ~/.claude/skills/tedandlisa</code>
+              <button class="cmd-btn" data-copy-btn aria-label="Copy the clone command">
                 <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
                 <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
@@ -943,36 +801,97 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
           </div>
         </li>
         <li class="step">
-          <h4><span class="en">[Then this]</span><span class="ko">[그다음 할 일]</span></h4>
-          <p><span class="en">[What changes, and what to check before moving on.]</span><span class="ko">[무엇이 달라지고, 다음으로 넘어가기 전에 확인할 것.]</span></p>
+          <h4><span class="en">Link the two sibling skills</span><span class="ko">보조 스킬 두 개 연결</span></h4>
+          <p><span class="en">They live inside the clone. Symlinking them one level up is what makes <code class="inline-cmd">/tedandlisa-design</code> and <code class="inline-cmd">/tedandlisa-new-template</code> appear as commands of their own.</span><span class="ko">두 스킬은 클론 안에 있습니다. 한 단계 위로 심볼릭 링크를 걸어야 <code class="inline-cmd">/tedandlisa-design</code>과 <code class="inline-cmd">/tedandlisa-new-template</code>이 독립 명령으로 나타납니다.</span></p>
+          <div class="cmd cmd-sm" data-copy-root>
+            <div class="cmd-body"><span class="cmd-prompt" aria-hidden="true">$</span>
+              <code class="cmd-text" data-copy-text>ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-design ~/.claude/skills/tedandlisa-design</code>
+              <button class="cmd-btn" data-copy-btn aria-label="Copy the symlink command">
+                <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+                <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
         </li>
         <li class="step">
-          <h4><span class="en">[Then this]</span><span class="ko">[그다음 할 일]</span></h4>
-          <p><span class="en">[A step with no command needs no .cmd block — leave it out rather than inventing one.]</span><span class="ko">[명령이 없는 단계에는 .cmd 블록을 넣지 않습니다.]</span></p>
+          <h4><span class="en">Describe what you need</span><span class="ko">필요한 것을 설명</span></h4>
+          <p><span class="en">One line is enough. The intake panel opens, asks what the brief could not tell it, and every question already has a default — you can accept the lot and still get a finished file.</span><span class="ko">한 줄이면 충분합니다. 인테이크 패널이 열리고 브리프에서 알 수 없는 것만 묻습니다. 모든 문항에 기본값이 있어 전부 그대로 두어도 완성된 파일이 나옵니다.</span></p>
+          <div class="cmd cmd-sm" data-copy-root>
+            <div class="cmd-body"><span class="cmd-prompt" aria-hidden="true">$</span>
+              <code class="cmd-text" data-copy-text>/tedandlisa a 12-slide deck on our Q3 roadmap, for the exec team</code>
+              <button class="cmd-btn" data-copy-btn aria-label="Copy the example prompt">
+                <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+                <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
         </li>
         <li class="step">
-          <h4><span class="en">[Finally]</span><span class="ko">[마지막으로]</span></h4>
-          <p><span class="en">[The finished state. Say how the reader knows they are done.]</span><span class="ko">[완료된 상태. 끝났음을 어떻게 아는지 쓸 것.]</span></p>
+          <h4><span class="en">Open the file</span><span class="ko">파일 열기</span></h4>
+          <p><span class="en">You get one HTML file. Double-click it. There is no server to start and no dependency to install — if it opens, it is finished.</span><span class="ko">HTML 파일 하나가 나옵니다. 더블클릭하면 끝입니다. 띄울 서버도, 설치할 의존성도 없습니다. 열린다면 완성된 것입니다.</span></p>
         </li>
       </ol>
 
       <div class="callout reveal">
-        <b><span class="en">[If it did not work.]</span><span class="ko">[잘 되지 않았다면.]</span></b> <span class="en">[The one failure most readers hit, and what to do about it.]</span><span class="ko">[대부분이 겪는 문제와 그 해결 방법.]</span>
+        <b><span class="en">Working in one project only?</span><span class="ko">한 프로젝트에서만 쓰려면?</span></b> <span class="en">Clone into that project's <code class="inline-cmd">.claude/skills/</code> instead of your home directory. Everything else is identical.</span><span class="ko">홈 디렉터리 대신 해당 프로젝트의 <code class="inline-cmd">.claude/skills/</code>에 클론하세요. 나머지는 동일합니다.</span>
       </div>
     </div>
   </section>
 </section>
 
-<!-- ======================== PAGE 6: COMPARE ========================
-     Keep .tblwrap around every table: it is what stops a wide table
-     scrolling the whole page instead of itself. -->
+<!-- ======================== DOCS ======================== -->
+<section class="page" id="page-docs">
+  <section class="section">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="eyebrow-num">06</span> <span class="en">Docs</span><span class="ko">문서</span></span>
+        <h2 class="section-title"><span class="en">What is actually in the repository</span><span class="ko">저장소에 실제로 들어 있는 것</span></h2>
+        <p class="section-lede"><span class="en">There is no build system to learn. Two Python scripts, a registry, and a folder of HTML.</span><span class="ko">배워야 할 빌드 시스템이 없습니다. 파이썬 스크립트 두 개, 레지스트리 하나, 그리고 HTML 폴더 하나가 전부입니다.</span></p>
+      </div>
+
+      <div class="prose reveal">
+        <p><span class="en">Every template is a single HTML file carrying its own design tokens, chrome, scripts, and language mechanism. They are not variations of one look — a change to one has no bearing on another, which is deliberate: <strong>one template per shape, not one template with switches</strong>.</span><span class="ko">각 템플릿은 자체 디자인 토큰과 크롬, 스크립트, 언어 처리 방식을 담은 HTML 파일 하나입니다. 한 디자인의 변형이 아니므로 하나를 고쳐도 다른 것에 영향이 없습니다. 이는 의도된 설계로, <strong>형태마다 템플릿 하나이지 스위치가 달린 템플릿 하나가 아닙니다</strong>.</span></p>
+        <p><span class="en">Language is handled two ways. The presentation deck loads Google Translate on demand, which is why anything that must not be translated — a filename, a command, a product name — is marked in its markup. The document templates instead carry <strong>both languages inline</strong> and toggle them with a class, so nothing is machine-translated and nothing needs protecting.</span><span class="ko">언어는 두 가지 방식으로 처리합니다. 발표용 덱은 필요할 때 Google 번역을 불러오므로, 파일명·명령·제품명처럼 번역되면 안 되는 것은 마크업에 표시합니다. 문서 템플릿은 대신 <strong>두 언어를 파일 안에 함께</strong> 넣고 클래스로 전환하므로, 기계 번역이 개입하지 않고 따로 보호할 것도 없습니다.</span></p>
+      </div>
+
+      <div class="callout reveal">
+        <b><span class="en">No test suite, on purpose.</span><span class="ko">테스트 스위트가 없는 이유.</span></b> <span class="en">Verification is browser-based and written down as checklists: open the output, exercise navigation and the language switch, check the console, and confirm nothing overflows at 375px.</span><span class="ko">검증은 브라우저에서 체크리스트로 수행합니다. 결과물을 열어 내비게이션과 언어 전환을 확인하고, 콘솔을 보고, 375px에서 넘침이 없는지 확인합니다.</span>
+      </div>
+
+      <div class="reveal" style="margin-top:28px;display:flex;flex-direction:column;gap:14px;max-width:var(--maxw-prose)">
+        <div class="cmd cmd-sm" data-copy-root>
+          <span class="cmd-label"><span class="en">Open the intake panel by hand</span><span class="ko">인테이크 패널 직접 실행</span></span>
+          <div class="cmd-body"><span class="cmd-prompt" aria-hidden="true">$</span>
+            <code class="cmd-text" data-copy-text>python3 scripts/tedandlisa_intake.py --prompt "the deck brief" --out intake.json</code>
+            <button class="cmd-btn" data-copy-btn aria-label="Copy the intake command">
+              <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+              <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="cmd cmd-sm" data-copy-root>
+          <span class="cmd-label"><span class="en">Re-capture the gallery thumbnails</span><span class="ko">갤러리 썸네일 재촬영</span></span>
+          <div class="cmd-body"><span class="cmd-prompt" aria-hidden="true">$</span>
+            <code class="cmd-text" data-copy-text>python3 scripts/tedandlisa_thumbs.py --only project-website</code>
+            <button class="cmd-btn" data-copy-btn aria-label="Copy the thumbnail command">
+              <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+              <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ======================== COMPARE ======================== -->
 <section class="page" id="page-compare">
   <section class="section">
     <div class="container">
       <div class="sec-head reveal">
         <span class="eyebrow"><span class="eyebrow-num">07</span> <span class="en">Compare</span><span class="ko">비교</span></span>
-        <h2 class="section-title"><span class="en">[WHAT THIS IS, AND WHAT IT IS NOT.]</span><span class="ko">[이것은 무엇이고, 무엇이 아닌지.]</span></h2>
-        <p class="section-lede"><span class="en">[Be fair about where the alternative wins. A comparison that loses nowhere is not read as a comparison.]</span><span class="ko">[상대가 더 나은 지점도 솔직하게 밝힐 것. 모든 항목에서 이기는 비교표는 신뢰받지 못합니다.]</span></p>
+        <h2 class="section-title"><span class="en">Where this wins, and where it plainly does not</span><span class="ko">유리한 지점과, 분명히 불리한 지점</span></h2>
+        <p class="section-lede"><span class="en">Against a presentation app, and against simply asking an agent for a deck with no skill installed.</span><span class="ko">프레젠테이션 앱, 그리고 스킬 없이 에이전트에게 그냥 자료를 부탁하는 경우와 비교합니다.</span></p>
       </div>
 
       <div class="tblwrap reveal">
@@ -980,140 +899,178 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
           <thead>
             <tr>
               <th><span class="en">Capability</span><span class="ko">항목</span></th>
-              <th>[THIS]</th>
-              <th>[ALTERNATIVE A]</th>
-              <th>[ALTERNATIVE B]</th>
+              <th>Hi Ted, Meet Lisa</th>
+              <th><span class="en">Presentation app</span><span class="ko">프레젠테이션 앱</span></th>
+              <th><span class="en">Agent, no skill</span><span class="ko">스킬 없는 에이전트</span></th>
               <th><span class="en">Notes</span><span class="ko">비고</span></th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><span class="en">[Capability]</span><span class="ko">[항목]</span></td>
+              <td><span class="en">One self-contained file</span><span class="ko">독립 실행 파일 하나</span></td>
               <td><span class="pill pill-ok">yes</span></td>
-              <td><span class="pill pill-warn">partial</span></td>
-              <td><span class="pill pill-no">no</span></td>
-              <td><span class="en">[What the difference costs in practice.]</span><span class="ko">[실제로 어떤 차이를 만드는지.]</span></td>
+              <td><span class="pill pill-warn">export</span></td>
+              <td><span class="pill pill-warn">varies</span></td>
+              <td><span class="en">Opens anywhere, no runtime.</span><span class="ko">어디서나 열리고 런타임이 필요 없습니다.</span></td>
             </tr>
             <tr>
-              <td><span class="en">[Capability]</span><span class="ko">[항목]</span></td>
+              <td><span class="en">Same look months apart</span><span class="ko">몇 달 뒤에도 같은 디자인</span></td>
               <td><span class="pill pill-ok">yes</span></td>
               <td><span class="pill pill-ok">yes</span></td>
-              <td><span class="pill pill-warn">partial</span></td>
-              <td><span class="en">[Note.]</span><span class="ko">[비고.]</span></td>
+              <td><span class="pill pill-no">no</span></td>
+              <td><span class="en">A template file beats a remembered instruction.</span><span class="ko">기억된 지시보다 템플릿 파일이 확실합니다.</span></td>
             </tr>
             <tr>
-              <td><span class="en">[Capability]</span><span class="ko">[항목]</span></td>
+              <td><span class="en">Two languages in one file</span><span class="ko">한 파일에 두 언어</span></td>
+              <td><span class="pill pill-ok">yes</span></td>
               <td><span class="pill pill-no">no</span></td>
-              <td><span class="pill pill-ok">yes</span></td>
-              <td><span class="pill pill-ok">yes</span></td>
-              <td><span class="en">[Say plainly where this one loses.]</span><span class="ko">[이 항목에서 밀린다는 점을 분명히 밝힐 것.]</span></td>
+              <td><span class="pill pill-no">no</span></td>
+              <td><span class="en">Written inline; works with no network.</span><span class="ko">파일 안에 함께 작성되어 네트워크 없이 동작합니다.</span></td>
             </tr>
             <tr>
-              <td><code>[config or flag]</code></td>
+              <td><span class="en">Edit without an agent</span><span class="ko">에이전트 없이 편집</span></td>
+              <td><span class="pill pill-warn">HTML</span></td>
+              <td><span class="pill pill-ok">yes</span></td>
+              <td><span class="pill pill-warn">HTML</span></td>
+              <td><span class="en">Plain HTML and CSS, but you do need to be comfortable in them.</span><span class="ko">순수 HTML·CSS이지만, 다룰 줄 알아야 합니다.</span></td>
+            </tr>
+            <tr>
+              <td><span class="en">Editable in PowerPoint</span><span class="ko">PowerPoint에서 편집</span></td>
+              <td><span class="pill pill-warn">handoff</span></td>
               <td><span class="pill pill-ok">yes</span></td>
               <td><span class="pill pill-no">no</span></td>
+              <td><span class="en">Only through <code>/tedandlisa-design</code>, which needs bun.</span><span class="ko"><code>/tedandlisa-design</code>을 거쳐야 하며 bun이 필요합니다.</span></td>
+            </tr>
+            <tr>
+              <td><span class="en">Real-time co-editing</span><span class="ko">실시간 공동 편집</span></td>
               <td><span class="pill pill-no">no</span></td>
-              <td><span class="en">[Note.]</span><span class="ko">[비고.]</span></td>
+              <td><span class="pill pill-ok">yes</span></td>
+              <td><span class="pill pill-no">no</span></td>
+              <td><span class="en">A file on disk has no collaboration model. This is the real trade.</span><span class="ko">디스크 위의 파일에는 협업 모델이 없습니다. 이것이 실제 대가입니다.</span></td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <div class="callout reveal">
-        <b><span class="en">[When to pick something else.]</span><span class="ko">[다른 선택이 나은 경우.]</span></b> <span class="en">[The case this project genuinely does not serve.]</span><span class="ko">[이 프로젝트가 적합하지 않은 상황.]</span>
+        <b><span class="en">Pick something else when</span><span class="ko">다른 도구가 나은 경우</span></b> <span class="en">several people need to edit the same deck at the same time, or the deck has to end its life inside PowerPoint. Neither is what a single standalone file is good at.</span><span class="ko">여러 사람이 같은 자료를 동시에 편집해야 하거나, 최종 산출물이 PowerPoint여야 하는 경우입니다. 둘 다 단일 독립 파일이 잘하는 일이 아닙니다.</span>
       </div>
     </div>
   </section>
 </section>
 
-<!-- ======================== PAGE 7: CHANGELOG ======================== -->
-<section class="page" id="page-changelog">
+<!-- ======================== DECISION LOG ========================
+     Real entries from the repository's own project-context/DECISIONS.md,
+     newest first. Ids and dates are the ones recorded there. -->
+<section class="page" id="page-decisions">
   <section class="section">
     <div class="container">
       <div class="sec-head reveal">
-        <span class="eyebrow"><span class="eyebrow-num">08</span> <span class="en">Changelog</span><span class="ko">변경 이력</span></span>
-        <h2 class="section-title"><span class="en">[WHAT CHANGED, NEWEST FIRST.]</span><span class="ko">[무엇이 바뀌었는지, 최신순.]</span></h2>
-        <p class="section-lede"><span class="en">[How often this ships, and what a version number means here.]</span><span class="ko">[배포 주기와 버전 번호의 의미.]</span></p>
+        <span class="eyebrow"><span class="eyebrow-num">08</span> <span class="en">Decision log</span><span class="ko">결정 기록</span></span>
+        <h2 class="section-title"><span class="en">Choices that constrain what comes next</span><span class="ko">앞으로를 제약하는 선택들</span></h2>
+        <p class="section-lede"><span class="en">Not a release history — the repository has no versions. These are the decisions recorded as they were taken, each one narrowing what a future contributor may freely change.</span><span class="ko">릴리스 이력이 아닙니다. 이 저장소에는 버전이 없습니다. 아래는 결정이 내려진 시점에 기록된 것들로, 각각이 이후 기여자가 자유롭게 바꿀 수 있는 범위를 좁힙니다.</span></p>
       </div>
 
-      <!-- `is-current` lights the marker for the newest entry. Exactly one. -->
       <div class="releases reveal">
         <div class="release is-current">
-          <div class="rel-head"><span class="rel-ver">[0.0.0]</span><span class="rel-date">[YYYY-MM-DD]</span></div>
-          <p class="rel-note"><span class="en">[One sentence on what this release is about.]</span><span class="ko">[이번 릴리스의 요지 한 문장.]</span></p>
+          <div class="rel-head"><span class="rel-ver">D-019</span><span class="rel-date">2026-08-29</span></div>
+          <p class="rel-note"><span class="en">The project-website template keeps the source design's dark palette, contrast failure included.</span><span class="ko">project-website 템플릿은 원본 디자인의 어두운 팔레트를 명암비 미달까지 그대로 유지합니다.</span></p>
           <ul class="rel-list">
-            <li><span class="en">[A change a reader would notice.]</span><span class="ko">[사용자가 체감하는 변경.]</span></li>
-            <li><span class="en">[Another change.]</span><span class="ko">[또 다른 변경.]</span></li>
-            <li><span class="en">[A fix, said as what now works rather than what was broken.]</span><span class="ko">[수정 사항. 무엇이 고장났었는지보다 이제 무엇이 되는지로 쓸 것.]</span></li>
+            <li><span class="en">A template preserves its author's system, including choices the extractor would have made differently.</span><span class="ko">템플릿은 원작자의 체계를 보존합니다. 추출한 쪽이라면 다르게 했을 선택까지 포함해서입니다.</span></li>
+            <li><span class="en">The measured ratios and the one-line fix are written beside the tokens, so the choice takes seconds and is deliberate.</span><span class="ko">측정된 명암비와 한 줄짜리 수정안을 토큰 옆에 적어 두어, 선택이 몇 초 만에 의식적으로 이루어지도록 했습니다.</span></li>
+            <li><span class="en">The light palette was added by this repository rather than inherited, so it is held to AA at every size.</span><span class="ko">밝은 팔레트는 물려받은 것이 아니라 이 저장소가 추가한 것이므로, 모든 크기에서 AA 기준을 지킵니다.</span></li>
           </ul>
         </div>
+
         <div class="release">
-          <div class="rel-head"><span class="rel-ver">[0.0.0]</span><span class="rel-date">[YYYY-MM-DD]</span></div>
-          <p class="rel-note"><span class="en">[One sentence.]</span><span class="ko">[한 문장.]</span></p>
+          <div class="rel-head"><span class="rel-ver">D-018</span><span class="rel-date">2026-08-29</span></div>
+          <p class="rel-note"><span class="en">The sitemap-ia skeleton ships on CDNs, and standalone is an answer rather than the default.</span><span class="ko">sitemap-ia 스켈레톤은 CDN을 사용하며, 완전 독립 실행은 기본값이 아니라 선택 항목입니다.</span></p>
           <ul class="rel-list">
-            <li><span class="en">[A change.]</span><span class="ko">[변경 사항.]</span></li>
-            <li><span class="en">[A change.]</span><span class="ko">[변경 사항.]</span></li>
+            <li><span class="en">The source document was self-contained at 9MB, of which about 8.5MB was library code.</span><span class="ko">원본 문서는 9MB의 독립 실행 파일이었고, 그중 약 8.5MB가 라이브러리 코드였습니다.</span></li>
+            <li><span class="en">On CDNs the skeleton is 111KB, in line with the other templates.</span><span class="ko">CDN을 쓰면 스켈레톤은 111KB로, 다른 템플릿과 비슷한 수준입니다.</span></li>
           </ul>
         </div>
+
         <div class="release">
-          <div class="rel-head"><span class="rel-ver">[0.0.0]</span><span class="rel-date">[YYYY-MM-DD]</span></div>
-          <p class="rel-note"><span class="en">[The first release.]</span><span class="ko">[첫 릴리스.]</span></p>
+          <div class="rel-head"><span class="rel-ver">D-017</span><span class="rel-date">2026-08-29</span></div>
+          <p class="rel-note"><span class="en">Intake questions can be scoped to a single template, not only to a kind.</span><span class="ko">인테이크 문항을 종류 단위가 아니라 개별 템플릿 단위로 한정할 수 있습니다.</span></p>
+          <ul class="rel-list">
+            <li><span class="en">A panel that asks irrelevant questions trains people to skim the relevant ones.</span><span class="ko">관계없는 질문을 하는 패널은 정작 중요한 질문까지 대충 넘기게 만듭니다.</span></li>
+          </ul>
+        </div>
+
+        <div class="release">
+          <div class="rel-head"><span class="rel-ver">D-016</span><span class="rel-date">2026-08-28</span></div>
+          <p class="rel-note"><span class="en">The README opens with how to start, not with why it matters.</span><span class="ko">README는 의의가 아니라 시작하는 방법으로 시작합니다.</span></p>
+          <ul class="rel-list">
+            <li><span class="en">The start instructions had been at line 211 of 272, below nine other sections.</span><span class="ko">시작 안내가 272줄 중 211번째 줄, 아홉 개 섹션 아래에 있었습니다.</span></li>
+          </ul>
+        </div>
+
+        <div class="release">
+          <div class="rel-head"><span class="rel-ver">D-009</span><span class="rel-date">2026-08-28</span></div>
+          <p class="rel-note"><span class="en">Source documents never enter this repository.</span><span class="ko">원본 문서는 이 저장소에 들어오지 않습니다.</span></p>
+          <ul class="rel-list">
+            <li><span class="en">A source handed over for extraction is someone's real work: client architecture, internal costs, unreleased plans. Only the scrubbed skeleton is committed.</span><span class="ko">추출을 위해 건네받은 원본은 누군가의 실제 작업물입니다. 고객사 구조, 내부 비용, 미공개 계획이 담깁니다. 커밋되는 것은 세척된 스켈레톤뿐입니다.</span></li>
+          </ul>
+        </div>
+
+        <div class="release">
+          <div class="rel-head"><span class="rel-ver">D-007</span><span class="rel-date">2026-08-28</span></div>
+          <p class="rel-note"><span class="en">One template per shape, not one template with switches.</span><span class="ko">형태마다 템플릿 하나이지, 스위치가 달린 템플릿 하나가 아닙니다.</span></p>
         </div>
       </div>
     </div>
   </section>
 </section>
 
-<!-- ======================== PAGE 8: CONTRIBUTE ======================== -->
+<!-- ======================== CONTRIBUTE ======================== -->
 <section class="page" id="page-contribute">
   <section class="section">
     <div class="container">
       <div class="sec-head reveal">
         <span class="eyebrow"><span class="eyebrow-num">09</span> <span class="en">Contribute</span><span class="ko">참여하기</span></span>
-        <h2 class="section-title"><span class="en">[WHAT HELP IS ACTUALLY WANTED.]</span><span class="ko">[실제로 어떤 도움이 필요한지.]</span></h2>
-        <p class="section-lede"><span class="en">[Name the contribution that would help most right now. A generic invitation gets generic contributions.]</span><span class="ko">[지금 가장 도움이 되는 기여를 구체적으로 밝힐 것. 막연한 초대는 막연한 기여를 부릅니다.]</span></p>
+        <h2 class="section-title"><span class="en">The most useful thing you can send is a template</span><span class="ko">가장 도움이 되는 기여는 템플릿입니다</span></h2>
+        <p class="section-lede"><span class="en">If you have an HTML deck or page whose look you want to keep, <code class="inline-cmd">/tedandlisa-new-template</code> turns it into one — extracting the stylesheet and machinery, replacing the subject matter with placeholders, and registering the result.</span><span class="ko">디자인을 계속 쓰고 싶은 HTML 자료나 페이지가 있다면 <code class="inline-cmd">/tedandlisa-new-template</code>이 템플릿으로 바꿔 줍니다. 스타일시트와 동작부를 추출하고, 내용은 플레이스홀더로 바꾼 뒤 등록합니다.</span></p>
       </div>
 
       <div class="split-layout">
         <div class="reveal">
-          <h3 class="pillar-title"><span class="en">[Before you open one]</span><span class="ko">[제출하기 전에]</span></h3>
-          <!-- .chk renders ☐ / ☑ from li.done. The .cid is a stable id worth
-               quoting in a review; drop it if nothing refers to these. -->
+          <h3 class="pillar-title"><span class="en">Before you open a pull request</span><span class="ko">풀 리퀘스트를 열기 전에</span></h3>
           <ul class="chk" style="margin-top:16px">
-            <li class="done"><span class="cid">C-01</span><span class="en">[Something already true, so the list reads as real.]</span><span class="ko">[이미 충족된 항목. 목록이 실제처럼 읽히도록.]</span></li>
-            <li><span class="cid">C-02</span><span class="en">[Something the contributor must do.]</span><span class="ko">[기여자가 해야 할 일.]</span></li>
-            <li><span class="cid">C-03</span><span class="en">[Something else they must do.]</span><span class="ko">[또 하나의 준비 사항.]</span></li>
-            <li><span class="cid">C-04</span><span class="en">[The check people forget.]</span><span class="ko">[사람들이 자주 빠뜨리는 확인.]</span></li>
+            <li class="done"><span class="cid">C-01</span><span class="en">The source document itself is not in the diff — only the scrubbed skeleton.</span><span class="ko">원본 문서가 아니라 세척된 스켈레톤만 diff에 있는지 확인합니다.</span></li>
+            <li><span class="cid">C-02</span><span class="en">No client name, project name, hostname, price, headcount, or internal URL survives — not in markup, comments, the title, or example rows.</span><span class="ko">고객사명·프로젝트명·호스트명·가격·인원·내부 URL이 마크업, 주석, 타이틀, 예시 행 어디에도 남아 있지 않아야 합니다.</span></li>
+            <li><span class="cid">C-03</span><span class="en">Opened in a browser over http, with every page reachable and no console errors.</span><span class="ko">http로 브라우저에서 열어 모든 페이지에 접근되고 콘솔 오류가 없는지 확인합니다.</span></li>
+            <li><span class="cid">C-04</span><span class="en">Nothing overflows horizontally at 375px — the check people forget.</span><span class="ko">375px에서 가로 넘침이 없는지 확인합니다. 가장 자주 빠뜨리는 항목입니다.</span></li>
+            <li><span class="cid">C-05</span><span class="en">A pattern reference is included, so the next person composes from known-good markup instead of guessing.</span><span class="ko">패턴 참조 문서를 함께 넣어, 다음 사람이 추측 대신 검증된 마크업으로 조립할 수 있게 합니다.</span></li>
           </ul>
         </div>
 
         <div class="reveal">
-          <h3 class="pillar-title"><span class="en">[Get set up]</span><span class="ko">[개발 환경 준비]</span></h3>
+          <h3 class="pillar-title"><span class="en">Get set up</span><span class="ko">개발 환경 준비</span></h3>
           <div style="margin-top:16px;display:flex;flex-direction:column;gap:14px">
             <div class="cmd cmd-sm" data-copy-root>
-              <span class="cmd-label"><span class="en">[Clone]</span><span class="ko">[클론]</span></span>
-              <div class="cmd-body">
-                <span class="cmd-prompt" aria-hidden="true">$</span>
-                <code class="cmd-text" data-copy-text>[clone command]</code>
-                <button class="cmd-btn" data-copy-btn aria-label="Copy: [clone command]">
+              <span class="cmd-label"><span class="en">Analyze a document, read-only</span><span class="ko">문서 분석 (읽기 전용)</span></span>
+              <div class="cmd-body"><span class="cmd-prompt" aria-hidden="true">$</span>
+                <code class="cmd-text" data-copy-text>python3 scripts/tedandlisa_new_template.py analyze SOURCE.html</code>
+                <button class="cmd-btn" data-copy-btn aria-label="Copy the analyze command">
                   <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
                   <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
               </div>
             </div>
             <div class="cmd cmd-sm" data-copy-root>
-              <span class="cmd-label"><span class="en">[Check your work]</span><span class="ko">[검증]</span></span>
-              <div class="cmd-body">
-                <span class="cmd-prompt" aria-hidden="true">$</span>
-                <code class="cmd-text" data-copy-text>[verify command]</code>
-                <button class="cmd-btn" data-copy-btn aria-label="Copy: [verify command]">
+              <span class="cmd-label"><span class="en">Serve the repo to check your work</span><span class="ko">작업 확인용 로컬 서버</span></span>
+              <div class="cmd-body"><span class="cmd-prompt" aria-hidden="true">$</span>
+                <code class="cmd-text" data-copy-text>python3 -m http.server 8777 --bind 127.0.0.1</code>
+                <button class="cmd-btn" data-copy-btn aria-label="Copy the server command">
                   <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
                   <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
               </div>
             </div>
           </div>
-          <a href="[REPO OR EXTERNAL URL]" target="_blank" rel="noopener" class="btn btn-secondary split-cta"><span class="en">[Open the tracker]</span><span class="ko">[이슈 트래커 열기]</span></a>
+          <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa" target="_blank" rel="noopener" class="btn btn-secondary split-cta"><span class="en">Open the repository</span><span class="ko">저장소 열기</span></a>
         </div>
       </div>
     </div>
@@ -1122,10 +1079,6 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
 
 </main>
 
-<!-- ==================================================================
-     FOOTER. Site chrome, so it sits outside the pages and shows on all
-     of them. Column links route with data-page; external links use href.
-     ================================================================== -->
 <footer class="footer">
   <div class="container">
     <div class="footer-grid">
@@ -1137,33 +1090,33 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
               <path d="M12 3v18M4 7.5l8 4.5 8-4.5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" opacity="0.55"/>
             </svg>
           </span>
-          <span>[PROJECT]<span class="brand-dim">[-SUFFIX]</span></span>
+          <span>Hi Ted,<span class="brand-dim"> Meet Lisa</span></span>
         </a>
-        <p class="footer-tag"><span class="en">[One or two sentences. The same promise as the hero, said plainly.]</span><span class="ko">[한두 문장. 히어로와 같은 약속을 담백하게.]</span></p>
-        <p class="footer-cmd mono">[install or run command]</p>
+        <p class="footer-tag"><span class="en">An agent skill that turns a brief into one self-contained HTML file. No build step, nothing to install to read it.</span><span class="ko">브리프를 하나의 독립 실행 HTML 파일로 바꿔 주는 에이전트 스킬입니다. 빌드 과정도, 읽기 위한 설치도 없습니다.</span></p>
+        <p class="footer-cmd mono">/tedandlisa a 12-slide deck on our Q3 roadmap</p>
       </div>
 
-      <nav class="footer-col" aria-label="[COLUMN 1]">
-        <h3><span class="en">[COLUMN 1]</span><span class="ko">[열 1]</span></h3>
+      <nav class="footer-col" aria-label="Product">
+        <h3><span class="en">Product</span><span class="ko">제품</span></h3>
         <ul>
-          <li><a onclick="go('catalog')"><span class="en">[Link]</span><span class="ko">[링크]</span></a></li>
-          <li><a onclick="go('how')"><span class="en">[Link]</span><span class="ko">[링크]</span></a></li>
-          <li><a onclick="go('docs')"><span class="en">[Link]</span><span class="ko">[링크]</span></a></li>
+          <li><a onclick="go('templates')"><span class="en">Templates</span><span class="ko">템플릿</span></a></li>
+          <li><a onclick="go('how')"><span class="en">How it works</span><span class="ko">작동 방식</span></a></li>
+          <li><a onclick="go('compare')"><span class="en">Compare</span><span class="ko">비교</span></a></li>
         </ul>
       </nav>
-      <nav class="footer-col" aria-label="[COLUMN 2]">
-        <h3><span class="en">[COLUMN 2]</span><span class="ko">[열 2]</span></h3>
+      <nav class="footer-col" aria-label="Get started">
+        <h3><span class="en">Get started</span><span class="ko">시작하기</span></h3>
         <ul>
-          <li><a onclick="go('docs')"><span class="en">[Link]</span><span class="ko">[링크]</span></a></li>
-          <li><a onclick="go('docs')"><span class="en">[Link]</span><span class="ko">[링크]</span></a></li>
-          <li><a onclick="go('docs')"><span class="en">[Link]</span><span class="ko">[링크]</span></a></li>
+          <li><a onclick="go('guides')"><span class="en">Install</span><span class="ko">설치</span></a></li>
+          <li><a onclick="go('docs')"><span class="en">Docs</span><span class="ko">문서</span></a></li>
+          <li><a onclick="go('decisions')"><span class="en">Decision log</span><span class="ko">결정 기록</span></a></li>
         </ul>
       </nav>
-      <nav class="footer-col" aria-label="[COLUMN 3]">
-        <h3><span class="en">[COLUMN 3]</span><span class="ko">[열 3]</span></h3>
+      <nav class="footer-col" aria-label="Resources">
+        <h3><span class="en">Resources</span><span class="ko">자료</span></h3>
         <ul>
-          <li><a href="[REPO OR EXTERNAL URL]" target="_blank" rel="noopener">[EXTERNAL LINK] ↗</a></li>
-          <li><a href="[REPO OR EXTERNAL URL]" target="_blank" rel="noopener">[EXTERNAL LINK] ↗</a></li>
+          <li><a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa" target="_blank" rel="noopener">GitHub ↗</a></li>
+          <li><a onclick="go('contribute')"><span class="en">Contribute</span><span class="ko">참여하기</span></a></li>
         </ul>
       </nav>
     </div>
@@ -1171,8 +1124,7 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
     <hr class="hairline">
 
     <div class="footer-bottom">
-      <p>© [YYYY] [PROJECT] · <span class="en">[licence or rights line]</span><span class="ko">[라이선스 또는 권리 표기]</span></p>
-      <!-- House rule: the MonoMind mark stays and links to monomind.one. -->
+      <p>© 2026 MonoMind AI Lab · <span class="en">MIT licensed</span><span class="ko">MIT 라이선스</span></p>
       <a class="mm-by" href="https://monomind.one" target="_blank" rel="noopener">
         <svg viewBox="0 0 512 512" aria-hidden="true" fill="currentColor"><path d="M0 0 C21.12 0 42.24 0 64 0 C64.33 9.24 64.66 18.48 65 28 C67.31 28.825 69.62 29.65 72 30.5 C80.67855394 33.70320466 88.83987436 37.66197192 97 42 C98.13824219 42.59296875 99.27648437 43.1859375 100.44921875 43.796875 C114.11283709 51.2237895 126.32645153 60.78564509 138 71 C138.33 53.51 138.66 36.02 139 18 C147.41726708 18 155.23771035 18.11320702 163.5 19.1875 C165.04349121 19.38714355 165.04349121 19.38714355 166.61816406 19.59082031 C209.08178959 25.42223064 247.55036699 43.98420048 278.48925781 73.55664062 C279.51252583 74.53426838 280.54069027 75.50679224 281.57324219 76.47460938 C316.21868127 109.03500379 337.95056536 156.61339058 341 204 C341 209.28 341 214.56 341 220 C319.88 220 298.76 220 277 220 C276.34 213.07 275.68 206.14 275 199 C274.38439297 195.37078182 273.77803562 191.97121696 272.875 188.4375 C272.66327148 187.58655762 272.45154297 186.73561523 272.23339844 185.85888672 C266.69864116 164.72016184 256.75707174 146.80424072 243 130 C242.33226562 129.17757812 241.66453125 128.35515625 240.9765625 127.5078125 C235.93066496 121.55571295 230.17510386 116.74552502 224 112 C223.10023438 111.30777344 222.20046875 110.61554688 221.2734375 109.90234375 C203.20851766 96.39269908 177.88565782 83.53645418 154.625 83.9375 C153.42875 83.958125 152.2325 83.97875 151 84 C151.58265625 84.66902344 152.1653125 85.33804688 152.765625 86.02734375 C185.07129092 123.86967253 203 170.1014647 203 220 C181.88 220 160.76 220 139 220 C138.01 211.75 137.02 203.5 136 195 C129.68082068 166.91475858 117.85438519 144.07221923 98 123 C97.45085937 122.39800781 96.90171875 121.79601562 96.3359375 121.17578125 C86.97145584 111.2807994 75.80572295 104.7461274 64 98 C64 138.26 64 178.52 64 220 C42.88 220 21.76 220 0 220 C0 147.4 0 74.8 0 0 Z" transform="translate(74,141)"/><path d="M0 0 C6.93122125 2.33191353 11.59348712 6.73609933 15 13.15234375 C17.3325015 19.79450622 17.26381755 27.06296996 14.3125 33.5 C10.66303794 39.55276634 5.78715496 43.90906429 -1 46 C-7.43466397 46.85737784 -13.48798557 46.74360867 -19.18359375 43.40234375 C-24.96806721 38.93648145 -29.37878226 33.62316781 -30.37109375 26.23828125 C-30.53935564 18.82486011 -29.62715748 12.97497629 -25 7 C-17.06174054 0.27985277 -10.33089416 -1.10531813 0 0 Z" transform="translate(450,315)"/></svg>
         <span><span class="en">Made with MonoMind</span><span class="ko">MonoMind로 제작</span></span>
@@ -1192,10 +1144,10 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
    Add a page here AND as a section.page id AND as a data-page nav entry
    in both the desktop and the mobile list. Miss one and the page is
    unreachable; miss the array and its deep link silently falls home. */
-var PAGES = ['home','catalog','how','guides','docs','compare','changelog','contribute'];
+var PAGES = ['home','templates','how','guides','docs','compare','decisions','contribute'];
 /* The subset that lives behind the More dropdown. Listed separately only so
    the button can show as current when one of them is the routed page. */
-var DROP_PAGES = ['compare','changelog','contribute'];
+var DROP_PAGES = ['compare','decisions','contribute'];
 var LANGS = ['en','ko'];
 var HOME  = 'home';
 

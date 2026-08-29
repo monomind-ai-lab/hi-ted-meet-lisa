@@ -243,3 +243,23 @@ stable IDs such as `L-001`.
   cache with a query string and assert the theme by reading back a known token
   colour before trusting any ratio computed alongside it.
 - Evidence: [`../assets/tedandlisa-template-project-website.html`](../assets/tedandlisa-template-project-website.html), `D-019`
+
+## L-024: A capped nav row has no wider screen to grow into, so it fails by wrapping
+
+- Status: `accepted`
+- Scope: Any template whose nav sits inside a `max-width` container —
+  `project-website`, and the same shape in `web-document`.
+- Learning: A nav row inside a container capped at 1120px is 1120px wide on a
+  1280px laptop and on a 3840px display alike, so "it will fit on a big screen"
+  is false. Measured on `project-website` with eight pages: the row needed
+  1136px against 1120px available. It did not overflow — `.nav-link` had no
+  `white-space`, so labels wrapped mid-word and the row silently grew to two
+  lines while every DOM assertion still passed. The brand had already been given
+  `min-width:0` for a narrow-screen fix, which made it absorb the shortfall by
+  truncating, hiding the cause further. Only a screenshot showed it.
+- Action: Give every nav label `white-space:nowrap`, so an over-full row fails
+  visibly rather than quietly. Write the width budget into the stylesheet as a
+  comment with real numbers — what the row has, what the default spends, what is
+  left — and put overflow pages in a dropdown rather than trusting the row to
+  stretch. Check the nav at the container cap, not at the viewport width.
+- Evidence: [`../assets/tedandlisa-template-project-website.html`](../assets/tedandlisa-template-project-website.html), [`../references/slide-patterns-project-website.md`](../references/slide-patterns-project-website.md)

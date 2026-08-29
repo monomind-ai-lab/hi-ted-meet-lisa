@@ -137,17 +137,19 @@
       "thumb": "templates/thumbs/project-website.png",
       "kind": "document",
       "best_for": "A project's own site — a launch page, a tool's home, a programme's front door. Read at desk distance, linked to, and skimmed before it is read.",
-      "navigation": "Sticky top nav with hash routing (#/lang/page); each page scrolls, one footer for the whole site, burger under 960px.",
+      "navigation": "Sticky top nav with hash routing (#/lang/page); five inline links plus a More dropdown for the rest, one footer for the whole site, burger under 960px.",
       "languages": "English and Korean written inline and toggled instantly — no translation service, works offline.",
       "dependencies": "Google Fonts only — no diagram runtime, no CDN, no analytics.",
       "features": [
         "hero with copy-to-clipboard command",
         "six-step process track",
         "category-tinted card grid",
+        "step list, table and checklist",
         "light and dark, persisted",
-        "reveal on scroll",
         "PDF and self-download"
-      ]
+      ],
+      "preview": "previews/project-website.html",
+      "thumb_source": "previews/project-website.html"
     }
   ]
 }
