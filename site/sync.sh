@@ -53,7 +53,7 @@ PY
 # are pre-tinted RGBA renders (cream fill, luminance-as-alpha) of the
 # grayscale figure art extracted from the Canva brand deck.
 cp assets/tedlisaidea.jpg assets/tedmeetslisa.jpg assets/monomind-mark-white.svg \
-   assets/ted-and-lisa-in-frame.svg site/assets/
+   assets/ted-and-lisa-in-frame.png site/assets/
 
 # The canonical mark uses currentColor, which an <img> renders black.
 # Derive a solid-white copy for the page's dark chrome (deploy artifact
