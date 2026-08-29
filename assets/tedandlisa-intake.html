@@ -602,13 +602,6 @@ var QUESTIONS = [
     type: "textarea", seed: "MonoMind, MonoMind AI Lab, Project Context, GitNexus, Graphify, OpenWiki, MIT",
     placeholder: "MonoMind, Project Context, …" },
 
-  { id: "format", q: "Which output?", kinds: ["external"],
-    hint: "The vendored pipeline builds either; PowerPoint needs bun on the machine.",
-    type: "single", options: [
-      { id: "html", label: "Animated HTML", note: "One file, GSAP and CSS, viewport-fitted.", def: true },
-      { id: "pptx", label: "PowerPoint (.pptx)", note: "Editable, with layout and overlap validation." },
-      { id: "both", label: "Both", note: "Two deliverables from one plan." } ] },
-
   { id: "menu", q: "Deck menu", kinds: ["slides", "document"],
     type: "single", options: [
       { id: "full",    label: "Full menu", note: "Hamburger by the brand mark.", def: true, reveal: "menuitems" },

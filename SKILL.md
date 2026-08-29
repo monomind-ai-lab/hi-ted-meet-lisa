@@ -133,7 +133,7 @@ language. See `references/slide-patterns-web-document.md`.
 To add a template, use `/tedandlisa-new-template`.
 
 When none of them is the right shape — the deck needs a look the house style
-does not have, or the output must be an editable `.pptx` — use
+does not have — use
 `/tedandlisa-design`, which drives the vendored Slides AI pipeline with
 MonoMind branding applied. See `skills/tedandlisa-design/SKILL.md`.
 
@@ -195,7 +195,7 @@ Before handing the file over:
 | `references/slide-patterns-architecture.md` | Component markup for the architecture template. |
 | `assets/tedandlisa-template-project-website.html` | The project-website template: sticky nav, hash-routed pages, inline bilingual, no CDN. |
 | `references/slide-patterns-project-website.md` | Component markup for the project-website template. |
-| `skills/tedandlisa-design/` | The wrapper for the vendored Slides AI pipeline (HTML or `.pptx`). |
+| `skills/tedandlisa-design/` | The wrapper for the vendored Slides AI pipeline (animated HTML). |
 | `vendor/slides-ai-plugin/` | Git submodule, MIT. `git submodule update --init` if empty. |
 | `scripts/tedandlisa_thumbs.py` | Captures template thumbnails for the gallery. |
 | `scripts/tedandlisa_new_template.py` | Analyzes a source document and registers a new template. |

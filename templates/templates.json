@@ -89,18 +89,17 @@
     {
       "id": "slide-design",
       "name": "Slide design",
-      "tagline": "Not a MonoMind template — twelve style presets, animated HTML, or editable .pptx.",
+      "tagline": "Not a MonoMind template — twelve style presets and animated HTML slides.",
       "kind": "external",
       "skill": "/tedandlisa-design",
-      "best_for": "A deck the house style cannot shape, or a deliverable that has to be editable in PowerPoint.",
+      "best_for": "A deck the house style cannot shape — a different look, or animation.",
       "navigation": "Whatever the chosen preset provides.",
-      "languages": "One deck per language for .pptx — PowerPoint has no toggle.",
-      "dependencies": "Submodule vendor/slides-ai-plugin; bun is needed for .pptx.",
+      "languages": "One language per deck — the presets carry no toggle.",
+      "dependencies": "Submodule vendor/slides-ai-plugin.",
       "preview": "previews/slide-design.html",
       "features": [
         "12 style presets",
         "animated HTML",
-        "editable .pptx",
         "converts an existing deck"
       ],
       "thumb_source": "previews/slide-design.html",

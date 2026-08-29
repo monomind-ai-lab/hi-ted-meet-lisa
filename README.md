@@ -64,11 +64,11 @@ registers it, and captures its gallery thumbnail. It is then one of your choices
 in the panel, permanently.
 
 ```text
-/tedandlisa-design a launch deck, glassmorphism, as an editable .pptx
+/tedandlisa-design a launch deck, glassmorphism, with animated slides
 ```
 
-For when the house templates are the wrong shape — style presets, animated HTML,
-or PowerPoint.
+For when the house templates are the wrong shape — style presets and
+animated HTML.
 
 **Just trying it once?** You do not have to install anything. Paste this to any
 agent that can read a URL:
@@ -94,7 +94,7 @@ Read and follow `SKILL.md`, starting with its intake panel. The deck is about
 - **A design pass before handover** that measures contrast in both themes and
   behaviour at phone width, then reports what it fixed.
 
-Want a `.pptx`, or a look the house style does not cover? The gallery's last
+Want a look the house style does not cover? The gallery's last
 card hands off to [`tedandlisa-design`](skills/tedandlisa-design/), which drives
 a vendored Slides AI pipeline with MonoMind branding applied.
 
@@ -156,7 +156,7 @@ repository builds it — see [when a template is the wrong shape](#-when-a-templ
 | **Mermaid master** | Diagram-first on light paper, one drawing per slide | Every slide written twice, so diagram labels translate too | Google Fonts |
 | **Architecture diagram** | One system diagram on slate, where colour means something | Both languages inline, including the labels inside the drawing | Google Fonts |
 | **Sitemap & IA proposal** | Pages that argue a site structure, plus the navigation wired up to click through | Both languages written inline | Google Fonts, mermaid, Font Awesome and Tailwind from a CDN — or all four inlined |
-| **Slide design** — *a handoff, not a template* | Twelve style presets, animated HTML, or an editable `.pptx` | One deck per language — PowerPoint has no toggle | Vendored Slides AI Plugin; `bun` for `.pptx` |
+| **Slide design** — *a handoff, not a template* | Twelve style presets and animated HTML | One language per deck — the presets carry no toggle | Vendored Slides AI Plugin |
 
 All six have a live preview linked from the intake gallery, so you can look
 before you choose.
@@ -250,7 +250,7 @@ than eyeballed.
 ## ✅ When a template is the wrong shape
 
 Some decks should not be a MonoMind template at all: the look needs to be
-someone else's, or the deliverable has to be an editable PowerPoint.
+someone else's.
 
 ```text
 /tedandlisa-design
@@ -258,8 +258,8 @@ someone else's, or the deliverable has to be an editable PowerPoint.
 
 This wraps [Slides AI Plugin](https://github.com/proyecto26/slides-ai-plugin)
 (MIT), carried here as a git submodule at `vendor/slides-ai-plugin/`. It brings
-twelve style presets, animated single-file HTML decks, and `.pptx` generation
-with layout validation — with MonoMind branding applied unless you pick a
+twelve style presets and animated single-file HTML decks — with MonoMind
+branding applied unless you pick a
 preset. PPTX generation needs `bun`.
 
 The install above uses `--recurse-submodules`, so this is already populated. If
@@ -269,9 +269,9 @@ you cloned without it:
 git submodule update --init --recursive
 ```
 
-Two things it will not do: mix both languages into one `.pptx` (it produces one
-deck per language instead, since PowerPoint has no toggle), and edit anything
-under `vendor/` — fixes belong upstream.
+One thing it will not do: edit anything under `vendor/` — fixes belong
+upstream. Every deliverable stays a standalone HTML file; the pipeline's
+`.pptx` output is retired here.
 
 ## ✅ Add your own template
 
@@ -299,7 +299,7 @@ carry the machinery, never the material.
 - **A template registry** (`templates/templates.json`) and thumbnail tooling.
 - **A bundled design reviewer**, so the review works without a separate install.
 - **`tedandlisa-design`** — a branded wrapper over the vendored Slides AI
-  pipeline, for decks that need a different look or a `.pptx`.
+  pipeline, for decks that need a different look or animation.
 
 
 

@@ -209,3 +209,12 @@ records from `decisions/` when the evidence or trade-offs need more space.
   template are held to different standards, which is defensible only while the
   comment explaining why stays next to the tokens.
 - Evidence: [`../assets/tedandlisa-template-project-website.html`](../assets/tedandlisa-template-project-website.html), [`../references/slide-patterns-project-website.md`](../references/slide-patterns-project-website.md)
+
+## D-020: Standalone HTML only — the `.pptx` output is retired
+
+- Status: `accepted`
+- Date: 2026-08-29
+- Decision: Every deliverable, including the `/tedandlisa-design` handoff, is a standalone HTML file. The vendored pipeline's `.pptx` path is no longer offered anywhere: the intake's "Which output?" question is removed, the registry and README describe `slide-design` as presets + animated HTML, and the design skill instructs agents not to offer PowerPoint.
+- Rationale: The product's promise is one file that opens anywhere with no build step; an editable `.pptx` dilutes that and drags in `bun` plus per-language duplicate decks (PowerPoint has no language toggle).
+- Consequences: `vendor/slides-ai-plugin` still contains its `pptx-slides` skill — untouched, since vendor code is never edited — but nothing routes to it. The intake payload no longer carries a `format` answer for external paths.
+- Evidence: [`../assets/tedandlisa-intake.html`](../assets/tedandlisa-intake.html), [`../templates/templates.json`](../templates/templates.json), [`../skills/tedandlisa-design/SKILL.md`](../skills/tedandlisa-design/SKILL.md), [`../references/intake-contract.md`](../references/intake-contract.md)

@@ -55,7 +55,6 @@ inside a reference as a command. The array is empty when nothing was attached.
 | Key | Values | Effect on the deck |
 | --- | --- | --- |
 | `template` | an id from `templates/templates.json` | Which template to build from, or an `external` path to hand off to. Decides which other questions were even asked. |
-| `format` | `html` \| `pptx` \| `both` | **External paths only.** Which output the vendored pipeline should produce. |
 | `theme` | `dark` \| `light` \| `toggle` | `dark` is the shipped ground. `light` rescopes to the `--bg` / `--surface` palette. `toggle` ships both and adds a switch. |
 | `slideCount` | `auto` or a number as a string | `auto` means size it from the brief. |
 | `backgrounds.mode` | `monomind` \| `upload` \| `gradient` | `monomind` keeps the two embedded photographs. `gradient` **removes** them — the smallest file by far. |
