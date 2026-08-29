@@ -55,5 +55,11 @@ PY
 cp assets/tedlisaidea.jpg assets/tedmeetslisa.jpg assets/monomind-mark-white.svg \
    assets/ted-figure-cream.png assets/lisa-figure-cream.png site/assets/
 
+# The canonical mark uses currentColor, which an <img> renders black.
+# Derive a solid-white copy for the page's dark chrome (deploy artifact
+# only — the canonical file keeps currentColor).
+sed 's/currentColor/#ffffff/g' assets/monomind-mark-white.svg \
+  > site/assets/monomind-mark-solid-white.svg
+
 echo "site/ assembled:"
 find site -type f | sort

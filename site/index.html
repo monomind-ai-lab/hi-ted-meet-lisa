@@ -95,7 +95,8 @@ code { font-family: var(--font-mono); font-size: 0.9em; }
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--hair);
 }
-.wordmark { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+.wordmark { display: flex; align-items: center; gap: 14px; }
+.wordmark a { text-decoration: none; display: flex; align-items: center; }
 .wordmark img { width: 30px; height: 30px; display: block; }
 .wordmark span {
   font-size: 12px; font-weight: 500; letter-spacing: 0.18em;
@@ -114,6 +115,54 @@ code { font-family: var(--font-mono); font-size: 0.9em; }
 }
 .topnav .gh:hover { border-color: var(--cream); background: color-mix(in srgb, var(--cream) 8%, transparent); }
 @media (max-width: 640px) { .topnav a:not(.gh) { display: none; } }
+
+/* ── language switch (Google Translate, cookie-driven) ─────────── */
+.lang { position: relative; }
+.lang-btn {
+  display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+  color: var(--cream-dim); background: transparent;
+  border: 1px solid var(--hair-strong); border-radius: 9999px; padding: 8px 14px;
+  transition: color 200ms var(--ease), border-color 200ms var(--ease);
+}
+.lang-btn:hover, .lang-btn[aria-expanded="true"] { color: var(--cream); border-color: var(--cream); }
+.lang-panel[hidden] { display: none; }
+.lang-panel {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 60;
+  width: 240px; max-height: 340px; display: flex; flex-direction: column;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--hair-strong); box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+}
+.lang-search {
+  font-family: var(--font-display); font-size: 13px; color: var(--cream);
+  background: transparent; border: 0; border-bottom: 1px solid var(--hair);
+  padding: 12px 14px; outline: none;
+}
+.lang-search::placeholder { color: var(--cream-faint); }
+.lang-list { overflow-y: auto; padding: 6px; }
+.lang-list .lg {
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--cream-faint); padding: 8px 10px 4px;
+}
+.lang-list button {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  width: 100%; text-align: left; cursor: pointer; background: transparent; border: 0;
+  font-family: var(--font-display); font-size: 13.5px; color: var(--cream-dim);
+  padding: 8px 10px; border-radius: 8px;
+  transition: background 160ms var(--ease), color 160ms var(--ease);
+}
+.lang-list button:hover { background: color-mix(in srgb, var(--cream) 8%, transparent); color: var(--cream); }
+.lang-list button.active { color: var(--terracotta); }
+.lang-list button .code { font-family: var(--font-mono); font-size: 10px; color: var(--cream-faint); }
+/* Google Translate chrome stays off the page */
+#google_translate_element { display: none; }
+iframe.skiptranslate, .goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame,
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf, .VIpgJd-ZVi9od-ORHb-OEVmcd {
+  display: none !important; visibility: hidden !important;
+}
+body { top: 0 !important; }
+html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15em; }
 
 /* ── hero ──────────────────────────────────────────────────────── */
 .hero {
@@ -311,6 +360,15 @@ section { padding: clamp(64px, 10vh, 128px) var(--pad); }
 .card:focus-visible { outline: none; }
 .card:focus-visible .frame { outline: 3px solid var(--terracotta); outline-offset: 3px; }
 .card.handoff .frame { border-style: dashed; border-width: 2px; border-color: var(--hair-strong); }
+.card.yours .frame.empty {
+  border-style: dashed; border-width: 2px; border-color: var(--hair-strong);
+  display: grid; place-items: center; box-shadow: none;
+  background: color-mix(in srgb, var(--bg-lift) 50%, transparent);
+}
+.card.yours .yours-hint {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--cream-faint);
+}
 
 /* ── features grid ─────────────────────────────────────────────── */
 .feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--hair); border: 1px solid var(--hair); }
@@ -326,27 +384,17 @@ section { padding: clamp(64px, 10vh, 128px) var(--pad); }
 @media (max-width: 880px) { .file-grid { grid-template-columns: 1fr; } }
 .file-copy h2 { font-size: clamp(30px, 4vw, 46px); margin: 14px 0 18px; }
 .file-copy > p { color: var(--cream-dim); max-width: 48ch; }
-.file-scene { position: relative; display: flex; align-items: flex-end; justify-content: center; height: clamp(320px, 34vw, 440px); }
+.file-scene { position: relative; display: flex; align-items: center; justify-content: center; }
 .file-card {
-  width: clamp(220px, 24vw, 300px); border: 9px solid var(--frame);
+  width: clamp(240px, 26vw, 320px); border: 9px solid var(--frame);
   background: #101109; box-shadow: 0 24px 60px rgba(0,0,0,0.5);
-  font-family: var(--font-mono); padding: 26px 24px; align-self: center;
-  margin-right: -34px; position: relative; z-index: 3;
+  font-family: var(--font-mono); padding: 28px 26px;
 }
 .file-card .fname { font-size: 15px; color: var(--cream); font-weight: 500; }
 .file-card hr { border: 0; height: 1px; background: var(--hair-strong); margin: 14px 0 16px; }
 .file-card ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
 .file-card li { font-size: 12px; color: var(--cream-dim); display: flex; justify-content: space-between; gap: 12px; }
 .file-card li b { color: var(--terracotta); font-weight: 500; }
-.file-scene .lisa-fig {
-  height: 82%; width: auto; position: relative; z-index: 2; opacity: 0.96;
-  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.4));
-}
-.file-scene .cap {
-  position: absolute; top: calc(100% - 2px); left: 0; right: 0; text-align: center;
-  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--cream-faint);
-}
-
 /* ── closing scene: Ted, the frame, and Lisa ───────────────────── */
 .scene-section { border-top: 1px solid var(--hair); overflow: hidden; }
 .scene-grid {
@@ -422,14 +470,25 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
 <div class="grain" aria-hidden="true"></div>
 
 <header class="topbar">
-  <a class="wordmark" href="#top" aria-label="Hi Ted, Meet Lisa — home">
-    <img src="assets/monomind-mark-white.svg" alt="">
-    <span>Hi Ted, Meet Lisa</span>
-  </a>
+  <div class="wordmark">
+    <a href="https://monomind.one" rel="noopener" aria-label="MonoMind">
+      <img src="assets/monomind-mark-solid-white.svg" alt="MonoMind"></a>
+    <a href="#top" aria-label="Hi Ted, Meet Lisa — home"><span>Hi Ted, Meet Lisa</span></a>
+  </div>
   <nav class="topnav" aria-label="Primary">
     <a href="#paths" data-path="try">Try it</a>
     <a href="#paths" data-path="install">Install</a>
     <a href="#templates">Templates</a>
+    <div class="lang" id="lang">
+      <button class="lang-btn" id="lang-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="15" height="15" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/></svg>
+        <span id="lang-cur">EN</span>
+      </button>
+      <div class="lang-panel" id="lang-panel" hidden>
+        <input class="lang-search" id="lang-search" type="search" placeholder="Search languages…" aria-label="Search languages">
+        <div class="lang-list" id="lang-list" role="listbox" aria-label="Languages"></div>
+      </div>
+    </div>
     <a class="gh" href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa" rel="noopener">GitHub</a>
   </nav>
 </header>
@@ -617,7 +676,8 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
         <p class="kicker">The templates</p>
         <h2 id="tpl-h">Six shapes, previewed for real.</h2>
         <p>These are not mockups — every preview below is an actual generated file.
-        Open one, present it, resize it. What you see is what the agent ships.</p>
+        Open one, present it, resize it. What you see is what the agent ships.
+        More are on the way — and once installed, any deck you like can join them.</p>
       </div>
       <div class="gallery">
         <a class="card" href="previews/monomind-deck.html" rel="noopener">
@@ -661,6 +721,12 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
           <div class="meta"><h3>Slide Design <span class="kind">handoff</span></h3>
           <p>Beyond the house style — twelve style presets and animated slides
           via the companion design pipeline. Still one HTML file.</p></div>
+        </a>
+        <a class="card yours" href="#paths" data-path="install">
+          <div class="frame empty"><span class="yours-hint">your look here</span><span class="open">See how</span></div>
+          <div class="meta"><h3>Your Template <span class="kind">coming</span></h3>
+          <p>More templates are on the way — and any finished deck you like can
+          become one. Install, and <code>/tedandlisa-new-template</code> does the rest.</p></div>
         </a>
       </div>
     </div>
@@ -752,12 +818,10 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
               <li>files <b>1</b></li>
               <li>dependencies <b>0</b></li>
               <li>build step <b>none</b></li>
-              <li>languages <b>2</b></li>
+              <li>languages <b>your pick</b></li>
               <li>opens from <b>anywhere</b></li>
             </ul>
           </div>
-          <img class="lisa-fig" src="assets/lisa-figure-cream.png" alt="">
-          <span class="cap">lisa, presenting the file</span>
         </div>
       </div>
     </div>
@@ -790,10 +854,10 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
 
 <footer>
   <div class="foot">
-    <div class="left">
-      <img src="assets/monomind-mark-white.svg" alt="">
+    <a class="left" href="https://monomind.one" rel="noopener">
+      <img src="assets/monomind-mark-solid-white.svg" alt="">
       <span>MonoMind AI Lab</span>
-    </div>
+    </a>
     <div style="display:flex; gap:24px;">
       <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa" rel="noopener">GitHub</a>
       <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa/blob/main/SKILL.md" rel="noopener">The skill</a>
@@ -885,6 +949,158 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
       });
     });
   });
+})();
+</script>
+
+<div id="google_translate_element"></div>
+<script>
+/* Language switch — Google Translate, cookie-driven, adapted from the
+   monomind-deck template's language machinery. Everything that is a file
+   name, command, or product name is marked translate="no" BEFORE the
+   translator loads, so code stays code and Ted stays Ted. */
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement(
+    { pageLanguage: 'en', autoDisplay: false },
+    'google_translate_element'
+  );
+}
+(function () {
+  "use strict";
+  var PREFERRED = [
+    ['en', 'English'], ['ko', '한국어'], ['zh-TW', '繁體中文']
+  ];
+  var OTHERS = [
+    ['ja','日本語'], ['zh-CN','简体中文'], ['es','Español'], ['fr','Français'],
+    ['de','Deutsch'], ['it','Italiano'], ['pt','Português'], ['ru','Русский'],
+    ['ar','العربية'], ['hi','हिन्दी'], ['th','ไทย'], ['vi','Tiếng Việt'],
+    ['id','Bahasa Indonesia'], ['ms','Bahasa Melayu'], ['tr','Türkçe'],
+    ['nl','Nederlands'], ['pl','Polski'], ['sv','Svenska'], ['da','Dansk'],
+    ['no','Norsk'], ['fi','Suomi'], ['cs','Čeština'], ['el','Ελληνικά'],
+    ['he','עברית'], ['uk','Українська'], ['ro','Română'], ['hu','Magyar'],
+    ['bg','Български'], ['hr','Hrvatski'], ['sk','Slovenčina'], ['bn','বাংলা'],
+    ['ta','தமிழ்'], ['te','తెలుగు'], ['fa','فارسی'], ['ur','اردو'],
+    ['tl','Filipino'], ['sw','Kiswahili'], ['mn','Монгол'], ['km','ខ្មែរ'],
+    ['lo','ລາວ'], ['my','မြန်မာ']
+  ];
+
+  var LITERAL_BLOCKS = '.cmd, .promptbox, code, .file-card, .agents, .lang-panel, .wordmark';
+  var TERMS = /(MonoMind(?: AI Lab)?|MONOMIND(?: AI LAB)?|Hi Ted, Meet Lisa|Claude Code|Gemini CLI|OpenCode|Codex|Hermes|claude\.ai|GitHub|Cloudflare|\bTed\b|\bLisa\b|\/tedandlisa(?:-[a-z-]+)?|[A-Za-z0-9_.-]+\.(?:html|md|json|pptx)\b)/g;
+  var SKIP = /^(SCRIPT|STYLE|CODE|TEXTAREA|NOSCRIPT|IFRAME)$/;
+
+  function protect() {
+    document.querySelectorAll(LITERAL_BLOCKS).forEach(function (el) {
+      el.setAttribute('translate', 'no');
+      el.classList.add('notranslate');
+    });
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (node) {
+        if (!node.nodeValue || node.nodeValue.length < 3) return NodeFilter.FILTER_REJECT;
+        var p = node.parentNode;
+        if (!p || SKIP.test(p.nodeName)) return NodeFilter.FILTER_REJECT;
+        if (p.closest && p.closest('[translate="no"]')) return NodeFilter.FILTER_REJECT;
+        TERMS.lastIndex = 0;
+        return TERMS.test(node.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      }
+    });
+    var targets = [], n;
+    while ((n = walker.nextNode())) targets.push(n);
+    targets.forEach(function (node) {
+      var frag = document.createDocumentFragment();
+      var text = node.nodeValue, last = 0, m;
+      TERMS.lastIndex = 0;
+      while ((m = TERMS.exec(text))) {
+        if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+        var span = document.createElement('span');
+        span.className = 'notranslate nt-term';
+        span.setAttribute('translate', 'no');
+        span.textContent = m[0];
+        frag.appendChild(span);
+        last = m.index + m[0].length;
+      }
+      if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+
+  function currentLang() {
+    var m = document.cookie.match(/(?:^|;\s*)googtrans=\/en\/([^;]+)/);
+    return m ? decodeURIComponent(m[1]) : 'en';
+  }
+  function setLang(code) {
+    var host = location.hostname;
+    var kill = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+    document.cookie = kill;
+    if (host) {
+      document.cookie = kill + '; domain=' + host;
+      document.cookie = kill + '; domain=.' + host;
+    }
+    if (code !== 'en') {
+      document.cookie = 'googtrans=/en/' + code + '; path=/';
+      if (host) document.cookie = 'googtrans=/en/' + code + '; path=/; domain=.' + host;
+    }
+    location.reload();
+  }
+
+  /* dropdown */
+  var btn = document.getElementById('lang-btn');
+  var panel = document.getElementById('lang-panel');
+  var list = document.getElementById('lang-list');
+  var search = document.getElementById('lang-search');
+  var cur = currentLang();
+  document.getElementById('lang-cur').textContent = cur.toUpperCase();
+
+  function row(code, name) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('role', 'option');
+    b.setAttribute('data-code', code);
+    b.setAttribute('data-name', name.toLowerCase());
+    if (code === cur) b.classList.add('active');
+    b.innerHTML = '<span>' + name + '</span><span class="code">' + code + '</span>';
+    b.addEventListener('click', function () {
+      if (code !== cur) setLang(code); else toggle(false);
+    });
+    return b;
+  }
+  function render(filter) {
+    list.innerHTML = '';
+    var f = (filter || '').trim().toLowerCase();
+    function matches(code, name) {
+      return !f || name.toLowerCase().indexOf(f) !== -1 || code.toLowerCase().indexOf(f) !== -1;
+    }
+    var pref = PREFERRED.filter(function (l) { return matches(l[0], l[1]); });
+    var rest = OTHERS.filter(function (l) { return matches(l[0], l[1]); });
+    if (pref.length) {
+      var h1 = document.createElement('div'); h1.className = 'lg'; h1.textContent = 'Preferred';
+      list.appendChild(h1);
+      pref.forEach(function (l) { list.appendChild(row(l[0], l[1])); });
+    }
+    if (rest.length) {
+      var h2 = document.createElement('div'); h2.className = 'lg'; h2.textContent = 'All languages';
+      list.appendChild(h2);
+      rest.forEach(function (l) { list.appendChild(row(l[0], l[1])); });
+    }
+  }
+  function toggle(open) {
+    panel.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+    if (open) { render(''); search.value = ''; search.focus(); }
+  }
+  btn.addEventListener('click', function () { toggle(panel.hidden); });
+  search.addEventListener('input', function () { render(search.value); });
+  document.addEventListener('click', function (e) {
+    if (!panel.hidden && !e.target.closest('.lang')) toggle(false);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !panel.hidden) toggle(false);
+  });
+
+  if (cur !== 'en') {
+    protect();
+    var sc = document.createElement('script');
+    sc.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    document.head.appendChild(sc);
+  }
 })();
 </script>
 
