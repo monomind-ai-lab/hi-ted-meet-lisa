@@ -13,7 +13,7 @@ when the user has not installed Impeccable themselves.
 | License | Apache License 2.0 — see `LICENSE` |
 | Modifications | None. Installed via `npx impeccable install --scope=project --no-hooks` and committed as-is. |
 
-Hi Ted, Meet Lisa is MIT licensed; this directory is not. Everything under
+Hi Ted, Meet Lisa is MIT + Commons Clause licensed; this directory is not. Everything under
 `.agents/skills/impeccable/` remains under Apache 2.0, and `NOTICE.md` carries
 Impeccable's own third-party attributions.
 

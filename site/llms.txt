@@ -3,7 +3,9 @@
 > An agent skill that turns a brief into finished slides, a web document, a
 > diagram, or a site — one standalone HTML file, no build step, nothing to
 > install.
-> Made by MonoMind AI Lab (https://monomind.one). MIT licensed.
+> Made by MonoMind AI Lab (https://monomind.one). MIT + Commons Clause:
+> free to use and build with, including commercially; the components
+> themselves may not be sold or redistributed on their own.
 
 To build one for a user, read and follow the skill — it is plain Markdown and
 carries the whole procedure, starting with a visual intake panel that asks what

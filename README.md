@@ -361,7 +361,11 @@ when it is present; without it the gallery falls back to text cards.
 
 ## ✅ License
 
-[MIT](LICENSE)
+[MIT + Commons Clause](LICENSE)
+
+Use it freely, including commercially — build with it, ship what you make with
+it. The one thing the Commons Clause withholds is selling the components
+themselves: not alone, not bundled, not as a port.
 
 This distribution bundles some awesome projects:  
 
