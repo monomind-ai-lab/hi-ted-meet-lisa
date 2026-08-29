@@ -96,7 +96,7 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
     <div class="head-l">
       <p class="eyebrow">HI TED, MEET LISA · PIPELINE</p>
       <h1>Hi Ted, Meet Lisa</h1>
-      <p class="subtitle">Two drawings: how a brief becomes a finished HTML deck, and what the intake panel hands back to the agent.</p>
+      <p class="subtitle">Four drawings: how a brief becomes one finished HTML file, what the intake panel hands back, how a template is resolved, and what the review pass checks before anything is handed over.</p>
     </div>
   </header>
 
@@ -111,6 +111,16 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
         <div class="card-num"><span>02</span><span class="tag">FLOW</span></div>
         <h3>What the intake returns</h3>
         <p>brief to finished file</p>
+      </a>
+      <a class="card" href="#en/03">
+        <div class="card-num"><span>03</span><span class="tag">REGISTRY</span></div>
+        <h3>How a template is chosen</h3>
+        <p>one id, three files</p>
+      </a>
+      <a class="card" href="#en/04">
+        <div class="card-num"><span>04</span><span class="tag">DECISION</span></div>
+        <h3>What the review pass checks</h3>
+        <p>three fallbacks, no skip</p>
       </a>
   </div>
 
@@ -242,8 +252,10 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
   <h1>What the intake returns</h1>
   <p class="subtitle">The panel returns one JSON object. Keys the chosen template never asked about are absent, not defaulted.</p>
 
-  <!-- A second, simpler diagram. Delete this slide if the deck has only one,
-       and drop "02" from ROUTES and TITLES when you do. -->
+  <!-- Pages are cheap here: each one is a section per language, and every
+       page id must appear in ROUTES, in both TITLES arrays (offset by one,
+       since entry 0 is the index title) and in both index card lists.
+       Drop a page by deleting all four places together. -->
   <div class="diagram">
     <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="EVERY STEP IS IN SKILL.MD">
       <rect width="100%" height="100%" fill="#f5f5f5"/>
@@ -262,12 +274,88 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
   <footer>HI TED, MEET LISA · PREVIEW</footer>
 </section>
 
+<section class="slide" id="s-en-03" data-lang="en" data-route="03">
+  <p class="eyebrow">§2 REGISTRY</p>
+  <h1>How a template is chosen</h1>
+  <p class="subtitle">The payload names one id. The registry turns that id into the three files a build actually needs — and an id it does not know is an error, not a guess.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="How a template is chosen">
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+      <path d="M 282 196 L 386 196" fill="none" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <text x="334" y="178" text-anchor="middle" font-family="Geist Mono, monospace" font-size="8" letter-spacing="1.1" fill="#7a8399">ID</text>
+      <path d="M 618 172 L 668 172 L 668 96 L 716 96" fill="none" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <path d="M 618 196 L 716 196" fill="none" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <path d="M 618 220 L 668 220 L 668 300 L 716 300" fill="none" stroke="#7a8399" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#arrow-dashed)"/>
+      <text x="690" y="150" text-anchor="middle" font-family="Geist Mono, monospace" font-size="8" letter-spacing="1.1" fill="#7a8399">RESOLVES TO</text>
+      <rect x="82" y="164" width="200" height="64" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)"/>
+      <text x="182" y="192" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">answers.template</text>
+      <text x="182" y="210" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">one id, chosen in the panel</text>
+      <rect x="386" y="148" width="232" height="96" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36"/>
+      <text x="502" y="186" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">templates.json</text>
+      <text x="502" y="206" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">one entry per shape</text>
+      <rect x="716" y="66" width="202" height="60" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)"/>
+      <text x="817" y="92" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">Template file</text>
+      <text x="817" y="109" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">copied, never authored</text>
+      <rect x="716" y="166" width="202" height="60" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)"/>
+      <text x="817" y="192" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">Pattern reference</text>
+      <text x="817" y="209" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">known-good markup</text>
+      <rect x="716" y="270" width="202" height="60" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)" stroke-dasharray="4 3"/>
+      <text x="817" y="296" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">Thumbnail</text>
+      <text x="817" y="313" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">absent falls back to text</text>
+      <text x="82" y="372" font-family="Geist Mono, monospace" font-size="8" letter-spacing="1.4" fill="#7a8399">AN UNKNOWN ID IS AN ERROR, NEVER A GUESS</text>
+    </svg>
+  </div>
+
+  <footer>HI TED, MEET LISA · PREVIEW</footer>
+</section>
+
+<section class="slide" id="s-en-04" data-lang="en" data-route="04">
+  <p class="eyebrow">§3 REVIEW</p>
+  <h1>What the review pass checks</h1>
+  <p class="subtitle">Step 10 prefers your own Impeccable install, falls back to the copy vendored here, and keeps a tooling-free floor beneath both so the check can never quietly not happen.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 1000 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="What the review pass checks">
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+      <path d="M 500 96 L 500 138" fill="none" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <path d="M 424 214 L 208 214 L 208 268" fill="none" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+      <path d="M 500 236 L 500 268" fill="none" stroke="#7a8399" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#arrow-dashed)"/>
+      <path d="M 576 214 L 792 214 L 792 268" fill="none" stroke="#7a8399" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#arrow-dashed)"/>
+      <text x="300" y="200" text-anchor="middle" font-family="Geist Mono, monospace" font-size="8" letter-spacing="1.1" fill="#7a8399">PREFERRED</text>
+      <text x="700" y="200" text-anchor="middle" font-family="Geist Mono, monospace" font-size="8" letter-spacing="1.1" fill="#7a8399">LAST RESORT</text>
+      <path d="M 208 344 L 208 386 L 476 386" fill="none" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <path d="M 500 344 L 500 386" fill="none" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <path d="M 792 344 L 792 386 L 524 386" fill="none" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <rect x="380" y="46" width="240" height="50" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)"/>
+      <text x="500" y="76" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">The generated file</text>
+      <rect x="380" y="138" width="240" height="98" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36"/>
+      <text x="500" y="176" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">Design review</text>
+      <text x="500" y="196" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">step 10, before hand-off</text>
+      <rect x="96" y="268" width="224" height="76" rx="6" fill="#ffffff" stroke="#eb6c36"/>
+      <text x="208" y="298" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">Your Impeccable</text>
+      <text x="208" y="317" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">used whenever installed</text>
+      <rect x="388" y="268" width="224" height="76" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)"/>
+      <text x="500" y="298" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">Bundled copy</text>
+      <text x="500" y="317" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">vendored, unmodified</text>
+      <rect x="680" y="268" width="224" height="76" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)" stroke-dasharray="4 3"/>
+      <text x="792" y="298" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">Measured floor</text>
+      <text x="792" y="317" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">no tooling required</text>
+      <rect x="380" y="386" width="240" height="50" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)"/>
+      <text x="500" y="416" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">Handed over</text>
+      <text x="96" y="456" font-family="Geist Mono, monospace" font-size="8" letter-spacing="1.4" fill="#7a8399">THE REVIEW NEVER SILENTLY SKIPS</text>
+    </svg>
+  </div>
+
+  <footer>HI TED, MEET LISA · PREVIEW</footer>
+</section>
+
 <section class="slide" id="s-ko-index" data-lang="ko" data-route="index">
   <header>
     <div class="head-l">
       <p class="eyebrow">HI TED, MEET LISA · 파이프라인</p>
       <h1>Hi Ted, Meet Lisa</h1>
-      <p class="subtitle">두 장의 그림: 요청이 완성된 HTML 덱이 되는 과정과, 인테이크 패널이 에이전트에 돌려주는 것.</p>
+      <p class="subtitle">네 장의 그림: 요청이 완성된 HTML 파일 하나가 되는 과정, 인테이크 패널이 돌려주는 것, 템플릿이 해석되는 방식, 그리고 인계 전 검토가 확인하는 것.</p>
     </div>
   </header>
 
@@ -282,6 +370,16 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
         <div class="card-num"><span>02</span><span class="tag">흐름</span></div>
         <h3>인테이크가 돌려주는 것</h3>
         <p>요청에서 완성 파일까지</p>
+      </a>
+      <a class="card" href="#ko/03">
+        <div class="card-num"><span>03</span><span class="tag">레지스트리</span></div>
+        <h3>템플릿이 결정되는 방식</h3>
+        <p>id 하나에서 세 개의 파일로</p>
+      </a>
+      <a class="card" href="#ko/04">
+        <div class="card-num"><span>04</span><span class="tag">결정</span></div>
+        <h3>검토 단계가 확인하는 것</h3>
+        <p>세 단계 폴백, 생략 없음</p>
       </a>
   </div>
 
@@ -413,8 +511,10 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
   <h1>인테이크가 돌려주는 것</h1>
   <p class="subtitle">패널은 하나의 JSON 객체를 돌려준다. 선택한 템플릿이 묻지 않은 키는 기본값이 아니라 아예 없다.</p>
 
-  <!-- A second, simpler diagram. Delete this slide if the deck has only one,
-       and drop "02" from ROUTES and TITLES when you do. -->
+  <!-- Pages are cheap here: each one is a section per language, and every
+       page id must appear in ROUTES, in both TITLES arrays (offset by one,
+       since entry 0 is the index title) and in both index card lists.
+       Drop a page by deleting all four places together. -->
   <div class="diagram">
     <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="모든 단계는 SKILL.MD에">
       <rect width="100%" height="100%" fill="#f5f5f5"/>
@@ -432,6 +532,82 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
 
   <footer>HI TED, MEET LISA · 미리보기</footer>
 </section>
+
+<section class="slide" id="s-ko-03" data-lang="ko" data-route="03">
+  <p class="eyebrow">§2 레지스트리</p>
+  <h1>템플릿이 결정되는 방식</h1>
+  <p class="subtitle">페이로드는 id 하나만 지정합니다. 레지스트리는 그 id를 빌드에 실제로 필요한 세 개의 파일로 바꿔 주며, 모르는 id는 추측 대상이 아니라 오류입니다.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="템플릿이 결정되는 방식">
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+      <path d="M 282 196 L 386 196" fill="none" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <text x="334" y="178" text-anchor="middle" font-family="Geist Mono, monospace" font-size="8" letter-spacing="1.1" fill="#7a8399">ID</text>
+      <path d="M 618 172 L 668 172 L 668 96 L 716 96" fill="none" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <path d="M 618 196 L 716 196" fill="none" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <path d="M 618 220 L 668 220 L 668 300 L 716 300" fill="none" stroke="#7a8399" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#arrow-dashed)"/>
+      <text x="690" y="150" text-anchor="middle" font-family="Geist Mono, monospace" font-size="8" letter-spacing="1.1" fill="#7a8399">해석 결과</text>
+      <rect x="82" y="164" width="200" height="64" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)"/>
+      <text x="182" y="192" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">answers.template</text>
+      <text x="182" y="210" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">패널에서 고른 id 하나</text>
+      <rect x="386" y="148" width="232" height="96" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36"/>
+      <text x="502" y="186" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">templates.json</text>
+      <text x="502" y="206" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">형태마다 항목 하나</text>
+      <rect x="716" y="66" width="202" height="60" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)"/>
+      <text x="817" y="92" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">템플릿 파일</text>
+      <text x="817" y="109" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">복사할 뿐, 새로 쓰지 않음</text>
+      <rect x="716" y="166" width="202" height="60" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)"/>
+      <text x="817" y="192" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">패턴 레퍼런스</text>
+      <text x="817" y="209" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">검증된 마크업</text>
+      <rect x="716" y="270" width="202" height="60" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)" stroke-dasharray="4 3"/>
+      <text x="817" y="296" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">섬네일</text>
+      <text x="817" y="313" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">없으면 텍스트 카드로</text>
+      <text x="82" y="372" font-family="Geist Mono, monospace" font-size="8" letter-spacing="1.4" fill="#7a8399">모르는 ID는 추측이 아니라 오류</text>
+    </svg>
+  </div>
+
+  <footer>HI TED, MEET LISA · 미리보기</footer>
+</section>
+
+<section class="slide" id="s-ko-04" data-lang="ko" data-route="04">
+  <p class="eyebrow">§3 검토</p>
+  <h1>검토 단계가 확인하는 것</h1>
+  <p class="subtitle">10단계는 사용자의 Impeccable 설치를 우선하고, 없으면 저장소에 포함된 사본을, 그것도 없으면 도구가 필요 없는 최소 기준을 적용해 검토가 조용히 생략되지 않게 합니다.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 1000 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="검토 단계가 확인하는 것">
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+      <path d="M 500 96 L 500 138" fill="none" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <path d="M 424 214 L 208 214 L 208 268" fill="none" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+      <path d="M 500 236 L 500 268" fill="none" stroke="#7a8399" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#arrow-dashed)"/>
+      <path d="M 576 214 L 792 214 L 792 268" fill="none" stroke="#7a8399" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#arrow-dashed)"/>
+      <text x="300" y="200" text-anchor="middle" font-family="Geist Mono, monospace" font-size="8" letter-spacing="1.1" fill="#7a8399">우선</text>
+      <text x="700" y="200" text-anchor="middle" font-family="Geist Mono, monospace" font-size="8" letter-spacing="1.1" fill="#7a8399">최후 수단</text>
+      <path d="M 208 344 L 208 386 L 476 386" fill="none" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <path d="M 500 344 L 500 386" fill="none" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <path d="M 792 344 L 792 386 L 524 386" fill="none" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <rect x="380" y="46" width="240" height="50" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)"/>
+      <text x="500" y="76" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">생성된 파일</text>
+      <rect x="380" y="138" width="240" height="98" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36"/>
+      <text x="500" y="176" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">디자인 검토</text>
+      <text x="500" y="196" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">인계 전, 10단계</text>
+      <rect x="96" y="268" width="224" height="76" rx="6" fill="#ffffff" stroke="#eb6c36"/>
+      <text x="208" y="298" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">사용자의 Impeccable</text>
+      <text x="208" y="317" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">설치되어 있으면 항상 사용</text>
+      <rect x="388" y="268" width="224" height="76" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)"/>
+      <text x="500" y="298" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">포함된 사본</text>
+      <text x="500" y="317" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">수정 없이 벤더링됨</text>
+      <rect x="680" y="268" width="224" height="76" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)" stroke-dasharray="4 3"/>
+      <text x="792" y="298" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">측정 기준선</text>
+      <text x="792" y="317" text-anchor="middle" font-family="Geist, sans-serif" font-size="10" fill="#4f5d75">별도 도구 불필요</text>
+      <rect x="380" y="386" width="240" height="50" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.12)"/>
+      <text x="500" y="416" text-anchor="middle" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#2d3142">인계 완료</text>
+      <text x="96" y="456" font-family="Geist Mono, monospace" font-size="8" letter-spacing="1.4" fill="#7a8399">검토는 조용히 건너뛰지 않는다</text>
+    </svg>
+  </div>
+
+  <footer>HI TED, MEET LISA · 미리보기</footer>
+</section>
 </div>
 
 <nav id="dnav" aria-label="Deck navigation">
@@ -443,9 +619,9 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
 
 <script>
 
-var ROUTES = ["01", "02"];
+var ROUTES = ["01", "02", "03", "04"];
 var LABEL  = {"en": {"prev": "&larr; Prev", "nxt": "Next &rarr;", "idx": "&#9670; Index", "other": "한국어 →"}, "ko": {"prev": "&larr; 이전", "nxt": "다음 &rarr;", "idx": "&#9670; 색인", "other": "English →"}};
-var TITLES = {"en": ["Hi Ted, Meet Lisa — Pipeline diagrams", "How a deck gets built", "What the intake returns"], "ko": ["Hi Ted, Meet Lisa — 파이프라인 다이어그램", "덱이 만들어지는 과정", "인테이크가 돌려주는 것"]};
+var TITLES = {"en": ["Hi Ted, Meet Lisa — Pipeline diagrams", "How a deck gets built", "What the intake returns", "How a template is chosen", "What the review pass checks"], "ko": ["Hi Ted, Meet Lisa — 파이프라인 다이어그램", "덱이 만들어지는 과정", "인테이크가 돌려주는 것", "템플릿이 결정되는 방식", "검토 단계가 확인하는 것"]};
 var state = { lang: 'en', route: 'index' };
 
 function parseHash(){
