@@ -123,6 +123,7 @@ template's pattern reference before writing anything.
 | `mermaid-master` | Diagram-first slides on light paper | Every slide written twice, diagram labels included | Yes, fonts aside |
 | `architecture` | One system diagram on slate, colour is semantic | Both languages inline, labels included | Yes, fonts aside |
 | `sitemap-ia` | Hash-routed pages, plus a clickable navigation prototype | Both languages written inline | Only if `delivery: standalone` — otherwise mermaid, Font Awesome and Tailwind load from a CDN |
+| `project-website` | Hash-routed pages behind a sticky nav, one shared footer | Both languages written inline | Yes, fonts aside |
 
 The translation-safety section below applies to `monomind-deck`. The technical
 document needs none of it: nothing is machine-translated, so nothing needs
@@ -192,6 +193,8 @@ Before handing the file over:
 | `references/slide-patterns-mermaid-master.md` | Component markup for the mermaid-master template. |
 | `assets/tedandlisa-template-architecture.html` | The architecture template: semantic node colours on slate. |
 | `references/slide-patterns-architecture.md` | Component markup for the architecture template. |
+| `assets/tedandlisa-template-project-website.html` | The project-website template: sticky nav, hash-routed pages, inline bilingual, no CDN. |
+| `references/slide-patterns-project-website.md` | Component markup for the project-website template. |
 | `skills/tedandlisa-design/` | The wrapper for the vendored Slides AI pipeline (HTML or `.pptx`). |
 | `vendor/slides-ai-plugin/` | Git submodule, MIT. `git submodule update --init` if empty. |
 | `scripts/tedandlisa_thumbs.py` | Captures template thumbnails for the gallery. |

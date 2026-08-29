@@ -127,6 +127,27 @@
       ],
       "preview": "previews/sitemap-ia.html",
       "thumb_source": "previews/sitemap-ia.html"
+    },
+    {
+      "id": "project-website",
+      "name": "Project website",
+      "tagline": "A project's public face: sticky nav, hash-routed pages, dark ink and a blue halo.",
+      "file": "assets/tedandlisa-template-project-website.html",
+      "patterns": "references/slide-patterns-project-website.md",
+      "thumb": "templates/thumbs/project-website.png",
+      "kind": "document",
+      "best_for": "A project's own site — a launch page, a tool's home, a programme's front door. Read at desk distance, linked to, and skimmed before it is read.",
+      "navigation": "Sticky top nav with hash routing (#/lang/page); each page scrolls, one footer for the whole site, burger under 960px.",
+      "languages": "English and Korean written inline and toggled instantly — no translation service, works offline.",
+      "dependencies": "Google Fonts only — no diagram runtime, no CDN, no analytics.",
+      "features": [
+        "hero with copy-to-clipboard command",
+        "six-step process track",
+        "category-tinted card grid",
+        "light and dark, persisted",
+        "reveal on scroll",
+        "PDF and self-download"
+      ]
     }
   ]
 }

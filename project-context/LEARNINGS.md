@@ -200,3 +200,46 @@ stable IDs such as `L-001`.
   skeleton's own shape. The `new-template` procedure already says to rewrite
   routing arrays and page registers; index-based lookups belong in that list.
 - Evidence: [`../skills/tedandlisa-new-template/SKILL.md`](../skills/tedandlisa-new-template/SKILL.md), [`../assets/tedandlisa-template-sitemap-ia.html`](../assets/tedandlisa-template-sitemap-ia.html)
+
+## L-022: Reveal-on-scroll renders a blank page wherever IntersectionObserver never fires
+
+- Status: `accepted`
+- Scope: Any template using the `.reveal` / `IntersectionObserver` pattern —
+  `project-website` today, and any extraction that inherits it.
+- Learning: `.reveal` starts at `opacity:0` and is only made visible by an
+  observer callback, so any context that never delivers those callbacks renders
+  a page that is structurally perfect and visually empty. This is not
+  hypothetical: in a hidden browser tab a freshly constructed probe observer
+  fired zero times over 600ms while the observed element sat 187px inside a
+  720px viewport, and `document.visibilityState` was `hidden`. The same tab also
+  throttles `setTimeout`, so a naive timer fallback does not run either. Two
+  earlier confusions traced to the same root — scrolled screenshots of the
+  source site came back blank, and a second page of the template looked broken
+  when it was not.
+- Action: Never let an observer be the only path to visible. Arm reveals per
+  page activation, and pair them with a fail-visible timer that checks whether
+  *any* element in that scope was reported and reveals the lot if none was —
+  which leaves the animation untouched wherever the observer does work. Add
+  `@media print{.reveal{opacity:1}}` beside it. When a page looks blank, check
+  `document.hidden` before believing the markup is wrong.
+- Evidence: [`../assets/tedandlisa-template-project-website.html`](../assets/tedandlisa-template-project-website.html)
+
+## L-023: The browser pane serves stale CSS and defers style recalc, so palettes must be measured off-browser
+
+- Status: `accepted`
+- Scope: Any contrast or token verification done through the preview pane.
+- Learning: Three consecutive contrast measurements of the same light palette
+  disagreed with each other and with the file. Two causes, both invisible from
+  inside the page: the pane re-served a cached copy of the HTML after the file
+  on disk had been patched twice, and setting `data-theme` then reading
+  `getComputedStyle` in the same task returned the *old* custom-property values
+  — one probe reported the dark `--fg-muted` (`rgb(161,161,161)`) against the
+  light background, a pairing that exists nowhere in the stylesheet. The
+  contradiction was only caught because the returned colour was checked against
+  the token file rather than trusted.
+- Action: Measure palette contrast analytically from the token values — the
+  inputs are hex strings and the formula is twelve lines of Python — and use the
+  browser only for layout and behaviour. When the browser must be used, bust the
+  cache with a query string and assert the theme by reading back a known token
+  colour before trusting any ratio computed alongside it.
+- Evidence: [`../assets/tedandlisa-template-project-website.html`](../assets/tedandlisa-template-project-website.html), `D-019`

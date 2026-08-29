@@ -185,3 +185,27 @@ records from `decisions/` when the evidence or trade-offs need more space.
   the webfont subsetting step is the part most likely to be skipped — skipping
   it costs several megabytes.
 - Evidence: [`../assets/tedandlisa-template-sitemap-ia.html`](../assets/tedandlisa-template-sitemap-ia.html), [`../SKILL.md`](../SKILL.md)
+
+## D-019: `project-website` keeps the source's dark palette, contrast failure included
+
+- Status: `accepted`
+- Date: 2026-08-29
+- Decision: The `project-website` skeleton ships the source design's dark tokens
+  unchanged, including `--fg-faint:#565656`, which fails WCAG AA at the sizes it
+  carries. The `:root` block names the measured ratios and the one-line
+  override that fixes them; the added light theme is held to AA instead.
+- Rationale: `/tedandlisa-new-template` says a template preserves its author's
+  system, including choices the extractor would have made differently — and the
+  faint tier is load-bearing for this design's hierarchy, not an oversight to
+  patch silently. But shipping a measured failure with no note makes every
+  downstream deliverable inherit it unknowingly. Naming the numbers and the fix
+  in the file turns a silent defect into a deliberate, ten-second choice. The
+  light theme is a MonoMind addition rather than the author's work, so it had no
+  claim to the same deference and was re-tiered to 7.5 / 6.0 / 5.3 on white.
+- Consequences: A generated site is not AA-clean in the dark theme unless
+  someone acts on the comment, so the design-review step should expect to raise
+  it. The same reasoning applies to the next extraction: preserve the source,
+  measure it, and write the number down. It also means the two themes in this
+  template are held to different standards, which is defensible only while the
+  comment explaining why stays next to the tokens.
+- Evidence: [`../assets/tedandlisa-template-project-website.html`](../assets/tedandlisa-template-project-website.html), [`../references/slide-patterns-project-website.md`](../references/slide-patterns-project-website.md)

@@ -35,6 +35,14 @@
   --surface:#0e0e0e; --surface-2:#141414; --surface-3:#1a1a1a;
   --border:#1f1f1f; --border-strong:#2e2e2e; --border-hover:#3a3a3a;
   --fg:#ededed; --fg-bright:#ffffff; --fg-muted:#a1a1a1; --fg-dim:#7d7d7d; --fg-faint:#565656;
+  /* KNOWN, MEASURED, AND INHERITED: --fg-faint is 2.86:1 on --bg, 2.70:1 on
+     --bg-subtle and 2.63:1 on --surface. It carries 11-13px text
+     (.ic-when, .cmd-row-principle, .cmd-label, .footer-bottom), so those
+     four fail WCAG AA. The value is the source design's, kept because a
+     template preserves its author's system -- but the fix is one line, and
+     #7a7a7a is the lightest grey that clears 4.5:1 on all three grounds:
+         --fg-faint:#7a7a7a;
+     Decide deliberately. The light theme below already clears AA. */
   --accent:#52a8ff; --accent-strong:#0072f5; --accent-contrast:#ffffff;
   --success:#46d160; --warn:#f5a623;
   --title-grad:linear-gradient(180deg,#fff 30%,#b9b9b9);
@@ -58,7 +66,12 @@ html[data-theme="light"]{
   --bg:#ffffff; --bg-subtle:#f7f8fa;
   --surface:#f6f7f9; --surface-2:#eef0f4; --surface-3:#e6e9ee;
   --border:#e4e7ec; --border-strong:#d2d7df; --border-hover:#b9c0cb;
-  --fg:#1b1f27; --fg-bright:#0b0d12; --fg-muted:#535a67; --fg-dim:#6d7480; --fg-faint:#878e9a;
+  /* The dim tiers are re-tiered, not merely inverted: the dark ramp's
+     --fg-faint lands at 3.1:1 on paper, which fails at the 12-13px sizes
+     that token is used at (.ic-when, .cmd-row-principle, .footer-bottom,
+     .cmd-label). Measured on white: 7.5 / 6.1 / 5.3, so the hierarchy
+     survives and every step clears AA. */
+  --fg:#1b1f27; --fg-bright:#0b0d12; --fg-muted:#4e5563; --fg-dim:#5c6371; --fg-faint:#656c7a;
   --accent:#0064d2; --accent-strong:#0050a8;
   --success:#1a8f3c; --warn:#a86500;
   --title-grad:linear-gradient(180deg,#0b0d12 30%,#454b57);
@@ -141,7 +154,11 @@ code,kbd{font-family:var(--font-mono);font-size:.9em}
 /* ============================== NAV ============================== */
 .nav{position:sticky;top:0;z-index:50;background:rgba(0,0,0,.70);backdrop-filter:saturate(160%) blur(14px);-webkit-backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid var(--border)}
 .nav-inner{display:flex;align-items:center;gap:24px;height:var(--nav-h)}
-.brand{display:inline-flex;align-items:center;gap:9px;font-weight:600;letter-spacing:-.02em;font-size:.98rem;color:var(--fg-bright)}
+/* min-width:0 lets the brand shrink instead of pushing the utility cluster
+   off the screen: [PROJECT] is a placeholder, and a real project name is
+   usually longer than the one it replaces. */
+.brand{display:inline-flex;align-items:center;gap:9px;min-width:0;font-weight:600;letter-spacing:-.02em;font-size:.98rem;color:var(--fg-bright)}
+.brand-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .brand-mark{color:var(--accent);display:inline-flex}
 .brand-dim{color:var(--fg-dim)}
 .nav-links{display:flex;gap:4px;margin-inline-start:8px}
@@ -173,6 +190,15 @@ code,kbd{font-family:var(--font-mono);font-size:.9em}
 @media(max-width:1080px){.utilbar button span{display:none}}
 @media(max-width:960px){.nav-links,.nav-cta{display:none}.nav-toggle{display:flex}}
 @media(max-width:520px){.utilbar{display:none}}
+/* Below 420px the nav has no slack left. The external-link icon goes first
+   because the mobile menu already carries the same link; then the gaps and
+   the language labels tighten. Checked against a 320px viewport. */
+@media(max-width:420px){
+  .nav-inner{gap:12px}
+  .nav-actions{gap:6px}
+  .nav-icon{display:none}
+  .lang-toggle button{padding-inline:8px;font-size:.72rem}
+}
 
 /* ============================== PAGES ============================== */
 /* Only the routed page is in the document flow. */
@@ -876,9 +902,24 @@ var revealObserver = ('IntersectionObserver' in window)
   : null;
 
 function armReveal(scope){
+  if(!scope) return;
   var els = scope.querySelectorAll('.reveal:not(.in)');
+  if(!els.length) return;
   if(!revealObserver){ els.forEach(function(el){ el.classList.add('in'); }); return; }
   els.forEach(function(el){ revealObserver.observe(el); });
+
+  /* Fail visible. Some contexts never deliver IntersectionObserver
+     callbacks at all -- an offscreen or hidden embed, a print preview, a
+     headless screenshot -- and .reveal starts at opacity 0, so the page
+     renders blank in exactly the places nobody thinks to check. If not one
+     element in this page has been reported after a beat, the observer is
+     not working here: show everything rather than show nothing. A browser
+     that does deliver will already have flagged the top element, so the
+     animation is untouched. */
+  setTimeout(function(){
+    if(scope.querySelector('.reveal.in')) return;
+    els.forEach(function(el){ el.classList.add('in'); revealObserver.unobserve(el); });
+  }, 1200);
 }
 
 /* ---------- routing: #/{lang}/{page} ---------- */
