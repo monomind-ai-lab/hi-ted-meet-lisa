@@ -456,7 +456,7 @@ var TEMPLATES = CTX.templates || [
     tagline: "Horizontal presentation deck, dark ink and accent halos." },
   { id: "web-document", name: "Web document", kind: "document",
     tagline: "Reads like a website page: top nav, sections, diagrams." },
-  { id: "mermaid-master", name: "Mermaid master", kind: "slides",
+  { id: "mermaid-master", name: "Multi-page Diagrams", kind: "slides",
     tagline: "Diagram-first deck on light paper, one drawing per slide." },
   { id: "architecture", name: "Architecture diagram", kind: "document",
     tagline: "One system diagram on slate, where colour means something." },
@@ -545,11 +545,11 @@ var QUESTIONS = [
       { id: "desktop", label: "Desktop only", note: "One breakpoint, embedded in the page." },
       { id: "none",    label: "No prototype", note: "Diagrams only — a much smaller file." } ] },
 
-  { id: "delivery", q: "Does the file need to work offline?", templates: ["sitemap-ia"],
-    hint: "Standalone inlines mermaid, the webfonts, Font Awesome and Tailwind. Roughly 150KB against roughly 9MB.",
+  { id: "delivery", q: "Does the file need to work offline?", kinds: ["slides", "document"],
+    hint: "Every shape pulls its webfonts from Google, and the diagram-heavy ones also load mermaid and CSS libraries. Standalone inlines all of it \u2014 usually a few hundred KB, and several MB for the heaviest shapes.",
     type: "single", options: [
-      { id: "cdn",        label: "Load libraries from a CDN", note: "Small file; needs a connection to draw diagrams.", def: true },
-      { id: "standalone", label: "Fully standalone", note: "Opens from a USB stick with no network at all." } ] },
+      { id: "cdn",        label: "Load webfonts and libraries from a CDN", note: "Smaller file; needs a connection to render fully.", def: true },
+      { id: "standalone", label: "Fully standalone", note: "Fonts and libraries inlined \u2014 opens from a USB stick with no network at all." } ] },
 
   { id: "theme", q: "Which theme?", kinds: ["slides", "document"], hint: "It ships dark; the token set carries a full light palette.",
     type: "single", options: [
@@ -1064,6 +1064,18 @@ function expandOther(qid) {
     (other[qid] || "").split(",").map(function (s) { return s.trim(); }).filter(Boolean));
 }
 
+/* Attachments ride along as base64 data URIs, which is right when the runner
+   hands the payload to an agent as a file. In web mode the reader copies the
+   payload by hand, and one photo turns it into a megabyte of base64 that no
+   chat box will take — so there we send the manifest and let the agent ask. */
+function refsForMode() {
+  if (CTX.mode !== "web") return refs;
+  return refs.map(function (r) {
+    return { name: r.name, type: r.type, size: r.size,
+             note: "not inlined \u2014 ask me to share this file" };
+  });
+}
+
 function payload() {
   /* `other` is a UI sentinel, never an answer: drop it and splice in whatever
      the reader actually typed (nothing, if they typed nothing). */
@@ -1122,7 +1134,7 @@ function payload() {
     handoff: chosen.kind === "external" ? (chosen.skill || null) : null,
     prompt: (document.getElementById("prompttext").value || "").trim() || null,
     promptEdited: (document.getElementById("prompttext").value || "").trim() !== (CTX.prompt || "").trim(),
-    references: refs,
+    references: refsForMode(),
     answers: answers
   };
 }

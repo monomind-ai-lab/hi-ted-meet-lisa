@@ -46,7 +46,7 @@
     },
     {
       "id": "mermaid-master",
-      "name": "Mermaid master",
+      "name": "Multi-page Diagrams",
       "tagline": "Diagram-first deck on light paper, one drawing per slide.",
       "file": "assets/tedandlisa-template-mermaid-master.html",
       "patterns": "references/slide-patterns-mermaid-master.md",
