@@ -1864,22 +1864,50 @@ question. Show me the proposed plan and wait for my approval before making chang
       });
     }
 
-    function currentLang() {
+    /*
+      On a real subdomain (html.monomind.one) googtrans cookies pile up at
+      several scopes at once — the two this switch used to write, plus the
+      zone-wide one Google's widget adds after every successful run. The
+      old kill only cleared the host scopes, so picking ZH-TW after KR left
+      `googtrans=/en/ko` alive at `.monomind.one`, and both the widget and
+      the button state read that stale value: the deck came back Korean.
+      Kill every scope, then keep exactly one host-only cookie.
+    */
+    function killCookies() {
+      var kill = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+      document.cookie = kill;
+      var parts = location.hostname.split('.');
+      for (var i = 0; i < parts.length - 1; i++) {
+        var d = parts.slice(i).join('.');
+        document.cookie = kill + '; domain=' + d;
+        document.cookie = kill + '; domain=.' + d;
+      }
+    }
+    /*
+      The widget consumes the googtrans cookie once it has translated, so
+      the cookie alone cannot carry the choice across page loads.
+      localStorage remembers it; the cookie is re-seeded from it on every
+      load, just before the widget boots. Cookie stays the fallback for
+      storage-blocked contexts (private windows, partitioned iframes).
+    */
+    var LANG_KEY = 'tedandlisa-lang';
+    function storedLang() {
+      try { return localStorage.getItem(LANG_KEY) || ''; } catch (e) { return ''; }
+    }
+    function cookieLang() {
       var m = document.cookie.match(/(?:^|;\s*)googtrans=\/en\/([^;]+)/);
       return m ? decodeURIComponent(m[1]) : 'en';
     }
+    function currentLang() {
+      return storedLang() || cookieLang();
+    }
     function setLang(code) {
-      var host = location.hostname;
-      var kill = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
-      document.cookie = kill;
-      if (host) {
-        document.cookie = kill + '; domain=' + host;
-        document.cookie = kill + '; domain=.' + host;
-      }
-      if (code !== 'en') {
-        document.cookie = 'googtrans=/en/' + code + '; path=/';
-        if (host) document.cookie = 'googtrans=/en/' + code + '; path=/; domain=.' + host;
-      }
+      killCookies();
+      try {
+        if (code === 'en') localStorage.removeItem(LANG_KEY);
+        else localStorage.setItem(LANG_KEY, code);
+      } catch (e) {}
+      if (code !== 'en') document.cookie = 'googtrans=/en/' + code + '; path=/';
       location.reload();
     }
 
@@ -1892,7 +1920,11 @@ question. Show me the proposed plan and wait for my approval before making chang
           if (btn.getAttribute('data-lang') !== cur) setLang(btn.getAttribute('data-lang'));
         });
       });
+      // Scrub every scope on boot too: the widget re-adds a zone-wide copy
+      // after each run, which would poison the next load.
+      killCookies();
       if (cur !== 'en') {
+        document.cookie = 'googtrans=/en/' + cur + '; path=/';
         protect();
         var sc = document.createElement('script');
         sc.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
