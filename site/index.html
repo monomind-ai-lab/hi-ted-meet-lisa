@@ -344,7 +344,7 @@ section { padding: clamp(64px, 10vh, 128px) var(--pad); }
   position: relative; border: 1px solid var(--hair-strong); background: #101109;
   font-family: var(--font-mono); font-size: 12px; line-height: 1.7;
   padding: 16px 90px 16px 18px; color: var(--cream);
-  white-space: pre; overflow-x: auto;
+  white-space: pre-wrap; overflow-wrap: anywhere; overflow-x: auto;
 }
 .getlist { list-style: none; display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
 .getlist li { display: flex; gap: 12px; font-size: 14px; color: var(--cream-dim); }
@@ -639,14 +639,18 @@ Read and follow `SKILL.md`, starting with its intake panel.<button class="copybt
               <div class="lbl"><span class="n">01</span><b>Clone it into your skills directory</b></div>
               <p class="why">One clone, available in every project. Other agents have their
               own skills directory — the layout is the same.</p>
-              <div class="cmd">git clone --recurse-submodules   https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git   ~/.claude/skills/tedandlisa<button class="copybtn" data-copy-raw="git clone --recurse-submodules https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git ~/.claude/skills/tedandlisa" type="button">Copy</button></div>
+              <div class="cmd">git clone --recurse-submodules \
+  https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git \
+  ~/.claude/skills/tedandlisa<button class="copybtn" data-copy-raw="git clone --recurse-submodules https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git ~/.claude/skills/tedandlisa" type="button">Copy</button></div>
             </div>
             <div class="cmdstep">
               <div class="lbl"><span class="n">02</span><b>Link the two companion skills</b></div>
               <p class="why">They ride along in the clone — the links just make them
               commands of their own.</p>
-              <div class="cmd">ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-design       ~/.claude/skills/tedandlisa-design
-ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template       ~/.claude/skills/tedandlisa-new-template<button class="copybtn" data-copy-raw="ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-design ~/.claude/skills/tedandlisa-design && ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template ~/.claude/skills/tedandlisa-new-template" type="button">Copy</button></div>
+              <div class="cmd">ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-design \
+      ~/.claude/skills/tedandlisa-design
+ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
+      ~/.claude/skills/tedandlisa-new-template<button class="copybtn" data-copy-raw="ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-design ~/.claude/skills/tedandlisa-design && ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template ~/.claude/skills/tedandlisa-new-template" type="button">Copy</button></div>
             </div>
             <div class="cmdstep">
               <div class="lbl"><span class="n">03</span><b>Use it, whenever</b></div>
