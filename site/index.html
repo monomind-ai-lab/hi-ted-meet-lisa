@@ -440,6 +440,12 @@ section { padding: clamp(64px, 10vh, 128px) var(--pad); }
   position: relative; height: clamp(300px, 36vw, 430px);
   display: flex; align-items: flex-end; justify-content: center; gap: 0;
 }
+/* The scene is now one composed illustration rather than three layered
+   pieces, so it only needs to fit its box. */
+.scene > img {
+  max-width: 100%; max-height: 100%; width: auto; height: auto;
+  filter: drop-shadow(0 24px 50px rgba(0,0,0,0.45));
+}
 .scene .ted {
   height: 72%; width: auto; position: relative; z-index: 2;
   margin-right: -30px; opacity: 0.96;
@@ -589,24 +595,12 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
 
       <!-- path 01: try once -->
       <div class="pane on" id="pane-try" role="tabpanel" aria-labelledby="tab-try">
-        <div class="gen-grid">
-          <div class="gen-side">
-            <p>Fill in the panel on this page. It hands back one prompt with all
-            your answers baked in — your agent asks nothing further and starts
-            building immediately.</p>
-            <button class="btn btn-primary js-open-intake" type="button">Open the intake panel</button>
-          </div>
-          <div>
-            <div class="promptbox" id="prompt-text">Build me a standalone HTML page using
-https://github.com/monomind-ai-lab/hi-ted-meet-lisa.
-Read and follow `SKILL.md`, starting with its intake panel.<button class="copybtn" data-copy="prompt-text" type="button">Copy</button></div>
-            <p class="gen-note">Nothing to edit — the panel asks what it is about, who it
-            is for, and what shape it should take. Works with any coding agent that can
-            read a public URL:</p>
-            <div class="agents" aria-label="Agents this works with">
-              <span>Claude Code</span><span>Codex</span><span>Pi</span><span>OpenCode</span><span>Hermes</span><span>Gemini CLI</span><span>claude.ai</span><span>…and yours</span>
-            </div>
-          </div>
+        <div class="gen-side">
+          <p>Fill in the panel on this page — it asks what this is about, who it is
+          for, and what shape it should take. The last step hands back one prompt
+          with every answer baked in, so your agent asks nothing further and starts
+          building immediately.</p>
+          <button class="btn btn-primary js-open-intake" type="button">Open the intake panel</button>
         </div>
       </div>
 
@@ -851,7 +845,7 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template       ~/.claude
           </div>
         </div>
         <div class="scene" aria-hidden="true">
-          <img src="assets/ted-and-lisa-in-frame.svg" alt="Ted and Lisa together in a white frame">
+          <img src="assets/ted-and-lisa-in-frame.svg" alt="" loading="lazy" decoding="async">
         </div>
       </div>
     </div>
@@ -1012,52 +1006,36 @@ function googleTranslateElementInit() {
     ['#paths .section-head p:not(.kicker)', '맞는 방법을 고르세요. 어떤 길이든 끝은 같습니다 — 나의 에이전트가 건네주는 완성된 HTML 파일 하나.', '挑一個適合你的。每條路的終點都一樣：由你自己的 agent 交出的一個完成的 HTML 檔案。'],
 
     ['#tab-try .n', '경로 01', '路徑 01'],
-    ['#tab-try h3', '한 번만 써보기', '先試一次'],
-    ['#tab-try p', '준비된 프롬프트를 복사해 에이전트에 붙여넣으면 완성된 파일이 돌아옵니다. 다운로드도 설정도 없습니다.', '複製現成的提示詞貼給你的 agent，就能拿回一個完成的檔案。不用下載，不用設定。'],
-    ['#tab-try .pick', '가장 빠름 — 2분', '最快 — 2 分鐘'],
+    ['#tab-try h3', '여기서 답하고, 붙여넣기', '在這裡回答，然後貼上'],
+    ['#tab-try p', '이 페이지의 패널을 채우세요. 답변이 모두 담긴 프롬프트 하나를 돌려줍니다 — 에이전트는 더 묻지 않고 바로 만들기 시작합니다.', '在這一頁把面板填完，它會給你一段包含所有答案的提示詞 — 你的 agent 不會再多問，直接開始製作。'],
+    ['#tab-try .pick', '몇 분이면 준비 완료', '幾分鐘就緒'],
     ['#tab-install .n', '경로 02', '路徑 02'],
-    ['#tab-install h3', '내 것으로 만들기', '變成你的'],
-    ['#tab-install p', '스킬을 설치하면 <code>/tedandlisa</code>가 상시 명령이 됩니다 — 마음에 드는 페이지를 나만의 템플릿으로 등록해 갤러리에 영구히 추가할 수도 있습니다.', '安裝技能後，<code>/tedandlisa</code> 就是常駐指令 — 還能教它你自己的範本：任何你喜歡的頁面都能永久加入圖庫。'],
-    ['#tab-install .pick', '한 번 설치, 평생 사용', '裝一次，永遠是你的'],
+    ['#tab-install h3', '먼저 붙여넣고, 브라우저에서 답하기', '先貼上，再在瀏覽器回答'],
+    ['#tab-install p', '짧은 프롬프트를 복사하세요 — 채워 넣을 것이 없습니다. 에이전트가 스킬을 받아와 같은 인테이크 패널을 내 브라우저에서 열어 주고, 거기서 답하면 됩니다. 가볍게 써보고 싶은 사람에게 보내기 좋을 만큼 짧습니다.', '複製這段短提示詞 — 沒有任何要填的地方。你的 agent 會抓取技能，並在你自己的瀏覽器裡打開同一份 intake 面板讓你作答。短到可以直接傳給任何想快速試試的人。'],
+    ['#tab-install .pick', '공유하고, 써보기', '分享並試用'],
     ['#tab-both .n', '경로 03', '路徑 03'],
-    ['#tab-both h3', '둘 다 하기', '兩個都要'],
-    ['#tab-both p', '지금 프롬프트를 붙여넣고, 첫 파일이 만들어지는 동안 설치하세요. Ted와 Lisa와 보내는 최고의 첫 한 시간.', '現在就貼上提示詞 — 趁第一個檔案生成時順手安裝。與 Ted 和 Lisa 共度最棒的第一個小時。'],
-    ['#tab-both .pick', '지금 써보고, 평생 간직', '現在試，永遠留'],
+    ['#tab-both h3', '내 것으로 만들기', '變成你的'],
+    ['#tab-both p', '스킬을 설치하면 <code>/tedandlisa</code>가 상시 명령이 됩니다 — 마음에 드는 페이지를 나만의 템플릿으로 등록해 갤러리에 영구히 추가할 수도 있습니다.', '安裝技能後，<code>/tedandlisa</code> 就是常駐指令 — 還能教它你自己的範本：任何你喜歡的頁面都能永久加入圖庫。'],
+    ['#tab-both .pick', '내 것으로, 계속 확장', '擁有它，擴充它'],
 
-    ['#pane-try .waylead', '어느 쪽이든 같은 인테이크 패널에 답합니다 — 다른 건 <em>어디서</em> 답하느냐뿐입니다. 끝은 똑같이 독립 실행형 HTML 파일 하나.', '兩種方式回答的是同一份 intake 面板 — 差別只在<em>在哪裡</em>回答。結果都是一個獨立的 HTML 檔案。'],
-    ['#pane-try .way:nth-of-type(1) h3', '여기서 답하고, 붙여넣기', '在這裡回答，然後貼上'],
-    ['#pane-try .way:nth-of-type(1) p', '이 페이지의 패널을 채우세요. 답변이 모두 담긴 프롬프트 하나를 돌려줍니다 — 에이전트는 더 묻지 않고 바로 만들기 시작합니다.', '在這一頁把面板填完，它會給你一段包含所有答案的提示詞 — 你的 agent 不會再多問，直接開始製作。'],
-    ['#pane-try .way:nth-of-type(1) .btn', '인테이크 패널 열기', '打開 intake 面板'],
-    ['#pane-try .way:nth-of-type(2) h3', '먼저 붙여넣고, 브라우저에서 답하기', '先貼上，再在瀏覽器回答'],
-    ['#pane-try .way:nth-of-type(2) p', '짧은 프롬프트를 복사하세요 — 채워 넣을 것이 없습니다. 에이전트가 스킬을 받아와 같은 인테이크 패널을 내 브라우저에서 열어 주고, 거기서 답하면 됩니다. 가볍게 써보고 싶은 사람에게 보내기 좋을 만큼 짧습니다.', '複製這段短提示詞 — 沒有任何要填的地方。你的 agent 會抓取技能，並在你自己的瀏覽器裡打開同一份 intake 面板讓你作答。短到可以直接傳給任何想快速試試的人。'],
-    ['#pane-try .gen-note', '수정할 것이 없습니다 — 무엇에 대한 것인지, 누구를 위한 것인지, 어떤 형태여야 하는지는 패널이 묻습니다. 공개 URL을 읽을 수 있는 어떤 코딩 에이전트와도 작동합니다:', '沒有需要修改的地方 — 主題、對象、要做成什麼形態，面板都會問你。任何能讀取公開網址的 coding agent 都適用：'],
-    ['#pane-install .cmdstep:nth-child(1) b', '스킬 디렉터리에 클론하기', 'clone 到你的技能目錄'],
-    ['#pane-install .cmdstep:nth-child(1) .why', '클론 한 번이면 모든 프로젝트에서 사용할 수 있습니다. 다른 에이전트도 각자의 스킬 디렉터리가 있고, 구조는 같습니다.', 'clone 一次，每個專案都能用。其他 agent 有自己的技能目錄 — 結構是一樣的。'],
-    ['#pane-install .cmdstep:nth-child(2) b', '두 개의 동반 스킬 연결하기', '連結兩個附屬技能'],
-    ['#pane-install .cmdstep:nth-child(2) .why', '클론에 함께 들어 있습니다 — 링크는 각각을 독립된 명령으로 만들어 줄 뿐입니다.', '它們已經在 clone 裡了 — 建立連結只是讓它們各自成為指令。'],
-    ['#pane-install .cmdstep:nth-child(3) b', '언제든 사용하기', '隨時使用'],
-    ['#pane-install .cmdstep:nth-child(4) b', '나만의 스타일 가르치기', '教它你自己的風格'],
-    ['#pane-install .cmdstep:nth-child(4) .why', '많이들 놓치는 부분입니다. 마음에 드는 HTML 파일을 건네면 그 비주얼 시스템이 재사용 가능한 템플릿이 됩니다 — 추출하고, 내용을 비우고, 등록하고, 섬네일까지. 그 후로는 갤러리에서 영구히 선택할 수 있습니다.', '這是最容易被忽略的部分：把任何你喜歡的 HTML 檔案交給它，它的視覺系統就會變成可重複使用的範本 — 抽取樣式、清除內容、註冊、產生縮圖。之後它就永久成為圖庫裡的選項之一。'],
-    ['#pane-install .gen-side h3', '설치하면 얻는 것', '安裝後你會得到'],
-    ['#pane-install .getlist li:nth-child(1) > span', '<b>로컬로 실행되는 인테이크 패널.</b> 에이전트가 브라우저에 패널을 띄우고 답변도 직접 가져갑니다 — 복사할 필요가 없습니다.', '<b>在本機執行的 intake 面板。</b>agent 會在瀏覽器打開它，並自己取回答案 — 不用複製。'],
-    ['#pane-install .getlist li:nth-child(2) > span', '<b>나만의 템플릿.</b> 마음에 드는 페이지를 <code>/tedandlisa-new-template</code>에 건네면 그 스타일이 갤러리의 영구 선택지가 됩니다.', '<b>你自己的範本。</b>把喜歡的頁面交給 <code>/tedandlisa-new-template</code>，它的樣式就會永久加入圖庫。'],
-    ['#pane-install .getlist li:nth-child(3) > span', '<b>디자인 파이프라인.</b> <code>/tedandlisa-design</code>으로 12가지 스타일 프리셋과 애니메이션 슬라이드를 — 여전히 HTML 파일 하나로.', '<b>設計管線。</b><code>/tedandlisa-design</code> 提供十二種風格預設與動畫投影片 — 依然是一個 HTML 檔。'],
-    ['#pane-install .getlist li:nth-child(4) > span', '<b>어떤 에이전트에서든.</b> 스킬은 평범한 Markdown과 HTML입니다 — Claude Code, Codex, Pi, OpenCode, Hermes 모두 같은 파일을 읽습니다.', '<b>你用的每個 agent。</b>技能就是純 Markdown 和 HTML — Claude Code、Codex、Pi、OpenCode、Hermes 讀的都是同一份檔案。'],
-    ['#pane-install .soon', '터미널이 부담스러우신가요? claude.ai용 스킬 zip 패키지(Settings → Capabilities → Skills)가 곧 제공됩니다.', '完全不想碰終端機？給 claude.ai 用的技能 zip 套件（Settings → Capabilities → Skills）即將推出。'],
+    ['#pane-try .gen-side p', '이 페이지의 패널을 채우세요 — 무엇에 대한 것인지, 누구를 위한 것인지, 어떤 형태여야 하는지를 묻습니다. 마지막 단계에서 모든 답변이 담긴 프롬프트 하나를 돌려주므로, 에이전트는 더 묻지 않고 바로 만들기 시작합니다.', '在這一頁把面板填完 — 它會問這是關於什麼、給誰看、要做成什麼形態。最後一步會給你一段包含所有答案的提示詞，你的 agent 不會再多問，直接開始製作。'],
+    ['#pane-try .gen-side .btn', '인테이크 패널 열기', '打開 intake 面板'],
+    ['#pane-install .gen-side p', '짧은 프롬프트를 복사하세요 — 채워 넣을 것이 없습니다. 에이전트가 스킬을 받아와 같은 인테이크 패널을 내 브라우저에서 열어 주고, 거기서 답하면 됩니다. 가볍게 써보고 싶은 사람에게 보내기 좋을 만큼 짧습니다.', '複製這段短提示詞 — 沒有任何要填的地方。你的 agent 會抓取技能，並在你自己的瀏覽器裡打開同一份 intake 面板讓你作答。短到可以直接傳給任何想快速試試的人。'],
+    ['#pane-install .gen-note', '수정할 것이 없습니다 — 가볍게 써보고 싶은 사람에게 이 프롬프트를 그대로 보내세요.', '沒有需要修改的地方 — 直接把這段提示詞分享給任何想快速試試的人。'],
+    ['#pane-both .cmdstep:nth-child(1) b', '스킬 디렉터리에 클론하기', 'clone 到你的技能目錄'],
+    ['#pane-both .cmdstep:nth-child(1) .why', '클론 한 번이면 모든 프로젝트에서 사용할 수 있습니다. 다른 에이전트도 각자의 스킬 디렉터리가 있고, 구조는 같습니다.', 'clone 一次，每個專案都能用。其他 agent 有自己的技能目錄 — 結構是一樣的。'],
+    ['#pane-both .cmdstep:nth-child(2) b', '두 개의 동반 스킬 연결하기', '連結兩個附屬技能'],
+    ['#pane-both .cmdstep:nth-child(2) .why', '클론에 함께 들어 있습니다 — 링크는 각각을 독립된 명령으로 만들어 줄 뿐입니다.', '它們已經在 clone 裡了 — 建立連結只是讓它們各自成為指令。'],
+    ['#pane-both .cmdstep:nth-child(3) b', '언제든 사용하기', '隨時使用'],
+    ['#pane-both .cmdstep:nth-child(4) b', '나만의 스타일 가르치기', '教它你自己的風格'],
+    ['#pane-both .cmdstep:nth-child(4) .why', '많이들 놓치는 부분입니다. 마음에 드는 HTML 파일을 건네면 그 비주얼 시스템이 재사용 가능한 템플릿이 됩니다 — 추출하고, 내용을 비우고, 등록하고, 섬네일까지. 그 후로는 갤러리에서 영구히 선택할 수 있습니다.', '這是最容易被忽略的部分：把任何你喜歡的 HTML 檔案交給它，它的視覺系統就會變成可重複使用的範本 — 抽取樣式、清除內容、註冊、產生縮圖。之後它就永久成為圖庫裡的選項之一。'],
+    ['#pane-both .gen-side h3', '설치하면 얻는 것', '安裝後你會得到'],
+    ['#pane-both .getlist li:nth-child(1) > span', '<b>로컬로 실행되는 인테이크 패널.</b> 에이전트가 브라우저에 패널을 띄우고 답변도 직접 가져갑니다 — 복사할 필요가 없습니다.', '<b>在本機執行的 intake 面板。</b>agent 會在瀏覽器打開它，並自己取回答案 — 不用複製。'],
+    ['#pane-both .getlist li:nth-child(2) > span', '<b>나만의 템플릿.</b> 마음에 드는 페이지를 <code>/tedandlisa-new-template</code>에 건네면 그 스타일이 갤러리의 영구 선택지가 됩니다.', '<b>你自己的範本。</b>把喜歡的頁面交給 <code>/tedandlisa-new-template</code>，它的樣式就會永久加入圖庫。'],
+    ['#pane-both .getlist li:nth-child(3) > span', '<b>디자인 파이프라인.</b> <code>/tedandlisa-design</code>으로 12가지 스타일 프리셋과 애니메이션 슬라이드를 — 여전히 HTML 파일 하나로.', '<b>設計管線。</b><code>/tedandlisa-design</code> 提供十二種風格預設與動畫投影片 — 依然是一個 HTML 檔。'],
+    ['#pane-both .getlist li:nth-child(4) > span', '<b>어떤 에이전트에서든.</b> 스킬은 평범한 Markdown과 HTML입니다 — Claude Code, Codex, Pi, OpenCode, Hermes 모두 같은 파일을 읽습니다.', '<b>你用的每個 agent。</b>技能就是純 Markdown 和 HTML — Claude Code、Codex、Pi、OpenCode、Hermes 讀的都是同一份檔案。'],
+    ['#pane-both .soon', '터미널이 부담스러우신가요? claude.ai용 스킬 zip 패키지(Settings → Capabilities → Skills)가 곧 제공됩니다.', '完全不想碰終端機？給 claude.ai 用的技能 zip 套件（Settings → Capabilities → Skills）即將推出。'],
 
-    ['#pane-both .both-step:nth-child(1) .n', '먼저 · 0분', '首先 · 第 0 分鐘'],
-    ['#pane-both .both-step:nth-child(1) h3', '프롬프트 보내기', '送出提示詞'],
-    ['#pane-both .both-step:nth-child(1) p', '인테이크 패널을 열어 답하고, 완성된 프롬프트를 에이전트에 붙여넣으세요. 첫 파일이 바로 만들어지기 시작합니다.', '打開 intake 面板、回答問題，把完成的提示詞貼給你的 agent。第一個檔案立刻開始生成。'],
-    ['#pane-both .both-step:nth-child(1) .btn', '인테이크 패널 열기', '打開 intake 面板'],
-    ['#pane-both .both-step:nth-child(2) .n', '만들어지는 동안', '生成的同時'],
-    ['#pane-both .both-step:nth-child(2) h3', '동시에 설치하기', '同步安裝'],
-    ['#pane-both .both-step:nth-child(2) p', '도착하기까지 몇 분 걸립니다. 설치에 딱 그만큼 걸리죠 — 기다리는 동안 경로 02의 클론을 실행하세요.', '完成需要幾分鐘，安裝也剛好差不多 — 等待時就跑一下路徑 02 的 clone 吧。'],
-    ['#pane-both .both-step:nth-child(2) .btn', '설치 단계 보기', '看安裝步驟'],
-    ['#pane-both .both-step:nth-child(3) .n', '그 후로 쭉', '從此以後'],
-    ['#pane-both .both-step:nth-child(3) h3', '이제 명령어입니다', '現在它是指令了'],
-    ['#pane-both .both-step:nth-child(3) p', '어느 프로젝트에서든 <code>/tedandlisa</code> 한 줄이면 패널이 알아서 열리고, 나만의 템플릿이 갤러리에 더해집니다. Ted와 Lisa는 이제 여기 삽니다.', '在任何專案輸入 <code>/tedandlisa</code>，面板會自己打開，你的範本也會加入圖庫。Ted 和 Lisa 從此住在這裡。'],
-    ['#pane-both .both-step:nth-child(3) .btn', '템플릿 둘러보기', '瀏覽範本'],
-    ['#pane-both .both-note', '두 방법은 충돌하지 않습니다 — 프롬프트는 GitHub에서 스킬을 읽고, 설치는 같은 스킬을 내 컴퓨터에 둡니다. 어느 쪽으로 만들어도 결과물은 똑같습니다.', '兩條路並不衝突 — 提示詞從 GitHub 讀取技能，安裝則是把同一份技能放到你的機器上。兩種方式的成果一模一樣。'],
 
     ['#templates .section-head .kicker', '템플릿', '範本'],
     ['#tpl-h', '여섯 가지 형태, 실물로 미리보기.', '六種形態，真實預覽。'],
