@@ -82,6 +82,9 @@ Triggers decide *when* to write. These rules decide *how*:
 - Record decisions with stable IDs, status, date, statement, rationale,
   consequences, and evidence. Supersede instead of silently reversing meaning.
 - Record learnings with stable IDs, evidence, scope, and a concrete future action.
+- After adding an entry or changing a status, regenerate the registry
+  indexes with `python3 scripts/context_index.py`. They are derived
+  tables; a hand-edited one is overwritten.
 - In the full profile, use `designs/` and `incidents/` for evidence that will
   help future work.
 - Preserve completed evidence and correct its interpretation through status and
@@ -108,3 +111,17 @@ once a day, caches its answer, fails silently when offline, and only reports:
 upgrading is the `project-context-init` skill's create-only job and needs the
 user's go-ahead. Set `PROJECT_CONTEXT_UPDATE_CHECK=0` to turn it off, or
 `PROJECT_CONTEXT_REPO` to follow a different source.
+
+## Health
+
+When context looks stale, contradictory, or hard to navigate, run the sibling
+`project-context-init` skill's doctor:
+
+    python3 .agents/skills/project-context-init/scripts/project_context_init.py doctor --target .
+
+It checks core files, scaffold version, review freshness, duplicate decision and
+learning IDs, and broken relative links, and it never rewrites content.
+
+To see whether a trigger window is currently open, without waiting for a hook:
+
+    python3 .agents/skills/project-context/scripts/context_triggers.py status

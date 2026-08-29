@@ -10,3 +10,6 @@ intake.json
 site/previews/
 site/intake.html
 site/assets/
+
+# wrangler local state
+.wrangler/

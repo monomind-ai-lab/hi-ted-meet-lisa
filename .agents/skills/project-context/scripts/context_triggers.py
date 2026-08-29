@@ -335,11 +335,29 @@ def read_hook_input() -> dict:
     return parsed if isinstance(parsed, dict) else {}
 
 
+def script_root() -> str:
+    """The repository this script is installed in.
+
+    The script lives at <root>/.agents/skills/project-context/scripts/, so the
+    fourth parent is the root. This is the fallback for the case the upward
+    walk cannot serve: the harness opened a directory *above* the repository,
+    or beside it, so neither the cwd nor any of its parents holds
+    project-context/ — while the script being executed is sitting inside a
+    repository that does. Without it the check exits silently and the session
+    looks like one where no trigger was open.
+    """
+    try:
+        return str(Path(__file__).resolve().parents[3])
+    except (IndexError, OSError):
+        return ""
+
+
 def resolve_target(hook: dict) -> Path:
     for candidate in (
         os.environ.get("CLAUDE_PROJECT_DIR"),
         hook.get("cwd"),
         os.getcwd(),
+        script_root(),
     ):
         if not candidate:
             continue
