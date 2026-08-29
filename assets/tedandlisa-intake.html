@@ -349,7 +349,7 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
       <div class="brief" id="brief">
         <b>Your prompt</b>
         <textarea id="prompttext" rows="2"
-          placeholder="What is the deck about, and who is it for?"></textarea>
+          placeholder="What is this about, and who is it for?"></textarea>
         <p class="promptnote">Passed in as <code>/tedandlisa [your prompt]</code>. Edit it here if it
           needs sharpening.</p>
         <div class="refs">
@@ -533,11 +533,11 @@ var QUESTIONS = [
       { id: "cdn",        label: "Load libraries from a CDN", note: "Small file; needs a connection to draw diagrams.", def: true },
       { id: "standalone", label: "Fully standalone", note: "Opens from a USB stick with no network at all." } ] },
 
-  { id: "theme", q: "Which theme?", kinds: ["slides", "document"], hint: "The deck ships dark; the token set carries a full light palette.",
+  { id: "theme", q: "Which theme?", kinds: ["slides", "document"], hint: "It ships dark; the token set carries a full light palette.",
     type: "single", options: [
       { id: "dark",   label: "Dark",  note: "Deep ink ground with accent halos.", def: true },
       { id: "light",  label: "Light", note: "Uses the unused --bg / --surface palette." },
-      { id: "toggle", label: "Reader can toggle", note: "Ships both; adds a switch to the deck chrome." } ] },
+      { id: "toggle", label: "Reader can toggle", note: "Ships both; adds a switch to the chrome." } ] },
 
   { id: "slideCount", q: "How long should the deck be?", kinds: ["slides", "external"],
     hint: "Skip this and I size it from the brief.",
@@ -573,8 +573,8 @@ var QUESTIONS = [
                styletext:  [ { kind: "textarea", id: "text", label: "What should change?",
                                placeholder: "Warmer accent, tighter type scale, no photography on the cover…" } ] } },
 
-  { id: "elements", q: "Any element the deck must include?",
-    hint: "Pick as many as apply. Anything not picked is still available to the deck if the content calls for it.",
+  { id: "elements", q: "Any element it must include?",
+    hint: "Pick as many as apply. Anything not picked is still available if the content calls for it.",
     type: "multi", options: [
       { id: "chart",   label: "Chart" },
       { id: "graph",   label: "Graph" },
@@ -602,7 +602,7 @@ var QUESTIONS = [
     type: "textarea", seed: "MonoMind, MonoMind AI Lab, Project Context, GitNexus, Graphify, OpenWiki, MIT",
     placeholder: "MonoMind, Project Context, …" },
 
-  { id: "menu", q: "Deck menu", kinds: ["slides", "document"],
+  { id: "menu", q: "The menu", kinds: ["slides", "document"],
     type: "single", options: [
       { id: "full",    label: "Full menu", note: "Hamburger by the brand mark.", def: true, reveal: "menuitems" },
       { id: "minimal", label: "Minimal", note: "No menu — just a back-to-the-start icon beside the page counter." },
@@ -622,10 +622,10 @@ var QUESTIONS = [
         placeholder: "https://github.com/…" } ] } },
 
   { id: "export", q: "What can a reader take away?", kinds: ["slides", "document"],
-    hint: "Both add a small control to the deck chrome.",
+    hint: "Both add a small control to the chrome.",
     type: "multi", options: [
       { id: "pdf",  label: "Download as PDF", note: "Print stylesheet, one slide per landscape page." },
-      { id: "html", label: "Download the standalone HTML", note: "The deck saves a copy of itself." } ] }
+      { id: "html", label: "Download the standalone HTML", note: "The file saves a copy of itself." } ] }
 ];
 
 var state = {};        /* id -> value */
@@ -865,7 +865,7 @@ function paintFileCard(zone, f) {
     '<span class="meta"><b>' + esc(f.name) + '</b><span>' + bytes(f.size) + '</span></span>' +
     '<button type="button" class="clear">Remove</button>' +
     (f.size > MAX_INLINE_BYTES
-      ? '<div class="warn">Large — this inflates the deck by ~' + Math.round(f.size * 1.37 / 1024) + ' KB once embedded.</div>'
+      ? '<div class="warn">Large — this inflates the file by ~' + Math.round(f.size * 1.37 / 1024) + ' KB once embedded.</div>'
       : "");
 }
 
@@ -1128,7 +1128,8 @@ function show(title, lead, needsCopy, json) {
    it is the product. The payload becomes one complete paste-ready prompt:
    preamble plus answers, so a single copy is the whole job. */
 function webPrompt(json) {
-  return "Build me a deck using https://github.com/monomind-ai-lab/hi-ted-meet-lisa.\n" +
+  return "Build me a standalone HTML page using\n" +
+         "https://github.com/monomind-ai-lab/hi-ted-meet-lisa.\n" +
          "Read and follow `SKILL.md`. My intake answers are below — apply them\n" +
          "instead of asking again, and hand back one standalone HTML file.\n\n" + json;
 }
@@ -1143,8 +1144,8 @@ function submit() {
     show("Prompt is ready.",
          "Copy it and paste it to any coding agent — Claude Code, Codex, Pi, " +
          "OpenCode, Hermes, or anything else that can read a public URL. " +
-         "The agent reads the skill from GitHub, builds your deck, and hands " +
-         "back one HTML file. Nothing to install.",
+         "The agent reads the skill from GitHub, builds it, and hands back " +
+         "one standalone HTML file. Nothing to install.",
          true, webPrompt(json));
     return;
   }
@@ -1156,7 +1157,7 @@ function submit() {
       .then(function (res) {
         if (!res.ok) { throw new Error("HTTP " + res.status); }
         show("Lisa has your answers.",
-             "You can close this tab — she is building the deck now.", false, json);
+             "You can close this tab — she is building it now.", false, json);
       })
       .catch(function () {
         show("Answers ready — one step left.",

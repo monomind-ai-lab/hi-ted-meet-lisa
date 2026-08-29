@@ -289,11 +289,14 @@ section { padding: clamp(64px, 10vh, 128px) var(--pad); }
 /* try pane */
 .gen-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(32px, 5vw, 80px); align-items: start; }
 @media (max-width: 880px) { .gen-grid { grid-template-columns: 1fr; } }
-.ministeps { list-style: none; display: flex; flex-direction: column; gap: 18px; margin: 22px 0 28px; }
-.ministeps li { display: flex; gap: 16px; align-items: baseline; }
-.ministeps .n { font-family: var(--font-mono); font-size: 12px; color: var(--terracotta); flex: none; }
-.ministeps b { display: block; font-size: 15px; }
-.ministeps span { font-size: 13.5px; color: var(--cream-dim); }
+.waylead { font-size: 14.5px; color: var(--cream-dim); max-width: 46ch; margin-bottom: 30px; }
+.waylead em { color: var(--cream); font-style: italic; }
+.way { padding-left: 20px; border-left: 1px solid var(--hair); margin-bottom: 30px; }
+.way:last-child { margin-bottom: 0; }
+.wayn { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; color: var(--terracotta); }
+.way h3 { font-size: 19px; margin: 10px 0 8px; }
+.way p { font-size: 14px; color: var(--cream-dim); max-width: 46ch; }
+.way .btn { margin-top: 16px; padding: 12px 22px; font-size: 14px; }
 .promptbox {
   border: 1px solid var(--hair-strong); background: #101109;
   font-family: var(--font-mono); font-size: 13px; line-height: 1.75;
@@ -585,29 +588,34 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
       <div class="pane on" id="pane-try" role="tabpanel" aria-labelledby="tab-try">
         <div class="gen-grid">
           <div class="gen-side">
-            <h3>The thorough way</h3>
-            <p>Open the intake panel — the same one agents use. Pick a template,
-            answer the questions, and it hands you a complete, paste-ready prompt.</p>
-            <ol class="ministeps">
-              <li><span class="n">01</span><span><b>Describe it</b>
-                <span>Answer the panel — nine to sixteen questions, every one with a default.</span></span></li>
-              <li><span class="n">02</span><span><b>Copy the prompt</b>
-                <span>The last screen says “Prompt is ready.” One click copies everything.</span></span></li>
-              <li><span class="n">03</span><span><b>Paste it to your agent</b>
-                <span>It reads the skill from GitHub, builds it, and hands you the finished file.</span></span></li>
-            </ol>
-            <button class="btn btn-primary js-open-intake" type="button">Open the intake panel</button>
-            <div class="or">or keep it to one line</div>
-            <h3>The quick way</h3>
-            <p>Skip the panel. Copy the prompt on the right, replace the two
-            placeholders, and let the agent ask you the rest.</p>
+            <p class="waylead">Either way you answer the same intake panel — the only
+            question is <em>where</em>. Both end with one standalone HTML file.</p>
+
+            <div class="way">
+              <span class="wayn">WAY 01</span>
+              <h3>Answer here, then paste</h3>
+              <p>Fill in the panel on this page. It hands back one prompt with all
+              your answers baked in — your agent asks nothing further and starts
+              building immediately.</p>
+              <button class="btn btn-primary js-open-intake" type="button">Open the intake panel</button>
+            </div>
+
+            <div class="way">
+              <span class="wayn">WAY 02</span>
+              <h3>Paste first, answer in your browser</h3>
+              <p>Copy the short prompt — nothing to fill in. Your agent fetches the
+              skill and opens the same intake panel in your own browser, where you
+              answer the questions. Short enough to send to anyone who wants a
+              quick try.</p>
+            </div>
           </div>
           <div>
-            <div class="promptbox" id="prompt-text">Build me a standalone HTML page using https://github.com/monomind-ai-lab/hi-ted-meet-lisa.
-Read and follow `SKILL.md`, starting with its intake panel — it asks what
-shape this should take: slides, a document, a diagram, or a site.
-This is about <span class="ph">[YOUR SUBJECT]</span>, for <span class="ph">[AUDIENCE]</span>.<button class="copybtn" data-copy="prompt-text" type="button">Copy</button></div>
-            <p class="gen-note">Works with any coding agent that can read a public URL:</p>
+            <div class="promptbox" id="prompt-text">Build me a standalone HTML page using
+https://github.com/monomind-ai-lab/hi-ted-meet-lisa.
+Read and follow `SKILL.md`, starting with its intake panel.<button class="copybtn" data-copy="prompt-text" type="button">Copy</button></div>
+            <p class="gen-note">Nothing to edit — the panel asks what it is about, who it
+            is for, and what shape it should take. Works with any coding agent that can
+            read a public URL:</p>
             <div class="agents" aria-label="Agents this works with">
               <span>Claude Code</span><span>Codex</span><span>Pi</span><span>OpenCode</span><span>Hermes</span><span>Gemini CLI</span><span>claude.ai</span><span>…and yours</span>
             </div>
@@ -1048,20 +1056,13 @@ function googleTranslateElementInit() {
     ['#tab-both p', '지금 프롬프트를 붙여넣고, 첫 파일이 만들어지는 동안 설치하세요. Ted와 Lisa와 보내는 최고의 첫 한 시간.', '現在就貼上提示詞 — 趁第一個檔案生成時順手安裝。與 Ted 和 Lisa 共度最棒的第一個小時。'],
     ['#tab-both .pick', '지금 써보고, 평생 간직', '現在試，永遠留'],
 
-    ['#pane-try .gen-side h3:nth-of-type(1)', '꼼꼼한 방법', '完整的做法'],
-    ['#pane-try .gen-side > p:nth-of-type(1)', '에이전트가 쓰는 것과 같은 인테이크 패널을 여세요. 템플릿을 고르고 질문에 답하면, 바로 붙여넣을 수 있는 완성된 프롬프트를 줍니다.', '打開 intake 面板 — 和 agent 用的是同一個。選範本、回答問題，它就會給你一份可直接貼上的完整提示詞。'],
-    ['#pane-try .ministeps li:nth-child(1) b', '설명하기', '描述它'],
-    ['#pane-try .ministeps li:nth-child(1) b + span', '패널에 답하세요 — 9~16개 질문, 모두 기본값이 있습니다.', '回答面板的問題 — 9 到 16 題，每一題都有預設值。'],
-    ['#pane-try .ministeps li:nth-child(2) b', '프롬프트 복사', '複製提示詞'],
-    ['#pane-try .ministeps li:nth-child(2) b + span', '마지막 화면에 “Prompt is ready.”가 뜨면 클릭 한 번으로 전부 복사됩니다.', '最後一頁顯示「Prompt is ready.」，一鍵複製全部內容。'],
-    ['#pane-try .ministeps li:nth-child(3) b', '에이전트에 붙여넣기', '貼給你的 agent'],
-    ['#pane-try .ministeps li:nth-child(3) b + span', '에이전트가 GitHub에서 스킬을 읽고 만들어서 완성된 파일을 건네줍니다.', '它會從 GitHub 讀取技能、生成內容，然後把完成的檔案交給你。'],
-    ['#pane-try .js-open-intake', '인테이크 패널 열기', '打開 intake 面板'],
-    ['#pane-try .or', '또는 한 줄로 끝내기', '或者一行搞定'],
-    ['#pane-try .gen-side h3:nth-of-type(2)', '빠른 방법', '快速的做法'],
-    ['#pane-try .gen-side > p:nth-of-type(2)', '패널은 건너뛰세요. 오른쪽 프롬프트를 복사해 두 개의 자리표시자만 바꾸면, 나머지는 에이전트가 물어봅니다.', '跳過面板。複製右邊的提示詞，改掉兩個佔位符，剩下的讓 agent 問你。'],
-    ['#pane-try .gen-note', '공개 URL을 읽을 수 있는 어떤 코딩 에이전트와도 작동합니다:', '任何能讀取公開網址的 coding agent 都適用：'],
-
+    ['#pane-try .waylead', '어느 쪽이든 같은 인테이크 패널에 답합니다 — 다른 건 <em>어디서</em> 답하느냐뿐입니다. 끝은 똑같이 독립 실행형 HTML 파일 하나.', '兩種方式回答的是同一份 intake 面板 — 差別只在<em>在哪裡</em>回答。結果都是一個獨立的 HTML 檔案。'],
+    ['#pane-try .way:nth-of-type(1) h3', '여기서 답하고, 붙여넣기', '在這裡回答，然後貼上'],
+    ['#pane-try .way:nth-of-type(1) p', '이 페이지의 패널을 채우세요. 답변이 모두 담긴 프롬프트 하나를 돌려줍니다 — 에이전트는 더 묻지 않고 바로 만들기 시작합니다.', '在這一頁把面板填完，它會給你一段包含所有答案的提示詞 — 你的 agent 不會再多問，直接開始製作。'],
+    ['#pane-try .way:nth-of-type(1) .btn', '인테이크 패널 열기', '打開 intake 面板'],
+    ['#pane-try .way:nth-of-type(2) h3', '먼저 붙여넣고, 브라우저에서 답하기', '先貼上，再在瀏覽器回答'],
+    ['#pane-try .way:nth-of-type(2) p', '짧은 프롬프트를 복사하세요 — 채워 넣을 것이 없습니다. 에이전트가 스킬을 받아와 같은 인테이크 패널을 내 브라우저에서 열어 주고, 거기서 답하면 됩니다. 가볍게 써보고 싶은 사람에게 보내기 좋을 만큼 짧습니다.', '複製這段短提示詞 — 沒有任何要填的地方。你的 agent 會抓取技能，並在你自己的瀏覽器裡打開同一份 intake 面板讓你作答。短到可以直接傳給任何想快速試試的人。'],
+    ['#pane-try .gen-note', '수정할 것이 없습니다 — 무엇에 대한 것인지, 누구를 위한 것인지, 어떤 형태여야 하는지는 패널이 묻습니다. 공개 URL을 읽을 수 있는 어떤 코딩 에이전트와도 작동합니다:', '沒有需要修改的地方 — 主題、對象、要做成什麼形態，面板都會問你。任何能讀取公開網址的 coding agent 都適用：'],
     ['#pane-install .cmdstep:nth-child(1) b', '스킬 디렉터리에 클론하기', 'clone 到你的技能目錄'],
     ['#pane-install .cmdstep:nth-child(1) .why', '클론 한 번이면 모든 프로젝트에서 사용할 수 있습니다. 다른 에이전트도 각자의 스킬 디렉터리가 있고, 구조는 같습니다.', 'clone 一次，每個專案都能用。其他 agent 有自己的技能目錄 — 結構是一樣的。'],
     ['#pane-install .cmdstep:nth-child(2) b', '두 개의 동반 스킬 연결하기', '連結兩個附屬技能'],
