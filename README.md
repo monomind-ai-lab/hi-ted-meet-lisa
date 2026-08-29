@@ -26,7 +26,14 @@ edit at any time.
 
 ## ✅ Start here
 
-Install it once, then it is three commands you have for good.
+**No terminal? Start at the website.** [html.monomind.one](https://html.monomind.one)
+is the whole front door in a browser: preview every template live, answer the
+intake panel, and copy one paste-ready prompt for any coding agent — Claude
+Code, Codex, Pi, OpenCode, Hermes, or anything else that reads a public URL.
+Nothing to install.
+
+Prefer it as a standing command? Install it once, then it is three commands
+you have for good.
 
 ```sh
 git clone --recurse-submodules \
@@ -70,8 +77,9 @@ in the panel, permanently.
 For when the house templates are the wrong shape — style presets and
 animated HTML.
 
-**Just trying it once?** You do not have to install anything. Paste this to any
-agent that can read a URL:
+**Just trying it once?** You do not have to install anything. The
+[website](https://html.monomind.one) hands you a finished prompt — or paste
+this to any agent that can read a URL:
 
 ```text
 Build me a deck using https://github.com/monomind-ai-lab/hi-ted-meet-lisa.
@@ -126,6 +134,12 @@ This repository is an agent-facing package: two skills, three templates, a
 visual intake panel, a template registry, and the tooling that ties them
 together. An agent uses them to produce a deck without asking you to run
 anything yourself.
+
+It also carries its own public face: [`site/`](site/) is the source of
+[html.monomind.one](https://html.monomind.one), a static page assembled at
+deploy time by `site/sync.sh` from the same previews, thumbnails, and intake
+panel this repository ships — so the website and the skill can never drift
+apart.
 
 ### How agents find the instructions
 
