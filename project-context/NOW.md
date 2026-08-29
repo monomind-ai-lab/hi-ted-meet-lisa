@@ -44,9 +44,9 @@ Last reviewed: 2026-08-29
   nothing enforces agreement, and a mismatch fails the way `L-019` describes —
   silently, with the markup intact.
 
-- The gallery's five cards are the only surface where the handoff path is
-  visible. An agent that skips the panel has to read `templates.json` to learn
-  that `slide-design` exists at all.
+- An agent that skips the intake panel has to read `templates.json` to learn
+  that `slide-design` exists at all. The gallery and `README.md` both show it;
+  nothing else does.
 - `vendor/slides-ai-plugin` is pinned at `1f8505f`. A clone needs
   `git submodule update --init --recursive` before `/tedandlisa-design`
   works; the wrapper says so, but nothing enforces it.

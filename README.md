@@ -103,6 +103,11 @@ anything yourself.
 Five templates, chosen at the start of the intake. They are not variations of
 one look — they differ in shape, navigation, and how they handle language.
 
+The intake gallery offers a sixth card beside them, listed here for the same
+reason it appears there: you are choosing how the deck gets made, not first
+choosing between two menus. It is not a template, and nothing in this
+repository builds it — see [when a template is the wrong shape](#-when-a-template-is-the-wrong-shape).
+
 | Template | Shape | Language | Dependencies |
 | --- | --- | --- | --- |
 | **MonoMind deck** | Horizontal slides, one idea each, read across a room | Google Translate, loaded only when a reader picks another language | Google Fonts |
@@ -110,12 +115,14 @@ one look — they differ in shape, navigation, and how they handle language.
 | **Mermaid master** | Diagram-first on light paper, one drawing per slide | Every slide written twice, so diagram labels translate too | Google Fonts |
 | **Architecture diagram** | One system diagram on slate, where colour means something | Both languages inline, including the labels inside the drawing | Google Fonts |
 | **Sitemap & IA proposal** | Pages that argue a site structure, plus the navigation wired up to click through | Both languages written inline | Google Fonts, mermaid, Font Awesome and Tailwind from a CDN — or all four inlined |
+| **Slide design** — *a handoff, not a template* | Twelve style presets, animated HTML, or an editable `.pptx` | One deck per language — PowerPoint has no toggle | Vendored Slides AI Plugin; `bun` for `.pptx` |
 
-Each has a live preview linked from the intake gallery, so you can look before
-you choose.
+All six have a live preview linked from the intake gallery, so you can look
+before you choose.
 
-Each template has a pattern reference in `references/` giving verbatim markup
-for every component, plus the rules that are easy to get wrong.
+Each of the five templates has a pattern reference in `references/` giving
+verbatim markup for every component, plus the rules that are easy to get wrong.
+The handoff has none — it is not built from markup here.
 
 A template is a **scaffold, not a cage**. Agents extend it — new components, new
 slide shapes — in the template's own design tokens. What they may not rewrite is
