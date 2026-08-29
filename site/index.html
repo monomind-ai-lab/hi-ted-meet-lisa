@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hi Ted, Meet Lisa — decks that come to life in HTML</title>
-<meta name="description" content="Describe a deck, answer a short visual intake, and your agent hands you one standalone HTML file. Works with any coding agent — Claude Code, Codex, Pi, OpenCode, Hermes — nothing to install.">
+<title>Hi Ted, Meet Lisa — ideas that come to life in HTML</title>
+<meta name="description" content="Describe what you need, answer a short visual intake, and your agent hands you one standalone HTML file — slides, a document, a diagram, or a site. Works with any coding agent.">
 <link rel="canonical" href="https://html.monomind.one/">
 <meta name="theme-color" content="#15160f">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://html.monomind.one/">
 <meta property="og:site_name" content="Hi Ted, Meet Lisa">
-<meta property="og:title" content="Hi Ted, Meet Lisa — decks that come to life in HTML">
-<meta property="og:description" content="When Ted meets Lisa, ideas come to life in HTML. An agent skill that turns a brief into a finished deck — one standalone file, no build step, any coding agent.">
+<meta property="og:title" content="Hi Ted, Meet Lisa — ideas that come to life in HTML">
+<meta property="og:description" content="When Ted meets Lisa, ideas come to life in HTML. An agent skill that turns a brief into finished slides, documents, or diagrams — one standalone file, no build step, any coding agent.">
 <meta property="og:image" content="https://html.monomind.one/assets/tedlisa-cover-og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Hi Ted, Meet Lisa — Ted and Lisa in a white frame over a blurred poppy photograph.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Hi Ted, Meet Lisa — decks that come to life in HTML">
-<meta name="twitter:description" content="Describe a deck, answer a short visual intake, and your agent hands you one standalone HTML file. Nothing to install.">
+<meta name="twitter:title" content="Hi Ted, Meet Lisa — ideas that come to life in HTML">
+<meta name="twitter:description" content="Describe what you need, answer a short visual intake, and your agent hands you one standalone HTML file. Nothing to install.">
 <meta name="twitter:image" content="https://html.monomind.one/assets/tedlisa-cover-og.jpg">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <script type="application/ld+json">
@@ -30,7 +30,7 @@
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-  "description": "An agent skill that turns a brief into a finished slide deck, web document, or diagram — one standalone HTML file with no build step. Works with any coding agent that can read a public URL.",
+  "description": "An agent skill that turns a brief into finished slides, a web document, a diagram, or a site — one standalone HTML file with no build step. Works with any coding agent that can read a public URL.",
   "image": "https://html.monomind.one/assets/tedlisa-cover-og.jpg",
   "license": "https://github.com/monomind-ai-lab/hi-ted-meet-lisa/blob/main/LICENSE",
   "publisher": { "@type": "Organization", "name": "MonoMind AI Lab", "url": "https://monomind.one" },
@@ -529,11 +529,12 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
       <h1 class="notranslate" translate="no">Hi Ted,<br>Meet Lisa</h1>
       <hr class="rule">
       <p class="tagline">When Ted meets Lisa,<br>ideas come to life in <strong>HTML</strong></p>
-      <p class="sub">Describe a deck. Answer a short visual intake. Your agent hands
-      back one standalone HTML file — open it, present it, print it, email it.
-      No build step. Nothing to install.</p>
+      <p class="sub">Describe what you need — slides, a document, a diagram, a site.
+      Answer a short visual intake, and your agent hands back one standalone HTML
+      file: open it, present it, print it, email it. No build step, nothing to
+      install.</p>
       <div class="cta-row">
-        <button class="btn btn-primary js-open-intake" type="button">Describe your deck</button>
+        <button class="btn btn-primary js-open-intake" type="button">Describe what you need</button>
         <a class="btn btn-ghost" href="#paths">Choose your path</a>
       </div>
     </div>
@@ -550,7 +551,7 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
     <div class="shell">
       <div class="section-head">
         <p class="kicker">New here?</p>
-        <h2 id="paths-h">Three ways to your first deck.</h2>
+        <h2 id="paths-h">Three ways to your first file.</h2>
         <p>Pick what fits. Every path ends the same way: one finished HTML file,
         handed to you by your own agent.</p>
       </div>
@@ -559,22 +560,22 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
         <button class="choice" role="tab" id="tab-try" aria-selected="true" aria-controls="pane-try" type="button">
           <span class="n">PATH 01</span>
           <h3>Just try it once</h3>
-          <p>Get a ready-made prompt, paste it to your agent, get a deck back.
-          Nothing downloaded, nothing configured.</p>
+          <p>Get a ready-made prompt, paste it to your agent, get a finished file
+          back. Nothing downloaded, nothing configured.</p>
           <span class="pick">Fastest — 2 minutes</span>
         </button>
         <button class="choice" role="tab" id="tab-install" aria-selected="false" aria-controls="pane-install" type="button">
           <span class="n">PATH 02</span>
           <h3>Make it yours</h3>
           <p>Install the skill so <code>/tedandlisa</code> is a standing command —
-          and teach it templates of your own: any deck you like becomes a
+          and teach it templates of your own: any page you like becomes a
           permanent choice in the gallery.</p>
           <span class="pick">One install, yours for good</span>
         </button>
         <button class="choice" role="tab" id="tab-both" aria-selected="false" aria-controls="pane-both" type="button">
           <span class="n">PATH 03</span>
           <h3>Do both</h3>
-          <p>Paste the prompt now — and install while your first deck is being
+          <p>Paste the prompt now — and install while your first file is being
           built. The best first hour with Ted and Lisa.</p>
           <span class="pick">Try now, keep forever</span>
         </button>
@@ -593,7 +594,7 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
               <li><span class="n">02</span><span><b>Copy the prompt</b>
                 <span>The last screen says “Prompt is ready.” One click copies everything.</span></span></li>
               <li><span class="n">03</span><span><b>Paste it to your agent</b>
-                <span>It reads the skill from GitHub, builds the deck, and hands you the file.</span></span></li>
+                <span>It reads the skill from GitHub, builds it, and hands you the finished file.</span></span></li>
             </ol>
             <button class="btn btn-primary js-open-intake" type="button">Open the intake panel</button>
             <div class="or">or keep it to one line</div>
@@ -602,9 +603,10 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
             placeholders, and let the agent ask you the rest.</p>
           </div>
           <div>
-            <div class="promptbox" id="prompt-text">Build me a deck using https://github.com/monomind-ai-lab/hi-ted-meet-lisa.
-Read and follow `SKILL.md`, starting with its intake panel.
-The deck is about <span class="ph">[YOUR SUBJECT]</span>, for <span class="ph">[AUDIENCE]</span>.<button class="copybtn" data-copy="prompt-text" type="button">Copy</button></div>
+            <div class="promptbox" id="prompt-text">Build me a standalone HTML page using https://github.com/monomind-ai-lab/hi-ted-meet-lisa.
+Read and follow `SKILL.md`, starting with its intake panel — it asks what
+shape this should take: slides, a document, a diagram, or a site.
+This is about <span class="ph">[YOUR SUBJECT]</span>, for <span class="ph">[AUDIENCE]</span>.<button class="copybtn" data-copy="prompt-text" type="button">Copy</button></div>
             <p class="gen-note">Works with any coding agent that can read a public URL:</p>
             <div class="agents" aria-label="Agents this works with">
               <span>Claude Code</span><span>Codex</span><span>Pi</span><span>OpenCode</span><span>Hermes</span><span>Gemini CLI</span><span>claude.ai</span><span>…and yours</span>
@@ -636,15 +638,15 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
             </div>
             <div class="cmdstep">
               <div class="lbl"><span class="n">03</span><b>Use it, whenever</b></div>
-              <div class="cmd">/tedandlisa a 12-slide deck on our Q3 roadmap, for the exec team</div>
+              <div class="cmd">/tedandlisa an architecture overview for the platform team, as a web document</div>
             </div>
             <div class="cmdstep">
               <div class="lbl"><span class="n">04</span><b>Teach it your own look</b></div>
-              <p class="why">This is the part people miss: hand it any finished HTML deck
+              <p class="why">This is the part people miss: hand it any finished HTML file
               you like, and its visual system becomes a reusable template — extracted,
               stripped of its content, registered, thumbnailed. It's then one of your
               choices in the gallery, permanently.</p>
-              <div class="cmd">/tedandlisa-new-template ./that-deck-i-like.html</div>
+              <div class="cmd">/tedandlisa-new-template ./that-page-i-like.html</div>
             </div>
           </div>
           <div class="gen-side">
@@ -653,7 +655,7 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
               <li><span><b>The intake panel, served locally.</b> Your agent opens it in
               your browser and picks the answers up itself — no copying.</span></li>
               <li><span><b>Your own templates.</b> Hand <code>/tedandlisa-new-template</code>
-              a deck you like and its look becomes a permanent choice in the gallery.</span></li>
+              a page you like and its look becomes a permanent choice in the gallery.</span></li>
               <li><span><b>The design pipeline.</b> <code>/tedandlisa-design</code> for
               twelve style presets and animated slides — still one HTML file.</span></li>
               <li><span><b>Every agent you use.</b> The skill is plain Markdown and HTML —
@@ -672,14 +674,14 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
             <span class="n">FIRST · MINUTE 0</span>
             <h3>Send the prompt</h3>
             <p>Open the intake panel, answer it, and paste the finished prompt to
-            your agent. Your first deck starts building immediately.</p>
+            your agent. Your first file starts building immediately.</p>
             <button class="btn btn-primary js-open-intake" type="button">Open the intake panel</button>
           </div>
           <div class="both-step">
             <span class="n">WHILE IT BUILDS</span>
             <h3>Install in parallel</h3>
-            <p>The deck takes a few minutes to arrive. That's exactly how long the
-            install takes — run the clone from Path 02 while you wait.</p>
+            <p>It takes a few minutes to arrive. That's exactly how long the install
+            takes — run the clone from Path 02 while you wait.</p>
             <button class="btn btn-ghost js-goto-install" type="button">See the install steps</button>
           </div>
           <div class="both-step">
@@ -691,8 +693,8 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
           </div>
         </div>
         <p class="both-note">The two paths don't conflict — the prompt reads the skill
-        from GitHub, the install puts the same skill on your machine. Decks made either
-        way look identical.</p>
+        from GitHub, the install puts the same skill on your machine. What you get is
+        identical either way.</p>
       </div>
     </div>
   </section>
@@ -705,7 +707,7 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
         <h2 id="tpl-h">Six shapes, previewed for real.</h2>
         <p>These are not mockups — every preview below is an actual generated file.
         Open one, present it, resize it. What you see is what the agent ships.
-        More are on the way — and once installed, any deck you like can join them.</p>
+        More are on the way — and once installed, any page you like can join them.</p>
       </div>
       <div class="gallery">
         <a class="card" href="previews/monomind-deck.html" rel="noopener">
@@ -730,7 +732,7 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
           <div class="frame"><img src="previews/architecture.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
           <div class="meta"><h3>Architecture <span class="kind">diagram</span></h3>
           <p>One system diagram on slate, colour used semantically.
-          For when the whole deck is a single picture.</p></div>
+          For when the whole thing is a single picture.</p></div>
         </a>
         <a class="card" href="previews/sitemap-ia.html" rel="noopener">
           <div class="frame"><img src="previews/sitemap-ia.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
@@ -753,7 +755,7 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
         <a class="card yours" href="#paths" data-path="install">
           <div class="frame empty"><span class="yours-hint">your look here</span><span class="open">See how</span></div>
           <div class="meta"><h3>Your Template <span class="kind">coming</span></h3>
-          <p>More templates are on the way — and any finished deck you like can
+          <p>More templates are on the way — and any finished HTML file you like can
           become one. Install, and <code>/tedandlisa-new-template</code> does the rest.</p></div>
         </a>
       </div>
@@ -766,23 +768,23 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
       <div class="section-head">
         <p class="kicker">Inside every file</p>
         <h2 id="feat-h">Small file. Big machinery.</h2>
-        <p>A deck from Ted and Lisa is not a static export — it carries its own
+        <p>A file from Ted and Lisa is not a static export — it carries its own
         navigation, its own languages, and in some shapes, a working prototype.</p>
       </div>
       <div class="feats">
         <div class="feat">
           <span class="n">◐ LANGUAGE</span>
           <h3>Two languages, one file</h3>
-          <p>English plus Korean or Traditional Chinese in the same deck, switched
+          <p>English plus Korean or Traditional Chinese in the same file, switched
           in place. Filenames, commands, and product names are protected — they
           never get machine-translated into nonsense.</p>
         </div>
         <div class="feat">
           <span class="n">→ NAVIGATION</span>
           <h3>It presents itself</h3>
-          <p>Scroll-snap slides, arrow keys, touch swipe, and a deck menu with
-          contents — plus optional PDF and HTML download entries, right in the
-          deck's own chrome.</p>
+          <p>Scroll-snap slides, arrow keys, touch swipe, and a menu with contents —
+          plus optional PDF and HTML download entries, right in the file's own
+          chrome.</p>
         </div>
         <div class="feat">
           <span class="n">◑ THEMES</span>
@@ -800,7 +802,7 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
         </div>
         <div class="feat">
           <span class="n">✎ RESEARCH</span>
-          <h3>Decks that argue</h3>
+          <h3>Documents that argue</h3>
           <p>Some shapes are guided research, not slideware: information
           architecture proposals, system diagrams where colour means something,
           documents with decision records.</p>
@@ -810,7 +812,7 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
           <h3>Diagrams that translate</h3>
           <p>Diagram-first shapes carry inline SVG — no CDN, works offline, and
           the labels inside the drawings switch language along with the rest of
-          the deck.</p>
+          the file.</p>
         </div>
       </div>
     </div>
@@ -840,7 +842,7 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
         </div>
         <div class="file-scene" aria-hidden="true">
           <div class="file-card">
-            <div class="fname">deck.html</div>
+            <div class="fname">q3-roadmap.html</div>
             <hr>
             <ul>
               <li>files <b>1</b></li>
@@ -865,7 +867,7 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
           <p>You bring the brief; the agent does the building. What comes back
           is one file that opens anywhere and looks like it came from one studio.</p>
           <div class="cta-row">
-            <button class="btn btn-primary js-open-intake" type="button">Describe your deck</button>
+            <button class="btn btn-primary js-open-intake" type="button">Describe what you need</button>
           </div>
         </div>
         <div class="scene" aria-hidden="true">
@@ -895,7 +897,7 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
 </footer>
 
 <!-- ── intake overlay ──────────────────────────────────────────── -->
-<div class="overlay" id="intake-overlay" role="dialog" aria-modal="true" aria-label="Deck intake panel">
+<div class="overlay" id="intake-overlay" role="dialog" aria-modal="true" aria-label="Intake panel">
   <div class="sheet">
     <button class="close" id="close-intake" type="button" aria-label="Close the intake panel">×</button>
     <iframe id="intake-frame" title="Hi Ted, Meet Lisa intake panel" loading="lazy"></iframe>
@@ -1024,26 +1026,26 @@ function googleTranslateElementInit() {
     ['.topnav a[href="#templates"]', '템플릿', '範本'],
 
     ['.hero .tagline', 'Ted가 Lisa를 만나면,<br>아이디어가 <strong>HTML</strong>로 살아납니다', '當 Ted 遇見 Lisa，<br>想法在 <strong>HTML</strong> 中活了起來'],
-    ['.hero .sub', '덱을 설명하고, 짧은 비주얼 인테이크에 답하세요. 에이전트가 독립 실행형 HTML 파일 하나를 만들어 드립니다 — 열고, 발표하고, 인쇄하고, 이메일로 보내세요. 빌드 과정도, 설치할 것도 없습니다.', '描述你的簡報，回答簡短的視覺化提問。你的 agent 會交回一個獨立的 HTML 檔案 — 打開、簡報、列印、寄出都可以。沒有建置流程，也不用安裝任何東西。'],
-    ['.hero .cta-row .btn-primary', '덱 설명하기', '描述你的簡報'],
+    ['.hero .sub', '무엇이 필요한지 알려주세요 — 슬라이드, 문서, 다이어그램, 사이트. 짧은 비주얼 인테이크에 답하면 에이전트가 독립 실행형 HTML 파일 하나를 건네줍니다: 열고, 발표하고, 인쇄하고, 이메일로 보내세요. 빌드 과정도, 설치할 것도 없습니다.', '告訴我們你需要什麼 — 投影片、文件、圖表或網站。回答簡短的視覺化提問，你的 agent 就會交回一個獨立的 HTML 檔案：打開、簡報、列印、寄出都可以。沒有建置流程，也不用安裝任何東西。'],
+    ['.hero .cta-row .btn-primary', '필요한 것 알려주기', '告訴我們你需要什麼'],
     ['.hero .cta-row .btn-ghost', '방법 선택하기', '選擇你的路徑'],
     ['.hero-art .caption span:last-child', '그림 01 — 프레임', '圖 01 — 畫框'],
 
     ['#paths .section-head .kicker', '처음이신가요?', '第一次來嗎？'],
-    ['#paths-h', '첫 덱을 만드는 세 가지 방법.', '做出第一份簡報的三種方式。'],
+    ['#paths-h', '첫 파일을 만드는 세 가지 방법.', '做出第一個檔案的三種方式。'],
     ['#paths .section-head p:not(.kicker)', '맞는 방법을 고르세요. 어떤 길이든 끝은 같습니다 — 나의 에이전트가 건네주는 완성된 HTML 파일 하나.', '挑一個適合你的。每條路的終點都一樣：由你自己的 agent 交出的一個完成的 HTML 檔案。'],
 
     ['#tab-try .n', '경로 01', '路徑 01'],
     ['#tab-try h3', '한 번만 써보기', '先試一次'],
-    ['#tab-try p', '준비된 프롬프트를 복사해 에이전트에 붙여넣으면 덱이 돌아옵니다. 다운로드도 설정도 없습니다.', '複製現成的提示詞貼給你的 agent，就能拿回一份簡報。不用下載，不用設定。'],
+    ['#tab-try p', '준비된 프롬프트를 복사해 에이전트에 붙여넣으면 완성된 파일이 돌아옵니다. 다운로드도 설정도 없습니다.', '複製現成的提示詞貼給你的 agent，就能拿回一個完成的檔案。不用下載，不用設定。'],
     ['#tab-try .pick', '가장 빠름 — 2분', '最快 — 2 分鐘'],
     ['#tab-install .n', '경로 02', '路徑 02'],
     ['#tab-install h3', '내 것으로 만들기', '變成你的'],
-    ['#tab-install p', '스킬을 설치하면 <code>/tedandlisa</code>가 상시 명령이 됩니다 — 마음에 드는 덱을 나만의 템플릿으로 등록해 갤러리에 영구히 추가할 수도 있습니다.', '安裝技能後，<code>/tedandlisa</code> 就是常駐指令 — 還能教它你自己的範本：任何你喜歡的簡報都能永久加入圖庫。'],
+    ['#tab-install p', '스킬을 설치하면 <code>/tedandlisa</code>가 상시 명령이 됩니다 — 마음에 드는 페이지를 나만의 템플릿으로 등록해 갤러리에 영구히 추가할 수도 있습니다.', '安裝技能後，<code>/tedandlisa</code> 就是常駐指令 — 還能教它你自己的範本：任何你喜歡的頁面都能永久加入圖庫。'],
     ['#tab-install .pick', '한 번 설치, 평생 사용', '裝一次，永遠是你的'],
     ['#tab-both .n', '경로 03', '路徑 03'],
     ['#tab-both h3', '둘 다 하기', '兩個都要'],
-    ['#tab-both p', '지금 프롬프트를 붙여넣고, 첫 덱이 만들어지는 동안 설치하세요. Ted와 Lisa와 보내는 최고의 첫 한 시간.', '現在就貼上提示詞 — 趁第一份簡報生成時順手安裝。與 Ted 和 Lisa 共度最棒的第一個小時。'],
+    ['#tab-both p', '지금 프롬프트를 붙여넣고, 첫 파일이 만들어지는 동안 설치하세요. Ted와 Lisa와 보내는 최고의 첫 한 시간.', '現在就貼上提示詞 — 趁第一個檔案生成時順手安裝。與 Ted 和 Lisa 共度最棒的第一個小時。'],
     ['#tab-both .pick', '지금 써보고, 평생 간직', '現在試，永遠留'],
 
     ['#pane-try .gen-side h3:nth-of-type(1)', '꼼꼼한 방법', '完整的做法'],
@@ -1053,7 +1055,7 @@ function googleTranslateElementInit() {
     ['#pane-try .ministeps li:nth-child(2) b', '프롬프트 복사', '複製提示詞'],
     ['#pane-try .ministeps li:nth-child(2) b + span', '마지막 화면에 “Prompt is ready.”가 뜨면 클릭 한 번으로 전부 복사됩니다.', '最後一頁顯示「Prompt is ready.」，一鍵複製全部內容。'],
     ['#pane-try .ministeps li:nth-child(3) b', '에이전트에 붙여넣기', '貼給你的 agent'],
-    ['#pane-try .ministeps li:nth-child(3) b + span', '에이전트가 GitHub에서 스킬을 읽고 덱을 만들어 파일을 건네줍니다.', '它會從 GitHub 讀取技能、生成簡報，然後把檔案交給你。'],
+    ['#pane-try .ministeps li:nth-child(3) b + span', '에이전트가 GitHub에서 스킬을 읽고 만들어서 완성된 파일을 건네줍니다.', '它會從 GitHub 讀取技能、生成內容，然後把完成的檔案交給你。'],
     ['#pane-try .js-open-intake', '인테이크 패널 열기', '打開 intake 面板'],
     ['#pane-try .or', '또는 한 줄로 끝내기', '或者一行搞定'],
     ['#pane-try .gen-side h3:nth-of-type(2)', '빠른 방법', '快速的做法'],
@@ -1066,31 +1068,31 @@ function googleTranslateElementInit() {
     ['#pane-install .cmdstep:nth-child(2) .why', '클론에 함께 들어 있습니다 — 링크는 각각을 독립된 명령으로 만들어 줄 뿐입니다.', '它們已經在 clone 裡了 — 建立連結只是讓它們各自成為指令。'],
     ['#pane-install .cmdstep:nth-child(3) b', '언제든 사용하기', '隨時使用'],
     ['#pane-install .cmdstep:nth-child(4) b', '나만의 스타일 가르치기', '教它你自己的風格'],
-    ['#pane-install .cmdstep:nth-child(4) .why', '많이들 놓치는 부분입니다. 마음에 드는 HTML 덱을 건네면 그 비주얼 시스템이 재사용 가능한 템플릿이 됩니다 — 추출하고, 내용을 비우고, 등록하고, 섬네일까지. 그 후로는 갤러리에서 영구히 선택할 수 있습니다.', '這是最容易被忽略的部分：把任何你喜歡的 HTML 簡報交給它，它的視覺系統就會變成可重複使用的範本 — 抽取樣式、清除內容、註冊、產生縮圖。之後它就永久成為圖庫裡的選項之一。'],
+    ['#pane-install .cmdstep:nth-child(4) .why', '많이들 놓치는 부분입니다. 마음에 드는 HTML 파일을 건네면 그 비주얼 시스템이 재사용 가능한 템플릿이 됩니다 — 추출하고, 내용을 비우고, 등록하고, 섬네일까지. 그 후로는 갤러리에서 영구히 선택할 수 있습니다.', '這是最容易被忽略的部分：把任何你喜歡的 HTML 檔案交給它，它的視覺系統就會變成可重複使用的範本 — 抽取樣式、清除內容、註冊、產生縮圖。之後它就永久成為圖庫裡的選項之一。'],
     ['#pane-install .gen-side h3', '설치하면 얻는 것', '安裝後你會得到'],
     ['#pane-install .getlist li:nth-child(1) > span', '<b>로컬로 실행되는 인테이크 패널.</b> 에이전트가 브라우저에 패널을 띄우고 답변도 직접 가져갑니다 — 복사할 필요가 없습니다.', '<b>在本機執行的 intake 面板。</b>agent 會在瀏覽器打開它，並自己取回答案 — 不用複製。'],
-    ['#pane-install .getlist li:nth-child(2) > span', '<b>나만의 템플릿.</b> 마음에 드는 덱을 <code>/tedandlisa-new-template</code>에 건네면 그 스타일이 갤러리의 영구 선택지가 됩니다.', '<b>你自己的範本。</b>把喜歡的簡報交給 <code>/tedandlisa-new-template</code>，它的樣式就會永久加入圖庫。'],
+    ['#pane-install .getlist li:nth-child(2) > span', '<b>나만의 템플릿.</b> 마음에 드는 페이지를 <code>/tedandlisa-new-template</code>에 건네면 그 스타일이 갤러리의 영구 선택지가 됩니다.', '<b>你自己的範本。</b>把喜歡的頁面交給 <code>/tedandlisa-new-template</code>，它的樣式就會永久加入圖庫。'],
     ['#pane-install .getlist li:nth-child(3) > span', '<b>디자인 파이프라인.</b> <code>/tedandlisa-design</code>으로 12가지 스타일 프리셋과 애니메이션 슬라이드를 — 여전히 HTML 파일 하나로.', '<b>設計管線。</b><code>/tedandlisa-design</code> 提供十二種風格預設與動畫投影片 — 依然是一個 HTML 檔。'],
     ['#pane-install .getlist li:nth-child(4) > span', '<b>어떤 에이전트에서든.</b> 스킬은 평범한 Markdown과 HTML입니다 — Claude Code, Codex, Pi, OpenCode, Hermes 모두 같은 파일을 읽습니다.', '<b>你用的每個 agent。</b>技能就是純 Markdown 和 HTML — Claude Code、Codex、Pi、OpenCode、Hermes 讀的都是同一份檔案。'],
     ['#pane-install .soon', '터미널이 부담스러우신가요? claude.ai용 스킬 zip 패키지(Settings → Capabilities → Skills)가 곧 제공됩니다.', '完全不想碰終端機？給 claude.ai 用的技能 zip 套件（Settings → Capabilities → Skills）即將推出。'],
 
     ['#pane-both .both-step:nth-child(1) .n', '먼저 · 0분', '首先 · 第 0 分鐘'],
     ['#pane-both .both-step:nth-child(1) h3', '프롬프트 보내기', '送出提示詞'],
-    ['#pane-both .both-step:nth-child(1) p', '인테이크 패널을 열어 답하고, 완성된 프롬프트를 에이전트에 붙여넣으세요. 첫 덱이 바로 만들어지기 시작합니다.', '打開 intake 面板、回答問題，把完成的提示詞貼給你的 agent。第一份簡報立刻開始生成。'],
+    ['#pane-both .both-step:nth-child(1) p', '인테이크 패널을 열어 답하고, 완성된 프롬프트를 에이전트에 붙여넣으세요. 첫 파일이 바로 만들어지기 시작합니다.', '打開 intake 面板、回答問題，把完成的提示詞貼給你的 agent。第一個檔案立刻開始生成。'],
     ['#pane-both .both-step:nth-child(1) .btn', '인테이크 패널 열기', '打開 intake 面板'],
     ['#pane-both .both-step:nth-child(2) .n', '만들어지는 동안', '生成的同時'],
     ['#pane-both .both-step:nth-child(2) h3', '동시에 설치하기', '同步安裝'],
-    ['#pane-both .both-step:nth-child(2) p', '덱이 도착하기까지 몇 분 걸립니다. 설치에 딱 그만큼 걸리죠 — 기다리는 동안 경로 02의 클론을 실행하세요.', '簡報需要幾分鐘才會完成，安裝也剛好差不多 — 等待時就跑一下路徑 02 的 clone 吧。'],
+    ['#pane-both .both-step:nth-child(2) p', '도착하기까지 몇 분 걸립니다. 설치에 딱 그만큼 걸리죠 — 기다리는 동안 경로 02의 클론을 실행하세요.', '完成需要幾分鐘，安裝也剛好差不多 — 等待時就跑一下路徑 02 的 clone 吧。'],
     ['#pane-both .both-step:nth-child(2) .btn', '설치 단계 보기', '看安裝步驟'],
     ['#pane-both .both-step:nth-child(3) .n', '그 후로 쭉', '從此以後'],
     ['#pane-both .both-step:nth-child(3) h3', '이제 명령어입니다', '現在它是指令了'],
     ['#pane-both .both-step:nth-child(3) p', '어느 프로젝트에서든 <code>/tedandlisa</code> 한 줄이면 패널이 알아서 열리고, 나만의 템플릿이 갤러리에 더해집니다. Ted와 Lisa는 이제 여기 삽니다.', '在任何專案輸入 <code>/tedandlisa</code>，面板會自己打開，你的範本也會加入圖庫。Ted 和 Lisa 從此住在這裡。'],
     ['#pane-both .both-step:nth-child(3) .btn', '템플릿 둘러보기', '瀏覽範本'],
-    ['#pane-both .both-note', '두 방법은 충돌하지 않습니다 — 프롬프트는 GitHub에서 스킬을 읽고, 설치는 같은 스킬을 내 컴퓨터에 둡니다. 어느 쪽으로 만들어도 덱은 똑같습니다.', '兩條路並不衝突 — 提示詞從 GitHub 讀取技能，安裝則是把同一份技能放到你的機器上。兩種方式做出的簡報一模一樣。'],
+    ['#pane-both .both-note', '두 방법은 충돌하지 않습니다 — 프롬프트는 GitHub에서 스킬을 읽고, 설치는 같은 스킬을 내 컴퓨터에 둡니다. 어느 쪽으로 만들어도 결과물은 똑같습니다.', '兩條路並不衝突 — 提示詞從 GitHub 讀取技能，安裝則是把同一份技能放到你的機器上。兩種方式的成果一模一樣。'],
 
     ['#templates .section-head .kicker', '템플릿', '範本'],
     ['#tpl-h', '여섯 가지 형태, 실물로 미리보기.', '六種形態，真實預覽。'],
-    ['#templates .section-head p:not(.kicker)', '목업이 아닙니다 — 아래 미리보기는 전부 실제로 생성된 파일입니다. 열어 보고, 발표해 보고, 크기도 바꿔 보세요. 보이는 그대로 에이전트가 만들어 줍니다. 더 많은 템플릿이 준비 중이고, 설치하면 마음에 드는 덱을 직접 추가할 수도 있습니다.', '這些不是示意圖 — 下面每個預覽都是真正生成的檔案。打開它、簡報它、縮放它，你看到的就是 agent 交付的。更多範本正在路上 — 安裝之後，任何你喜歡的簡報都能加入。'],
+    ['#templates .section-head p:not(.kicker)', '목업이 아닙니다 — 아래 미리보기는 전부 실제로 생성된 파일입니다. 열어 보고, 발표해 보고, 크기도 바꿔 보세요. 보이는 그대로 에이전트가 만들어 줍니다. 더 많은 템플릿이 준비 중이고, 설치하면 마음에 드는 페이지를 직접 추가할 수도 있습니다.', '這些不是示意圖 — 下面每個預覽都是真正生成的檔案。打開它、簡報它、縮放它，你看到的就是 agent 交付的。更多範本正在路上 — 安裝之後，任何你喜歡的頁面都能加入。'],
     ['.gallery .open', '라이브 미리보기', '開啟即時預覽', 1],
     ['.gallery .card:nth-child(1) .kind', '슬라이드', '投影片'],
     ['.gallery .card:nth-child(1) .meta p', '프레젠테이션 덱. 가로 슬라이드, 덱 메뉴, 키보드·터치 내비게이션, 필요할 때 EN → KR/ZH 번역.', '簡報用的 deck。橫向投影片、簡報選單、鍵盤與觸控導覽，隨需 EN → KR / ZH 翻譯。'],
@@ -1099,7 +1101,7 @@ function googleTranslateElementInit() {
     ['.gallery .card:nth-child(3) .kind', '다이어그램', '圖表'],
     ['.gallery .card:nth-child(3) .meta p', '밝은 종이 위 다이어그램 중심 슬라이드. 인라인 SVG, CDN 없음, 완전 오프라인 — 다이어그램까지 번역됩니다.', '淺色紙面上以圖表為主的投影片。內嵌 SVG、無 CDN、完全離線 — 連圖表都能翻譯。'],
     ['.gallery .card:nth-child(4) .kind', '다이어그램', '圖表'],
-    ['.gallery .card:nth-child(4) .meta p', '슬레이트 위 시스템 다이어그램 하나, 의미가 담긴 색상. 덱 전체가 그림 한 장일 때를 위해.', '石板色底上的一張系統架構圖，顏色皆有語意。適合整份簡報就是一張圖的時候。'],
+    ['.gallery .card:nth-child(4) .meta p', '슬레이트 위 시스템 다이어그램 하나, 의미가 담긴 색상. 전체가 그림 한 장일 때를 위해.', '石板色底上的一張系統架構圖，顏色皆有語意。適合整個成品就是一張圖的時候。'],
     ['.gallery .card:nth-child(5) .kind', '제안', '提案'],
     ['.gallery .card:nth-child(5) .meta p', '페이지로 논증하는 사이트 구조 — 두 가지 화면 크기에서 클릭되는 내비게이션 프로토타입으로 마무리.', '用頁面論證網站結構，最後附上兩種斷點下可點擊的導覽原型。'],
     ['.gallery .card:nth-child(6) .kind', '사이트', '網站'],
@@ -1109,17 +1111,17 @@ function googleTranslateElementInit() {
     ['.card.yours .yours-hint', '당신의 스타일 자리', '你的風格在這'],
     ['.card.yours .open', '방법 보기', '看怎麼做'],
     ['.card.yours .meta h3', '나의 템플릿 <span class="kind">준비 중</span>', '你的範本 <span class="kind">即將推出</span>'],
-    ['.card.yours .meta p', '더 많은 템플릿이 오고 있습니다 — 마음에 드는 완성된 덱도 템플릿이 될 수 있어요. 설치만 하면 <code>/tedandlisa-new-template</code>가 나머지를 해냅니다.', '更多範本即將登場 — 任何你喜歡的成品簡報都能變成範本。安裝後，<code>/tedandlisa-new-template</code> 會搞定剩下的。'],
+    ['.card.yours .meta p', '더 많은 템플릿이 오고 있습니다 — 마음에 드는 완성된 HTML 파일도 템플릿이 될 수 있어요. 설치만 하면 <code>/tedandlisa-new-template</code>가 나머지를 해냅니다.', '更多範本即將登場 — 任何你喜歡的成品 HTML 檔案都能變成範本。安裝後，<code>/tedandlisa-new-template</code> 會搞定剩下的。'],
 
     ['#features .section-head .kicker', '모든 파일 안에', '每個檔案裡'],
     ['#feat-h', '작은 파일, 큰 기계장치.', '小檔案，大機關。'],
-    ['#features .section-head p:not(.kicker)', 'Ted와 Lisa의 덱은 정적인 내보내기가 아닙니다 — 자체 내비게이션과 언어를 품고, 어떤 형태에서는 작동하는 프로토타입까지 담습니다.', 'Ted 和 Lisa 做的簡報不是靜態匯出 — 它自帶導覽、自帶語言，某些形態裡甚至帶著能動的原型。'],
+    ['#features .section-head p:not(.kicker)', 'Ted와 Lisa의 파일은 정적인 내보내기가 아닙니다 — 자체 내비게이션과 언어를 품고, 어떤 형태에서는 작동하는 프로토타입까지 담습니다.', 'Ted 和 Lisa 做的檔案不是靜態匯出 — 它自帶導覽、自帶語言，某些形態裡甚至帶著能動的原型。'],
     ['.feats .feat:nth-child(1) .n', '◐ 언어', '◐ 語言'],
     ['.feats .feat:nth-child(1) h3', '두 언어, 한 파일', '兩種語言，一個檔案'],
-    ['.feats .feat:nth-child(1) p', '같은 덱 안에 영어와 한국어(또는 번체 중국어)가 함께 있고, 그 자리에서 전환됩니다. 파일명·명령어·제품명은 보호되어 엉뚱하게 번역되지 않습니다.', '英文加上韓文或繁體中文放在同一份簡報裡，原地切換。檔名、指令與產品名稱都受保護 — 不會被機器翻譯成怪話。'],
+    ['.feats .feat:nth-child(1) p', '같은 파일 안에 영어와 한국어(또는 번체 중국어)가 함께 있고, 그 자리에서 전환됩니다. 파일명·명령어·제품명은 보호되어 엉뚱하게 번역되지 않습니다.', '英文加上韓文或繁體中文放在同一個檔案裡，原地切換。檔名、指令與產品名稱都受保護 — 不會被機器翻譯成怪話。'],
     ['.feats .feat:nth-child(2) .n', '→ 내비게이션', '→ 導覽'],
     ['.feats .feat:nth-child(2) h3', '스스로 발표합니다', '它自己會簡報'],
-    ['.feats .feat:nth-child(2) p', '스크롤 스냅 슬라이드, 방향키, 터치 스와이프, 목차가 담긴 덱 메뉴 — PDF·HTML 다운로드 항목까지 덱 자체 크롬 안에 들어 있습니다.', '滾動吸附投影片、方向鍵、觸控滑動，還有帶目錄的簡報選單 — 連 PDF 與 HTML 下載都在簡報自己的介面裡。'],
+    ['.feats .feat:nth-child(2) p', '스크롤 스냅 슬라이드, 방향키, 터치 스와이프, 목차가 담긴 메뉴 — PDF·HTML 다운로드 항목까지 파일 자체 크롬 안에 들어 있습니다.', '滾動吸附投影片、方向鍵、觸控滑動，還有帶目錄的選單 — 連 PDF 與 HTML 下載都在檔案自己的介面裡。'],
     ['.feats .feat:nth-child(3) .n', '◑ 테마', '◑ 主題'],
     ['.feats .feat:nth-child(3) h3', '라이트와 다크, 측정 완료', '淺色與深色，量測過的'],
     ['.feats .feat:nth-child(3) p', '두 테마가 한 파일에 담겨 스위치로 전환됩니다. 디자인 리뷰 단계가 각 테마의 대비와 모바일 폭에서의 동작을 측정한 뒤에야 파일이 전달됩니다.', '兩種主題裝在同一個檔案裡，一鍵切換。設計審查會逐一量測兩種主題的對比度與手機寬度下的表現，然後才交件。'],
@@ -1127,11 +1129,11 @@ function googleTranslateElementInit() {
     ['.feats .feat:nth-child(4) h3', '클릭되는 웹사이트 목업', '可點擊的網站模型'],
     ['.feats .feat:nth-child(4) p', 'Sitemap &amp; IA 형태는 사이트 구조를 그리는 데서 멈추지 않고, 데스크톱과 모바일 두 화면 폭에서 실제로 클릭해 볼 수 있는 내비게이션 프로토타입으로 끝납니다.', 'Sitemap &amp; IA 形態不只畫出網站結構 — 它的結尾是一個真的可以點的導覽原型，桌機與手機兩種斷點都有。'],
     ['.feats .feat:nth-child(5) .n', '✎ 리서치', '✎ 研究'],
-    ['.feats .feat:nth-child(5) h3', '논증하는 덱', '會論證的簡報'],
+    ['.feats .feat:nth-child(5) h3', '논증하는 문서', '會論證的文件'],
     ['.feats .feat:nth-child(5) p', '어떤 형태는 슬라이드웨어가 아니라 가이드된 리서치입니다: 정보 구조 제안, 색에 의미를 담은 시스템 다이어그램, 의사결정 기록이 담긴 문서.', '有些形態不是投影片，而是有引導的研究：資訊架構提案、顏色有語意的系統圖、帶決策記錄的文件。'],
     ['.feats .feat:nth-child(6) .n', '⧉ 다이어그램', '⧉ 圖表'],
     ['.feats .feat:nth-child(6) h3', '번역되는 다이어그램', '會翻譯的圖表'],
-    ['.feats .feat:nth-child(6) p', '다이어그램 중심 형태는 인라인 SVG를 씁니다 — CDN 없이 오프라인으로 작동하고, 그림 속 레이블도 덱과 함께 언어가 바뀝니다.', '以圖表為主的形態使用內嵌 SVG — 不靠 CDN、可離線，圖裡的標籤也會跟著簡報一起換語言。'],
+    ['.feats .feat:nth-child(6) p', '다이어그램 중심 형태는 인라인 SVG를 씁니다 — CDN 없이 오프라인으로 작동하고, 그림 속 레이블도 파일과 함께 언어가 바뀝니다.', '以圖表為主的形態使用內嵌 SVG — 不靠 CDN、可離線，圖裡的標籤也會跟著檔案一起換語言。'],
 
     ['#the-file .kicker', '매체', '媒介'],
     ['#file-h', '독립 실행형 HTML 파일 하나의 아름다움.', '一個獨立 HTML 檔案的美。'],
@@ -1144,7 +1146,7 @@ function googleTranslateElementInit() {
     ['.scene-copy .kicker', '핵심 아이디어', '整個想法'],
     ['#scene-h', '아이디어는 Ted가,<br>프레임은 Lisa가.', 'Ted 有想法，<br>Lisa 給它畫框。'],
     ['.scene-copy p', '브리프는 당신이, 제작은 에이전트가. 돌아오는 것은 어디서나 열리고 한 스튜디오에서 나온 듯한 파일 하나입니다.', '你出題目，agent 負責打造。回到你手上的，是一個到哪都能開、看起來像出自同一間工作室的檔案。'],
-    ['.scene-copy .btn', '덱 설명하기', '描述你的簡報'],
+    ['.scene-copy .btn', '필요한 것 알려주기', '告訴我們你需要什麼'],
 
     ['.foot a[href*="SKILL.md"]', '스킬', '技能'],
     ['.foot a[href*="LICENSE"]', 'MIT 라이선스', 'MIT 授權']
