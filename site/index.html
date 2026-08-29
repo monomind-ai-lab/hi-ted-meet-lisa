@@ -1054,17 +1054,38 @@ function googleTranslateElementInit() {
     var m = document.cookie.match(/(?:^|;\s*)googtrans=\/en\/([^;]+)/);
     return m ? decodeURIComponent(m[1]) : 'en';
   }
-  function setLang(code) {
-    var host = location.hostname;
+  /* On a real subdomain (html.monomind.one) googtrans cookies pile up at
+     several scopes — ours plus the one Google's widget sets zone-wide —
+     and the widget chokes on the ambiguity (it marks the page translated
+     but changes nothing). Kill every scope, then keep a single host-only
+     cookie. pages.dev never hit this: the Public Suffix List blocks the
+     zone-wide cookie there. */
+  function killCookies() {
     var kill = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
     document.cookie = kill;
-    if (host) {
-      document.cookie = kill + '; domain=' + host;
-      document.cookie = kill + '; domain=.' + host;
+    var parts = location.hostname.split('.');
+    for (var i = 0; i < parts.length - 1; i++) {
+      var d = parts.slice(i).join('.');
+      document.cookie = kill + '; domain=' + d;
+      document.cookie = kill + '; domain=.' + d;
     }
+  }
+  /* The widget consumes (and deletes) the googtrans cookie once it has
+     translated, so the cookie alone cannot carry the choice across page
+     loads. localStorage remembers it; the cookie is re-seeded from it on
+     every load, just before the widget boots. */
+  function storedLang() {
+    try { return localStorage.getItem('tedandlisa-lang') || 'en'; }
+    catch (e) { return 'en'; }
+  }
+  function setLang(code) {
+    killCookies();
+    try {
+      if (code === 'en') localStorage.removeItem('tedandlisa-lang');
+      else localStorage.setItem('tedandlisa-lang', code);
+    } catch (e) {}
     if (code !== 'en') {
       document.cookie = 'googtrans=/en/' + code + '; path=/';
-      if (host) document.cookie = 'googtrans=/en/' + code + '; path=/; domain=.' + host;
     }
     location.reload();
   }
@@ -1074,7 +1095,16 @@ function googleTranslateElementInit() {
   var panel = document.getElementById('lang-panel');
   var list = document.getElementById('lang-list');
   var search = document.getElementById('lang-search');
-  var cur = currentLang();
+  /* The widget silently refuses to translate when duplicate googtrans
+     cookies are visible at load — and it re-adds a zone-wide copy after
+     every successful run, poisoning the next load. So on every boot:
+     scrub all scopes, then seed exactly one host-only cookie. */
+  var cur = storedLang();
+  if (cur === 'en') cur = currentLang();
+  if (cur !== 'en') {
+    killCookies();
+    document.cookie = 'googtrans=/en/' + cur + '; path=/';
+  }
   document.getElementById('lang-cur').textContent = cur.toUpperCase();
 
   function row(code, name) {
@@ -1137,6 +1167,32 @@ function googleTranslateElementInit() {
     var sc = document.createElement('script');
     sc.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
     document.head.appendChild(sc);
+    /* Belt and braces: after a reload the widget often wakes believing it
+       has already translated (combo at the target value, translated-ltr
+       set) while the text is still English — and a same-value change is a
+       no-op. If the text has not changed shortly after load, bounce the
+       hidden select through its restore state and back, which forces a
+       real translation pass. */
+    var probe = document.querySelector('.hero .sub');
+    var original = probe ? probe.textContent : '';
+    [1600, 3800].forEach(function (t) {
+      setTimeout(function () {
+        if (!probe || probe.textContent !== original) return;
+        var sel = document.querySelector('select.goog-te-combo');
+        if (!sel) return;
+        if (sel.value === cur) {
+          sel.value = '';
+          sel.dispatchEvent(new Event('change'));
+          setTimeout(function () {
+            sel.value = cur;
+            sel.dispatchEvent(new Event('change'));
+          }, 350);
+        } else {
+          sel.value = cur;
+          sel.dispatchEvent(new Event('change'));
+        }
+      }, t);
+    });
   }
 })();
 </script>
