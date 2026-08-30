@@ -206,6 +206,7 @@ h4.subsub{color:var(--ink);font-size:18px;font-weight:600;line-height:1.4;margin
 footer{border-top:1px solid var(--hairline-soft);padding:48px 0 64px;margin-top:48px}
 footer .frow{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
 footer .mono{color:var(--muted-soft)}
+footer .mono a{color:inherit} /* the colophon link stays as quiet as the line it sits in */
 .cta-band{position:relative;text-align:center;padding:96px 24px;overflow:hidden}
 .cta-band .glow{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:700px;height:400px;background:radial-gradient(closest-side,rgba(26,38,255,.25),transparent 70%);pointer-events:none}
 .cta-band h2{position:relative;color:var(--ink);font-size:clamp(28px,4vw,44px);font-weight:500;letter-spacing:-.03em;line-height:1.1}
@@ -670,7 +671,7 @@ footer .mono{color:var(--muted-soft)}
   </div>
   <footer><div class="wrap"><div class="frow">
     <div><span class="en">Helios AX · Architecture &amp; Tech Stack Overview</span><span class="zh">Helios AX · 架構與技術棧總覽</span></div>
-    <div class="mono">MonoMind × Northwind · 2026-08 · ADR-001…005</div>
+    <div class="mono">MonoMind × Northwind · 2026-08 · ADR-001…005 · <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener"><span class="en">Made with Hi Ted, Meet Lisa</span><span class="zh">以 Hi Ted, Meet Lisa 製作</span></a></div>
   </div></div></footer>
 </section>
 

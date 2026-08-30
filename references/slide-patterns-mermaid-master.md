@@ -92,6 +92,18 @@ Index cards link by hash (`#en/01`), so they keep working in the saved file.
   `L` toggles language.
 - `@media print` shows every slide, one per page — the deck prints as a set.
 
+## Colophon — the maker's credit
+
+Each language's index footer ends with the credit link — the slide sets are
+parallel, so the line exists once per copy and the two must stay in step. It
+ships by default; remove the `<a>` (only) when the intake answered
+`credit: false`.
+
+```html
+<footer><span>[DOCUMENT · VERSION · DATE]</span> <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener">Made with Hi Ted, Meet Lisa</a></footer>
+<footer><span>[문서 · 버전 · 날짜]</span> <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener">Hi Ted, Meet Lisa로 제작</a></footer>
+```
+
 ## Dependencies
 
 Google Fonts only. Everything else is inline, so the file works offline and

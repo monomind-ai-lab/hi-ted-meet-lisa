@@ -919,6 +919,17 @@ a.brand-mark:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 .close-links a:hover { background: var(--glass-hi-2); }
 .close-links a.is-accent { border-color: var(--accent-hair); }
 
+/* colophon — the quiet maker's credit on the closing slide. Kept by default;
+   remove the .deck-colophon line (only) when the intake answered
+   `credit: false`. */
+.deck-colophon {
+  margin-top: var(--space-4);
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em;
+  color: var(--muted-inv);
+}
+.deck-colophon a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--glass-hair); }
+.deck-colophon a:hover { border-bottom-color: currentColor; }
+
 /* ── Responsive deck hardening ─────────────────────────────────────
    These overrides intentionally live after the guide layer. The deck's
    component rules are shared with the desktop composition, so placing the
@@ -1156,7 +1167,7 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
        the detail. cover-meta chips are optional. -->
   <section class="slide hero dark is-photo cover-hero" data-screen-label="01 Cover"
            role="group" aria-label="Slide 01 Cover">
-    <a class="brand-mark" href="https://monomind.one" target="_blank" rel="noopener noreferrer" aria-label="MonoMind AI Lab — opens monomind.one in a new tab"></a>
+    <a class="brand-mark" href="https://monomind.one/?ref=deck-mark" target="_blank" rel="noopener noreferrer" aria-label="MonoMind AI Lab — opens monomind.one in a new tab"></a>
     <div class="cover-kicker">
       <p class="eyebrow">MonoMind AI Lab · [KICKER]</p>
     </div>
@@ -1177,7 +1188,7 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
        Swap .grid-4 for .grid-2 / .grid-3 as the count requires. -->
   <section class="slide dark dg-slide dg-center" data-screen-label="02 Card grid"
            role="group" aria-label="Slide 02 Card grid">
-    <a class="brand-mark" href="https://monomind.one" target="_blank" rel="noopener noreferrer" aria-label="MonoMind AI Lab — opens monomind.one in a new tab"></a>
+    <a class="brand-mark" href="https://monomind.one/?ref=deck-mark" target="_blank" rel="noopener noreferrer" aria-label="MonoMind AI Lab — opens monomind.one in a new tab"></a>
     <p class="eyebrow">Part 1 · [Section]</p>
     <h2 class="h-md">[The point of this slide, as a statement.]</h2>
     <p class="lead">[Optional supporting line. Delete if the headline stands alone.]</p>
@@ -1197,7 +1208,7 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
        give the table the accent-edged panel treatment. -->
   <section class="slide dark dg-slide dg-center" data-screen-label="03 Table"
            role="group" aria-label="Slide 03 Table">
-    <a class="brand-mark" href="https://monomind.one" target="_blank" rel="noopener noreferrer" aria-label="MonoMind AI Lab — opens monomind.one in a new tab"></a>
+    <a class="brand-mark" href="https://monomind.one/?ref=deck-mark" target="_blank" rel="noopener noreferrer" aria-label="MonoMind AI Lab — opens monomind.one in a new tab"></a>
     <p class="eyebrow">Part 2 · [Section]</p>
     <h2 class="h-md">[What the table establishes]</h2>
     <p class="lead">[Optional framing line.]</p>
@@ -1219,7 +1230,7 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
        close-links: first one carries .is-accent as the primary action. -->
   <section class="slide hero dark is-photo" data-screen-label="04 Closing"
            role="group" aria-label="Slide 04 Closing">
-    <a class="brand-mark" href="https://monomind.one" target="_blank" rel="noopener noreferrer" aria-label="MonoMind AI Lab — opens monomind.one in a new tab"></a>
+    <a class="brand-mark" href="https://monomind.one/?ref=deck-mark" target="_blank" rel="noopener noreferrer" aria-label="MonoMind AI Lab — opens monomind.one in a new tab"></a>
     <div class="close-grid">
       <div>
         <p class="eyebrow">[Closing kicker]</p>
@@ -1231,6 +1242,10 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
         <a href="[url]">[secondary]</a>
         <a href="[url]">[secondary]</a>
       </div>
+      <!-- credit: the maker's colophon. Ships by default; remove this one
+           line (only) when the intake answered `credit: false`. -->
+      <p class="deck-colophon">Made with
+        <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer"><span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></a></p>
     </div>
   </section>
 
@@ -1542,7 +1557,7 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
     // Blocks that are entirely code / paths / file trees.
     var LITERAL_BLOCKS = '.code, .dg-treeview, .dg-chip .nm, .dg-leader-name, .lang-switch';
     // Inline terms: product names, *.ext file names, and anything path-shaped.
-    var TERMS = /(GitNexus|Graphify|OpenWiki|MonoMind(?: AI Lab)?|MONOMIND(?: AI LAB)?|\bMIT\b|[A-Za-z0-9_.-]+\.(?:md|py|json|ya?ml|txt|html|lock)\b|[A-Za-z0-9_.-]*\/[A-Za-z0-9_./-]+)/g;
+    var TERMS = /(Hi Ted, Meet Lisa|GitNexus|Graphify|OpenWiki|MonoMind(?: AI Lab)?|MONOMIND(?: AI LAB)?|\bMIT\b|[A-Za-z0-9_.-]+\.(?:md|py|json|ya?ml|txt|html|lock)\b|[A-Za-z0-9_.-]*\/[A-Za-z0-9_./-]+)/g;
     var SKIP = /^(SCRIPT|STYLE|CODE|TEXTAREA|NOSCRIPT)$/;
 
     function protect() {

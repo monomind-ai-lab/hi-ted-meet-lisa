@@ -31,6 +31,9 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
 .slide footer{margin-top:2.25rem;padding-top:1rem;border-top:1px solid var(--rule);
   font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;
   color:var(--soft);display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+/* the colophon link on the index footers stays as quiet as the line it sits in */
+.slide footer a{color:inherit;text-decoration:none;}
+.slide footer a:hover{color:var(--ink);}
 /* index page */
 .slide header{display:flex;justify-content:space-between;align-items:flex-start;gap:2rem;
   padding-bottom:1.5rem;border-bottom:1px solid var(--rule);margin-bottom:1rem;}
@@ -124,7 +127,7 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
       </a>
   </div>
 
-  <footer>HI TED, MEET LISA · PREVIEW · 2026-08</footer>
+  <footer><span>HI TED, MEET LISA · PREVIEW · 2026-08</span> <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener">Made with Hi Ted, Meet Lisa</a></footer>
 </section>
 
 <section class="slide" id="s-en-01" data-lang="en" data-route="01">
@@ -383,7 +386,7 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
       </a>
   </div>
 
-  <footer>HI TED, MEET LISA · 미리보기 · 2026-08</footer>
+  <footer><span>HI TED, MEET LISA · 미리보기 · 2026-08</span> <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener">Hi Ted, Meet Lisa로 제작</a></footer>
 </section>
 
 <section class="slide" id="s-ko-01" data-lang="ko" data-route="01">

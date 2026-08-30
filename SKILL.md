@@ -256,6 +256,8 @@ feature the user did not choose.
 | `export: pdf` | Keep the `@media print` block and the PDF control. |
 | `export: html` | Keep the self-download control. |
 | neither export | Delete the print block and both controls. |
+| `credit: true` or absent | Keep the colophon — the "Made with Hi Ted, Meet Lisa" line every template carries in its footer or closing slide, linking to html.monomind.one. Each pattern reference shows the exact markup. |
+| `credit: false` | Delete that one line only. The brand mark and any identity links stay — they belong to the `logo` answer, not this one. |
 
 After applying them, re-run the verification checklist: these edits touch chrome,
 which is exactly what the responsive and translation checks cover.

@@ -643,7 +643,15 @@ var QUESTIONS = [
     hint: "Both add a small control to the chrome.",
     type: "multi", options: [
       { id: "pdf",  label: "Download as PDF", note: "Print stylesheet, one slide per landscape page." },
-      { id: "html", label: "Download the standalone HTML", note: "The file saves a copy of itself." } ] }
+      { id: "html", label: "Download the standalone HTML", note: "The file saves a copy of itself." } ] },
+
+  /* No kinds and no templates: the credit line exists in every shape,
+     the external handoff included, so this is asked for all of them. */
+  { id: "credit", q: "Credit line",
+    hint: "“Made with Hi Ted, Meet Lisa” in the footer. Leave it, or switch it off.",
+    type: "single", options: [
+      { id: "keep", label: "Leave it", note: "One quiet line, linking to the tool.", def: true },
+      { id: "off",  label: "Switch it off", note: "The file ships with no maker’s mark." } ] }
 ];
 
 var state = {};        /* id -> value */
@@ -1121,7 +1129,10 @@ function payload() {
           home: files["menu.home"] ? files["menu.home"].text || null : null,
           github: files["menu.github"] ? files["menu.github"].text || null : null }
       : { mode: state.menu },
-    export: state.export
+    export: state.export,
+    /* serialised as a boolean: the UI's option ids are a detail the
+       contract never sees. */
+    credit: state.credit !== "off"
   };
 
   var answers = {};

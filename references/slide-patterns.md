@@ -19,7 +19,7 @@ section.slide.dark.dg-slide.dg-center
 
 ```html
 <section class="slide dark dg-slide dg-center" data-screen-label="02 Why it matters" role="group" aria-label="Slide 02 Why it matters">
-    <a class="brand-mark" href="https://monomind.one" target="_blank" rel="noopener noreferrer" aria-label="MonoMind AI Lab — opens monomind.one in a new tab"></a>
+    <a class="brand-mark" href="https://monomind.one/?ref=deck-mark" target="_blank" rel="noopener noreferrer" aria-label="MonoMind AI Lab — opens monomind.one in a new tab"></a>
     <p class="eyebrow">Part 1 · Why</p>
     <h2 class="h-md">A collaborator returning after three weeks should not rebuild the project from stale chats.</h2>
     <p class="lead">Project Context answers four questions through a small set of typed Markdown records and a maintenance protocol that works across repositories and agent harnesses.</p>
@@ -159,4 +159,16 @@ question. Show me the proposed plan and wait for my approval before making chang
 
 ```html
 <div class="dg-arrow"><span class="cap">install &amp; operate via SKILL.md</span><span class="ln"></span></div>
+```
+
+## Colophon — the maker's credit
+
+The closing slide carries the quiet credit line, after `.close-links` inside
+`.close-grid`. It ships by default; remove the `<p>` (only) when the intake
+answered `credit: false`. The product name is wrapped `notranslate` so Google
+Translate leaves it alone — "Made with" is meant to translate.
+
+```html
+<p class="deck-colophon">Made with
+  <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer"><span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></a></p>
 ```

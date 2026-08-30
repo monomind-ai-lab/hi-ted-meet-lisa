@@ -87,6 +87,7 @@ An entry arrives in one of two shapes, and you must handle both:
 | `prototype` | `both` \| `desktop` \| `none` | **`sitemap-ia` only.** How much of the navigation is clickable. |
 | `delivery` | `cdn` \| `standalone` | **`sitemap-ia` only.** `standalone` inlines mermaid, the webfonts, Font Awesome and Tailwind. |
 | `export` | array of `pdf` `html` | Each adds a control to the deck chrome. |
+| `credit` | `true` \| `false` | Whether the file keeps its colophon — the "Made with Hi Ted, Meet Lisa" line linking to html.monomind.one. Every template ships it; `false` means delete that one line (never the logo or identity links, which belong to `logo`). Asked for **every** shape, the external handoff included, so it is present in both the runner's payload and the web panel's paste-ready prompt alike. |
 
 ## The menu object
 

@@ -180,6 +180,17 @@ script. They encode fixes for problems that are not visible in the markup.
 Rewrite only the registers: `PAGES`, the nav entries, and the prototype's
 `sets` indices.
 
+## Colophon — the maker's credit
+
+Every document footer carries a third `.mono` span with the credit link — the
+prototype's own footers are the proposed site's content and never carry it. It
+ships by default; remove the span (only) when the intake answered
+`credit: false`.
+
+```html
+<span class="mono"><a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener"><span class="en">Made with Hi Ted, Meet Lisa</span><span class="zh">以 Hi Ted, Meet Lisa 製作</span></a></span>
+```
+
 ## Dependencies
 
 Google Fonts and mermaid from a CDN for the document; Font Awesome and Tailwind

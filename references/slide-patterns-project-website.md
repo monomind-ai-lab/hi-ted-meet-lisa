@@ -282,6 +282,19 @@ special case. `.rel-ver` is a label, not necessarily a version — the preview
 uses decision ids, because inventing a release history for a project that has
 no versions would be inventing a record.
 
+## Colophon — the maker's credit
+
+`.footer-bottom` ends with the `.mm-by` credit, the mark plus the credit line
+linking to the tool. It ships by default; remove the `.mm-by` link (only) when
+the intake answered `credit: false`.
+
+```html
+<a class="mm-by" href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener">
+  <svg viewBox="0 0 512 512" aria-hidden="true" fill="currentColor"><!-- the MonoMind mark, kept verbatim from the template --></svg>
+  <span><span class="en">Made with Hi Ted, Meet Lisa</span><span class="ko">Hi Ted, Meet Lisa로 제작</span></span>
+</a>
+```
+
 ## Chrome you must not rewrite
 
 - **Routing** — `#/{lang}/{page}`. `go(id)` changes page, `setLang(l)` changes

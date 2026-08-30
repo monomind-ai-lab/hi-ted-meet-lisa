@@ -145,6 +145,16 @@ which already carry `scroll-margin-top`.
 - **Nav** — collapses to a burger under 1120px; the Documents dropdown flattens
   into the mobile list.
 
+## Colophon — the maker's credit
+
+The footer's `.mono` line ends with the credit link, written in both languages
+like every other reader-visible string. It ships by default; remove the `<a>`
+(only) when the intake answered `credit: false`.
+
+```html
+<div class="mono">[OWNER] · [YYYY-MM] · <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener"><span class="en">Made with Hi Ted, Meet Lisa</span><span class="ko">Hi Ted, Meet Lisa로 제작</span></a></div>
+```
+
 ## Dependencies
 
 Google Fonts, and **mermaid from a CDN**. Unlike the MonoMind deck, this

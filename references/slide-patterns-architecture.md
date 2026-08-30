@@ -98,6 +98,17 @@ legend entry implies a component the reader then hunts for.
   `var()` inside an SVG presentation attribute never resolves, and the grid
   silently disappears.
 
+## Colophon — the maker's credit
+
+The footer ends with the credit link, bilingual like everything else on the
+page. It ships by default; remove that last `&middot;` and `<a>` (only) when
+the intake answered `credit: false` — the `monomind ai lab` identity link
+before it belongs to the logo answer, not to this one.
+
+```html
+&middot; <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer"><span class="en">Made with Hi Ted, Meet Lisa</span><span class="ko">Hi Ted, Meet Lisa로 제작</span></a>
+```
+
 ## Dependencies
 
 Google Fonts only. Everything else is inline.
