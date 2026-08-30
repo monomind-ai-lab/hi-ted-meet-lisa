@@ -472,6 +472,14 @@ section { padding: clamp(64px, 10vh, 128px) var(--pad); }
   text-transform: uppercase; color: var(--cream-faint); white-space: nowrap;
 }
 
+/* ── for teams: the page's one paid surface ────────────────────── */
+.teams-section { border-top: 1px solid var(--hair); background: color-mix(in srgb, var(--bg-lift) 55%, transparent); }
+.teams-copy { max-width: var(--measure); }
+.teams-copy h2 { font-size: clamp(30px, 4vw, 46px); margin: 14px 0 18px; }
+.teams-body { color: var(--cream-dim); }
+.teams-copy .cta-row { margin-top: 30px; }
+.teams-by { margin-top: 26px; font-size: 12.5px; color: var(--cream-faint); }
+
 /* ── footer ────────────────────────────────────────────────────── */
 footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
 .foot { max-width: 1280px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: space-between; }
@@ -522,6 +530,7 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
     <a href="#paths" data-path="try">Try it</a>
     <a href="#paths" data-path="install">Install</a>
     <a href="#templates">Templates</a>
+    <a href="#for-teams">For teams</a>
     <div class="lang" id="lang">
       <button class="lang-btn" id="lang-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="15" height="15" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/></svg>
@@ -868,6 +877,31 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
       </div>
     </div>
   </section>
+
+  <!-- ── for teams ────────────────────────────────────────────────
+       The one commercial surface on the page, appended last on purpose:
+       it reads as the closing scene's last turn rather than an ad break.
+       No pricing here and no second paid surface anywhere else — sales
+       lives on monomind.one. -->
+  <section class="teams-section" id="for-teams" aria-labelledby="teams-h">
+    <div class="shell">
+      <div class="teams-copy">
+        <p class="kicker">For teams</p>
+        <h2 id="teams-h">Your brand, installed as a skill.</h2>
+        <p class="teams-body">Everything on this page is the house style. The same
+        machinery can carry yours: your design tokens, your components lifted
+        verbatim from decks you already ship, your protected terms, your own
+        intake — delivered as a private template pack your agent reads. You
+        don't send us deck requests; we install the studio. Every file your team
+        makes after that looks like it came from one studio — yours.</p>
+        <div class="cta-row">
+          <a class="btn btn-ghost" id="teams-cta" data-paid-cta="tedlisa-band"
+             href="https://monomind.one/?ref=tedlisa-band" rel="noopener">How a pack gets built — monomind.one</a>
+        </div>
+        <p class="teams-by">Built by MonoMind, the studio behind this site.</p>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
@@ -880,6 +914,7 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
       <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa" rel="noopener">GitHub</a>
       <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa/blob/main/SKILL.md" rel="noopener">The skill</a>
       <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa/blob/main/LICENSE" rel="noopener">MIT + Commons Clause</a>
+      <a href="#for-teams">For teams</a>
     </div>
   </div>
 </footer>
@@ -895,6 +930,26 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
 <script>
 (function () {
   "use strict";
+
+  /* ---- where the paid CTAs land ------------------------------------
+     THE ONE LINE TO CHANGE. monomind.one/branded-decks does not exist
+     yet, so every commercial CTA lands on the MonoMind homepage with a
+     per-surface ref tag. When the Branded Deck System landing page ships,
+     edit PAID_LANDING below and every element carrying
+     `data-paid-cta="<ref>"` on this page follows. The markup keeps a
+     working href of its own so a no-JS reader still lands somewhere real
+     — it stays valid either way, since monomind.one always resolves.
+
+     Three copies of this URL live outside this file and need the same
+     edit by hand:
+       · assets/tedandlisa-intake.html — #teamsline, ?ref=tedlisa-intake
+       · site/llms.txt                 — "## For teams and brands", 2 URLs
+       · site/index.html <head>        — the Service JSON-LD block's url
+  */
+  var PAID_LANDING = "https://monomind.one/";
+  Array.prototype.forEach.call(document.querySelectorAll("[data-paid-cta]"), function (a) {
+    a.href = PAID_LANDING + "?ref=" + a.getAttribute("data-paid-cta");
+  });
 
   /* ---- intake overlay -------------------------------------------- */
   var overlay = document.getElementById("intake-overlay");
@@ -1012,6 +1067,7 @@ function googleTranslateElementInit() {
     ['.topnav a[data-path="try"]', '써보기', '試試看'],
     ['.topnav a[data-path="install"]', '설치', '安裝'],
     ['.topnav a[href="#templates"]', '템플릿', '範本'],
+    ['.topnav a[href="#for-teams"]', '팀을 위해', '團隊方案'],
 
     ['.hero .tagline', 'Ted가 Lisa를 만나면,<br>아이디어가 <strong>HTML</strong>로 살아납니다', '當 Ted 遇見 Lisa，<br>想法在 <strong>HTML</strong> 中活了起來'],
     ['.hero .sub', '무엇이 필요한지 알려주세요 — 슬라이드, 문서, 다이어그램, 사이트. 짧은 비주얼 인테이크에 답하면 에이전트가 독립 실행형 HTML 파일 하나를 건네줍니다: 열고, 발표하고, 인쇄하고, 이메일로 보내세요. 빌드 과정도, 설치할 것도 없습니다.', '告訴我們你需要什麼 — 投影片、文件、圖表或網站。回答簡短的視覺化提問，你的 agent 就會交回一個獨立的 HTML 檔案：打開、簡報、列印、寄出都可以。沒有建置流程，也不用安裝任何東西。'],
@@ -1112,8 +1168,15 @@ function googleTranslateElementInit() {
     ['.scene-copy p:not(.kicker)', '브리프는 당신이, 제작은 에이전트가. 돌아오는 것은 어디서나 열리고 한 스튜디오에서 나온 듯한 파일 하나입니다.', '你出題目，agent 負責打造。回到你手上的，是一個到哪都能開、看起來像出自同一間工作室的檔案。'],
     ['.scene-copy .btn', '필요한 것 알려주기', '告訴我們你需要什麼'],
 
+    ['#for-teams .kicker', '팀을 위해', '團隊方案'],
+    ['#teams-h', '당신의 브랜드를, 스킬로 설치합니다.', '把你的品牌，安裝成一個技能。'],
+    ['.teams-body', '이 페이지의 모든 것이 저희 하우스 스타일입니다. 같은 기계장치가 당신의 스타일도 실어 나를 수 있습니다: 당신의 디자인 토큰, 이미 쓰고 있는 자료에서 그대로 떼어 온 컴포넌트, 지켜야 할 용어, 당신만의 인테이크 — 에이전트가 읽는 비공개 템플릿 팩으로 전달됩니다. 저희에게 덱을 주문하시는 게 아니라, 스튜디오를 설치하시는 겁니다. 그 뒤로 팀이 만드는 모든 파일이 한 스튜디오에서 나온 것처럼 보입니다 — 당신의 스튜디오에서.', '這一頁上的一切都是我們的自家風格。同一套機器也能載著你的：你的設計 token、從你已經在交付的簡報裡原封不動取下的元件、你要保護的詞彙、你自己的 intake — 全部做成一份你的 agent 讀得懂的私有範本包。你不是來下單做簡報，而是把整間工作室裝進來。從此以後，團隊做出的每一個檔案，看起來都像出自同一間工作室 — 你的。'],
+    ['#teams-cta', '팩은 이렇게 만들어집니다 — monomind.one', '一份範本包是怎麼做出來的 — monomind.one'],
+    ['.teams-by', '이 사이트를 만든 스튜디오, MonoMind가 만듭니다.', '由 MonoMind 打造 — 就是做出這個網站的工作室。'],
+
     ['.foot a[href*="SKILL.md"]', '스킬', '技能'],
-    ['.foot a[href*="LICENSE"]', 'MIT + Commons Clause', 'MIT + Commons Clause']
+    ['.foot a[href*="LICENSE"]', 'MIT + Commons Clause', 'MIT + Commons Clause'],
+    ['.foot a[href="#for-teams"]', '팀을 위해', '團隊方案']
   ];
   var UI = {
     en: { search: 'Search languages…', instant: 'Instant', mt: 'Machine translated' },
@@ -1137,7 +1200,11 @@ function googleTranslateElementInit() {
   }
 
   var LITERAL_BLOCKS = '.cmd, .promptbox, code, .file-card, .agents, .lang-panel, .wordmark';
-  var TERMS = /(MonoMind(?: AI Lab)?|MONOMIND(?: AI LAB)?|monomind(?: ai lab)?|Hi Ted, Meet Lisa|Claude Code|Gemini CLI|OpenCode|Codex|Hermes|claude\.ai|GitHub|Cloudflare|\bTed\b|\bLisa\b|\/tedandlisa(?:-[a-z-]+)?|[A-Za-z0-9_.-]+\.(?:html|md|json|pptx)\b)/g;
+  /* Case-sensitive by design (a lowercase `monomind` alternative had to be
+     added once already), so every casing a term actually appears in on this
+     page needs its own alternative. Longest form first: `monomind.one` must
+     win over the bare `monomind`, or the machine translator gets the `.one`. */
+  var TERMS = /(html\.monomind\.one|monomind\.one|MonoMind(?: AI Lab)?|MONOMIND(?: AI LAB)?|monomind(?: ai lab)?|Branded Deck System|BRANDED DECK SYSTEM|branded deck system|Hi Ted, Meet Lisa|Claude Code|Gemini CLI|OpenCode|Codex|Hermes|claude\.ai|GitHub|Cloudflare|\bTed\b|\bLisa\b|\/tedandlisa(?:-[a-z-]+)?|[A-Za-z0-9_.-]+\.(?:html|md|json|pptx)\b)/g;
   var SKIP = /^(SCRIPT|STYLE|CODE|TEXTAREA|NOSCRIPT|IFRAME)$/;
 
   function protect() {
