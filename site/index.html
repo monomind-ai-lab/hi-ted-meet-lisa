@@ -350,7 +350,6 @@ section { padding: clamp(64px, 10vh, 128px) var(--pad); }
 .getlist li { display: flex; gap: 12px; font-size: 14px; color: var(--cream-dim); }
 .getlist li::before { content: "—"; color: var(--terracotta); flex: none; }
 .getlist b { color: var(--cream); font-weight: 700; }
-.soon { margin-top: 24px; font-size: 12.5px; color: var(--cream-faint); font-style: italic; }
 
 /* both pane */
 .both-flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--hair); border: 1px solid var(--hair); margin-bottom: 28px; }
@@ -677,8 +676,6 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
               <li><span><b>Every agent you use.</b> The skill is plain Markdown and HTML —
               Claude Code, Codex, Pi, OpenCode, Hermes all read the same files.</span></li>
             </ul>
-            <p class="soon">Prefer no terminal at all? Packaged skill zips for claude.ai
-            (Settings → Capabilities → Skills) are coming soon.</p>
           </div>
         </div>
       </div>
@@ -1045,7 +1042,6 @@ function googleTranslateElementInit() {
     ['#pane-both .getlist li:nth-child(2) > span', '<b>나만의 템플릿.</b> 마음에 드는 페이지를 <code>/tedandlisa-new-template</code>에 건네면 그 스타일이 갤러리의 영구 선택지가 됩니다.', '<b>你自己的範本。</b>把喜歡的頁面交給 <code>/tedandlisa-new-template</code>，它的樣式就會永久加入圖庫。'],
     ['#pane-both .getlist li:nth-child(3) > span', '<b>디자인 파이프라인.</b> <code>/tedandlisa-design</code>으로 12가지 스타일 프리셋과 애니메이션 슬라이드를 — 여전히 HTML 파일 하나로.', '<b>設計管線。</b><code>/tedandlisa-design</code> 提供十二種風格預設與動畫投影片 — 依然是一個 HTML 檔。'],
     ['#pane-both .getlist li:nth-child(4) > span', '<b>어떤 에이전트에서든.</b> 스킬은 평범한 Markdown과 HTML입니다 — Claude Code, Codex, Pi, OpenCode, Hermes 모두 같은 파일을 읽습니다.', '<b>你用的每個 agent。</b>技能就是純 Markdown 和 HTML — Claude Code、Codex、Pi、OpenCode、Hermes 讀的都是同一份檔案。'],
-    ['#pane-both .soon', '터미널이 부담스러우신가요? claude.ai용 스킬 zip 패키지(Settings → Capabilities → Skills)가 곧 제공됩니다.', '完全不想碰終端機？給 claude.ai 用的技能 zip 套件（Settings → Capabilities → Skills）即將推出。'],
 
 
     ['#templates .section-head .kicker', '템플릿', '範本'],
