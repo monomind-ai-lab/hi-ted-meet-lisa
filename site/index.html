@@ -494,7 +494,18 @@ section { padding: clamp(64px, 10vh, 128px) var(--pad); }
 .teams-copy { max-width: var(--measure); }
 .teams-copy h2 { font-size: clamp(30px, 4vw, 46px); margin: 14px 0 18px; }
 .teams-body { color: var(--cream-dim); }
+.teams-proof { margin-top: 16px; color: var(--cream-dim); }
+.teams-pack { margin-top: 18px; font-size: 14.5px; color: var(--cream-dim); }
+.teams-pack b { color: var(--cream); font-weight: 700; }
 .teams-copy .cta-row { margin-top: 30px; }
+/* The quieter of the band's two actions, and deliberately not a .btn:
+   the monomind.one CTA stays the primary thing to click. */
+.teams-inspect {
+  align-self: center; font-size: 13.5px; color: var(--cream-dim);
+  text-underline-offset: 4px; text-decoration-color: var(--hair-strong);
+  transition: color 200ms var(--ease), text-decoration-color 200ms var(--ease);
+}
+.teams-inspect:hover { color: var(--cream); text-decoration-color: var(--cream); }
 .teams-by { margin-top: 26px; font-size: 12.5px; color: var(--cream-faint); }
 
 /* ── footer ────────────────────────────────────────────────────── */
@@ -914,9 +925,28 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
         intake — delivered as a private template pack your agent reads. You
         don't send us deck requests; we install the studio. Every file your team
         makes after that looks like it came from one studio — yours.</p>
+        <!-- The proof, and it costs no new artifact: the house style IS a pack,
+             and the repository makes that checkable rather than claimed. A
+             fictional-brand demo pack was the earlier plan and is cancelled —
+             see D-027. Nothing here is a second paid surface: the proof and the
+             manifest sit inside the one band D-025 allows. -->
+        <p class="teams-proof">What you are looking at is one. The six templates,
+        their pattern references, the protected terms, the intake questions —
+        that is our own pack, installed in our own agent, and every template
+        preview in the gallery is its output. You don't have to take that on
+        trust: the
+        registry and the pattern references are public files in this repository.</p>
+        <p class="teams-pack"><b>A pack is</b> your design tokens, one pattern
+        reference per template, your protected terms, your own intake questions,
+        and the install — in your agent, not ours.</p>
         <div class="cta-row">
           <a class="btn btn-ghost" id="teams-cta" data-paid-cta="tedlisa-band"
              href="https://monomind.one/?ref=tedlisa-band" rel="noopener">How a pack gets built — monomind.one</a>
+          <!-- No data-paid-cta ref on purpose: this is not a paid CTA and must
+               not fire cta-teams. It goes to the machinery itself. -->
+          <a class="teams-inspect" id="teams-inspect" target="_blank"
+             href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa/blob/main/templates/templates.json"
+             rel="noopener noreferrer">Inspect the machinery — GitHub</a>
         </div>
         <p class="teams-by">Built by MonoMind, the studio behind this site.</p>
       </div>
@@ -1233,6 +1263,11 @@ function googleTranslateElementInit() {
     ['.teams-body', '이 페이지의 모든 것이 저희 하우스 스타일입니다. 같은 기계장치가 당신의 스타일도 실어 나를 수 있습니다: 당신의 디자인 토큰, 이미 쓰고 있는 자료에서 그대로 떼어 온 컴포넌트, 지켜야 할 용어, 당신만의 인테이크 — 에이전트가 읽는 비공개 템플릿 팩으로 전달됩니다. 저희에게 덱을 주문하시는 게 아니라, 스튜디오를 설치하시는 겁니다. 그 뒤로 팀이 만드는 모든 파일이 한 스튜디오에서 나온 것처럼 보입니다 — 당신의 스튜디오에서.', '這一頁上的一切都是我們的自家風格。同一套機器也能載著你的：你的設計 token、從你已經在交付的簡報裡原封不動取下的元件、你要保護的詞彙、你自己的 intake — 全部做成一份你的 agent 讀得懂的私有範本包。你不是來下單做簡報，而是把整間工作室裝進來。從此以後，團隊做出的每一個檔案，看起來都像出自同一間工作室 — 你的。'],
     ['#teams-cta', '팩은 이렇게 만들어집니다 — monomind.one', '一份範本包是怎麼做出來的 — monomind.one'],
     ['.teams-by', '이 사이트를 만든 스튜디오, MonoMind가 만듭니다.', '由 MonoMind 打造 — 就是做出這個網站的工作室。'],
+    /* Appended after the band's existing entries, keyed on their own classes
+       and id — nothing in #for-teams is positional, so nothing retargets. */
+    ['.teams-proof', '지금 보고 계신 것이 바로 그 팩입니다. 여섯 개의 템플릿, 각각의 패턴 레퍼런스, 보호 용어, 인테이크 질문 — 이것이 저희 자신의 팩이고, 저희 자신의 에이전트에 설치되어 있으며, 위 템플릿 미리보기는 전부 그 결과물입니다. 말로만 믿으실 필요는 없습니다: 레지스트리도 패턴 레퍼런스도 이 저장소에 공개되어 있습니다.', '你現在看到的就是一份。六個範本、每個範本的樣式模式文件、受保護的詞彙、intake 的問題 — 那就是我們自己的範本包，裝在我們自己的 agent 裡，而上面每一個範本預覽都是它的產物。這件事不必只聽我們說：範本登錄檔和樣式模式文件都公開在這個儲存庫裡。'],
+    ['.teams-pack', '<b>팩은 이렇게 구성됩니다.</b> 당신의 디자인 토큰, 템플릿마다 하나씩의 패턴 레퍼런스, 지켜야 할 용어, 당신만의 인테이크 질문, 그리고 설치 — 저희 쪽이 아니라 당신의 에이전트 안에.', '<b>一份範本包包含：</b>你的設計 token、每個範本一份樣式模式文件、你要保護的詞彙、你自己的 intake 問題，以及安裝本身 — 裝在你的 agent 裡，不是我們的。'],
+    ['#teams-inspect', '기계장치를 직접 확인하기 — GitHub', '自己去看那套機器 — GitHub'],
 
     ['.foot a[href*="SKILL.md"]', '스킬', '技能'],
     ['.foot a[href*="LICENSE"]', 'MIT + Commons Clause', 'MIT + Commons Clause'],
