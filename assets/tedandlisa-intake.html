@@ -53,9 +53,48 @@
     radial-gradient(120vh 96vh at 8% 88%, color-mix(in srgb, var(--sage) 30%, transparent), transparent 66%),
     radial-gradient(90vh 70vh at 96% 84%, color-mix(in srgb, var(--sage) 20%, transparent), transparent 62%),
     var(--fg);
+
+  /* ── the app shell's three heights ──────────────────────────────
+     The panel is a fixed-height shell: a header of --top-h, a footer of
+     --foot-h, and one scrolling body between them. Nothing else scrolls,
+     so the two bars are where they are by construction rather than by
+     `position: sticky`.
+
+     --panel-h is the whole shell, and it is deliberately different in the
+     two contexts this file runs in:
+
+       local (default)  min(100dvh, 1040px)
+         The panel *is* the browser page. On a tall monitor a full-bleed
+         shell stretches the header and footer apart with nothing between
+         them, so the height is capped and the shell centres in the ground.
+
+       web  (body[data-mode="web"], set from CTX.mode by site/sync.sh)
+         site/index.html frames this in an iframe filling `.overlay .sheet`,
+         which is already `height: min(1040px, 100%)`. Inside the iframe
+         100dvh *is* that sheet, so the panel fills it exactly — capping it
+         a second time would leave a dead band inside the frame.
+
+     dvh, not vh: mobile browser chrome counts against the small viewport,
+     and a vh-sized shell puts the footer under it. The vh line before each
+     dvh line is the fallback for engines that do not know dvh. */
+  --panel-h: min(100vh, 1040px);
+  --panel-h: min(100dvh, 1040px);
+  --top-h: 156px;
+  --foot-h: 78px;
+}
+/* Web mode: fill the frame the site gives us, whatever its height. The sheet
+   already caps itself at 1040px, so today the two values usually land on the
+   same number — this is what stops a second, invisible cap from leaving a
+   dead band inside the frame if that sheet ever grows. */
+body[data-mode="web"] {
+  --panel-h: 100vh;
+  --panel-h: 100dvh;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; min-height: 100%; }
+html, body { margin: 0; }
+html { height: 100%; }
+/* The page itself never scrolls. The shell is exactly --panel-h tall and the
+   only scroll container in the file is .panelbody inside it. */
 body {
   font-family: var(--font-body);
   color: var(--fg-inv);
@@ -65,11 +104,31 @@ body {
   background: var(--ground);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   display: flex;
   justify-content: center;
-  padding: clamp(16px, 4vw, 48px) clamp(12px, 4vw, 32px);
+  align-items: center;
+  padding: 0 clamp(12px, 4vw, 32px);
 }
-.shell { width: 100%; max-width: 860px; display: flex; flex-direction: column; gap: var(--space-6); }
+/* Three rows: the header holds its own height, the footer holds its own, and
+   1fr gives everything left over to the body. min-height:0 is what lets that
+   1fr row actually shrink far enough to scroll — without it a grid row floors
+   at its content's height and the footer walks off the bottom. */
+.shell {
+  width: 100%; max-width: 860px;
+  height: var(--panel-h);
+  display: grid; grid-template-rows: auto 1fr auto;
+  min-height: 0;
+}
+/* The one scroll container. Its padding replaces the gap the old column
+   layout put between the bars and the content. */
+.panelbody {
+  min-height: 0; overflow-y: auto; overflow-x: hidden;
+  padding: var(--space-6) var(--space-3) var(--space-6) 0;
+  overscroll-behavior: contain;
+}
 
 /* ── brand header ─────────────────────────────────────────────── */
 .brandbar { display: flex; align-items: center; gap: var(--space-3); }
@@ -86,8 +145,8 @@ body {
 /* margin-left:auto, not the row's space-between: .stepname beside it is hidden
    above 700px, and space-between pins a lone child to the start — which sent
    the count to the left edge the moment the step name came out. */
-.count { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--muted-inv);
-  white-space: nowrap; margin-left: auto; }
+.count { font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.4;
+  color: var(--muted-inv); white-space: nowrap; margin-left: auto; }
 
 h1 { font-family: var(--font-display); font-size: clamp(28px, 4.4vw, 40px); line-height: 1.08;
      letter-spacing: -0.025em; margin: 0 0 var(--space-2); font-weight: 700; }
@@ -120,20 +179,24 @@ h1 { font-family: var(--font-display); font-size: clamp(28px, 4.4vw, 40px); line
 
 /* ── progress rail ─────────────────────────────────────────────────
    The rail is the map: Prompt, Template, one chapter per surviving
-   group of questions, Ready. It sits above everything and sticks, so a
-   long screen can scroll without the reader losing their place. The
-   chapters come out of the *filtered* question order, so the rail is
-   longer for `sitemap-ia` than for a deck and shorter still for the
-   external handoff — the length changing with the template pick is the
-   rail telling the truth, not a bug. */
-/* The mark and the rail travel together — the whole header stays put, so the
-   step count and the chapter you are on are never scrolled away. The bar
-   repaints --ground rather than tinting over it, because a translucent fill
-   over a fixed gradient shows as a band the moment content slides under it. */
+   group of questions, Ready. The chapters come out of the *filtered*
+   question order, so the rail is longer for `sitemap-ia` than for a deck
+   and shorter still for the external handoff — the length changing with
+   the template pick is the rail telling the truth, not a bug.
+
+   Every step is a real <button> that jumps to its screen, backwards to
+   check an answer or forwards to get on with it. That is safe because
+   every question carries a default, so no screen is ever in a state the
+   payload cannot describe — verified, not assumed. */
+/* The mark and the rail travel together in row 1 of the shell grid, at a
+   fixed --top-h: they hold their place by construction, so nothing here is
+   sticky any more. The bar still repaints --ground rather than tinting over
+   it, so its slice of the gradient lines up exactly with the body's — which
+   is also why it keeps background-attachment: fixed. */
 .topbar {
-  position: sticky; top: 0; z-index: 6;
+  height: var(--top-h);
   display: flex; flex-direction: column; gap: var(--space-4);
-  padding-top: clamp(10px, 2.5vw, 18px);
+  padding-top: var(--space-4);
   background: var(--ground);
   background-attachment: fixed;
 }
@@ -149,24 +212,50 @@ h1 { font-family: var(--font-display); font-size: clamp(28px, 4.4vw, 40px); line
    carries its own heading, so naming the step here just says it twice. It
    comes back under 700px, where the labels are dropped and this is the only
    thing left telling you which chapter you are in. */
-.stepname { display: none; font-size: var(--text-sm); font-weight: 600; color: var(--fg-inv);
+.stepname { display: none; font-size: var(--text-sm); line-height: 1.4; font-weight: 600;
+  color: var(--fg-inv);
   min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chaps { display: flex; gap: 6px; }
-.chap { flex: 1; min-width: 0; }
+/* Each step is a button, so the hit target has to be a target: the visible
+   bar is 3px, and 3px is not tappable. The padding above and below it is the
+   touch area, and min-height keeps that area honest under 700px where the
+   label — the only other thing in the button — is gone. */
+.chap {
+  flex: 1; min-width: 0; min-height: 38px;
+  display: flex; flex-direction: column; justify-content: flex-start;
+  font: inherit; color: inherit; text-align: left; cursor: pointer;
+  background: transparent; border: 0; border-radius: 6px;
+  padding: 9px 0 6px;
+}
+.chap:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .chap .barline { height: 3px; border-radius: var(--radius-pill);
-  background: var(--glass-hair); overflow: hidden; }
+  background: var(--glass-hair); overflow: hidden;
+  transition: background var(--motion-fast) var(--ease-standard); }
+.chap:hover .barline { background: color-mix(in srgb, var(--accent-on) 40%, transparent); }
 .chap .barline span { display: block; height: 100%; width: 0; background: var(--accent);
   transition: width var(--motion-base) var(--ease-standard); }
-.chap.done .barline span { background: var(--accent-hair); }
+/* The step's state is a data attribute, not a class. `.chap.done` used to be
+   the markup, and `.done` is also the result screen's completion block —
+   `display:flex; gap:16px` — which won on source order and collapsed every
+   passed step's bar to zero width. Nothing can collide with an attribute. */
+.chap[data-state="done"] .barline span { background: var(--accent-hair); }
 .chap .lbl { display: block; margin-top: 7px; font-family: var(--font-mono);
-  font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  font-size: 10px; line-height: 1.4; letter-spacing: 0.08em; text-transform: uppercase;
   color: color-mix(in srgb, var(--accent-on) 46%, transparent);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.chap.done .lbl { color: var(--muted-inv); }
-.chap.now .lbl { color: var(--accent); }
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: color var(--motion-fast) var(--ease-standard); }
+.chap[data-state="done"] .lbl { color: var(--muted-inv); }
+.chap[data-state="now"] .lbl { color: var(--accent); }
+.chap:hover .lbl { color: var(--fg-inv); }
 /* Below this the labels cannot hold their words, so the bars carry the
-   shape and #stepname carries the name. */
-@media (max-width: 700px) { .chap .lbl { display: none; } .stepname { display: block; } }
+   shape and #stepname carries the name. With the label gone the button has
+   nothing but a 3px bar in it, so the bar centres in the touch area rather
+   than clinging to the top of it. */
+@media (max-width: 700px) {
+  .chap .lbl { display: none; }
+  .chap { justify-content: center; min-height: 34px; padding: 6px 0; }
+  .stepname { display: block; }
+}
 
 /* ── screens ───────────────────────────────────────────────────── */
 .screen[hidden] { display: none; }
@@ -188,8 +277,9 @@ h1 { font-family: var(--font-display); font-size: clamp(28px, 4.4vw, 40px); line
   background: var(--glass-hi); padding: var(--space-5);
   transition: border-color var(--motion-fast) var(--ease-standard),
               background var(--motion-fast) var(--ease-standard);
-  /* clears the sticky rail when a question is scrolled into view */
-  scroll-margin-top: 96px;
+  /* The rail is outside the scroll container now, so a question only has to
+     clear .panelbody's own padding rather than a sticky bar's height. */
+  scroll-margin: var(--space-4) 0;
 }
 /* Every question on a chapter screen is open and answerable; `.active`
    only marks the one the number keys are aimed at. */
@@ -292,12 +382,34 @@ textarea::placeholder, input::placeholder { color: color-mix(in srgb, var(--acce
 .warn { font-size: var(--text-xs); color: var(--warn); margin-top: var(--space-2); font-family: var(--font-mono); }
 
 /* ── footer ───────────────────────────────────────────────────── */
-/* Matches the header: repaint --ground, hairline to mark the edge, and right
-   padding so the key hints are not jammed against the rail's edge. */
-.actions { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap;
-  position: sticky; bottom: 0; padding: var(--space-4) var(--space-3) var(--space-4) 0;
+/* Row 3 of the shell grid, at a fixed --foot-h. Matches the header: repaint
+   --ground, hairline to mark the edge, right padding so the key hints are not
+   jammed against the rail's edge. One bar serves the whole flow *and* the
+   Ready screen — the two groups inside it swap, the bar itself never moves.
+   align-items:center is what makes that true: whichever group is on show is
+   centred in the same fixed box, so the button row sits on one line for the
+   whole session. position/z-index are for the Copy tooltip, which reaches up
+   out of the footer and over the scrolling body. */
+.actions { height: var(--foot-h); display: flex; align-items: center;
+  padding: 0 var(--space-3) 0 0;
+  position: relative; z-index: 3;
   background: var(--ground); background-attachment: fixed;
   border-top: 1px solid var(--glass-hair); }
+.actgroup { display: flex; align-items: center; gap: var(--space-2); width: 100%; }
+.actgroup[hidden] { display: none; }
+/* One line, always. A button that shrinks wraps its own label, and a wrapped
+   label is a taller row — the exact thing a fixed-height bar exists to
+   prevent. The buttons keep their size and the key hints are the only thing
+   allowed to give, by clipping rather than by wrapping. */
+.actgroup button { flex: none; white-space: nowrap; }
+/* The long labels do not fit one row at 375px, and a second row would change
+   the footer's height. Each button carries both wordings and the breakpoint
+   picks one — syncFooter keeps the pair in step. */
+.narrowlbl { display: none; }
+@media (max-width: 620px) {
+  .widelbl { display: none; }
+  .narrowlbl { display: inline; }
+}
 button.primary {
   font: inherit; font-weight: 600; font-size: var(--text-base); cursor: pointer;
   background: var(--accent); color: var(--accent-ink); border: none;
@@ -306,12 +418,11 @@ button.primary:hover { background: color-mix(in oklab, var(--accent), black 8%);
 button.primary:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 button.ghost { font: inherit; font-size: var(--text-sm); cursor: pointer; background: transparent;
   color: var(--muted-inv); border: 1px solid var(--glass-hair); border-radius: var(--radius-pill);
-  padding: var(--space-3) var(--space-5); }
+  padding: var(--space-3) var(--space-4); }
 button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
-.result .actions { background: none; position: static; padding-top: var(--space-2);
-  border-top: none; }
-.kbd { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--muted-inv); margin-left: auto; }
-.kbd b { border: 1px solid var(--glass-hair); border-radius: 5px; padding: 1px 6px; font-weight: 400; }
+.kbd { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--muted-inv);
+  margin-left: auto; flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; }
+.kbd b { border: 1px solid var(--glass-hair); border-radius: 5px; padding: 1px 5px; font-weight: 400; }
 
 /* ── result states ────────────────────────────────────────────── */
 .result { display: none; flex-direction: column; gap: var(--space-4); }
@@ -405,14 +516,27 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }
+/* A phone cannot spend 156px on chrome, so the header is tightened rather
+   than merely re-measured: a smaller mark, less air around the rail, and the
+   chapter labels already gone. The height is still fixed — just fixed to a
+   different number, which is what "the bars never move" means per breakpoint. */
+@media (max-width: 700px) {
+  :root { --top-h: 138px; }
+  .topbar { gap: var(--space-3); padding-top: var(--space-3); }
+  .mark { width: 26px; height: 26px; }
+  .railbar { padding: var(--space-2) var(--space-3) var(--space-2) 0; }
+  .railtop { margin-bottom: var(--space-1); }
+}
 @media (max-width: 620px) {
+  :root { --foot-h: 72px; }
   .q { padding: var(--space-4); }
-  .actions { flex-direction: column; align-items: stretch; }
   .kbd { display: none; }
 }
 </style>
 </head>
-<body>
+<!-- data-mode is the shell's height switch (see --panel-h). It starts local and
+     the script flips it to "web" when site/sync.sh has injected that context. -->
+<body data-mode="local">
 <main class="shell">
   <div class="topbar">
   <div class="brandbar">
@@ -428,16 +552,19 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
   </div>
 
   <!-- The rail lives outside #intake so it survives the move to the result
-       screen: Ready is a step on it like any other. -->
+       screen: Ready is a step on it like any other. It is a navigation
+       region, not decoration — it used to carry aria-hidden because it was
+       three coloured bars; now each step is a button that goes there. -->
   <div class="railbar" id="railbar">
     <div class="railtop">
       <span class="stepname" id="stepname"></span>
       <span class="count" id="count"></span>
     </div>
-    <div class="chaps" id="rail" aria-hidden="true"></div>
+    <nav class="chaps" id="rail" aria-label="Progress"></nav>
   </div>
   </div>
 
+  <div class="panelbody" id="panelbody">
   <div id="intake">
     <header class="screen" id="screen-prompt">
       <h1 tabindex="-1">Tell her what you need.</h1>
@@ -460,28 +587,6 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
     </header>
 
     <div class="qlist screen" id="qlist" hidden></div>
-
-    <div class="actions">
-      <button class="primary" id="submit">Next &#9166;</button>
-      <button class="ghost" id="backstep" hidden>Back</button>
-      <button class="ghost" id="skip">Skip the rest, use defaults</button>
-      <span class="kbd"><b>1</b>&ndash;<b>9</b> select &middot; <b>&uarr;</b><b>&darr;</b> question &middot;
-        <b>&larr;</b><b>&rarr;</b> screen &middot; <b>&#9166;</b> continue</span>
-    </div>
-  </div>
-
-  <!-- Preview overlay. Local previews open here rather than by navigating:
-       an embedded browser turns target="_blank" into a same-tab navigation,
-       which throws away a half-answered form. The overlay carries a real
-       new-tab link for anyone who wants one. External links (a repository,
-       a hosted deck) skip the overlay — they refuse to be framed. -->
-  <div class="pvw" id="pvw" hidden>
-    <div class="pvw-bar">
-      <span class="pvw-title" id="pvwtitle"></span>
-      <a class="pvw-open" id="pvwopen" href="#" target="_blank" rel="noopener noreferrer">Open in a new tab &#8599;</a>
-      <button type="button" class="pvw-close" id="pvwclose" aria-label="Close preview">&times; Close</button>
-    </div>
-    <iframe class="pvw-frame" id="pvwframe" title="Template preview"></iframe>
   </div>
 
   <!-- The end state reads as finished either way. When the runner took the
@@ -514,14 +619,6 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
       <pre class="payload" id="payload"></pre>
     </details>
 
-    <div class="actions" id="resultactions">
-      <span class="tipwrap">
-        <button class="primary" id="copy" aria-describedby="copytip">Copy answers</button>
-        <span class="tip" id="copytip" role="tooltip">Didn't make it through? Copy this and paste it into the chat.</span>
-      </span>
-      <button class="ghost" id="back">Back to the questions</button>
-    </div>
-
     <!-- Web mode only. `show()` gates this exactly the way it gates the
          artwork above (CTX.mode === "web", injected by site/sync.sh), so the
          locally-served runner never shows commercial copy. The link is the
@@ -533,7 +630,47 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
       <a href="https://monomind.one/?ref=tedlisa-intake" target="_blank"
          rel="noopener">monomind.one</a></p>
   </section>
+  </div>
+
+  <!-- One footer for the whole panel. The flow group serves every asking
+       screen; the ready group takes over on Ready. They swap inside a box of
+       fixed height, so the bar is in the same place on every screen — which
+       is the point of moving the Ready controls out of .result and up here
+       rather than letting the end state carry its own bar. -->
+  <footer class="actions">
+    <div class="actgroup" id="flowactions">
+      <button class="primary" id="submit">Next &#9166;</button>
+      <button class="ghost" id="backstep" hidden>Back</button>
+      <button class="ghost" id="skip"><span class="widelbl">Skip the rest, use defaults</span><span class="narrowlbl">Skip</span></button>
+      <span class="kbd"><b>1</b>&ndash;<b>9</b> select &middot; <b>&uarr;</b><b>&darr;</b> question &middot;
+        <b>&larr;</b><b>&rarr;</b> screen &middot; <b>&#9166;</b> continue</span>
+    </div>
+    <div class="actgroup" id="resultactions" hidden>
+      <span class="tipwrap">
+        <button class="primary" id="copy" aria-describedby="copytip">Copy answers</button>
+        <span class="tip" id="copytip" role="tooltip">Didn't make it through? Copy this and paste it into the chat.</span>
+      </span>
+      <button class="ghost" id="back"><span class="widelbl">Back to the questions</span><span class="narrowlbl">Back</span></button>
+    </div>
+  </footer>
 </main>
+
+<!-- Preview overlay. Local previews open here rather than by navigating:
+     an embedded browser turns target="_blank" into a same-tab navigation,
+     which throws away a half-answered form. The overlay carries a real
+     new-tab link for anyone who wants one. External links (a repository,
+     a hosted deck) skip the overlay — they refuse to be framed.
+     It sits outside .shell so it covers the whole app shell: position:fixed
+     already puts it over everything, and living outside the grid means it can
+     never be mistaken for a fourth row. -->
+<div class="pvw" id="pvw" hidden>
+  <div class="pvw-bar">
+    <span class="pvw-title" id="pvwtitle"></span>
+    <a class="pvw-open" id="pvwopen" href="#" target="_blank" rel="noopener noreferrer">Open in a new tab &#8599;</a>
+    <button type="button" class="pvw-close" id="pvwclose" aria-label="Close preview">&times; Close</button>
+  </div>
+  <iframe class="pvw-frame" id="pvwframe" title="Template preview"></iframe>
+</div>
 
 <script>
 "use strict";
@@ -546,6 +683,11 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
 
 /* The runner may inject { prompt, title } before this script runs. */
 var CTX = window.__MONOMIND_INTAKE__ || {};
+
+/* The shell's height switch — see --panel-h in the stylesheet. The markup
+   ships data-mode="local" so a browser that never reaches this line still
+   gets a sane panel; web mode only exists when site/sync.sh injected it. */
+document.body.dataset.mode = CTX.mode === "web" ? "web" : "local";
 
 /* Web mode only, gated exactly the way #teamsline is (CTX.mode === "web",
    injected by site/sync.sh) so the locally-served runner and a file:// copy
@@ -854,6 +996,7 @@ function smooth() {
 
 var qlist = document.getElementById("qlist");
 var rail  = document.getElementById("rail");
+var panelbody = document.getElementById("panelbody");
 
 function esc(s) {
   return String(s).replace(/[&<>"']/g, function (c) {
@@ -1030,31 +1173,84 @@ function screenTitle(s) {
   return s.label;
 }
 
+/* The rail's buttons are rebuilt only when the *set* of steps changes — the
+   template pick can grow or shrink it — and repainted on every move. Blowing
+   the innerHTML away on each repaint would drop keyboard focus off a rail
+   button the moment ↑/↓ repainted the fill, so the two jobs are separate. */
+function renderRail() {
+  var sig = SCREENS.map(function (st) { return st.label; }).join(" ");
+  if (rail.dataset.sig !== sig) {
+    rail.dataset.sig = sig;
+    rail.innerHTML = SCREENS.map(function (st, i) {
+      return '<button type="button" class="chap" data-go="' + i + '">' +
+        '<span class="barline"><span></span></span>' +
+        '<span class="lbl">' + esc(st.label) + '</span></button>';
+    }).join("");
+  }
+  paintRail();
+}
+
 /* A passed step is full; the step you are on fills in proportion to how far
    through its questions you are, so the bar reports a real position rather
-   than decorating one. Prompt, Template and Ready hold one thing each. */
-function renderRail() {
+   than decorating one. Prompt, Template and Ready hold one thing each.
+   The accessible name spells the step out — "Step 3 of 7: Look" — because the
+   visible label is display:none under 700px, and a hidden label is a missing
+   name, not a quiet one. */
+function paintRail() {
   var s = SCREENS[atScreen] || SCREENS[0];
   document.getElementById("stepname").textContent = screenTitle(s);
   document.getElementById("count").textContent = (atScreen + 1) + " of " + SCREENS.length;
-  rail.innerHTML = SCREENS.map(function (st, i) {
+  Array.prototype.forEach.call(rail.children, function (b, i) {
+    var st = SCREENS[i];
+    if (!st) { return; }
     var fill = 0;
     if (i < atScreen) { fill = 100; }
     else if (i === atScreen) {
       fill = st.k === "chapter" ? Math.round((activeAt() + 1) / st.qs.length * 100) : 100;
     }
-    return '<div class="chap ' + (i < atScreen ? "done" : i === atScreen ? "now" : "") + '">' +
-      '<div class="barline"><span style="width:' + fill + '%"></span></div>' +
-      '<span class="lbl">' + esc(st.label) + '</span></div>';
-  }).join("");
+    b.dataset.state = i < atScreen ? "done" : i === atScreen ? "now" : "next";
+    b.firstChild.firstChild.style.width = fill + "%";
+    b.setAttribute("aria-label",
+      "Step " + (i + 1) + " of " + SCREENS.length + ": " + screenTitle(st));
+    if (i === atScreen) { b.setAttribute("aria-current", "step"); }
+    else { b.removeAttribute("aria-current"); }
+  });
 }
+
+/* A step on the rail goes to its screen — backwards to check or change an
+   answer, forwards to get on with it. Ready is the one step that is not just
+   a screen: reaching it *is* the submit, so the first visit runs it. After
+   that the end state is a record of what was sent, and it is only re-sent
+   when an answer actually changed — otherwise a second POST would reach a
+   runner that has already taken the answers and exited, and the panel would
+   report a failure that never happened. */
+rail.addEventListener("click", function (e) {
+  var b = e.target.closest ? e.target.closest("button[data-go]") : null;
+  if (!b) { return; }
+  var i = Number(b.dataset.go);
+  if (i === SCREENS.length - 1 && (sentKey === null || sentKey !== payloadKey())) {
+    submit();
+    return;
+  }
+  goScreen(i);
+});
 
 function syncFooter() {
   var onLast = atScreen >= SCREENS.length - 2;   /* the last screen that asks anything */
+  var ready = (SCREENS[atScreen] || {}).k === "ready";
+  document.getElementById("flowactions").hidden = ready;
+  document.getElementById("resultactions").hidden = !ready;
   document.getElementById("submit").textContent = onLast ? "Continue ⏎" : "Next ⏎";
-  document.getElementById("skip").textContent =
-    onLast ? "Use all defaults" : "Skip the rest, use defaults";
+  setPair("skip", onLast ? "Use all defaults" : "Skip the rest, use defaults",
+                  onLast ? "Defaults" : "Skip");
   document.getElementById("backstep").hidden = atScreen === 0;
+}
+
+/* Both wordings of a two-label button, kept in step. */
+function setPair(id, wide, narrow) {
+  var b = document.getElementById(id);
+  b.querySelector(".widelbl").textContent = wide;
+  b.querySelector(".narrowlbl").textContent = narrow;
 }
 
 function syncReveals(q) {
@@ -1096,7 +1292,12 @@ function goScreen(i) {
   render();
   var t = screenFocusTarget();
   if (t) { t.focus(); }
-  window.scrollTo({ top: 0, behavior: smooth() });
+  /* The page does not scroll — .panelbody does — so this is the element that
+     has to go back to the top on every screen change. Instantly: the content
+     under it has just been replaced, so animating a scroll through it would
+     be animating nothing, and .screen's own fade already carries the change.
+     It also cannot be interrupted by the scrollIntoView that ↑/↓ fires. */
+  panelbody.scrollTop = 0;
 }
 
 function screenFocusTarget() {
@@ -1420,6 +1621,17 @@ function payload() {
   };
 }
 
+/* The answers the end state is currently showing, minus the timestamp, which
+   is new on every call. The rail compares against this to tell "go back and
+   look at Ready" from "these answers changed and have to be sent again" —
+   without instrumenting every place an answer can be edited. */
+var sentKey = null;
+function payloadKey() {
+  var p = payload();
+  p.generatedAt = "";
+  return JSON.stringify(p);
+}
+
 /* `needsCopy` is the only difference between the two end states: it opens the
    fold and softens the mark. The screen says "done" either way, because it is —
    the answers exist and nothing was lost. */
@@ -1432,6 +1644,7 @@ function show(title, lead, needsCopy, json) {
   document.getElementById("resultlead").textContent = lead;
   document.getElementById("payload").textContent = json;
   document.getElementById("fallback").open = !!needsCopy;
+  sentKey = payloadKey();
   /* Ready is the rail's last step; goScreen does the showing and hiding. */
   goScreen(SCREENS.length - 1);
 }
