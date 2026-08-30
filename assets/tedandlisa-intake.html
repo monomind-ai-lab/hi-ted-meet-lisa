@@ -109,11 +109,54 @@ h1 { font-family: var(--font-display); font-size: clamp(28px, 4.4vw, 40px); line
 .brief b { display: block; font-size: var(--text-xs); text-transform: uppercase;
   letter-spacing: 0.08em; color: var(--muted-inv); margin-bottom: var(--space-1); font-weight: 600; }
 
-/* ── progress rail ────────────────────────────────────────────── */
-.rail { display: flex; gap: 4px; margin: var(--space-3) 0 var(--space-5); }
-.rail i { height: 3px; flex: 1; border-radius: var(--radius-pill);
-  background: var(--glass-hair); transition: background var(--motion-fast) var(--ease-standard); }
-.rail i.done { background: var(--accent); }
+/* ── progress rail ─────────────────────────────────────────────────
+   The rail is the map: Prompt, Template, one chapter per surviving
+   group of questions, Ready. It sits above everything and sticks, so a
+   long screen can scroll without the reader losing their place. The
+   chapters come out of the *filtered* question order, so the rail is
+   longer for `sitemap-ia` than for a deck and shorter still for the
+   external handoff — the length changing with the template pick is the
+   rail telling the truth, not a bug. */
+.railbar {
+  position: sticky; top: 0; z-index: 6;
+  padding: var(--space-3) 0 var(--space-2);
+  background: color-mix(in srgb, var(--fg) 88%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--glass-hair);
+}
+.railtop { display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--space-4); margin-bottom: var(--space-2); }
+.stepname { font-size: var(--text-sm); font-weight: 600; color: var(--fg-inv);
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chaps { display: flex; gap: 6px; }
+.chap { flex: 1; min-width: 0; }
+.chap .barline { height: 3px; border-radius: var(--radius-pill);
+  background: var(--glass-hair); overflow: hidden; }
+.chap .barline span { display: block; height: 100%; width: 0; background: var(--accent);
+  transition: width var(--motion-base) var(--ease-standard); }
+.chap.done .barline span { background: var(--accent-hair); }
+.chap .lbl { display: block; margin-top: 7px; font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent-on) 46%, transparent);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chap.done .lbl { color: var(--muted-inv); }
+.chap.now .lbl { color: var(--accent); }
+/* Below this the labels cannot hold their words, so the bars carry the
+   shape and #stepname carries the name. */
+@media (max-width: 700px) { .chap .lbl { display: none; } }
+
+/* ── screens ───────────────────────────────────────────────────── */
+.screen[hidden] { display: none; }
+.screen { animation: screenin var(--motion-base) var(--ease-standard) both; }
+@keyframes screenin { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+/* Each screen hands focus to its own heading, so the heading has to be
+   able to show a ring when the move came from the keyboard. */
+.screenhead:focus-visible, h1:focus-visible, .q h2:focus-visible, #resulttitle:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 6px; border-radius: 4px; }
+.screenhead { font-family: var(--font-display); font-size: clamp(22px, 3.2vw, 30px);
+  line-height: 1.1; letter-spacing: -0.02em; margin: 0; font-weight: 700; }
+.screenlead { color: var(--muted-inv); font-size: var(--text-base);
+  margin: var(--space-2) 0 0; max-width: 62ch; }
 
 /* ── question cards ───────────────────────────────────────────── */
 .qlist { display: flex; flex-direction: column; gap: var(--space-4); }
@@ -122,18 +165,12 @@ h1 { font-family: var(--font-display); font-size: clamp(28px, 4.4vw, 40px); line
   background: var(--glass-hi); padding: var(--space-5);
   transition: border-color var(--motion-fast) var(--ease-standard),
               background var(--motion-fast) var(--ease-standard);
-  scroll-margin-top: 16px;
+  /* clears the sticky rail when a question is scrolled into view */
+  scroll-margin-top: 96px;
 }
-.q.focused { border-color: var(--accent-hair); background: var(--glass-hi-2); }
-.q.done { padding: var(--space-3) var(--space-5); cursor: pointer; }
-.q.done:hover { border-color: var(--accent-hair); }
-.q.done .row { display: flex; align-items: baseline; gap: var(--space-3); }
-.q.done h3 { font-family: var(--font-display); font-size: var(--text-base); font-weight: 600;
-  margin: 0; color: var(--muted-inv); flex: none; }
-.q.done .answer { font-size: var(--text-sm); color: var(--fg-inv); flex: 1;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.q.done .edit { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--accent); flex: none; }
-.q.pending { display: none; }
+/* Every question on a chapter screen is open and answerable; `.active`
+   only marks the one the number keys are aimed at. */
+.q.active { border-color: var(--accent-hair); background: var(--glass-hi-2); }
 .q header { display: flex; align-items: baseline; gap: var(--space-3); margin-bottom: var(--space-4); }
 .q .num { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--muted-inv); flex: none; }
 .q h2 { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600;
@@ -336,7 +373,11 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
 .pvw-close:hover { border-color: var(--accent); }
 .pvw-frame { flex: 1; width: 100%; border: 0; background: #fff; }
 
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+/* The screen change is the one animation in the file, so it is named here
+   too — `transition: none` alone would leave it running. */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
 @media (max-width: 620px) {
   .q { padding: var(--space-4); }
   .actions { flex-direction: column; align-items: stretch; }
@@ -356,13 +397,21 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
     </span>
     <span class="brandtext"><b translate="no">monomind ai lab</b><span translate="no">hi ted, meet lisa</span></span>
     </a>
-    <span class="spacer"></span>
-    <span class="count" id="count">0 of 10</span>
+  </div>
+
+  <!-- The rail lives outside #intake so it survives the move to the result
+       screen: Ready is a step on it like any other. -->
+  <div class="railbar" id="railbar">
+    <div class="railtop">
+      <span class="stepname" id="stepname"></span>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="chaps" id="rail" aria-hidden="true"></div>
   </div>
 
   <div id="intake">
-    <header>
-      <h1>Tell her what you need.</h1>
+    <header class="screen" id="screen-prompt">
+      <h1 tabindex="-1">Tell her what you need.</h1>
       <p class="lead"><span id="qcount">A few</span> questions, and none of them
         compulsory. Answer what matters and leave the rest — anything untouched takes the
         value marked <span class="default">default</span>.</p>
@@ -381,13 +430,14 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
       </div>
     </header>
 
-    <div class="rail" id="rail" aria-hidden="true"></div>
-    <div class="qlist" id="qlist"></div>
+    <div class="qlist screen" id="qlist" hidden></div>
 
     <div class="actions">
-      <button class="primary" id="submit">Continue &#9166;</button>
-      <button class="ghost" id="skip">Use all defaults</button>
-      <span class="kbd"><b>1</b>&ndash;<b>9</b> select &middot; <b>&uarr;</b><b>&darr;</b> move &middot; <b>&#9166;</b> continue</span>
+      <button class="primary" id="submit">Next &#9166;</button>
+      <button class="ghost" id="backstep" hidden>Back</button>
+      <button class="ghost" id="skip">Skip the rest, use defaults</button>
+      <span class="kbd"><b>1</b>&ndash;<b>9</b> select &middot; <b>&uarr;</b><b>&darr;</b> question &middot;
+        <b>&larr;</b><b>&rarr;</b> screen &middot; <b>&#9166;</b> continue</span>
     </div>
   </div>
 
@@ -409,14 +459,16 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
        answers there is nothing left to do; when it did not, copying is the
        one remaining step rather than an error to recover from. The payload
        itself folds away — it is a fallback, not the point of the screen. -->
-  <section class="result" id="result" aria-live="polite">
+  <!-- The Ready screen. It is the rail's last step, which is why the rail
+       sits outside #intake and stays put when this takes over. -->
+  <section class="result screen" id="result" aria-live="polite">
     <div class="done">
       <span class="done-mark" id="donemark" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
              stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5 10-11"/></svg>
       </span>
       <div class="done-copy">
-        <h2 id="resulttitle"></h2>
+        <h2 id="resulttitle" tabindex="-1"></h2>
         <p class="lead" id="resultlead"></p>
       </div>
       <figure class="done-art" id="doneart" hidden>
@@ -497,6 +549,11 @@ var TEMPLATES = CTX.templates || [
     tagline: "Not a MonoMind template — style presets and animated HTML slides." }
 ];
 
+/* `chapter` groups a question onto one screen of the flow. It is presentation
+   and nothing else: the payload never carries it, and the contract
+   (references/intake-contract.md) never sees it. Every question needs one
+   except `template`, which is its own screen because it decides which of the
+   others are asked at all. */
 var QUESTIONS = [
   { id: "template", q: "Which template?",
     hint: "Pick the shape of the thing first — it decides what the rest of these questions mean.",
@@ -509,7 +566,7 @@ var QUESTIONS = [
      these ask for the source material and the evidence before anything else.
      Each is gated to the one template, and absent from every other payload. */
 
-  { id: "siteType", q: "What kind of site or app is this?", templates: ["sitemap-ia"],
+  { id: "siteType", chapter: "Grounds", q: "What kind of site or app is this?", templates: ["sitemap-ia"],
     hint: "The structure a buyer expects from a product site is not the one a reader expects from a publication. This decides what the top level is even made of.",
     type: "single", options: [
       { id: "marketing", label: "Marketing or corporate site", note: "Products, solutions, evidence, contact.", def: true },
@@ -520,7 +577,7 @@ var QUESTIONS = [
       { id: "internal",  label: "Internal tool or intranet", note: "Roles and workflows, not funnels." },
       { id: "other",     label: "Something else", isOther: true, placeholder: "e.g. museum, university faculty" } ] },
 
-  { id: "projectStage", q: "A new build, or a revamp?", templates: ["sitemap-ia"],
+  { id: "projectStage", chapter: "Grounds", q: "A new build, or a revamp?", templates: ["sitemap-ia"],
     hint: "A revamp has to account for what already exists — page counts, redirects, and the reasons the current structure grew the way it did.",
     type: "single", options: [
       { id: "revamp", label: "Revamp of an existing site", note: "There is a current structure to diagnose.", def: true, reveal: "current" },
@@ -530,7 +587,7 @@ var QUESTIONS = [
       { kind: "text", id: "url", label: "Current site URL", placeholder: "https://" },
       { kind: "text", id: "pageCount", label: "Roughly how many pages exist today?", placeholder: "e.g. 2000" } ] } },
 
-  { id: "sitemapSource", q: "Do you have a sitemap or IA to work from?", templates: ["sitemap-ia"],
+  { id: "sitemapSource", chapter: "Grounds", q: "Do you have a sitemap or IA to work from?", templates: ["sitemap-ia"],
     hint: "A spreadsheet, a crawl export, an old site map, a sketch — anything beats me inventing a structure you then have to correct.",
     type: "single", options: [
       { id: "upload",   label: "Upload what I have", note: "Spreadsheet, CSV, crawl export, or a document.", def: true, reveal: "smfiles" },
@@ -545,7 +602,7 @@ var QUESTIONS = [
         { kind: "textarea", id: "notes", label: "The structure as you understand it",
           placeholder: "Top level: Products, Solutions, Resources, About…" } ] } },
 
-  { id: "benchmarks", q: "Benchmarks, competitors, or inspirations", templates: ["sitemap-ia"],
+  { id: "benchmarks", chapter: "Grounds", q: "Benchmarks, competitors, or inspirations", templates: ["sitemap-ia"],
     hint: "Naming the sites you are measured against — and the ones you admire — is the fastest way to make the proposal argue on the right terms.",
     type: "single", options: [
       { id: "list", label: "Let me name some", def: true, reveal: "bmtext" },
@@ -558,7 +615,7 @@ var QUESTIONS = [
         { kind: "file", id: "file", label: "Competitive or benchmark notes",
           accept: ".md,.txt,.pdf,.docx,text/*" } ] } },
 
-  { id: "evidence", q: "What evidence backs the recommendation?", templates: ["sitemap-ia"],
+  { id: "evidence", chapter: "Grounds", q: "What evidence backs the recommendation?", templates: ["sitemap-ia"],
     hint: "Pick what exists. Whatever is missing is written into the open questions rather than quietly assumed — a proposal that lists its gaps is easier to trust.",
     type: "multi", options: [
       { id: "analytics",  label: "Analytics", note: "Entry pages, drop-off, internal journeys." },
@@ -569,26 +626,26 @@ var QUESTIONS = [
       { id: "seo",        label: "Keyword or search-volume research" },
       { id: "none",       label: "None yet", note: "The proposal will say so plainly." } ] },
 
-  { id: "prototype", q: "How much of the navigation should be clickable?", templates: ["sitemap-ia"],
+  { id: "prototype", chapter: "Grounds", q: "How much of the navigation should be clickable?", templates: ["sitemap-ia"],
     hint: "The prototype is what turns a sitemap from a diagram into something a reviewer can actually test a label against.",
     type: "single", options: [
       { id: "both",    label: "Desktop and mobile", note: "Mega menu in the page; mobile opens in its own tab.", def: true },
       { id: "desktop", label: "Desktop only", note: "One breakpoint, embedded in the page." },
       { id: "none",    label: "No prototype", note: "Diagrams only — a much smaller file." } ] },
 
-  { id: "delivery", q: "Does the file need to work offline?", kinds: ["slides", "document"],
+  { id: "delivery", chapter: "Shape", q: "Does the file need to work offline?", kinds: ["slides", "document"],
     hint: "Every shape pulls its webfonts from Google, and the diagram-heavy ones also load mermaid and CSS libraries. Standalone inlines all of it \u2014 usually a few hundred KB, and several MB for the heaviest shapes.",
     type: "single", options: [
       { id: "cdn",        label: "Load webfonts and libraries from a CDN", note: "Smaller file; needs a connection to render fully.", def: true },
       { id: "standalone", label: "Fully standalone", note: "Fonts and libraries inlined \u2014 opens from a USB stick with no network at all." } ] },
 
-  { id: "theme", q: "Which theme?", kinds: ["slides", "document"], hint: "It ships dark; the token set carries a full light palette.",
+  { id: "theme", chapter: "Look", q: "Which theme?", kinds: ["slides", "document"], hint: "It ships dark; the token set carries a full light palette.",
     type: "single", options: [
       { id: "dark",   label: "Dark",  note: "Deep ink ground with accent halos.", def: true },
       { id: "light",  label: "Light", note: "Uses the unused --bg / --surface palette." },
       { id: "toggle", label: "Reader can toggle", note: "Ships both; adds a switch to the chrome." } ] },
 
-  { id: "slideCount", q: "How long should the deck be?", kinds: ["slides", "external"],
+  { id: "slideCount", chapter: "Shape", q: "How long should the deck be?", kinds: ["slides", "external"],
     hint: "Skip this and I size it from the brief.",
     type: "single", options: [
       { id: "auto", label: "Let the brief decide", def: true },
@@ -597,7 +654,7 @@ var QUESTIONS = [
       { id: "18",   label: "About 18 slides", note: "Like the Project Context guide." },
       { id: "other", label: "A specific number", isOther: true, placeholder: "e.g. 9" } ] },
 
-  { id: "backgrounds", q: "Cover and closing artwork", kinds: ["slides"],
+  { id: "backgrounds", chapter: "Look", q: "Cover and closing artwork", kinds: ["slides"],
     hint: "These two slides carry the photography; the rest are typographic.",
     type: "single", options: [
       { id: "monomind", label: "MonoMind default photography", note: "The two images already embedded in the template.", def: true },
@@ -606,14 +663,14 @@ var QUESTIONS = [
     reveals: { bgfiles: [ { kind: "file", id: "cover", label: "Cover background", accept: "image/*" },
                           { kind: "file", id: "closing", label: "Closing background", accept: "image/*" } ] } },
 
-  { id: "logo", q: "Whose mark sits on every slide?",
+  { id: "logo", chapter: "Look", q: "Whose mark sits on every slide?",
     type: "single", options: [
       { id: "monomind", label: "MonoMind", note: "Links to monomind.one.", def: true },
       { id: "custom",   label: "Upload a logo", note: "SVG keeps it crisp at projection size.", reveal: "logofile" } ],
     reveals: { logofile: [ { kind: "file", id: "file", label: "Logo file", accept: "image/*,.svg" },
                            { kind: "text", id: "href", label: "Link the mark should open (optional)", placeholder: "https://" } ] } },
 
-  { id: "style", q: "Visual style",
+  { id: "style", chapter: "Look", q: "Visual style",
     type: "single", options: [
       { id: "default", label: "The MonoMind template as-is", def: true },
       { id: "designmd", label: "Follow a design.md I supply", reveal: "designfile" },
@@ -622,7 +679,7 @@ var QUESTIONS = [
                styletext:  [ { kind: "textarea", id: "text", label: "What should change?",
                                placeholder: "Warmer accent, tighter type scale, no photography on the cover…" } ] } },
 
-  { id: "elements", q: "Any element it must include?",
+  { id: "elements", chapter: "Look", q: "Any element it must include?",
     hint: "Pick as many as apply. Anything not picked is still available if the content calls for it.",
     type: "multi", options: [
       { id: "chart",   label: "Chart" },
@@ -636,7 +693,7 @@ var QUESTIONS = [
       { id: "image",   label: "Full-bleed image slide" },
       { id: "code",    label: "Code or prompt block" } ] },
 
-  { id: "languages", q: "Which languages?",
+  { id: "languages", chapter: "Language", q: "Which languages?",
     hint: "English always ships. Others load Google Translate only when a reader picks them.",
     type: "multi", options: [
       { id: "en",    label: "English", note: "Always included.", def: true, locked: true },
@@ -646,12 +703,12 @@ var QUESTIONS = [
       { id: "es",    label: "Spanish" },
       { id: "other", label: "Something else", isOther: true, placeholder: "Language name or BCP-47 tag" } ] },
 
-  { id: "noTranslate", q: "Terms that must never be translated", kinds: ["slides", "document"],
+  { id: "noTranslate", chapter: "Language", q: "Terms that must never be translated", kinds: ["slides", "document"],
     hint: "Comma-separated. Google Translate turned MonoMind AI Lab into 人工智慧實驗室 and MIT into the university — this list is what stops that. Filenames, paths, and commands are protected automatically.",
     type: "textarea", seed: "MonoMind, MonoMind AI Lab, Project Context, GitNexus, Graphify, OpenWiki, MIT",
     placeholder: "MonoMind, Project Context, …" },
 
-  { id: "menu", q: "The menu", kinds: ["slides", "document"],
+  { id: "menu", chapter: "Handover", q: "The menu", kinds: ["slides", "document"],
     type: "single", options: [
       { id: "full",    label: "Full menu", note: "Hamburger by the brand mark.", def: true, reveal: "menuitems" },
       { id: "minimal", label: "Minimal", note: "No menu — just a back-to-the-start icon beside the page counter." },
@@ -670,7 +727,7 @@ var QUESTIONS = [
       { kind: "text", id: "github", label: "Repository URL — only if the menu links to one",
         placeholder: "https://github.com/…" } ] } },
 
-  { id: "export", q: "What can a reader take away?", kinds: ["slides", "document"],
+  { id: "export", chapter: "Handover", q: "What can a reader take away?", kinds: ["slides", "document"],
     hint: "Both add a small control to the chrome.",
     type: "multi", options: [
       { id: "pdf",  label: "Download as PDF", note: "Print stylesheet, one slide per landscape page." },
@@ -678,7 +735,7 @@ var QUESTIONS = [
 
   /* No kinds and no templates: the credit line exists in every shape,
      the external handoff included, so this is asked for all of them. */
-  { id: "credit", q: "Credit line",
+  { id: "credit", chapter: "Handover", q: "Credit line",
     hint: "“Made with Hi Ted, Meet Lisa” in the footer. Leave it, or switch it off.",
     type: "single", options: [
       { id: "keep", label: "Leave it", note: "One quiet line, linking to the tool.", def: true },
@@ -690,9 +747,23 @@ var other = {};        /* id -> free text for the `other` option */
 var files = {};        /* "questionId.slotId" -> { name, type, size, dataUri } */
 var subsel = {};       /* "questionId.slotId" -> [checked ids] for `checks` fields */
 var refs = [];         /* reference files the user attached to the prompt */
-var focused = 0;
-var revealed = 0;  /* highest question disclosed so far */
-var ORDER = [];    /* questions applicable to the selected template */
+var active = 0;        /* index into ORDER of the question the number keys aim at */
+var atScreen = 0;      /* index into SCREENS of the screen on show */
+var ORDER = [];        /* questions applicable to the selected template */
+var SCREENS = [];      /* prompt, template, one per surviving chapter, ready */
+
+/* The chapters, in the order they are asked, with a line saying what each one
+   decides. A chapter is a heading over a group of questions — never a payload
+   key. The leads describe the territory rather than the individual questions,
+   because which questions survive depends on the template. */
+var CHAPTER_ORDER = ["Grounds", "Shape", "Look", "Language", "Handover"];
+var CHAPTER_LEAD = {
+  Grounds:  "Where the proposal gets its evidence.",
+  Shape:    "How much there is, and where it has to run.",
+  Look:     "How it reads on the page.",
+  Language: "Who reads it, and in what.",
+  Handover: "What a reader leaves with."
+};
 
 function kindOf(id) {
   var t = TEMPLATES.filter(function (x) { return x.id === id; })[0];
@@ -708,8 +779,48 @@ function rebuildOrder() {
     if (q.templates && q.templates.indexOf(state.template) === -1) { return false; }
     return true;
   });
-  revealed = Math.min(revealed, ORDER.length - 1);
-  focused = Math.min(focused, revealed);
+  rebuildScreens();
+}
+
+/* Chapters are derived from the *filtered* ORDER, never from QUESTIONS: a
+   chapter whose questions were all filtered away by `kinds` / `templates`
+   (D-017) has nothing to ask, so it never reaches the rail or the flow. That
+   is why a deck shows Shape, Look, Language and Handover; `sitemap-ia` also
+   shows Grounds; and the external handoff shows only what survives. Question
+   order inside a chapter stays ORDER's own — the payload's key order is built
+   from ORDER and must not move. */
+function rebuildScreens() {
+  SCREENS = [{ k: "prompt", label: "Prompt" }, { k: "template", label: "Template" }];
+  CHAPTER_ORDER.forEach(function (name) {
+    var qs = ORDER.filter(function (q) { return q.chapter === name; });
+    if (qs.length) { SCREENS.push({ k: "chapter", label: name, qs: qs }); }
+  });
+  SCREENS.push({ k: "ready", label: "Ready" });
+  atScreen = Math.max(0, Math.min(atScreen, SCREENS.length - 1));
+  clampActive();
+}
+
+/* The questions the screen on show is asking. Empty for prompt and ready. */
+function screenQs() {
+  var s = SCREENS[atScreen];
+  if (!s) { return []; }
+  if (s.k === "template") { return [QUESTIONS[0]]; }
+  return s.qs || [];
+}
+function activeAt() {
+  var at = screenQs().indexOf(ORDER[active]);
+  return at < 0 ? 0 : at;
+}
+function clampActive() {
+  var qs = screenQs();
+  if (qs.length && qs.indexOf(ORDER[active]) === -1) { active = ORDER.indexOf(qs[0]); }
+}
+/* An explicit scroll behaviour: `scroll-behavior: auto !important` in the
+   reduced-motion block governs CSS-driven scrolling, not a scrollIntoView that
+   asks for smooth by name. */
+function smooth() {
+  return (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+    ? "auto" : "smooth";
 }
 
 var qlist = document.getElementById("qlist");
@@ -765,12 +876,19 @@ function revealHtml(q) {
               '<span class="label">' + esc(o.label) + '</span></button>';
           }).join("") + '</div></div>';
       }
+      /* Typed values are read back out of `files[slot].text`. A screen leaves
+         the DOM whenever the flow moves on, so a field that rendered empty
+         would look to the reader as though their answer had been thrown
+         away — while the payload quietly still carried it. */
+      var typed = (files[slot] && typeof files[slot].text === "string") ? files[slot].text : "";
       if (f.kind === "textarea") {
         return '<div class="field"><label>' + esc(f.label) + '</label>' +
-          '<textarea rows="3" data-slot="' + slot + '" placeholder="' + esc(f.placeholder || "") + '"></textarea></div>';
+          '<textarea rows="3" data-slot="' + slot + '" placeholder="' + esc(f.placeholder || "") + '">' +
+          esc(typed) + '</textarea></div>';
       }
       return '<div class="field"><label>' + esc(f.label) + '</label>' +
-        '<input type="text" data-slot="' + slot + '" placeholder="' + esc(f.placeholder || "") + '"></div>';
+        '<input type="text" data-slot="' + slot + '" placeholder="' + esc(f.placeholder || "") +
+        '" value="' + esc(typed) + '"></div>';
     }).join("");
     return '<div class="reveal" data-reveal="' + key + '" hidden>' + fields + '</div>';
   }).join("");
@@ -823,78 +941,91 @@ function optionsHtml(q) {
   }).join("");
 }
 
-function summaryOf(q) {
+/* One question card, open and answerable. The number is its position in
+   ORDER, so it keeps its meaning across chapters. `data-at` is its position
+   on this screen, which is what the arrow keys walk. */
+function questionHtml(q, at) {
+  var i = ORDER.indexOf(q);
+  var body;
   if (q.type === "textarea") {
-    var t = (state[q.id] || "").trim();
-    return t ? t.replace(/\s+/g, " ").slice(0, 90) : "nothing protected";
+    body = '<textarea rows="3" data-seed="' + q.id + '" placeholder="' + esc(q.placeholder || "") + '">' +
+           esc(state[q.id] || "") + '</textarea>';
+  } else if (q.type === "gallery") {
+    body = galleryHtml(q);
+  } else {
+    body = '<div class="opts" role="' + (q.type === "multi" ? "group" : "radiogroup") +
+           '" aria-label="' + esc(q.q) + '">' + optionsHtml(q) + '</div>' + revealHtml(q);
   }
-  var picked = q.type === "multi" ? state[q.id] : [state[q.id]];
-  var labels = picked.filter(Boolean).map(function (id) {
-    var o = q.options.filter(function (x) { return x.id === id; })[0];
-    if (!o) { return id; }
-    if (o.isOther && other[q.id]) { return other[q.id]; }
-    return o.label;
-  });
-  if (!labels.length) { return "none"; }
-  var extra = [];
-  if (q.id === "backgrounds" && state[q.id] === "upload") {
-    ["cover", "closing"].forEach(function (k) { if (slot("backgrounds", k)) { extra.push(files["backgrounds." + k].name); } });
-  }
-  if (q.id === "logo" && slot("logo", "file")) { extra.push(files["logo.file"].name); }
-  if (q.id === "style" && slot("style", "file")) { extra.push(files["style.file"].name); }
-  if (q.id === "menu" && state.menu === "full" && subsel["menu.items"]) {
-    extra.push(subsel["menu.items"].join(", "));
-  }
-  return labels.join(", ") + (extra.length ? " — " + extra.join(", ") : "");
+  return '<section class="q' + (i === active ? " active" : "") + '" data-at="' + at +
+    '" data-i="' + i + '" id="q-' + q.id + '">' +
+    '<header><span class="num">' + String(i + 1).padStart(2, "0") + '</span>' +
+    '<h2 tabindex="-1">' + esc(q.q) + (q.hint ? '<span class="hint">' + esc(q.hint) + '</span>' : "") + '</h2>' +
+    (q.type === "multi" ? '<span class="tag">choose any</span>' : "") + '</header>' + body + '</section>';
 }
 
+/* One screen at a time. The prompt screen is the static header, the template
+   and chapter screens are rendered into #qlist, and Ready is the result
+   section — which is why the rail lives outside all three. */
 function render() {
-  qlist.innerHTML = ORDER.map(function (q, i) {
-    if (i > revealed) {
-      return '<section class="q pending" data-i="' + i + '" id="q-' + q.id + '"></section>';
-    }
-    if (i !== focused) {
-      return '<section class="q done" data-i="' + i + '" id="q-' + q.id + '" role="button" tabindex="0">' +
-        '<div class="row"><span class="num">' + String(i + 1).padStart(2, "0") + '</span>' +
-        '<h3>' + esc(q.q.replace(/\?$/, "")) + '</h3>' +
-        '<span class="answer">' + esc(summaryOf(q)) + '</span>' +
-        '<span class="edit">change</span></div></section>';
-    }
-    var body;
-    if (q.type === "textarea") {
-      body = '<textarea rows="3" data-seed="' + q.id + '" placeholder="' + esc(q.placeholder || "") + '">' +
-             esc(state[q.id] || "") + '</textarea>';
-    } else if (q.type === "gallery") {
-      body = galleryHtml(q);
-    } else {
-      body = '<div class="opts" role="' + (q.type === "multi" ? "group" : "radiogroup") +
-             '" aria-label="' + esc(q.q) + '">' + optionsHtml(q) + '</div>' + revealHtml(q);
-    }
-    return '<section class="q' + (i === focused ? " focused" : "") + '" data-i="' + i + '" id="q-' + q.id + '">' +
-      '<header><span class="num">' + String(i + 1).padStart(2, "0") + '</span>' +
-      '<h2>' + esc(q.q) + (q.hint ? '<span class="hint">' + esc(q.hint) + '</span>' : "") + '</h2>' +
-      (q.type === "multi" ? '<span class="tag">choose any</span>' : "") + '</header>' + body + '</section>';
-  }).join("");
+  var s = SCREENS[atScreen] || SCREENS[0];
+  var asks = s.k === "template" || s.k === "chapter";
 
-  rail.innerHTML = ORDER.map(function (_, i) {
-    return '<i class="' + (i <= revealed ? "done" : "") + '"></i>';
-  }).join("");
+  document.getElementById("screen-prompt").hidden = s.k !== "prompt";
+  qlist.hidden = !asks;
+  document.getElementById("intake").classList.toggle("hidden", s.k === "ready");
+  document.getElementById("result").classList.toggle("show", s.k === "ready");
+
+  if (asks) {
+    var qs = screenQs();
+    var head = s.k === "chapter"
+      ? '<div><h2 class="screenhead" tabindex="-1">' + esc(s.label) + '</h2>' +
+        '<p class="screenlead">' + esc(CHAPTER_LEAD[s.label] || "") + '</p></div>'
+      : "";
+    qlist.innerHTML = head + qs.map(questionHtml).join("");
+    qs.forEach(syncReveals);
+    restoreFileCards();
+  }
+
+  renderRail();
   syncFooter();
 
-  ORDER.forEach(syncReveals);
-  restoreFileCards();
-  document.getElementById("count").textContent = (focused + 1) + " of " + ORDER.length;
   var words = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
                "Nine", "Ten", "Eleven", "Twelve"];
   document.getElementById("qcount").textContent = words[ORDER.length] || ORDER.length;
 }
 
+function screenTitle(s) {
+  if (s.k === "prompt") { return "Your prompt"; }
+  if (s.k === "template") { return "Which template?"; }
+  if (s.k === "ready") { return "Ready"; }
+  return s.label;
+}
+
+/* A passed step is full; the step you are on fills in proportion to how far
+   through its questions you are, so the bar reports a real position rather
+   than decorating one. Prompt, Template and Ready hold one thing each. */
+function renderRail() {
+  var s = SCREENS[atScreen] || SCREENS[0];
+  document.getElementById("stepname").textContent = screenTitle(s);
+  document.getElementById("count").textContent = (atScreen + 1) + " of " + SCREENS.length;
+  rail.innerHTML = SCREENS.map(function (st, i) {
+    var fill = 0;
+    if (i < atScreen) { fill = 100; }
+    else if (i === atScreen) {
+      fill = st.k === "chapter" ? Math.round((activeAt() + 1) / st.qs.length * 100) : 100;
+    }
+    return '<div class="chap ' + (i < atScreen ? "done" : i === atScreen ? "now" : "") + '">' +
+      '<div class="barline"><span style="width:' + fill + '%"></span></div>' +
+      '<span class="lbl">' + esc(st.label) + '</span></div>';
+  }).join("");
+}
+
 function syncFooter() {
-  var last = ORDER.length - 1;
-  var btn = document.getElementById("submit");
-  btn.textContent = revealed >= last ? "Continue \u23ce" : "Next \u23ce";
+  var onLast = atScreen >= SCREENS.length - 2;   /* the last screen that asks anything */
+  document.getElementById("submit").textContent = onLast ? "Continue ⏎" : "Next ⏎";
   document.getElementById("skip").textContent =
-    revealed >= last ? "Use all defaults" : "Skip the rest, use defaults";
+    onLast ? "Use all defaults" : "Skip the rest, use defaults";
+  document.getElementById("backstep").hidden = atScreen === 0;
 }
 
 function syncReveals(q) {
@@ -927,24 +1058,87 @@ function paintFileCard(zone, f) {
 }
 
 /* ── interaction ──────────────────────────────────────────────── */
-function focus(i) {
-  focused = Math.max(0, Math.min(revealed, i));
+/* The screen the reader is on. `goScreen` is the only thing that changes it,
+   so every move — button, key, or the jump to Ready — lands the same way:
+   focus on the screen's own heading, scrolled to the top. */
+function goScreen(i) {
+  atScreen = Math.max(0, Math.min(SCREENS.length - 1, i));
+  clampActive();
   render();
-  qlist.children[focused].scrollIntoView({ block: "nearest", behavior: "smooth" });
+  var t = screenFocusTarget();
+  if (t) { t.focus(); }
+  window.scrollTo({ top: 0, behavior: smooth() });
 }
 
-/* Disclose the next question. Editing an earlier answer returns to the
-   frontier rather than replaying every step after it. */
-function advance() {
-  var last = ORDER.length - 1;
-  if (focused < revealed) { focused = revealed; render(); return true; }
-  if (revealed < last) { revealed += 1; focused = revealed; render(); return true; }
-  return false;
+function screenFocusTarget() {
+  var s = SCREENS[atScreen] || SCREENS[0];
+  if (s.k === "prompt") { return document.querySelector("#screen-prompt h1"); }
+  if (s.k === "ready") { return document.getElementById("resulttitle"); }
+  return qlist.querySelector("h2");
 }
 
-function choose(qid, oid) {
+/* Forward off the last asking screen is the submit. */
+function next() {
+  if (atScreen < SCREENS.length - 2) { goScreen(atScreen + 1); return; }
+  if (atScreen === SCREENS.length - 2) { submit(); }
+}
+function prev() { if (atScreen > 0) { goScreen(atScreen - 1); } }
+
+/* Which question on this screen the number keys aim at. Chapter members are
+   not contiguous in ORDER — `slideCount` sits between `theme` and
+   `backgrounds` — so this walks the screen's own list, never ORDER. */
+function setActiveAt(at) {
+  var qs = screenQs();
+  if (!qs.length) { return; }
+  var to = Math.max(0, Math.min(qs.length - 1, at));
+  active = ORDER.indexOf(qs[to]);
+  Array.prototype.forEach.call(qlist.querySelectorAll(".q"), function (el) {
+    el.classList.toggle("active", Number(el.dataset.at) === to);
+  });
+  renderRail();
+  var el = document.getElementById("q-" + qs[to].id);
+  if (el) { el.scrollIntoView({ block: "nearest", behavior: smooth() }); }
+}
+function setActiveQ(el) {
+  var sec = el && el.closest(".q");
+  if (sec) { setActiveAt(Number(sec.dataset.at)); }
+}
+
+/* Repaint one question's controls in place. A full re-render would throw away
+   whatever the reader is typing in a neighbouring question on the same
+   screen — which never mattered while only one question was ever open. */
+function paintOptions(q) {
+  var sec = document.getElementById("q-" + q.id);
+  if (!sec) { return; }
+  var attr = q.type === "multi" ? "aria-checked" : "aria-pressed";
+  Array.prototype.forEach.call(sec.querySelectorAll(".opt[data-q], .tpl[data-q]"), function (b) {
+    var on = q.type === "multi"
+      ? state[q.id].indexOf(b.dataset.o) !== -1
+      : state[q.id] === b.dataset.o;
+    b.setAttribute(b.classList.contains("tpl") ? "aria-checked" : attr, String(on));
+  });
+  var oth = sec.querySelector('[data-other="' + q.id + '"]');
+  if (oth) {
+    oth.hidden = q.type === "multi"
+      ? state[q.id].indexOf("other") === -1
+      : state[q.id] !== "other";
+  }
+  syncReveals(q);
+}
+
+function choose(qid, oid, viaKey) {
   var q = QUESTIONS.filter(function (x) { return x.id === qid; })[0];
-  if (qid === "template") { state.template = oid; rebuildOrder(); advance(); return; }
+  if (qid === "template") {
+    /* The pick decides which questions get asked, so it decides how long the
+       rail is. Re-derive both and stay put — the reader may want to compare
+       another card, or open a preview, before moving on. */
+    state.template = oid;
+    rebuildOrder();
+    paintOptions(q);
+    renderRail();
+    syncFooter();
+    return;
+  }
   var opt = q.options.filter(function (o) { return o.id === oid; })[0];
   if (q.type === "multi") {
     if (opt.locked) { return; }
@@ -954,27 +1148,16 @@ function choose(qid, oid) {
   } else {
     state[qid] = oid;
   }
-  if (q.type !== "multi") {
-    /* An option with sub-controls needs the step to stay open so the user can
-       fill them in; everything else moves on. */
-    if (opt.reveal) { render(); } else { advance(); }
-    return;
-  }
-  var sec = document.getElementById("q-" + qid);
-  Array.prototype.forEach.call(sec.querySelectorAll(".opt"), function (b) {
-    var on = q.type === "multi"
-      ? state[qid].indexOf(b.dataset.o) !== -1
-      : state[qid] === b.dataset.o;
-    b.setAttribute(q.type === "multi" ? "aria-checked" : "aria-pressed", String(on));
-    var oth = sec.querySelector('[data-other="' + qid + '"]');
-    if (oth && b.dataset.o === "other") { oth.hidden = !on; }
-  });
-  syncReveals(q);
+  paintOptions(q);
+  renderRail();
+  /* A number key steps to the next question on the screen, the way it used to
+     step to the next question in the list — unless the pick opened
+     sub-controls, which want filling in first. A click does not: the pointer
+     is already where the reader means to be. */
+  if (viaKey && q.type !== "multi" && !opt.reveal) { setActiveAt(activeAt() + 1); }
 }
 
 qlist.addEventListener("click", function (e) {
-  var done = e.target.closest(".q.done");
-  if (done) { focus(Number(done.dataset.i)); return; }
   var clear = e.target.closest(".clear");
   if (clear) {
     e.stopPropagation();
@@ -1006,7 +1189,7 @@ qlist.addEventListener("click", function (e) {
      do nothing. */
   var tpl = e.target.closest(".tpl");
   if (tpl) {
-    focus(Number(tpl.closest(".q").dataset.i));
+    setActiveQ(tpl);
     choose(tpl.dataset.q, tpl.dataset.o);
     return;
   }
@@ -1018,18 +1201,26 @@ qlist.addEventListener("click", function (e) {
     if (at === -1) { arr.push(opt.dataset.o); } else { arr.splice(at, 1); }
     var on = at === -1;
     opt.setAttribute("aria-checked", String(on));
-    opt.querySelector(".key").textContent = on ? "\u2713" : "";
+    opt.querySelector(".key").textContent = on ? "✓" : "";
     return;
   }
   if (opt) {
-    focus(Number(opt.closest(".q").dataset.i));
+    setActiveQ(opt);
     choose(opt.dataset.q, opt.dataset.o);
   }
 });
 
+/* A dropzone announces itself as a button, so it has to behave like one from
+   the keyboard — and it has to swallow the key, or the document handler reads
+   the same Enter as "continue" and walks off the screen mid-upload. */
 qlist.addEventListener("keydown", function (e) {
-  var done = e.target.closest && e.target.closest(".q.done");
-  if (done && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); focus(Number(done.dataset.i)); }
+  var z = e.target.closest && e.target.closest(".drop[data-slot]");
+  if (z && (e.key === "Enter" || e.key === " ")) {
+    e.preventDefault();
+    e.stopPropagation();
+    var input = qlist.querySelector('input[data-for="' + z.dataset.slot + '"]');
+    if (input) { input.click(); }
+  }
 });
 
 qlist.addEventListener("input", function (e) {
@@ -1073,22 +1264,41 @@ function readFile(file, slot) {
   r.readAsDataURL(file);
 }
 
+/* Keys, adapted to a screen holding several questions at once:
+     1–9   pick an option in the question marked `.active`, then step to the
+           next question on this screen (unless the pick opened sub-controls)
+     ↑ ↓   move `.active` between the questions on this screen
+     ← →   move between screens
+     ⏎     continue — and, on the last asking screen, submit
+   Enter is left alone whenever a button, link or fold has focus, so the
+   result screen's own controls keep working from the keyboard. */
 document.addEventListener("keydown", function (e) {
   if (!document.getElementById("pvw").hidden) { return; }  /* overlay owns the keyboard */
-  var typing = /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName);
-  if (e.key === "Enter" && (e.metaKey || e.ctrlKey || !typing)) {
+  var el = document.activeElement || document.body;
+  var typing = /^(INPUT|TEXTAREA)$/.test(el.tagName);
+  var onControl = /^(BUTTON|A|SUMMARY|SELECT)$/.test(el.tagName) ||
+                  (el.getAttribute && el.getAttribute("role") === "button");
+  var ready = (SCREENS[atScreen] || {}).k === "ready";
+  if (e.key === "Enter" && (e.metaKey || e.ctrlKey || (!typing && !onControl))) {
+    if (ready) { return; }
     e.preventDefault();
-    if (!advance()) { submit(); }
+    next();
     return;
   }
   if (typing) { return; }
-  if (e.key === "ArrowDown" || e.key === "Down") { e.preventDefault(); focus(focused + 1); return; }
-  if (e.key === "ArrowUp" || e.key === "Up")     { e.preventDefault(); focus(focused - 1); return; }
+  if (e.key === "ArrowDown" || e.key === "Down") { e.preventDefault(); setActiveAt(activeAt() + 1); return; }
+  if (e.key === "ArrowUp" || e.key === "Up")     { e.preventDefault(); setActiveAt(activeAt() - 1); return; }
+  /* Sideways never submits — only ⏎ and the button do. */
+  if (e.key === "ArrowRight" || e.key === "Right") {
+    if (atScreen < SCREENS.length - 2) { e.preventDefault(); goScreen(atScreen + 1); }
+    return;
+  }
+  if (e.key === "ArrowLeft" || e.key === "Left") { e.preventDefault(); prev(); return; }
   if (/^[1-9]$/.test(e.key)) {
-    var q = ORDER[focused];
-    if (q.options && q.options[Number(e.key) - 1]) {
+    var q = screenQs()[activeAt()];
+    if (q && q.options && q.options[Number(e.key) - 1]) {
       e.preventDefault();
-      choose(q.id, q.options[Number(e.key) - 1].id);
+      choose(q.id, q.options[Number(e.key) - 1].id, true);
     }
   }
 });
@@ -1185,9 +1395,7 @@ function payload() {
    fold and softens the mark. The screen says "done" either way, because it is —
    the answers exist and nothing was lost. */
 function show(title, lead, needsCopy, json) {
-  document.getElementById("intake").classList.add("hidden");
   var r = document.getElementById("result");
-  r.classList.add("show");
   r.classList.toggle("needscopy", !!needsCopy);
   document.getElementById("doneart").hidden = CTX.mode !== "web";
   document.getElementById("teamsline").hidden = CTX.mode !== "web";
@@ -1195,6 +1403,8 @@ function show(title, lead, needsCopy, json) {
   document.getElementById("resultlead").textContent = lead;
   document.getElementById("payload").textContent = json;
   document.getElementById("fallback").open = !!needsCopy;
+  /* Ready is the rail's last step; goScreen does the showing and hiding. */
+  goScreen(SCREENS.length - 1);
 }
 
 /* Web mode (CTX.mode === "web", injected by the public site's deploy step):
@@ -1245,9 +1455,10 @@ function submit() {
   }
 }
 
-document.getElementById("submit").addEventListener("click", function () {
-  if (!advance()) { submit(); }
-});
+document.getElementById("submit").addEventListener("click", next);
+document.getElementById("backstep").addEventListener("click", prev);
+/* Unchanged promise: this lands on Ready with every single-choice question at
+   its default, whichever screen it is pressed from. */
 document.getElementById("skip").addEventListener("click", function () {
   QUESTIONS.forEach(function (q) {
     if (q.type === "single") {
@@ -1267,8 +1478,7 @@ document.getElementById("copy").addEventListener("click", function () {
   });
 });
 document.getElementById("back").addEventListener("click", function () {
-  document.getElementById("result").classList.remove("show");
-  document.getElementById("intake").classList.remove("hidden");
+  goScreen(SCREENS.length - 2);   /* back to the last screen that asked something */
 });
 
 /* ---- prompt and references -------------------------------------------
