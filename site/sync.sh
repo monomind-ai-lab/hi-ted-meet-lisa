@@ -79,5 +79,34 @@ PY
 # Social/SEO meta image — page one of the Canva brand deck.
 cp assets/tedlisa-cover-og.jpg site/assets/
 
+# Cloudflare Web Analytics — cookieless, so no consent banner. Injected only
+# when CF_BEACON_TOKEN is set: locally that means never, and the deploy
+# workflow passes it from the CF_BEACON_TOKEN repository secret once it
+# exists. A missing token skips silently — a placeholder token must never
+# ship. The token itself is a one-time dashboard step: Cloudflare dashboard
+# → Web Analytics → Add a site → html.monomind.one, then
+#   gh secret set CF_BEACON_TOKEN
+# Note: index.html and 404.html are canonical files, so running this with
+# the token set locally dirties the working tree — deploy-time use only.
+if [ -n "${CF_BEACON_TOKEN:-}" ]; then
+  CF_BEACON_TOKEN="$CF_BEACON_TOKEN" python3 - <<'PY'
+import os, pathlib
+token = os.environ["CF_BEACON_TOKEN"]
+beacon = ("<script defer src='https://static.cloudflareinsights.com/beacon.min.js'"
+          " data-cf-beacon='{\"token\": \"" + token + "\"}'></script>")
+for name in ("index.html", "intake.html", "404.html"):
+    p = pathlib.Path("site") / name
+    html = p.read_text()
+    if "cloudflareinsights.com/beacon.min.js" in html:
+        print("site/" + name + ": beacon already present, left alone")
+        continue
+    assert "</body>" in html, name + " has no </body> to inject before"
+    p.write_text(html.replace("</body>", beacon + "\n</body>", 1))
+    print("site/" + name + ": analytics beacon injected")
+PY
+else
+  echo "CF_BEACON_TOKEN not set — analytics beacon skipped"
+fi
+
 echo "site/ assembled:"
 find site -type f | sort

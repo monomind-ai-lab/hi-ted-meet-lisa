@@ -11,6 +11,13 @@
 #   Create it at https://dash.cloudflare.com/profile/api-tokens, then:
 #   gh secret set CLOUDFLARE_API_TOKEN
 #
+# One is optional:
+#   CF_BEACON_TOKEN — the Cloudflare Web Analytics site token (cookieless,
+#   no consent banner needed). Dashboard → Web Analytics → Add a site →
+#   html.monomind.one, then: gh secret set CF_BEACON_TOKEN
+#   While it is unset, sync.sh skips the beacon rather than shipping a
+#   placeholder.
+#
 # The account id is not a secret and is set inline below.
 
 name: Deploy site to Cloudflare Pages
@@ -29,6 +36,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Assemble the deployable site folder
         run: bash site/sync.sh
+        env:
+          CF_BEACON_TOKEN: ${{ secrets.CF_BEACON_TOKEN }}
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
