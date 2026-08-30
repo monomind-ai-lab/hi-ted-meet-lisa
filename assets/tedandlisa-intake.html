@@ -308,6 +308,12 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
 .tip::after { content: ""; position: absolute; top: 100%; left: 18px;
   border: 6px solid transparent; border-top-color: var(--accent-ink); }
 .tipwrap:hover .tip, .tipwrap:focus-within .tip { opacity: 1; visibility: visible; transform: translateY(0); }
+/* Web mode only — hidden by default and unhidden by show(). */
+.teamsline { margin: var(--space-4) 0 0; font-size: var(--text-xs);
+  line-height: 1.6; color: var(--muted-inv); max-width: 62ch; }
+.teamsline[hidden] { display: none; }
+.teamsline a { color: var(--fg-inv); }
+
 .payload { font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.5;
   background: rgba(0,0,0,0.26); margin: 0;
   padding: var(--space-4); max-height: 38vh; overflow: auto; white-space: pre; }
@@ -434,6 +440,17 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
       </span>
       <button class="ghost" id="back">Back to the questions</button>
     </div>
+
+    <!-- Web mode only. `show()` gates this exactly the way it gates the
+         artwork above (CTX.mode === "web", injected by site/sync.sh), so the
+         locally-served runner never shows commercial copy. The link is the
+         only place in this file that carries it — see PAID_LANDING in
+         site/index.html for the others. -->
+    <p class="teamsline" id="teamsline" hidden>This will arrive in the house
+      style. Teams that want their own — tokens, patterns, protected terms —
+      have MonoMind build it as a private pack:
+      <a href="https://monomind.one/?ref=tedlisa-intake" target="_blank"
+         rel="noopener">monomind.one</a></p>
   </section>
 </main>
 
@@ -1159,6 +1176,7 @@ function show(title, lead, needsCopy, json) {
   r.classList.add("show");
   r.classList.toggle("needscopy", !!needsCopy);
   document.getElementById("doneart").hidden = CTX.mode !== "web";
+  document.getElementById("teamsline").hidden = CTX.mode !== "web";
   document.getElementById("resulttitle").textContent = title;
   document.getElementById("resultlead").textContent = lead;
   document.getElementById("payload").textContent = json;
