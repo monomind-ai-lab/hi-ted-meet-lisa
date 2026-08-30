@@ -37,6 +37,23 @@
   "sameAs": ["https://github.com/monomind-ai-lab/hi-ted-meet-lisa"]
 }
 </script>
+<!-- The free app above and the paid service below are deliberately two
+     blocks: the app's price stays 0, and the commissioned pack is what
+     costs money. `url` points at monomind.one until the Branded Deck
+     System landing page exists — see PAID_LANDING in the page script. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Branded Deck System",
+  "serviceType": "Brand system delivered as an agent skill",
+  "url": "https://monomind.one/",
+  "description": "A team's design tokens, component patterns, protected terms, and intake, delivered as a private template pack installed in the team's own agent — the machinery behind the free Hi Ted, Meet Lisa templates, carrying their brand instead of the house style.",
+  "provider": { "@type": "Organization", "name": "MonoMind AI Lab", "url": "https://monomind.one" },
+  "areaServed": "Worldwide",
+  "isRelatedTo": { "@type": "SoftwareApplication", "name": "Hi Ted, Meet Lisa", "url": "https://html.monomind.one/" }
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
