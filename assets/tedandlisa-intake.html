@@ -466,6 +466,20 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
 /* The runner may inject { prompt, title } before this script runs. */
 var CTX = window.__MONOMIND_INTAKE__ || {};
 
+/* Web mode only, gated exactly the way #teamsline is (CTX.mode === "web",
+   injected by site/sync.sh) so the locally-served runner and a file:// copy
+   stay silent — nothing to send, nowhere to send it. The public site counts
+   one moment from in here: the prompt was copied. The whole payload is that
+   one word; no answers, no prompt text, no id, no cookie ever leave. The
+   beacon is queued and forgotten, so the copy button never waits on it.
+   See the funnel-events note in site/index.html for the other four. */
+function track(name) {
+  try {
+    if (CTX.mode !== "web" || !navigator.sendBeacon) return;
+    navigator.sendBeacon("/e", name);
+  } catch (e) {}
+}
+
 var MAX_INLINE_BYTES = 1500000; /* ~1.5 MB — past this the deck gets heavy */
 
 var TEMPLATES = CTX.templates || [
@@ -1246,6 +1260,7 @@ document.getElementById("skip").addEventListener("click", function () {
 document.getElementById("copy").addEventListener("click", function () {
   var btn = this;
   var label = CTX.mode === "web" ? "Copy the prompt" : "Copy answers";
+  track("prompt-copy");
   navigator.clipboard.writeText(document.getElementById("payload").textContent).then(function () {
     btn.textContent = "Copied \u2713";
     setTimeout(function () { btn.textContent = label; }, 1800);

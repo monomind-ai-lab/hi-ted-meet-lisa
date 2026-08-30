@@ -971,12 +971,52 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
     a.href = PAID_LANDING + "?ref=" + a.getAttribute("data-paid-cta");
   });
 
+  /* ---- five funnel events ------------------------------------------
+     Cloudflare Web Analytics counts pageviews and referrers and has no
+     custom events, so five moments get their own hairline path: one
+     `sendBeacon` POST to /e (functions/e.js), whose entire body is the
+     event name. Nothing else travels — no URL, no query string, no
+     referrer, no id, no timestamp of ours, no cookie, no storage. There
+     is nothing here to consent to, which is why the page still carries
+     no banner. The server allow-lists the same five names, so a beacon
+     is a counter and never a log line.
+
+     Never blocks, never throws, never awaited: sendBeacon queues the
+     request and returns immediately, so a click still navigates at once.
+     Set TRACK_ENDPOINT to "" to switch the whole thing off. With it set
+     but the endpoint missing, nothing on the page notices — no exception,
+     no rejection, no slower click; only the browser's own network log
+     records the failed POST. */
+  var TRACK_ENDPOINT = "/e";
+  var EVENTS = { "ref-file": 1, "intake-open": 1, "prompt-copy": 1,
+                 "cta-teams": 1, "preview-open": 1 };
+  function track(name) {
+    try {
+      if (!TRACK_ENDPOINT || !EVENTS[name]) return;
+      if (!navigator.sendBeacon) return;
+      navigator.sendBeacon(TRACK_ENDPOINT, name);
+    } catch (e) {}
+  }
+
+  /* The growth loop, and the one number worth the most: a generated file
+     credited this site and somebody followed the link. Exactly `ref=file`
+     — the other ref tags are for monomind.one's own analytics. */
+  if (/[?&]ref=file(?:&|$)/.test(location.search)) track("ref-file");
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-paid-cta]"), function (a) {
+    a.addEventListener("click", function () { track("cta-teams"); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.gallery a[href^="previews/"]'), function (a) {
+    a.addEventListener("click", function () { track("preview-open"); });
+  });
+
   /* ---- intake overlay -------------------------------------------- */
   var overlay = document.getElementById("intake-overlay");
   var frame = document.getElementById("intake-frame");
   var lastFocus = null;
 
   function openIntake() {
+    track("intake-open");
     lastFocus = document.activeElement;
     if (!frame.src) frame.src = "intake.html";
     overlay.classList.add("on");
