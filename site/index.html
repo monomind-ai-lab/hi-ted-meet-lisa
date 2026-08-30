@@ -544,8 +544,11 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
     <a href="#top" aria-label="Hi Ted, Meet Lisa — home"><span>Hi Ted, Meet Lisa</span></a>
   </div>
   <nav class="topnav" aria-label="Primary">
+    <!-- The pane ids are legacy: the install content moved to #pane-both when
+         the "do both" flow was retired, so `both` — not `install` — is the
+         path that installs. Reads wrong, aims right. -->
     <a href="#paths" data-path="try">Try it</a>
-    <a href="#paths" data-path="install">Install</a>
+    <a href="#paths" data-path="both">Install</a>
     <a href="#templates">Templates</a>
     <a href="#for-teams">For teams</a>
     <div class="lang" id="lang">
@@ -1082,7 +1085,7 @@ function googleTranslateElementInit() {
   var INLINE = { en: 1, ko: 1, 'zh-TW': 1 };
   var T = [
     ['.topnav a[data-path="try"]', '써보기', '試試看'],
-    ['.topnav a[data-path="install"]', '설치', '安裝'],
+    ['.topnav a[data-path="both"]', '설치', '安裝'],
     ['.topnav a[href="#templates"]', '템플릿', '範本'],
     ['.topnav a[href="#for-teams"]', '팀을 위해', '團隊方案'],
 
