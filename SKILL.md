@@ -23,10 +23,13 @@ Everything else comes from the intake panel.
 
 ## Procedure
 
-1. **Run the intake panel.** It opens with the template gallery — the choice
-   that decides what everything after it means — then asks about theme, artwork,
-   logo, style, required components, languages, protected terms, menu, and
-   export. Questions that do not apply to the chosen template are not asked:
+1. **Run the intake panel.** It opens with the prompt, then the template
+   gallery — the choice that decides what everything after it means — then one
+   screen per chapter: **Grounds** (only where a proposal has to be reasoned
+   from something), **Shape**, **Look**, **Language**, **Handover**. Each
+   chapter screen holds all of its questions open at once. Questions that do
+   not apply to the chosen template are not asked, and a chapter left with no
+   questions is not shown at all:
 
    ```sh
    python3 scripts/tedandlisa_intake.py --prompt "THE BRIEF" --out intake.json

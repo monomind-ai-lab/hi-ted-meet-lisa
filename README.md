@@ -219,8 +219,12 @@ break.
 ## ✅ The intake panel
 
 `assets/tedandlisa-intake.html` is a standalone page that collects the deck
-settings. It opens with a gallery of template screenshots, then reveals one
-question at a time so a long interview never arrives all at once.
+settings. It runs as a short wizard: your prompt, then a gallery of template
+screenshots, then one screen per chapter — Grounds, Shape, Look, Language,
+Handover — each holding its two to five questions open at once, and finally
+the finished payload. A progress rail across the top names the chapters and
+sticks while a screen scrolls. Chapters with nothing to ask never appear, so
+the rail is shorter for a slide handoff than for a sitemap proposal.
 
 <p align="left">
   <img src="assets/tedandlisa-intake-panel.jpg" alt="The Hi Ted, Meet Lisa intake panel: an editable prompt field with a reference drop zone, an eleven-step progress bar, and the template gallery showing MonoMind deck, Web document, and Mermaid master as selectable cards" style="width: 100%; max-width: 100%;">

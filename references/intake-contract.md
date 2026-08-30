@@ -136,6 +136,9 @@ in the panel, because base64 inflates it by about 37% in the final file.
 
 A question may carry `kinds` (narrowing it to a shape) or `templates`
 (narrowing it to named template ids), or both, in which case both must pass.
+It also carries a `chapter`, which is the screen of the panel it is asked on —
+**presentation only, and never in the payload.** Do not look for it, and do not
+infer anything from the order the answers arrive in beyond what this file says.
 The `sitemap-ia` keys above are the first of the second sort: they are asked
 only when that template is chosen and are **absent from every other payload**.
 
