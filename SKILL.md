@@ -29,7 +29,10 @@ Everything else comes from the intake panel.
    from something), **Shape**, **Look**, **Language**, **Handover**. Each
    chapter screen holds all of its questions open at once. Questions that do
    not apply to the chosen template are not asked, and a chapter left with no
-   questions is not shown at all:
+   questions is not shown at all. Every step on the progress rail is a button
+   that goes there, so an earlier answer can be checked or changed at any
+   point — every question carries a default, so no screen is ever out of
+   reach:
 
    ```sh
    python3 scripts/tedandlisa_intake.py --prompt "THE BRIEF" --out intake.json
