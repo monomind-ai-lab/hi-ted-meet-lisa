@@ -928,7 +928,10 @@ var SCREENS = [];      /* prompt, template, one per surviving chapter, ready */
    key. The leads describe the territory rather than the individual questions,
    because which questions survive depends on the template. */
 var CHAPTER_ORDER = ["Grounds", "Shape", "Look", "Language", "Handover"];
+/* Template is not a chapter — it is one question on its own screen — but it
+   wears the same heading so every asking screen opens the same way. */
 var CHAPTER_LEAD = {
+  Template: "What you are making. It decides which questions follow.",
   Grounds:  "Where the proposal gets its evidence.",
   Shape:    "How much there is, and where it has to run.",
   Look:     "How it reads on the page.",
@@ -1149,10 +1152,10 @@ function render() {
 
   if (asks) {
     var qs = screenQs();
-    var head = s.k === "chapter"
-      ? '<div><h2 class="screenhead" tabindex="-1">' + esc(s.label) + '</h2>' +
-        '<p class="screenlead">' + esc(CHAPTER_LEAD[s.label] || "") + '</p></div>'
-      : "";
+    /* Both asking screens get the heading — the template screen was the one
+       screen that opened straight into a question card with nothing above it. */
+    var head = '<div><h2 class="screenhead" tabindex="-1">' + esc(s.label) + '</h2>' +
+               '<p class="screenlead">' + esc(CHAPTER_LEAD[s.label] || "") + '</p></div>';
     qlist.innerHTML = head + qs.map(questionHtml).join("");
     qs.forEach(syncReveals);
     restoreFileCards();
