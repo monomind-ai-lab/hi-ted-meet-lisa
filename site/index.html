@@ -391,6 +391,9 @@ section { padding: clamp(64px, 10vh, 128px) var(--pad); }
   letter-spacing: 0.12em; text-transform: uppercase; color: var(--terracotta);
 }
 .card .meta p { margin-top: 6px; font-size: 13.5px; color: var(--cream-dim); }
+/* Provenance note under a card that has one — quieter than the body copy. */
+.card .meta p.prov { margin-top: 9px; font-size: 12.5px; color: var(--cream-faint); }
+.card.yours .meta p b { color: var(--cream); font-weight: 700; }
 .card:focus-visible { outline: none; }
 .card:focus-visible .frame { outline: 3px solid var(--terracotta); outline-offset: 3px; }
 .card.handoff .frame { border-style: dashed; border-width: 2px; border-color: var(--hair-strong); }
@@ -733,13 +736,19 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
           <div class="frame"><img src="previews/slide-design.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
           <div class="meta"><h3>Slide Design <span class="kind">handoff</span></h3>
           <p>Beyond the house style — twelve style presets and animated slides
-          via the companion design pipeline. Still one HTML file.</p></div>
+          via the companion design pipeline. Still one HTML file.</p>
+          <p class="prov">This preview is a real open-source project's deck,
+          rebranded — the same move a private pack makes with yours.</p></div>
         </a>
-        <a class="card yours" href="#paths" data-path="install">
+        <a class="card yours" href="#for-teams">
           <div class="frame empty"><span class="yours-hint">your look here</span><span class="open">See how</span></div>
-          <div class="meta"><h3>Your Template <span class="kind">coming</span></h3>
-          <p>More templates are on the way — and any finished HTML file you like can
-          become one. Install, and <code>/tedandlisa-new-template</code> does the rest.</p></div>
+          <div class="meta"><h3>Your Template <span class="kind">yours</span></h3>
+          <p>Any page can become one — a file you made, or a page whose look you
+          want to keep. Install, and <code>/tedandlisa-new-template</code> lifts its
+          system into a skeleton; the subject matter never comes along. Or have it
+          built: MonoMind turns your brand into a private template pack — tokens,
+          patterns, protected terms — installed beside these, in your own agent.
+          <b>See how →</b></p></div>
         </a>
       </div>
     </div>
@@ -1062,10 +1071,11 @@ function googleTranslateElementInit() {
     ['.gallery .card:nth-child(6) .meta p', '프로젝트의 공개 얼굴 — 고정 내비게이션, 여덟 개의 해시 라우팅 페이지, 하나의 공용 푸터. 바로 이 사이트의 형제입니다.', '專案的門面 — 固定導覽列、八個 hash 路由頁面、一個共用頁尾。就是這個網站的兄弟。'],
     ['.gallery .card:nth-child(7) .kind', '핸드오프', '交接'],
     ['.gallery .card:nth-child(7) .meta p', '하우스 스타일 너머 — 동반 디자인 파이프라인의 12가지 프리셋과 애니메이션 슬라이드. 그래도 HTML 파일 하나.', '跳脫預設風格 — 由附屬設計管線提供十二種預設與動畫投影片。依然是一個 HTML 檔。'],
+    ['.card.handoff .prov', '이 미리보기는 실제 오픈소스 프로젝트의 덱을 리브랜딩한 것입니다 — 비공개 팩이 당신의 브랜드로 하는 일과 똑같습니다.', '這個預覽是把一個真實開源專案的簡報換上新品牌 — 私有範本包對你的品牌做的，就是同一件事。'],
     ['.card.yours .yours-hint', '당신의 스타일 자리', '你的風格在這'],
     ['.card.yours .open', '방법 보기', '看怎麼做'],
-    ['.card.yours .meta h3', '나의 템플릿 <span class="kind">준비 중</span>', '你的範本 <span class="kind">即將推出</span>'],
-    ['.card.yours .meta p', '더 많은 템플릿이 오고 있습니다 — 마음에 드는 완성된 HTML 파일도 템플릿이 될 수 있어요. 설치만 하면 <code>/tedandlisa-new-template</code>가 나머지를 해냅니다.', '更多範本即將登場 — 任何你喜歡的成品 HTML 檔案都能變成範本。安裝後，<code>/tedandlisa-new-template</code> 會搞定剩下的。'],
+    ['.card.yours .meta h3', '나의 템플릿 <span class="kind">나의 것</span>', '你的範本 <span class="kind">你的</span>'],
+    ['.card.yours .meta p', '어떤 페이지든 템플릿이 될 수 있습니다 — 직접 만든 파일이든, 그 룩을 그대로 간직하고 싶은 페이지든. 설치하면 <code>/tedandlisa-new-template</code>가 그 시스템을 골격으로 떠냅니다. 원본의 내용은 절대 따라오지 않습니다. 아니면 맡기셔도 됩니다: MonoMind가 당신의 브랜드를 비공개 템플릿 팩으로 만들어 — 토큰, 패턴, 보호 용어까지 — 이 템플릿들 옆에, 당신의 에이전트 안에 설치해 드립니다. <b>방법 보기 →</b>', '任何頁面都能變成範本 — 你自己做的檔案，或是你想留住那個樣子的頁面。安裝後，<code>/tedandlisa-new-template</code> 會把它的系統抽成骨架，原本的內容一概不會跟過來。也可以交給我們做：MonoMind 把你的品牌做成一份私有範本包 — 設計 token、樣式模式、受保護詞彙 — 就裝在這些範本旁邊，在你自己的 agent 裡。<b>看怎麼做 →</b>'],
 
     ['#features .section-head .kicker', '모든 파일 안에', '每個檔案裡'],
     ['#feat-h', '작은 파일, 큰 기계장치.', '小檔案，大機關。'],
