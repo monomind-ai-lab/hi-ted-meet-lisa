@@ -86,14 +86,22 @@ cp assets/tedlisa-cover-og.jpg site/assets/
 # ship. The token itself is a one-time dashboard step: Cloudflare dashboard
 # → Web Analytics → Add a site → html.monomind.one, then
 #   gh secret set CF_BEACON_TOKEN
+# The markup is Cloudflare's own snippet verbatim (type='module', which
+# defers by default, wrapped in its comment markers) so a reader of the
+# page source sees what it is.
 # Note: index.html and 404.html are canonical files, so running this with
 # the token set locally dirties the working tree — deploy-time use only.
+# If you do run it locally, restore them:
+#   git checkout site/index.html site/404.html
 if [ -n "${CF_BEACON_TOKEN:-}" ]; then
   CF_BEACON_TOKEN="$CF_BEACON_TOKEN" python3 - <<'PY'
 import os, pathlib
 token = os.environ["CF_BEACON_TOKEN"]
-beacon = ("<script defer src='https://static.cloudflareinsights.com/beacon.min.js'"
-          " data-cf-beacon='{\"token\": \"" + token + "\"}'></script>")
+beacon = ("<!-- Cloudflare Web Analytics -->"
+          "<script type='module'"
+          " src='https://static.cloudflareinsights.com/beacon.min.js'"
+          " data-cf-beacon='{\"token\": \"" + token + "\"}'></script>"
+          "<!-- End Cloudflare Web Analytics -->")
 for name in ("index.html", "intake.html", "404.html"):
     p = pathlib.Path("site") / name
     html = p.read_text()
