@@ -647,7 +647,7 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
     </div>
     <div class="actgroup" id="resultactions" hidden>
       <span class="tipwrap">
-        <button class="primary" id="copy" aria-describedby="copytip">Copy answers</button>
+        <button class="primary" id="copy" data-label="Copy answers" aria-describedby="copytip">Copy answers</button>
         <span class="tip" id="copytip" role="tooltip">Didn't make it through? Copy this and paste it into the chat.</span>
       </span>
       <button class="ghost" id="back"><span class="widelbl">Back to the questions</span><span class="narrowlbl">Back</span></button>
@@ -1660,13 +1660,30 @@ function webPrompt(json) {
          "instead of asking again, and hand back one standalone HTML file.\n\n" + json;
 }
 
+/* The local variant. Both fallbacks below are reached only from a copy of this
+   panel the reader opened themselves, so they are already running /tedandlisa
+   and the skill is on disk. webPrompt's "read SKILL.md from GitHub" line would
+   send their agent to fetch what it already has. */
+function localPrompt(json) {
+  return "Here are my /tedandlisa intake answers. Apply them instead of asking\n" +
+         "again, and hand back one standalone HTML file.\n\n" + json;
+}
+
+/* Relabels the fold, the button and the tip for the states where what the
+   reader copies is a prompt rather than the raw answers. Kept in one place so
+   the three labels can never disagree about which of the two it is. */
+function asPrompt(tip) {
+  var btn = document.getElementById("copy");
+  btn.textContent = "Copy the prompt";
+  btn.dataset.label = "Copy the prompt";
+  document.querySelector("#fallback .fb-title").textContent = "The full prompt";
+  document.getElementById("copytip").textContent = tip;
+}
+
 function submit() {
   var json = JSON.stringify(payload(), null, 2);
   if (CTX.mode === "web") {
-    document.getElementById("copy").textContent = "Copy the prompt";
-    document.querySelector("#fallback .fb-title").textContent = "The full prompt";
-    document.getElementById("copytip").textContent =
-      "Paste it into your agent's chat — that is the whole job.";
+    asPrompt("Paste it into your agent's chat — that is the whole job.");
     show("Prompt is ready.",
          "Copy it and paste it to any coding agent — Claude Code, Codex, Pi, " +
          "OpenCode, Hermes, or anything else that can read a public URL. " +
@@ -1686,14 +1703,18 @@ function submit() {
              "You can close this tab — she is building it now.", false, json);
       })
       .catch(function () {
-        show("Answers ready — one step left.",
-             "The panel could not reach the runner, so copy them across and Lisa can pick up from there.",
-             true, json);
+        asPrompt("Paste it to the agent you ran /tedandlisa from.");
+        show("Prompt ready to paste.",
+             "The runner stopped answering, so nothing was handed over automatically. " +
+             "Paste this to Lisa instead and she picks up from here.",
+             true, localPrompt(json));
       });
   } else {
-    show("Answers ready — one step left.",
-         "This page was opened from a file, so there is nothing to post to. Copy them across and Lisa can pick up from there.",
-         true, json);
+    asPrompt("Paste it to the agent you ran /tedandlisa from.");
+    show("Prompt ready to paste.",
+         "This panel was opened straight from a file, so there is no runner to hand the " +
+         "answers to. Paste this to Lisa instead and she picks up from here.",
+         true, localPrompt(json));
   }
 }
 
@@ -1712,7 +1733,9 @@ document.getElementById("skip").addEventListener("click", function () {
 });
 document.getElementById("copy").addEventListener("click", function () {
   var btn = this;
-  var label = CTX.mode === "web" ? "Copy the prompt" : "Copy answers";
+  /* Restore whatever this state called it, not what the mode implies: the two
+     local fallbacks copy a prompt too, so mode alone would relabel them wrong. */
+  var label = btn.dataset.label || "Copy answers";
   track("prompt-copy");
   navigator.clipboard.writeText(document.getElementById("payload").textContent).then(function () {
     btn.textContent = "Copied \u2713";
