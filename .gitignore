@@ -6,6 +6,10 @@ intake.json
 # project-context trigger state (session-local, not shared)
 .claude/project-context-state.json
 
+# the context registry lives beside the checkout, reached through this
+# symlink; no slash suffix so the symlink itself is ignored, not a directory
+/project-context
+
 # site/ is assembled at deploy time by site/sync.sh
 site/previews/
 site/intake.html

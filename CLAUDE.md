@@ -106,7 +106,10 @@ tooling-free checklist as the floor.
 
 This repo uses a local `project-context/` protocol (imported into `AGENTS.md`
 and wired via `.claude/settings.json` `SessionStart`/`Stop` hooks calling
-`.agents/skills/project-context/scripts/context_triggers.py`). Before
+`.agents/skills/project-context/scripts/context_triggers.py`). The registry
+itself lives beside the checkout and is untracked; `project-context` in the
+working tree is a gitignored symlink to it, so a fresh clone will not have
+it — the protocol applies to local sessions on this machine. Before
 substantial work, read `project-context/SKILL.md` and `project-context/NOW.md`,
 and search `project-context/DECISIONS.md` and `project-context/LEARNINGS.md`
 for relevant constraints/evidence. Update `NOW.md`/`DECISIONS.md`/`LEARNINGS.md`
