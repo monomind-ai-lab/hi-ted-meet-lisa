@@ -1323,10 +1323,10 @@ var L10N = {
       },
       theme: {
         q: "어떤 테마로 할까요?",
-        hint: "기본은 다크입니다; 토큰 세트에는 라이트 팔레트도 전부 들어 있습니다.",
+        hint: "대부분은 다크로, 페이퍼 계열은 라이트로 나갑니다. 템플릿이 어느 쪽이든 이걸로 바꿉니다.",
         o: { dark:   ["다크", "짙은 잉크 바탕에 액센트 헤일로."],
-             light:  ["라이트", "쓰이지 않던 --bg / --surface 팔레트를 씁니다."],
-             toggle: ["읽는 사람이 전환", "둘 다 실어 보내고, 크롬에 스위치를 답니다."] }
+             light:  ["라이트", "밝은 바탕 — 페이퍼 계열은 이미 이쪽이 기본입니다."],
+             toggle: ["읽는 사람이 전환", "둘 다 실어 보내고 스위치를 답니다. 아직 두 번째 팔레트가 없는 템플릿도 있습니다."] }
       },
       slideCount: {
         q: "덱은 얼마나 길어야 할까요?",
@@ -1538,10 +1538,10 @@ var L10N = {
       },
       theme: {
         q: "要用哪一種主題？",
-        hint: "預設出貨是深色；token 裡本來就備好了一整套淺色調色盤。",
+        hint: "多數形態出貨是深色，紙本類則是淺色。這一題把範本原本的底色換掉。",
         o: { dark:   ["深色", "深色底加上光暈重點色。"],
-             light:  ["淺色", "改用一直沒用到的 --bg / --surface 調色盤。"],
-             toggle: ["讓讀者自己切換", "兩套都出貨，並在介面上加一個開關。"] }
+             light:  ["淺色", "淺色底 — 紙本類本來就是這個。"],
+             toggle: ["讓讀者自己切換", "兩套都出貨並加上開關。有些範本還沒有第二套調色盤。"] }
       },
       slideCount: {
         q: "這份簡報要多長？",
@@ -1795,11 +1795,11 @@ var QUESTIONS = [
       { id: "cdn",        label: "Load webfonts and libraries from a CDN", note: "Smaller file; needs a connection to render fully.", def: true },
       { id: "standalone", label: "Fully standalone", note: "Fonts and libraries inlined \u2014 opens from a USB stick with no network at all." } ] },
 
-  { id: "theme", chapter: "Look", q: "Which theme?", kinds: ["slides", "document"], hint: "It ships dark; the token set carries a full light palette.",
+  { id: "theme", chapter: "Look", q: "Which theme?", kinds: ["slides", "document"], hint: "Most shapes ship dark; the paper ones ship light. This changes whichever ground the template starts from.",
     type: "single", options: [
       { id: "dark",   label: "Dark",  note: "Deep ink ground with accent halos.", def: true },
-      { id: "light",  label: "Light", note: "Uses the unused --bg / --surface palette." },
-      { id: "toggle", label: "Reader can toggle", note: "Ships both; adds a switch to the chrome." } ] },
+      { id: "light",  label: "Light", note: "Light ground — already the default on the paper shapes." },
+      { id: "toggle", label: "Reader can toggle", note: "Ships both and adds a switch. Not every template carries a second palette yet." } ] },
 
   { id: "slideCount", chapter: "Shape", q: "How long should the deck be?", kinds: ["slides", "external"],
     hint: "Skip this and I size it from the brief.",
