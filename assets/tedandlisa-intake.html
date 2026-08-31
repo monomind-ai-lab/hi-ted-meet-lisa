@@ -148,16 +148,16 @@ body {
 .count { font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.4;
   color: var(--muted-inv); white-space: nowrap; margin-left: auto; }
 
-/* ── back to the site ─────────────────────────────────────────────
-   The home control rides on the brand row because it is the only row in
-   the header with slack in it: the rail below is already a full-width row
-   of buttons, and the footer is a fixed box the flow controls fill edge
-   to edge.
+/* ── the two chrome controls ──────────────────────────────────────
+   A way back to the site, and the language. They ride on the brand row
+   because it is the only row in the header with slack in it: the rail
+   below is already a full-width row of buttons, and the footer is a
+   fixed box the flow controls fill edge to edge.
 
-   30px tall against a brand row that is already 38px (a 30px mark inside
-   .brandlink's 4px padding), so it sits *inside* the row's existing
-   height — which is what keeps --top-h at exactly the 156px / 138px it
-   was before it existed.
+   Both are 30px tall against a brand row that is already 38px (a 30px
+   mark inside .brandlink's 4px padding), so they sit *inside* the row's
+   existing height — which is what keeps --top-h at exactly the 156px /
+   138px it was before they existed.
 
    margin-left:auto on the group, never justify-content:space-between on
    the row: the group is the row's only sibling, and space-between pins a
@@ -172,6 +172,24 @@ body {
 .iconbtn:hover { color: var(--fg-inv); border-color: var(--accent); }
 .iconbtn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 .iconbtn svg { width: 15px; height: 15px; display: block; }
+.langwrap { position: relative; flex: none; display: inline-flex; align-items: center; }
+.langsel { font: inherit; font-family: var(--font-body); font-size: var(--text-xs);
+  height: 30px; color: var(--fg-inv); background: transparent; cursor: pointer;
+  border: 1px solid var(--glass-hair); border-radius: var(--radius-pill);
+  padding: 0 26px 0 var(--space-3);
+  -webkit-appearance: none; -moz-appearance: none; appearance: none;
+  transition: border-color var(--motion-fast) var(--ease-standard); }
+.langsel:hover { border-color: var(--accent); }
+.langsel:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+/* The open list is the platform's own and paints on the platform's own
+   ground, so the options need a colour that reads there rather than the
+   near-white this panel hands down. */
+.langsel option { color: #1a1c17; background: #ffffff; }
+/* appearance:none takes the native arrow with it. Drawn the same way
+   .fb-toggle draws the fold's chevron, and out of the pointer's way. */
+.langcaret { position: absolute; right: 11px; width: 6px; height: 6px; pointer-events: none;
+  border-right: 1.5px solid var(--muted-inv); border-bottom: 1.5px solid var(--muted-inv);
+  transform: translateY(-2px) rotate(45deg); }
 
 h1 { font-family: var(--font-display); font-size: clamp(28px, 4.4vw, 40px); line-height: 1.08;
      letter-spacing: -0.025em; margin: 0 0 var(--space-2); font-weight: 700; }
@@ -575,23 +593,33 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
     <span class="brandtext"><b translate="no">monomind ai lab</b><span translate="no">hi ted, meet lisa</span></span>
     </a>
 
-    <!-- The way back to the site. A real href, so a middle-click or ⌘-click
-         still opens a tab and the status bar still shows where it goes.
-         `_top`, not `_blank`: in web mode this panel is an iframe inside the
-         site's own overlay, and a plain navigation would nest the site inside
-         itself — and `_blank` is not a new tab in an embedded browser anyway
-         (L-013), it is a same-tab navigation wearing a new tab's clothes.
-         What guards the half-answered form is the confirm in the click
-         handler, not the target. -->
+    <!-- The header's two chrome controls. Both are names, not sentences, so
+         the labels live in attributes the language layer rewrites rather than
+         in text that would change the row's width as it switched.
+
+         The home link carries a real href, so a middle-click or ⌘-click still
+         opens a tab and the status bar still shows where it goes. `_top`, not
+         `_blank`: in web mode this panel is an iframe inside the site's own
+         overlay, and a plain navigation would nest the site inside itself —
+         and `_blank` is not a new tab in an embedded browser anyway (L-013),
+         it is a same-tab navigation wearing a new tab's clothes. What guards
+         the half-answered form is the confirm in the click handler, not the
+         target. -->
     <div class="chrome">
-      <a class="iconbtn" id="homebtn" href="https://html.monomind.one/?ref=intake-home"
-         target="_top" aria-label="Hi Ted, Meet Lisa home page"
-         title="Hi Ted, Meet Lisa home page">
+      <a class="iconbtn" id="homebtn" href="https://html.monomind.one/?ref=intake-home" target="_top">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M3 10.6 12 3.2l9 7.4"/><path d="M5.6 9.4V20.3h12.8V9.4"/>
         </svg>
       </a>
+      <span class="langwrap">
+        <select class="langsel" id="langsel">
+          <option value="en">English</option>
+          <option value="ko">한국어</option>
+          <option value="zh-TW">繁體中文</option>
+        </select>
+        <span class="langcaret" aria-hidden="true"></span>
+      </span>
     </div>
   </div>
 
@@ -612,17 +640,21 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
   <div id="intake">
     <header class="screen" id="screen-prompt">
       <h1 tabindex="-1">Tell her what you need.</h1>
-      <p class="lead"><span id="qcount">A few</span> questions, and none of them
+      <!-- The markup holds the English. Everything below with an id is rewritten
+           by applyChrome() when the language changes; the count of questions is
+           interpolated there too, because the number does not sit in the same
+           place in all three sentences. -->
+      <p class="lead" id="promptlead">A few questions, and none of them
         compulsory. Answer what matters and leave the rest — anything untouched takes the
         value marked <span class="default">default</span>.</p>
       <div class="brief" id="brief">
-        <b>Your prompt</b>
+        <b id="brieflabel">Your prompt</b>
         <textarea id="prompttext" rows="2"
           placeholder="What is this about, and who is it for?"></textarea>
-        <p class="promptnote">Passed in as <code>/tedandlisa [your prompt]</code>. Edit it here if it
+        <p class="promptnote" id="promptnote">Passed in as <code translate="no">/tedandlisa [your prompt]</code>. Edit it here if it
           needs sharpening.</p>
         <div class="refs">
-          <label for="refdrop">References <span>optional — slides, notes, data, an image to match</span></label>
+          <label for="refdrop" id="refslabel">References <span>optional — slides, notes, data, an image to match</span></label>
           <div class="drop" id="refdrop" tabindex="0" role="button">Drop files here, or click to choose</div>
           <input type="file" id="refinput" class="hidden" multiple>
           <ul class="reflist" id="reflist"></ul>
@@ -651,7 +683,7 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
       </div>
       <figure class="done-art" id="doneart" hidden>
         <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAYABgAAD/4QEORXhpZgAATU0AKgAAAAgABgEaAAUAAAABAAAAVgEbAAUAAAABAAAAXgEoAAMAAAABAAIAAAExAAIAAABqAAAAZgE7AAIAAAALAAAA0IdpAAQAAAABAAAA3AAAAAAAAABgAAAAAQAAAGAAAAABQ2FudmEgZG9jPURBSFRwSkh4TFhjIHVzZXI9VUFFRUVqaTlPbjAgYnJhbmQ9VGVhbSAocGFpZCkgdGVtcGxhdGU9ZGctMWEzZDQ3OTUtODAyNS00MDk3LWFhMjItMjQwYjQxMjI1YjY1AERhcmVuIEthbmcAAAADoAEAAwAAAAEAAQAAoAIABAAAAAEAAAHMoAMABAAAAAEAAAHMAAAAAP/hCrRodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDYuMC4wIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcDpDcmVhdG9yVG9vbD0iQ2FudmEgZG9jPURBSFRwSkh4TFhjIHVzZXI9VUFFRUVqaTlPbjAgYnJhbmQ9VGVhbSAocGFpZCkgdGVtcGxhdGU9ZGctMWEzZDQ3OTUtODAyNS00MDk3LWFhMjItMjQwYjQxMjI1YjY1Ij4gPGRjOnRpdGxlPiA8cmRmOkFsdD4gPHJkZjpsaSB4bWw6bGFuZz0ieC1kZWZhdWx0Ij5oaXRlZG1lZXRsaXNhIC0gNzwvcmRmOmxpPiA8L3JkZjpBbHQ+IDwvZGM6dGl0bGU+IDxkYzpjcmVhdG9yPiA8cmRmOlNlcT4gPHJkZjpsaT5EYXJlbiBLYW5nPC9yZGY6bGk+IDwvcmRmOlNlcT4gPC9kYzpjcmVhdG9yPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8P3hwYWNrZXQgZW5kPSJ3Ij8+AP/tAGxQaG90b3Nob3AgMy4wADhCSU0EBAAAAAAANBwBWgADGyVHHAIAAAIAAhwCBQARaGl0ZWRtZWV0bGlzYSAtIDccAlAACkRhcmVuIEthbmc4QklNBCUAAAAAABDH+lTvbSRdYzbVjb7cjQRf/8AAEQgBzAHMAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/bAEMA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" alt="">
-        <figcaption>one paste away</figcaption>
+        <figcaption id="doneartcap">one paste away</figcaption>
       </figure>
     </div>
 
@@ -686,7 +718,7 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
       <button class="primary" id="submit">Next &#9166;</button>
       <button class="ghost" id="backstep" hidden>Back</button>
       <button class="ghost" id="skip"><span class="widelbl">Skip the rest, use defaults</span><span class="narrowlbl">Skip</span></button>
-      <span class="kbd"><b>1</b>&ndash;<b>9</b> select &middot; <b>&uarr;</b><b>&darr;</b> question &middot;
+      <span class="kbd" id="kbdhints"><b>1</b>&ndash;<b>9</b> select &middot; <b>&uarr;</b><b>&darr;</b> question &middot;
         <b>&larr;</b><b>&rarr;</b> screen &middot; <b>&#9166;</b> continue</span>
     </div>
     <div class="actgroup" id="resultactions" hidden>
@@ -745,6 +777,805 @@ function track(name) {
     if (CTX.mode !== "web" || !navigator.sendBeacon) return;
     navigator.sendBeacon("/e", name);
   } catch (e) {}
+}
+
+/* ══ language ══════════════════════════════════════════════════════
+   English, Korean and Traditional Chinese, all three written by hand.
+   This is the same "instant" tier the public site keeps (the `T` table in
+   site/index.html) and deliberately not the same *mechanism*: the site can
+   translate a static page in place because its copy sits in the DOM, while
+   almost every string here is drawn by a function from data. So the copy
+   lives in tables and the drawing functions ask for it. There is no machine
+   translation tier and no network call — nothing here loads.
+
+   The one rule that matters: **this layer never reaches the payload.**
+   QUESTIONS, TEMPLATES and `state` keep their English ids and are never
+   rewritten; the tables below are keyed *by* those ids and are read only
+   when something is being drawn. An answer is an id in every language, so
+   payload() cannot tell which language the panel was in — which is what
+   keeps references/intake-contract.md true. */
+
+var LANGS = { en: 1, ko: 1, "zh-TW": 1 };
+
+/* Fold any BCP-47 tag onto one of the three the panel is written in.
+   Simplified Chinese lands on English on purpose: the panel has no machine
+   translation tier, and the site keeps zh-CN in the long tail that does. */
+function normLang(tag) {
+  var s = String(tag || "").trim();
+  if (LANGS[s]) { return s; }
+  if (/^ko\b/i.test(s)) { return "ko"; }
+  if (/^zh[-_](Hant|TW|HK|MO)\b/i.test(s)) { return "zh-TW"; }
+  return "en";
+}
+
+/* A **script** heuristic, not language identification. It asks which writing
+   system the brief is in and nothing more: Han characters are shared by
+   Chinese and Japanese, a Korean brief can be pure Latin until its first
+   Hangul syllable, and a Traditional/Simplified split is not visible here at
+   all. It is only good enough to choose which language the panel *opens* in,
+   and the selector overrides it the moment the reader disagrees. */
+function scriptLang(text) {
+  if (/[ᄀ-ᇿ㄰-㆏가-힣]/.test(text)) { return "ko"; }
+  if (/[㐀-䶿一-鿿豈-﫿]/.test(text)) { return "zh-TW"; }
+  return null;
+}
+
+/* Where the opening language comes from, in order:
+
+     ?lang=…    web mode. The site owns the choice and hands it over on the
+                frame's URL — openIntake() in site/index.html sets it, and
+                posts a message if the reader switches while the overlay is
+                open. The site is the single source of truth for it; nothing
+                here re-derives what the site already knows.
+     CTX.lang   a runner that wants to say so explicitly. None does today.
+     the brief  local mode. There is no site, so the only evidence of who is
+                reading is the text they wrote — see scriptLang above.
+     navigator  an empty brief has nothing to read, so fall back to the
+                browser's own preference, and to English past that. */
+function startLang() {
+  var q = /[?&]lang=([^&]*)/.exec(location.search);
+  if (q) { return normLang(decodeURIComponent(q[1])); }
+  if (CTX.lang) { return normLang(CTX.lang); }
+  /* The textarea, not CTX.prompt: they hold the same text at the open, and
+     the textarea is the one that is still right if a runner ever fills it
+     some other way. */
+  var box = document.getElementById("prompttext");
+  var brief = String((box && box.value) || CTX.prompt || "");
+  if (brief.trim()) { return scriptLang(brief) || "en"; }
+  return normLang((navigator.languages && navigator.languages[0]) || navigator.language);
+}
+
+var lang = "en";
+
+/* ── chrome ───────────────────────────────────────────────────────
+   Every string the panel draws that is not a question, an option or a
+   chapter. English is written out here rather than left in the DOM: most of
+   it is redrawn by render() anyway, so there is no original to switch back
+   to the way the site's table has one.
+
+   Entries that interpolate are functions. `lead`, `note`, `refs`, `kbd` and
+   `teams` carry markup and are assigned with innerHTML; everything else is
+   plain text and goes through esc() at its call site like any other string. */
+var UI = {
+  en: {
+    title: "Tell her what you need — Hi Ted, Meet Lisa",
+    htmlLang: "en",
+    h1: "Tell her what you need.",
+    lead: function (n) {
+      var words = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
+                   "Eight", "Nine", "Ten", "Eleven", "Twelve"];
+      return (words[n] || n) + " questions, and none of them compulsory. Answer what " +
+        "matters and leave the rest — anything untouched takes the value marked " +
+        '<span class="default">default</span>.';
+    },
+    briefLabel: "Your prompt",
+    promptPlaceholder: "What is this about, and who is it for?",
+    note: 'Passed in as <code translate="no">/tedandlisa [your prompt]</code>. ' +
+          "Edit it here if it needs sharpening.",
+    refs: "References <span>optional — slides, notes, data, an image to match</span>",
+    dropRefs: "Drop files here, or click to choose",
+    dropOne: "Drop a file here, or click to choose",
+    remove: "Remove",
+    large: function (kb) { return "Large — this inflates the file by ~" + kb + " KB once embedded."; },
+    railLabel: "Progress",
+    count: function (i, n) { return i + " of " + n; },
+    stepOf: function (i, n, name) { return "Step " + i + " of " + n + ": " + name; },
+    screenPrompt: "Your prompt",
+    screenTemplate: "Which template?",
+    screenReady: "Ready",
+    home: "Hi Ted, Meet Lisa home page",
+    langLabel: "Language",
+    /* Shown only when leaving would throw answers away — see the click
+       handler on #homebtn, and D-014 for why that matters here. */
+    leaveConfirm: "Leave the panel? Your answers are not saved anywhere.",
+    tagAny: "choose any",
+    defaultMark: "default",
+    previewLink: "Preview ↗",
+    noshot: "no preview",
+    next: "Next ⏎",
+    continue: "Continue ⏎",
+    backStep: "Back",
+    skipWide: "Skip the rest, use defaults",
+    skipNarrow: "Skip",
+    defaultsWide: "Use all defaults",
+    defaultsNarrow: "Defaults",
+    kbd: "<b>1</b>&ndash;<b>9</b> select &middot; <b>&uarr;</b><b>&darr;</b> question &middot; " +
+         "<b>&larr;</b><b>&rarr;</b> screen &middot; <b>&#9166;</b> continue",
+    copyAnswers: "Copy answers",
+    copyPrompt: "Copy the prompt",
+    copied: "Copied ✓",
+    foldAnswers: "Your answers as JSON",
+    foldPrompt: "The full prompt",
+    backWide: "Back to the questions",
+    backNarrow: "Back",
+    doneCaption: "one paste away",
+    teams: "This will arrive in the house style. Teams that want their own — tokens, " +
+      "patterns, protected terms — have MonoMind build it as a private pack: " +
+      '<a href="https://monomind.one/?ref=tedlisa-intake" target="_blank" ' +
+      'rel="noopener">monomind.one</a>',
+    pvwOpen: "Open in a new tab ↗",
+    pvwClose: "× Close",
+    pvwCloseLabel: "Close preview",
+    pvwFrame: "Template preview",
+    chap: { Prompt: "Prompt", Template: "Template", Grounds: "Grounds", Shape: "Shape",
+            Look: "Look", Language: "Language", Handover: "Handover", Ready: "Ready" },
+    ready: {
+      runner: ["Lisa has your answers.",
+               "You can close this tab — she is building it now.",
+               "Didn't make it through? Copy this and paste it into the chat."],
+      web: ["Prompt is ready.",
+            "Copy it and paste it to any coding agent — Claude Code, Codex, Pi, " +
+            "OpenCode, Hermes, or anything else that can read a public URL. " +
+            "The agent reads the skill from GitHub, builds it, and hands back " +
+            "one standalone HTML file. Nothing to install.",
+            "Paste it into your agent's chat — that is the whole job."],
+      stopped: ["Prompt ready to paste.",
+                "The runner stopped answering, so nothing was handed over automatically. " +
+                "Paste this to Lisa instead and she picks up from here.",
+                "Paste it to the agent you ran /tedandlisa from."],
+      file: ["Prompt ready to paste.",
+             "This panel was opened straight from a file, so there is no runner to hand the " +
+             "answers to. Paste this to Lisa instead and she picks up from here.",
+             "Paste it to the agent you ran /tedandlisa from."]
+    }
+  },
+
+  ko: {
+    title: "필요한 것을 알려주세요 — Hi Ted, Meet Lisa",
+    htmlLang: "ko",
+    h1: "필요한 것을 알려주세요.",
+    lead: function (n) {
+      return "질문 " + n + "개, 그중 필수는 하나도 없습니다. 중요한 것만 답하고 나머지는 " +
+        '그대로 두세요 — 손대지 않은 항목은 <span class="default">기본값</span>으로 ' +
+        "표시된 값을 그대로 씁니다.";
+    },
+    briefLabel: "당신의 프롬프트",
+    promptPlaceholder: "무엇에 대한 것이고, 누구를 위한 것인가요?",
+    note: '<code translate="no">/tedandlisa [your prompt]</code> 로 전달된 내용입니다. ' +
+          "더 다듬을 부분이 있으면 여기서 고치세요.",
+    refs: "참고 자료 <span>선택 사항 — 슬라이드, 메모, 데이터, 맞추고 싶은 이미지</span>",
+    dropRefs: "여기에 파일을 놓거나, 눌러서 고르세요",
+    dropOne: "여기에 파일 하나를 놓거나, 눌러서 고르세요",
+    remove: "제거",
+    large: function (kb) { return "큽니다 — 파일에 넣으면 약 " + kb + " KB가 불어납니다."; },
+    railLabel: "진행",
+    count: function (i, n) { return i + " / " + n + "단계"; },
+    stepOf: function (i, n, name) { return n + "단계 중 " + i + "단계: " + name; },
+    screenPrompt: "당신의 프롬프트",
+    screenTemplate: "어떤 템플릿을 쓸까요?",
+    screenReady: "준비 완료",
+    home: "Hi Ted, Meet Lisa 홈으로",
+    langLabel: "언어",
+    leaveConfirm: "패널을 떠날까요? 답변은 어디에도 저장되지 않습니다.",
+    tagAny: "복수 선택",
+    defaultMark: "기본값",
+    previewLink: "미리보기 ↗",
+    noshot: "미리보기 없음",
+    next: "다음 ⏎",
+    continue: "계속 ⏎",
+    backStep: "뒤로",
+    skipWide: "나머지는 건너뛰고 기본값 사용",
+    skipNarrow: "건너뛰기",
+    defaultsWide: "전부 기본값으로",
+    defaultsNarrow: "기본값",
+    kbd: "<b>1</b>&ndash;<b>9</b> 선택 &middot; <b>&uarr;</b><b>&darr;</b> 질문 &middot; " +
+         "<b>&larr;</b><b>&rarr;</b> 화면 &middot; <b>&#9166;</b> 계속",
+    copyAnswers: "답변 복사",
+    copyPrompt: "프롬프트 복사",
+    copied: "복사됨 ✓",
+    foldAnswers: "답변을 JSON으로",
+    foldPrompt: "전체 프롬프트",
+    backWide: "질문으로 돌아가기",
+    backNarrow: "뒤로",
+    doneCaption: "붙여넣기 한 번",
+    teams: "이 파일은 하우스 스타일로 도착합니다. 자기 팀만의 스타일 — 토큰, 패턴, " +
+      "보호할 용어 — 을 원하는 팀에게는 MonoMind가 비공개 팩으로 만들어 드립니다: " +
+      '<a href="https://monomind.one/?ref=tedlisa-intake" target="_blank" ' +
+      'rel="noopener">monomind.one</a>',
+    pvwOpen: "새 탭에서 열기 ↗",
+    pvwClose: "× 닫기",
+    pvwCloseLabel: "미리보기 닫기",
+    pvwFrame: "템플릿 미리보기",
+    chap: { Prompt: "프롬프트", Template: "템플릿", Grounds: "근거", Shape: "형태",
+            Look: "모양새", Language: "언어", Handover: "인계", Ready: "준비 완료" },
+    ready: {
+      runner: ["Lisa가 답변을 받았습니다.",
+               "이 탭은 닫으셔도 됩니다 — 지금 만들고 있습니다.",
+               "전달되지 않았나요? 이걸 복사해서 대화창에 붙여넣으세요."],
+      web: ["프롬프트가 준비됐습니다.",
+            "복사해서 아무 코딩 에이전트에나 붙여넣으세요 — Claude Code, Codex, Pi, " +
+            "OpenCode, Hermes, 그 밖에 공개 URL을 읽을 수 있는 무엇이든. 에이전트가 " +
+            "GitHub에서 스킬을 읽고, 만들고, 독립 실행형 HTML 파일 하나를 건네줍니다. " +
+            "설치할 것은 없습니다.",
+            "에이전트 대화창에 붙여넣으면, 그걸로 끝입니다."],
+      stopped: ["붙여넣을 프롬프트가 준비됐습니다.",
+                "러너가 응답을 멈춰서 자동으로 전달된 것은 없습니다. 대신 이걸 Lisa에게 " +
+                "붙여넣으면 여기서부터 이어서 진행합니다.",
+                "/tedandlisa 를 실행한 에이전트에 붙여넣으세요."],
+      file: ["붙여넣을 프롬프트가 준비됐습니다.",
+             "이 패널은 파일에서 바로 열렸기 때문에 답변을 건넬 러너가 없습니다. 대신 " +
+             "이걸 Lisa에게 붙여넣으면 여기서부터 이어서 진행합니다.",
+             "/tedandlisa 를 실행한 에이전트에 붙여넣으세요."]
+    }
+  },
+
+  "zh-TW": {
+    title: "告訴她你需要什麼 — Hi Ted, Meet Lisa",
+    htmlLang: "zh-Hant",
+    h1: "告訴她你需要什麼。",
+    lead: function (n) {
+      return n + " 個問題，沒有一個是必答的。回答重要的，其餘留著就好 — 沒有動過的項目，" +
+        '會採用標示為 <span class="default">預設</span> 的那個值。';
+    },
+    briefLabel: "你的 prompt",
+    promptPlaceholder: "這是關於什麼的，又是給誰看的？",
+    note: '這是透過 <code translate="no">/tedandlisa [your prompt]</code> 傳進來的。' +
+          "需要修得更準的話，在這裡改。",
+    refs: "參考資料 <span>選填 — 投影片、筆記、資料，或一張想比照的圖</span>",
+    dropRefs: "把檔案拖到這裡，或點一下選擇",
+    dropOne: "把一個檔案拖到這裡，或點一下選擇",
+    remove: "移除",
+    large: function (kb) { return "檔案偏大 — 嵌進去之後大約會多出 " + kb + " KB。"; },
+    railLabel: "進度",
+    count: function (i, n) { return "第 " + i + " / " + n + " 步"; },
+    stepOf: function (i, n, name) { return "第 " + i + " 步，共 " + n + " 步：" + name; },
+    screenPrompt: "你的 prompt",
+    screenTemplate: "要用哪一個範本？",
+    screenReady: "準備好了",
+    home: "回到 Hi Ted, Meet Lisa 首頁",
+    langLabel: "語言",
+    leaveConfirm: "要離開這個面板嗎？你的答案沒有存在任何地方。",
+    tagAny: "可複選",
+    defaultMark: "預設",
+    previewLink: "預覽 ↗",
+    noshot: "沒有預覽",
+    next: "下一步 ⏎",
+    continue: "繼續 ⏎",
+    backStep: "上一步",
+    skipWide: "跳過其餘，全用預設",
+    skipNarrow: "跳過",
+    defaultsWide: "全部使用預設",
+    defaultsNarrow: "預設",
+    kbd: "<b>1</b>&ndash;<b>9</b> 選擇 &middot; <b>&uarr;</b><b>&darr;</b> 問題 &middot; " +
+         "<b>&larr;</b><b>&rarr;</b> 畫面 &middot; <b>&#9166;</b> 繼續",
+    copyAnswers: "複製答案",
+    copyPrompt: "複製 prompt",
+    copied: "已複製 ✓",
+    foldAnswers: "你的答案，JSON 格式",
+    foldPrompt: "完整的 prompt",
+    backWide: "回到問題",
+    backNarrow: "返回",
+    doneCaption: "只差一次貼上",
+    teams: "這份檔案會以我們的自家風格交回。想要自己那一套的團隊 — token、樣式模式、" +
+      "要保護的詞彙 — MonoMind 可以做成一份私有範本包：" +
+      '<a href="https://monomind.one/?ref=tedlisa-intake" target="_blank" ' +
+      'rel="noopener">monomind.one</a>',
+    pvwOpen: "在新分頁開啟 ↗",
+    pvwClose: "× 關閉",
+    pvwCloseLabel: "關閉預覽",
+    pvwFrame: "範本預覽",
+    chap: { Prompt: "Prompt", Template: "範本", Grounds: "依據", Shape: "形態",
+            Look: "外觀", Language: "語言", Handover: "交付", Ready: "準備好了" },
+    ready: {
+      runner: ["Lisa 收到你的答案了。",
+               "這個分頁可以關了 — 她正在做。",
+               "沒有送達嗎？把這個複製起來，貼到對話裡。"],
+      web: ["prompt 準備好了。",
+            "複製起來，貼給任何一個 coding agent — Claude Code、Codex、Pi、OpenCode、" +
+            "Hermes，或任何讀得到公開網址的工具。agent 會從 GitHub 讀取這個技能，把它做" +
+            "出來，然後交回一個獨立的 HTML 檔案。沒有東西要安裝。",
+            "貼進 agent 的對話框 — 這樣就完成了。"],
+      stopped: ["prompt 已經可以貼上了。",
+                "runner 沒有回應，所以沒有自動交出去。把這個貼給 Lisa，她會從這裡接手。",
+                "貼給你執行 /tedandlisa 的那個 agent。"],
+      file: ["prompt 已經可以貼上了。",
+             "這個面板是直接從檔案打開的，所以沒有 runner 可以接手答案。把這個貼給 " +
+             "Lisa，她會從這裡接手。",
+             "貼給你執行 /tedandlisa 的那個 agent。"]
+    }
+  }
+};
+
+/* ── content ──────────────────────────────────────────────────────
+   The questions, their options, the chapter leads and the template cards.
+
+   English is absent on purpose: it is already written in QUESTIONS,
+   CHAPTER_LEAD and the registry, and duplicating it here would be two
+   places to keep in agreement. Every accessor below falls back to the
+   source data, so `en` is simply "no override".
+
+   Keys are the ids the payload already uses. `o` is options by option id,
+   `f` is a revealed field by "<reveal group>.<field id>" — the group is part
+   of the key because `sitemapSource` asks for `notes` in two groups and means
+   two different things — `c` is the sub-options of a `checks` field, and `p`
+   is the free-text placeholder behind an `isOther` option.
+
+   Left verbatim throughout: /tedandlisa, SKILL.md, design.md, intake.json,
+   MonoMind, Hi Ted, Meet Lisa, Ted, Lisa, Project Context, the CSS custom
+   property names, the vendor path, and every filename. */
+var L10N = {
+  ko: {
+    lead: {
+      Template: "무엇을 만들 것인가. 이 선택이 뒤따르는 질문을 정합니다.",
+      Grounds:  "제안이 근거를 어디에서 얻는가.",
+      Shape:    "분량은 얼마나 되고, 어디에서 열려야 하는가.",
+      Look:     "지면에서 어떻게 읽히는가.",
+      Language: "누가, 어떤 언어로 읽는가.",
+      Handover: "읽는 사람이 무엇을 가지고 떠나는가."
+    },
+    /* [name, tagline, best_for, dependencies] — the last two come off the
+       registry entry rather than the option, which is why they live here
+       and not under q.template.o. */
+    tpl: {
+      "monomind-deck": ["MonoMind 덱",
+        "가로로 넘기는 프레젠테이션 덱, 짙은 잉크와 액센트 헤일로.",
+        "발표용. 슬라이드 하나에 아이디어 하나, 방 건너편에서도 읽힙니다.",
+        "Google Fonts만 사용."],
+      "web-document": ["웹 문서",
+        "웹사이트 페이지처럼 읽힙니다: 상단 내비게이션, 섹션, 다이어그램.",
+        "책상 앞에서 읽고 링크로 공유하는 모든 것 — 개요, 가이드, 결정 기록, 핸드북.",
+        "Google Fonts, 그리고 다이어그램용 mermaid를 CDN에서."],
+      "mermaid-master": ["다중 페이지 다이어그램",
+        "밝은 종이 위의 다이어그램 중심 덱, 한 장에 그림 하나.",
+        "가까이서 읽고, 인쇄하고, 링크로 공유해야 하는 아키텍처·시스템 다이어그램.",
+        "Google Fonts만 — 다이어그램은 인라인 SVG라 mermaid 런타임이 없습니다."],
+      "architecture": ["아키텍처 다이어그램",
+        "슬레이트 위의 시스템 다이어그램, 색이 의미를 갖습니다 — 한 장이든 여러 장이든.",
+        "가까이서 검토하고 문서에 붙여 넣을 시스템·클라우드·네트워크 다이어그램.",
+        "Google Fonts만 — 인라인 SVG, 다이어그램 런타임 없음."],
+      "sitemap-ia": ["사이트맵 & IA 제안",
+        "정보 구조를 논증하고, 내비게이션은 실제로 눌러 볼 수 있게.",
+        "사이트 구조를 제안하거나 방어할 때 — 리뉴얼의 IA, 통합, 새 사이트의 첫 지도. " +
+        "승인할 사람들이 책상 앞에서 읽습니다.",
+        "문서에는 Google Fonts와 CDN의 mermaid, 프로토타입에는 CDN의 Font Awesome과 " +
+        "Tailwind. delivery 답변으로 넷 다 인라인할 수 있습니다."],
+      "slide-design": ["슬라이드 디자인",
+        "MonoMind 템플릿이 아닙니다 — 열두 가지 스타일 프리셋과 애니메이션 HTML 슬라이드.",
+        "하우스 스타일로는 담기지 않는 덱 — 다른 룩, 또는 애니메이션.",
+        "서브모듈 vendor/slides-ai-plugin."],
+      "project-website": ["프로젝트 웹사이트",
+        "프로젝트의 공개된 얼굴: 고정 내비게이션, 해시 라우팅 페이지, 짙은 잉크와 푸른 헤일로.",
+        "프로젝트 자체의 사이트 — 런치 페이지, 도구의 홈, 프로그램의 정문. 책상 앞에서 " +
+        "읽히고, 링크되고, 읽히기 전에 훑어집니다.",
+        "Google Fonts만 — 다이어그램 런타임도, CDN도, 애널리틱스도 없습니다."]
+    },
+    q: {
+      template: {
+        q: "어떤 템플릿을 쓸까요?",
+        hint: "먼저 만들 것의 형태를 고르세요 — 이 선택이 나머지 질문의 의미를 정합니다."
+      },
+      siteType: {
+        q: "어떤 사이트 또는 앱인가요?",
+        hint: "구매자가 제품 사이트에 기대하는 구조와 독자가 매체에 기대하는 구조는 " +
+              "다릅니다. 최상위 계층이 무엇으로 이루어질지가 여기서 정해집니다.",
+        o: { marketing: ["마케팅 또는 기업 사이트", "제품, 솔루션, 근거, 문의."],
+             ecommerce: ["스토어 또는 카탈로그", "둘러보고, 비교하고, 삽니다."],
+             product:   ["제품 또는 SaaS 앱", "공개된 화면 옆에 로그인 후 화면이 함께 있습니다."],
+             docs:      ["문서 또는 지원", "찾기 쉬움과 작업 완수가 가장 중요합니다."],
+             editorial: ["출판물 또는 미디어", "주제, 시리즈, 아카이브의 깊이."],
+             internal:  ["내부 도구 또는 인트라넷", "퍼널이 아니라 역할과 워크플로."],
+             other:     ["그 밖의 것"] },
+        p: { other: "예: 박물관, 대학 단과대학" }
+      },
+      projectStage: {
+        q: "새로 만드나요, 개편인가요?",
+        hint: "개편은 이미 있는 것을 감안해야 합니다 — 페이지 수, 리다이렉트, 그리고 " +
+              "지금 구조가 그렇게 자라난 이유까지.",
+        o: { revamp: ["기존 사이트 개편", "진단할 현재 구조가 있습니다."],
+             new:    ["새로 만들기", "이관할 것이 없습니다."],
+             merge:  ["여러 사이트 통합", "조율할 구조가 하나 이상입니다."] },
+        f: { "current.url": ["현재 사이트 URL", "https://"],
+             "current.pageCount": ["지금 페이지가 대략 몇 개인가요?", "예: 2000"] }
+      },
+      sitemapSource: {
+        q: "작업의 출발점이 될 사이트맵이나 IA가 있나요?",
+        hint: "스프레드시트, 크롤 내보내기, 예전 사이트맵, 스케치 — 무엇이든, 제가 " +
+              "구조를 지어내고 당신이 그걸 고치는 것보다는 낫습니다.",
+        o: { upload:   ["가진 것을 업로드", "스프레드시트, CSV, 크롤 내보내기, 또는 문서."],
+             describe: ["제가 설명하겠습니다"],
+             none:     ["아직 없음", "브리프에서 하나 제안하겠습니다."] },
+        f: { "smfiles.file": ["사이트맵, IA 스프레드시트, 또는 크롤"],
+             "smfiles.notes": ["제가 알아야 할 점이 있나요?",
+                               "열이 무엇을 뜻하는지, 어느 부분이 오래됐는지…"],
+             "smtext.notes":  ["당신이 이해하는 대로의 구조",
+                               "최상위: 제품, 솔루션, 자료실, 회사 소개…"] }
+      },
+      benchmarks: {
+        q: "벤치마크, 경쟁사, 또는 참고 사례",
+        hint: "당신이 비교당하는 사이트와 당신이 부러워하는 사이트를 짚어 주는 것이, " +
+              "제안이 올바른 기준 위에서 논증하게 만드는 가장 빠른 길입니다.",
+        o: { list: ["제가 몇 개 대겠습니다"],
+             file: ["이미 정리해 둔 것이 있습니다"],
+             none: ["없음 — 판단에 맡깁니다", "비슷한 사이트를 골라 이유와 함께 밝히겠습니다."] },
+        f: { "bmtext.notes": ["어떤 사이트이고, 그중 무엇이 좋은가요?",
+                              "구조가 부러운 경쟁사, 그리고 그곳이 더 잘하는 한 가지…"],
+             "bmfile.file":  ["경쟁사 또는 벤치마크 자료"] }
+      },
+      evidence: {
+        q: "무엇이 이 권고를 뒷받침하나요?",
+        hint: "있는 것만 고르세요. 없는 것은 조용히 가정하는 대신 미해결 질문으로 " +
+              "적힙니다 — 빈틈을 밝혀 두는 제안이 더 믿음직합니다.",
+        o: { analytics:  ["애널리틱스", "유입 페이지, 이탈, 내부 이동 경로."],
+             search:     ["사이트 검색 로그", "내비게이션이 실패했을 때 사람들이 무엇을 입력하는가."],
+             interviews: ["사용자 또는 이해관계자 인터뷰"],
+             cardsort:   ["카드 소팅 또는 트리 테스트"],
+             support:    ["고객 지원 티켓 또는 영업 문의"],
+             seo:        ["키워드 또는 검색량 조사"],
+             none:       ["아직 없음", "제안서에 그렇게 분명히 적겠습니다."] }
+      },
+      prototype: {
+        q: "내비게이션은 어디까지 눌러 볼 수 있어야 하나요?",
+        hint: "프로토타입은 사이트맵을 그림에서, 검토자가 라벨을 실제로 시험해 볼 수 " +
+              "있는 것으로 바꿔 놓습니다.",
+        o: { both:    ["데스크톱과 모바일", "메가 메뉴는 페이지 안에, 모바일은 별도 탭에서 열립니다."],
+             desktop: ["데스크톱만", "브레이크포인트 하나, 페이지에 임베드."],
+             none:    ["프로토타입 없음", "다이어그램만 — 파일이 훨씬 작아집니다."] }
+      },
+      delivery: {
+        q: "이 파일이 오프라인에서도 열려야 하나요?",
+        hint: "어떤 형태든 웹폰트를 Google에서 가져오고, 다이어그램이 많은 것들은 " +
+              "mermaid와 CSS 라이브러리도 불러옵니다. 완전 독립형은 그 전부를 파일 " +
+              "안에 넣습니다 — 보통 수백 KB, 가장 무거운 형태는 수 MB.",
+        o: { cdn:        ["웹폰트와 라이브러리를 CDN에서 불러오기",
+                          "파일이 작습니다; 온전히 렌더링하려면 연결이 필요합니다."],
+             standalone: ["완전 독립형",
+                          "폰트와 라이브러리를 내장 — 네트워크가 전혀 없는 USB에서도 열립니다."] }
+      },
+      theme: {
+        q: "어떤 테마로 할까요?",
+        hint: "기본은 다크입니다; 토큰 세트에는 라이트 팔레트도 전부 들어 있습니다.",
+        o: { dark:   ["다크", "짙은 잉크 바탕에 액센트 헤일로."],
+             light:  ["라이트", "쓰이지 않던 --bg / --surface 팔레트를 씁니다."],
+             toggle: ["읽는 사람이 전환", "둘 다 실어 보내고, 크롬에 스위치를 답니다."] }
+      },
+      slideCount: {
+        q: "덱은 얼마나 길어야 할까요?",
+        hint: "건너뛰면 브리프를 보고 제가 정하겠습니다.",
+        o: { auto: ["브리프에 맡기기"],
+             "6":  ["6장 안팎", "짧은 피치."],
+             "12": ["12장 안팎", "표준적인 발표."],
+             "18": ["18장 안팎", "Project Context 가이드 정도."],
+             other: ["숫자를 직접 지정"] },
+        p: { other: "예: 9" }
+      },
+      backgrounds: {
+        q: "표지와 마무리 이미지",
+        hint: "사진이 들어가는 것은 이 두 장뿐이고, 나머지는 타이포그래피입니다.",
+        o: { monomind: ["MonoMind 기본 사진", "템플릿에 이미 들어 있는 두 장의 이미지."],
+             upload:   ["직접 업로드", "표지에 한 장, 마무리에 한 장."],
+             gradient: ["사진 없이", "그라디언트와 액센트 헤일로만 — 파일이 훨씬 작아집니다."] },
+        f: { "bgfiles.cover": ["표지 배경"], "bgfiles.closing": ["마무리 배경"] }
+      },
+      logo: {
+        q: "모든 장에 들어갈 마크는 누구의 것인가요?",
+        o: { monomind: ["MonoMind", "monomind.one 으로 연결됩니다."],
+             custom:   ["로고 업로드", "SVG로 하면 프로젝션 크기에서도 선명합니다."] },
+        f: { "logofile.file": ["로고 파일"],
+             "logofile.href": ["마크를 눌렀을 때 열릴 링크 (선택)", "https://"] }
+      },
+      style: {
+        q: "비주얼 스타일",
+        o: { default:  ["MonoMind 템플릿 그대로"],
+             designmd: ["제가 드리는 design.md 를 따르기"],
+             prompt:   ["바꿀 점을 말로 설명하겠습니다"] },
+        f: { "designfile.file": ["design.md"],
+             "styletext.text": ["무엇을 바꿀까요?",
+                                "액센트를 더 따뜻하게, 타입 스케일을 더 촘촘하게, 표지에 사진 없이…"] }
+      },
+      elements: {
+        q: "반드시 들어가야 할 요소가 있나요?",
+        hint: "해당하는 것을 모두 고르세요. 고르지 않은 것도 내용이 요구하면 그대로 쓸 수 있습니다.",
+        o: { chart: ["차트"], graph: ["그래프"], diagram: ["다이어그램"], table: ["표"],
+             workflow: ["워크플로 행"], quote: ["인용구"], agenda: ["아젠다 / 섹션 구분"],
+             twocol: ["2단 텍스트"], image: ["전면 이미지 슬라이드"], code: ["코드 또는 프롬프트 블록"] }
+      },
+      languages: {
+        q: "어떤 언어를 넣을까요?",
+        hint: "영어는 항상 포함됩니다. 나머지는 읽는 사람이 고를 때만 Google Translate를 불러옵니다.",
+        o: { en: ["영어", "항상 포함됩니다."], ko: ["한국어"], "zh-TW": ["중국어 (번체)"],
+             ja: ["일본어"], es: ["스페인어"], other: ["그 밖의 언어"] },
+        p: { other: "언어 이름 또는 BCP-47 태그" }
+      },
+      noTranslate: {
+        q: "절대 번역되면 안 되는 용어",
+        hint: "쉼표로 구분하세요. Google Translate는 MonoMind AI Lab 을 人工智慧實驗室 로, " +
+              "MIT 를 그 대학교로 바꿔 놓았습니다 — 이 목록이 그걸 막습니다. 파일명, 경로, " +
+              "명령어는 자동으로 보호됩니다."
+      },
+      menu: {
+        q: "메뉴",
+        o: { full:    ["전체 메뉴", "브랜드 마크 옆의 햄버거."],
+             minimal: ["최소", "메뉴 없이 — 페이지 카운터 옆에 처음으로 돌아가는 아이콘만."],
+             none:    ["둘 다 없음", "키, 스크롤, 스와이프로만 이동합니다."] },
+        f: { "menuitems.items":  ["메뉴에 무엇을 넣을까요?"],
+             "menuitems.home":   ["홈 URL — 메뉴가 홈으로 연결될 때만", "https://monomind.one"],
+             "menuitems.github": ["저장소 URL — 메뉴가 저장소로 연결될 때만", "https://github.com/…"] },
+        c: { "menuitems.items": {
+               start: "처음으로", contents: "목차 — 아무 장으로나 이동", home: "홈 링크",
+               github: "GitHub 링크", pdf: "PDF로 내려받기", html: "HTML 내려받기",
+               language: "메뉴 안의 언어 전환" } }
+      },
+      export: {
+        q: "읽는 사람이 무엇을 가져갈 수 있나요?",
+        hint: "둘 다 크롬에 작은 컨트롤을 하나씩 더합니다.",
+        o: { pdf:  ["PDF로 내려받기", "인쇄 스타일시트, 가로 한 페이지에 한 장."],
+             html: ["독립 실행형 HTML 내려받기", "파일이 자기 자신의 사본을 저장합니다."] }
+      },
+      credit: {
+        q: "크레딧 한 줄",
+        hint: "푸터의 “Made with Hi Ted, Meet Lisa” 한 줄. 그대로 두거나, 끄세요.",
+        o: { keep: ["그대로 두기", "도구로 연결되는 조용한 한 줄."],
+             off:  ["끄기", "만든 이의 표시 없이 나갑니다."] }
+      }
+    }
+  },
+
+  "zh-TW": {
+    lead: {
+      Template: "你要做的是什麼。這個選擇決定了後面會問什麼。",
+      Grounds:  "這份提案的依據從哪裡來。",
+      Shape:    "有多少份量，又得在哪裡跑起來。",
+      Look:     "在頁面上讀起來是什麼樣子。",
+      Language: "誰會讀它，用什麼語言讀。",
+      Handover: "讀的人最後帶走什麼。"
+    },
+    tpl: {
+      "monomind-deck": ["MonoMind 簡報",
+        "橫向翻頁的簡報，深色底加上光暈重點色。",
+        "用來上台講。一張投影片一個想法，隔著整個房間也讀得到。",
+        "只用 Google Fonts。"],
+      "web-document": ["網頁文件",
+        "讀起來像一個網頁：頂部導覽、分區、圖表。",
+        "任何會在桌前細讀、也會被連結分享的東西 — 總覽、指南、決策記錄、手冊。",
+        "Google Fonts，圖表另外從 CDN 載入 mermaid。"],
+      "mermaid-master": ["多頁圖表",
+        "淺色紙面上的圖表型簡報，一頁一張圖。",
+        "需要近距離細看、列印、也會被連結分享的架構與系統圖。",
+        "只用 Google Fonts — 圖表是內嵌 SVG，沒有 mermaid runtime。"],
+      "architecture": ["架構圖",
+        "石板色底上的系統圖，顏色是有意義的 — 一張或多張都行。",
+        "會被仔細審視、然後貼進文件裡的系統、雲端或網路架構圖。",
+        "只用 Google Fonts — 內嵌 SVG，沒有繪圖 runtime。"],
+      "sitemap-ia": ["Sitemap 與 IA 提案",
+        "把一套資訊架構論證清楚，導覽還能真的點進去。",
+        "用來提出或捍衛一個網站結構 — 改版的 IA、多站整併、新站的第一份地圖。由要簽核" +
+        "的人在桌前讀。",
+        "文件用 Google Fonts 和 CDN 上的 mermaid；原型另外從 CDN 載入 Font Awesome 和 " +
+        "Tailwind。delivery 那題可以把四個都內嵌。"],
+      "slide-design": ["投影片設計",
+        "不是 MonoMind 範本 — 十二種風格預設，加上會動的 HTML 投影片。",
+        "自家風格裝不下的簡報 — 另一種樣子，或是要動起來。",
+        "子模組 vendor/slides-ai-plugin。"],
+      "project-website": ["專案網站",
+        "一個專案的對外門面：固定導覽、hash 路由的頁面、深色底配藍色光暈。",
+        "專案自己的網站 — 上線頁、工具的首頁、一個計畫的正門。在桌前讀、被連結，也常常" +
+        "是先掃過再讀。",
+        "只用 Google Fonts — 沒有繪圖 runtime、沒有 CDN、沒有分析工具。"]
+    },
+    q: {
+      template: {
+        q: "要用哪一個範本？",
+        hint: "先決定它是什麼形態 — 這個選擇會決定後面每一個問題的意思。"
+      },
+      siteType: {
+        q: "這是什麼樣的網站或應用？",
+        hint: "買家對產品網站期待的結構，和讀者對一個刊物期待的並不一樣。這一題決定了" +
+              "最上層是由什麼組成的。",
+        o: { marketing: ["行銷或企業網站", "產品、解決方案、佐證、聯絡。"],
+             ecommerce: ["商店或型錄", "瀏覽、比較、購買。"],
+             product:   ["產品或 SaaS 應用", "公開頁面之外，還有登入後的介面。"],
+             docs:      ["文件或支援", "找得到、做得完，是最重要的兩件事。"],
+             editorial: ["刊物或媒體", "主題、系列、過刊的深度。"],
+             internal:  ["內部工具或 intranet", "重點是角色和流程，不是漏斗。"],
+             other:     ["其他"] },
+        p: { other: "例如：博物館、大學系所" }
+      },
+      projectStage: {
+        q: "是新做，還是改版？",
+        hint: "改版必須面對既有的東西 — 頁面數量、轉址，以及現在這個結構為什麼會長成這樣。",
+        o: { revamp: ["既有網站改版", "有一個現行結構可以診斷。"],
+             new:    ["全新建置", "沒有東西要搬。"],
+             merge:  ["整併多個網站", "要調和的結構不只一個。"] },
+        f: { "current.url": ["目前的網站網址", "https://"],
+             "current.pageCount": ["現在大概有多少頁？", "例如：2000"] }
+      },
+      sitemapSource: {
+        q: "有沒有現成的 sitemap 或 IA 可以當起點？",
+        hint: "試算表、爬蟲匯出、舊的網站地圖、草圖 — 什麼都好，都比我憑空編一個、" +
+              "再讓你回頭改要好。",
+        o: { upload:   ["上傳我手上的", "試算表、CSV、爬蟲匯出，或一份文件。"],
+             describe: ["我用文字說明"],
+             none:     ["還沒有", "那就從 brief 提一個出來。"] },
+        f: { "smfiles.file": ["Sitemap、IA 試算表，或爬蟲結果"],
+             "smfiles.notes": ["有什麼是我該知道的嗎？", "欄位代表什麼、哪些部分已經過時了…"],
+             "smtext.notes":  ["你理解中的那個結構", "最上層：產品、解決方案、資源、關於我們…"] }
+      },
+      benchmarks: {
+        q: "對標對象、競爭者，或參考的靈感",
+        hint: "把你會被拿來比較的網站，還有你自己欣賞的那幾個講出來，是讓這份提案站在" +
+              "對的標準上論證最快的方法。",
+        o: { list: ["我來列幾個"],
+             file: ["我已經整理成文件了"],
+             none: ["沒有 — 你自己判斷", "我會挑幾個可比的網站，並說明為什麼是它們。"] },
+        f: { "bmtext.notes": ["哪些網站，好在哪裡？",
+                              "一個你羨慕它結構的競爭者，還有它做得比較好的那一件事…"],
+             "bmfile.file":  ["競品或對標的筆記"] }
+      },
+      evidence: {
+        q: "這個建議背後有哪些依據？",
+        hint: "有什麼就選什麼。沒有的不會被默默假設過去，而是寫進待解問題裡 — 一份會把" +
+              "缺口列出來的提案，比較容易讓人信。",
+        o: { analytics:  ["分析數據", "進入頁、流失點、站內動線。"],
+             search:     ["站內搜尋紀錄", "導覽失效時，人們會打什麼字。"],
+             interviews: ["使用者或利害關係人訪談"],
+             cardsort:   ["卡片分類或樹狀測試"],
+             support:    ["客服工單或業務常被問到的問題"],
+             seo:        ["關鍵字或搜尋量研究"],
+             none:       ["目前沒有", "提案裡會明白寫出來。"] }
+      },
+      prototype: {
+        q: "導覽要做到多少可以真的點？",
+        hint: "原型是把 sitemap 從一張圖，變成審核的人真的能拿一個標籤去試的東西。",
+        o: { both:    ["桌機和手機都要", "大選單直接放在頁面裡，手機版另開分頁。"],
+             desktop: ["只要桌機", "一個斷點，內嵌在頁面裡。"],
+             none:    ["不要原型", "只有圖 — 檔案會小很多。"] }
+      },
+      delivery: {
+        q: "這個檔案需要離線也能用嗎？",
+        hint: "每一種形態都會從 Google 拉 webfont，圖表多的那幾種還會載入 mermaid 和 " +
+              "CSS 函式庫。完全獨立會把這些全部內嵌 — 通常是幾百 KB，最重的形態則是" +
+              "好幾 MB。",
+        o: { cdn:        ["從 CDN 載入 webfont 和函式庫", "檔案較小；要完整呈現需要連線。"],
+             standalone: ["完全獨立", "字型和函式庫全部內嵌 — 完全沒網路，從隨身碟也打得開。"] }
+      },
+      theme: {
+        q: "要用哪一種主題？",
+        hint: "預設出貨是深色；token 裡本來就備好了一整套淺色調色盤。",
+        o: { dark:   ["深色", "深色底加上光暈重點色。"],
+             light:  ["淺色", "改用一直沒用到的 --bg / --surface 調色盤。"],
+             toggle: ["讓讀者自己切換", "兩套都出貨，並在介面上加一個開關。"] }
+      },
+      slideCount: {
+        q: "這份簡報要多長？",
+        hint: "跳過的話，我會依照 brief 自己決定長度。",
+        o: { auto: ["交給 brief 決定"],
+             "6":  ["大約 6 張", "一次簡短的提案。"],
+             "12": ["大約 12 張", "一場標準的演講。"],
+             "18": ["大約 18 張", "像 Project Context 那份指南。"],
+             other: ["指定一個數字"] },
+        p: { other: "例如：9" }
+      },
+      backgrounds: {
+        q: "封面與結尾的圖",
+        hint: "有照片的就這兩張，其餘都是排版。",
+        o: { monomind: ["MonoMind 預設的攝影", "範本裡本來就內嵌的那兩張圖。"],
+             upload:   ["上傳我自己的", "封面一張，結尾一張。"],
+             gradient: ["不要照片", "只有漸層和光暈 — 檔案會小很多。"] },
+        f: { "bgfiles.cover": ["封面背景"], "bgfiles.closing": ["結尾背景"] }
+      },
+      logo: {
+        q: "每一頁上的標誌是誰的？",
+        o: { monomind: ["MonoMind", "連到 monomind.one。"],
+             custom:   ["上傳一個標誌", "用 SVG，投影放大也不會糊。"] },
+        f: { "logofile.file": ["標誌檔案"],
+             "logofile.href": ["點擊標誌要開啟的連結（選填）", "https://"] }
+      },
+      style: {
+        q: "視覺風格",
+        o: { default:  ["就用 MonoMind 範本原本的樣子"],
+             designmd: ["照我提供的 design.md 做"],
+             prompt:   ["我用文字說要改什麼"] },
+        f: { "designfile.file": ["design.md"],
+             "styletext.text": ["要改什麼？",
+                                "重點色更暖一點、字級尺度收緊一點、封面不要照片…"] }
+      },
+      elements: {
+        q: "有沒有一定要放進去的元素？",
+        hint: "符合的都可以選。沒選到的，如果內容需要，還是用得上。",
+        o: { chart: ["圖表"], graph: ["曲線圖"], diagram: ["示意圖"], table: ["表格"],
+             workflow: ["流程列"], quote: ["引言"], agenda: ["議程與段落分隔"],
+             twocol: ["雙欄文字"], image: ["滿版圖片頁"], code: ["程式碼或 prompt 區塊"] }
+      },
+      languages: {
+        q: "要包含哪些語言？",
+        hint: "英文一定會有。其他語言只有在讀者選了之後，才會載入 Google Translate。",
+        o: { en: ["英文", "一定會包含。"], ko: ["韓文"], "zh-TW": ["中文（繁體）"],
+             ja: ["日文"], es: ["西班牙文"], other: ["其他語言"] },
+        p: { other: "語言名稱或 BCP-47 標籤" }
+      },
+      noTranslate: {
+        q: "絕對不能被翻譯的詞",
+        hint: "用逗號分隔。Google Translate 曾把 MonoMind AI Lab 變成 人工智慧實驗室，" +
+              "把 MIT 變成那所大學 — 這份清單就是用來擋這件事的。檔名、路徑和指令會" +
+              "自動受到保護。"
+      },
+      menu: {
+        q: "選單",
+        o: { full:    ["完整選單", "在標誌旁邊的漢堡選單。"],
+             minimal: ["精簡", "沒有選單 — 只在頁碼旁邊放一個回到開頭的圖示。"],
+             none:    ["兩個都不要", "只用按鍵、捲動和滑動來移動。"] },
+        f: { "menuitems.items":  ["選單裡要放什麼？"],
+             "menuitems.home":   ["首頁網址 — 只有選單有連到首頁時才需要", "https://monomind.one"],
+             "menuitems.github": ["儲存庫網址 — 只有選單有連到儲存庫時才需要", "https://github.com/…"] },
+        c: { "menuitems.items": {
+               start: "回到開頭", contents: "目錄 — 跳到任何一頁", home: "首頁連結",
+               github: "GitHub 連結", pdf: "下載成 PDF", html: "下載 HTML",
+               language: "選單裡的語言切換" } }
+      },
+      export: {
+        q: "讀者可以帶走什麼？",
+        hint: "兩個都會在介面上多加一個小控制項。",
+        o: { pdf:  ["下載成 PDF", "列印樣式表，一張投影片一頁橫式。"],
+             html: ["下載獨立的 HTML", "檔案會存下一份自己的副本。"] }
+      },
+      credit: {
+        q: "署名那一行",
+        hint: "頁尾的「Made with Hi Ted, Meet Lisa」。留著，或是關掉。",
+        o: { keep: ["留著", "安靜的一行，連回這個工具。"],
+             off:  ["關掉", "檔案出去時不帶任何製作者的標記。"] }
+      }
+    }
+  }
+};
+
+/* Accessors. Each one falls back to the source data, so English needs no
+   table and a missing entry degrades to English rather than to nothing. */
+function ui(k) {
+  var d = UI[lang] || UI.en;
+  return d[k] !== undefined ? d[k] : UI.en[k];
+}
+function L() { return L10N[lang] || null; }
+function LQ(id) { var d = L(); return (d && d.q[id]) || null; }
+function chapLabel(name) { return (ui("chap") || {})[name] || name; }
+function chapLead(name) {
+  var d = L();
+  return (d && d.lead[name]) || CHAPTER_LEAD[name] || "";
+}
+function tq(q) { var e = LQ(q.id); return (e && e.q) || q.q; }
+function thint(q) { var e = LQ(q.id); return (e && e.hint) || q.hint; }
+function topt(q, o, i) {
+  var e = LQ(q.id), v = e && e.o && e.o[o.id] && e.o[o.id][i];
+  return v || (i ? o.note : o.label);
+}
+function tplace(q, o) {
+  var e = LQ(q.id);
+  return (e && e.p && e.p[o.id]) || o.placeholder;
+}
+function tqplace(q) { var e = LQ(q.id); return (e && e.placeholder) || q.placeholder; }
+/* Template cards: [name, tagline, best_for, dependencies]. The last two are
+   registry fields read straight off the entry, so they are indexed here
+   rather than reached through the option. */
+function tplText(id, i, fallback) {
+  var d = L(), e = d && d.tpl && d.tpl[id];
+  return (e && e[i]) || fallback;
+}
+function tfield(q, key, f, i) {
+  var e = LQ(q.id), v = e && e.f && e.f[key + "." + f.id];
+  return (v && v[i]) || (i ? f.placeholder : f.label);
+}
+function tcheck(q, key, f, o) {
+  var e = LQ(q.id), v = e && e.c && e.c[key + "." + f.id];
+  return (v && v[o.id]) || o.label;
 }
 
 var MAX_INLINE_BYTES = 1500000; /* ~1.5 MB — past this the deck gets heavy */
@@ -1074,25 +1905,27 @@ function revealHtml(q) {
   return Object.keys(q.reveals).map(function (key) {
     var fields = q.reveals[key].map(function (f) {
       var slot = q.id + "." + f.id;
+      var flabel = tfield(q, key, f, 0);
       if (f.kind === "file") {
-        return '<div class="field"><label>' + esc(f.label) + '</label>' +
+        return '<div class="field"><label>' + esc(flabel) + '</label>' +
           '<div class="drop" data-slot="' + slot + '" data-accept="' + esc(f.accept || "") + '" tabindex="0" role="button">' +
-          'Drop a file here, or click to choose</div>' +
+          esc(ui("dropOne")) + '</div>' +
           '<input type="file" class="hidden" data-for="' + slot + '" accept="' + esc(f.accept || "") + '"></div>';
       }
       if (f.kind === "checks") {
         if (!subsel[slot]) {
           subsel[slot] = f.options.filter(function (o) { return o.def; }).map(function (o) { return o.id; });
         }
-        return '<div class="field"><label>' + esc(f.label) + '</label>' +
-          '<div class="opts" role="group" aria-label="' + esc(f.label) + '">' +
+        return '<div class="field"><label>' + esc(flabel) + '</label>' +
+          '<div class="opts" role="group" aria-label="' + esc(flabel) + '">' +
           f.options.map(function (o) {
             var on = subsel[slot].indexOf(o.id) !== -1;
+            var olbl = tcheck(q, key, f, o);
             return '<button type="button" class="opt sm" role="checkbox" aria-checked="' + on + '"' +
-              ' aria-label="' + esc(o.label) + '" data-sub="' + slot + '" data-o="' + o.id + '"' +
+              ' aria-label="' + esc(olbl) + '" data-sub="' + slot + '" data-o="' + o.id + '"' +
               (o.locked ? ' data-locked="1"' : "") + '>' +
               '<span class="key">' + (on ? "\u2713" : "") + '</span>' +
-              '<span class="label">' + esc(o.label) + '</span></button>';
+              '<span class="label">' + esc(olbl) + '</span></button>';
           }).join("") + '</div></div>';
       }
       /* Typed values are read back out of `files[slot].text`. A screen leaves
@@ -1100,13 +1933,14 @@ function revealHtml(q) {
          would look to the reader as though their answer had been thrown
          away — while the payload quietly still carried it. */
       var typed = (files[slot] && typeof files[slot].text === "string") ? files[slot].text : "";
+      var fph = tfield(q, key, f, 1) || "";
       if (f.kind === "textarea") {
-        return '<div class="field"><label>' + esc(f.label) + '</label>' +
-          '<textarea rows="3" data-slot="' + slot + '" placeholder="' + esc(f.placeholder || "") + '">' +
+        return '<div class="field"><label>' + esc(flabel) + '</label>' +
+          '<textarea rows="3" data-slot="' + slot + '" placeholder="' + esc(fph) + '">' +
           esc(typed) + '</textarea></div>';
       }
-      return '<div class="field"><label>' + esc(f.label) + '</label>' +
-        '<input type="text" data-slot="' + slot + '" placeholder="' + esc(f.placeholder || "") +
+      return '<div class="field"><label>' + esc(flabel) + '</label>' +
+        '<input type="text" data-slot="' + slot + '" placeholder="' + esc(fph) +
         '" value="' + esc(typed) + '"></div>';
     }).join("");
     return '<div class="reveal" data-reveal="' + key + '" hidden>' + fields + '</div>';
@@ -1114,24 +1948,33 @@ function revealHtml(q) {
 }
 
 function galleryHtml(q) {
-  return '<div class="gallery" role="radiogroup" aria-label="' + esc(q.q) + '">' +
+  return '<div class="gallery" role="radiogroup" aria-label="' + esc(tq(q)) + '">' +
     q.options.map(function (o, i) {
       var t = o.tpl || {};
       var on = state[q.id] === o.id;
+      /* The card's four strings come off the registry entry, so they are
+         translated by template id rather than by option \u2014 the id is the
+         thing both the registry and the dictionary agree on. */
+      var name = tplText(o.id, 0, o.label);
+      var tag  = tplText(o.id, 1, o.note || "");
+      var best = tplText(o.id, 2, t.best_for);
+      var deps = tplText(o.id, 3, t.dependencies);
       var preview = t.preview
-        ? '<a class="tplpreview" href="' + esc(t.preview) + '" target="_blank" rel="noopener noreferrer">Preview \u2197</a>'
+        ? '<a class="tplpreview" href="' + esc(t.preview) + '" target="_blank" rel="noopener noreferrer">' +
+          esc(ui("previewLink")) + '</a>'
         : "";
       return '<div class="tplcell">' +
         '<button type="button" class="tpl" role="radio" aria-checked="' + on + '"' +
-        ' aria-label="' + esc(o.label) + '" data-q="' + q.id + '" data-o="' + o.id + '">' +
+        ' aria-label="' + esc(name) + '" data-q="' + q.id + '" data-o="' + o.id + '">' +
         (t.thumb
           ? '<img src="' + t.thumb + '" alt="" loading="lazy">'
-          : '<span class="noshot">' + esc(t.badge || "no preview") + '</span>') +
+          : '<span class="noshot">' + esc(t.badge || ui("noshot")) + '</span>') +
         '<span class="tplmeta"><span class="key">' + (i + 1) + '</span>' +
-        '<span><b>' + esc(o.label) + (o.def ? ' <span class="default">default</span>' : "") + '</b>' +
-        '<span class="note">' + esc(o.note || "") + '</span>' +
-        (t.best_for ? '<span class="note">' + esc(t.best_for) + '</span>' : "") +
-        (t.dependencies ? '<span class="dep">' + esc(t.dependencies) + '</span>' : "") +
+        '<span><b>' + esc(name) +
+        (o.def ? ' <span class="default">' + esc(ui("defaultMark")) + '</span>' : "") + '</b>' +
+        '<span class="note">' + esc(tag) + '</span>' +
+        (best ? '<span class="note">' + esc(best) + '</span>' : "") +
+        (deps ? '<span class="dep">' + esc(deps) + '</span>' : "") +
         '</span></span></button>' + preview + '</div>';
     }).join("") + '</div>';
 }
@@ -1143,19 +1986,21 @@ function optionsHtml(q) {
       : state[q.id] === o.id;
     var attr = q.type === "multi" ? "aria-checked" : "aria-pressed";
     var role = q.type === "multi" ? "checkbox" : "radio";
+    var label = topt(q, o, 0);
+    var note = topt(q, o, 1);
     return '<button type="button" class="opt" role="' + role + '" ' + attr + '="' + selected + '"' +
       (o.locked ? ' data-locked="1"' : "") +
       ' data-q="' + q.id + '" data-o="' + o.id + '"' +
-      ' aria-label="' + esc(o.label) + '">' +
+      ' aria-label="' + esc(label) + '">' +
       '<span class="key">' + (i < 9 ? i + 1 : "·") + '</span>' +
-      '<span class="label">' + esc(o.label) +
-      (o.def ? ' <span class="default">default</span>' : "") +
-      (o.note ? '<span class="note">' + esc(o.note) + '</span>' : "") +
+      '<span class="label">' + esc(label) +
+      (o.def ? ' <span class="default">' + esc(ui("defaultMark")) + '</span>' : "") +
+      (note ? '<span class="note">' + esc(note) + '</span>' : "") +
       '</span></button>' +
       (o.isOther
         ? '<div class="reveal" data-other="' + q.id + '"' + (selected ? "" : " hidden") + '>' +
           '<div class="field"><input type="text" data-other-input="' + q.id + '" placeholder="' +
-          esc(o.placeholder || "") + '" value="' + esc(other[q.id] || "") + '"></div></div>'
+          esc(tplace(q, o) || "") + '" value="' + esc(other[q.id] || "") + '"></div></div>'
         : "");
   }).join("");
 }
@@ -1166,20 +2011,22 @@ function optionsHtml(q) {
 function questionHtml(q, at) {
   var i = ORDER.indexOf(q);
   var body;
+  var hint = thint(q);
   if (q.type === "textarea") {
-    body = '<textarea rows="3" data-seed="' + q.id + '" placeholder="' + esc(q.placeholder || "") + '">' +
+    body = '<textarea rows="3" data-seed="' + q.id + '" placeholder="' + esc(tqplace(q) || "") + '">' +
            esc(state[q.id] || "") + '</textarea>';
   } else if (q.type === "gallery") {
     body = galleryHtml(q);
   } else {
     body = '<div class="opts" role="' + (q.type === "multi" ? "group" : "radiogroup") +
-           '" aria-label="' + esc(q.q) + '">' + optionsHtml(q) + '</div>' + revealHtml(q);
+           '" aria-label="' + esc(tq(q)) + '">' + optionsHtml(q) + '</div>' + revealHtml(q);
   }
   return '<section class="q' + (i === active ? " active" : "") + '" data-at="' + at +
     '" data-i="' + i + '" id="q-' + q.id + '">' +
     '<header><span class="num">' + String(i + 1).padStart(2, "0") + '</span>' +
-    '<h2 tabindex="-1">' + esc(q.q) + (q.hint ? '<span class="hint">' + esc(q.hint) + '</span>' : "") + '</h2>' +
-    (q.type === "multi" ? '<span class="tag">choose any</span>' : "") + '</header>' + body + '</section>';
+    '<h2 tabindex="-1">' + esc(tq(q)) + (hint ? '<span class="hint">' + esc(hint) + '</span>' : "") + '</h2>' +
+    (q.type === "multi" ? '<span class="tag">' + esc(ui("tagAny")) + '</span>' : "") +
+    '</header>' + body + '</section>';
 }
 
 /* One screen at a time. The prompt screen is the static header, the template
@@ -1198,8 +2045,8 @@ function render() {
     var qs = screenQs();
     /* Both asking screens get the heading — the template screen was the one
        screen that opened straight into a question card with nothing above it. */
-    var head = '<div><h2 class="screenhead" tabindex="-1">' + esc(s.label) + '</h2>' +
-               '<p class="screenlead">' + esc(CHAPTER_LEAD[s.label] || "") + '</p></div>';
+    var head = '<div><h2 class="screenhead" tabindex="-1">' + esc(chapLabel(s.label)) + '</h2>' +
+               '<p class="screenlead">' + esc(chapLead(s.label)) + '</p></div>';
     qlist.innerHTML = head + qs.map(questionHtml).join("");
     qs.forEach(syncReveals);
     restoreFileCards();
@@ -1208,16 +2055,16 @@ function render() {
   renderRail();
   syncFooter();
 
-  var words = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
-               "Nine", "Ten", "Eleven", "Twelve"];
-  document.getElementById("qcount").textContent = words[ORDER.length] || ORDER.length;
+  /* The count of questions sits in a different place in each language's
+     sentence, so the whole line is rebuilt rather than one span inside it. */
+  document.getElementById("promptlead").innerHTML = ui("lead")(ORDER.length);
 }
 
 function screenTitle(s) {
-  if (s.k === "prompt") { return "Your prompt"; }
-  if (s.k === "template") { return "Which template?"; }
-  if (s.k === "ready") { return "Ready"; }
-  return s.label;
+  if (s.k === "prompt") { return ui("screenPrompt"); }
+  if (s.k === "template") { return ui("screenTemplate"); }
+  if (s.k === "ready") { return ui("screenReady"); }
+  return chapLabel(s.label);
 }
 
 /* The rail's buttons are rebuilt only when the *set* of steps changes — the
@@ -1225,13 +2072,17 @@ function screenTitle(s) {
    the innerHTML away on each repaint would drop keyboard focus off a rail
    button the moment ↑/↓ repainted the fill, so the two jobs are separate. */
 function renderRail() {
-  var sig = SCREENS.map(function (st) { return st.label; }).join(" ");
+  /* The language is part of the signature, not only the step set: a step's
+     visible label is written when the rail is *built*, and a language switch
+     leaves the set exactly as long as it was — so without this the rail keeps
+     the old language's words while everything around it changes. */
+  var sig = lang + " | " + SCREENS.map(function (st) { return st.label; }).join(" ");
   if (rail.dataset.sig !== sig) {
     rail.dataset.sig = sig;
     rail.innerHTML = SCREENS.map(function (st, i) {
       return '<button type="button" class="chap" data-go="' + i + '">' +
         '<span class="barline"><span></span></span>' +
-        '<span class="lbl">' + esc(st.label) + '</span></button>';
+        '<span class="lbl">' + esc(chapLabel(st.label)) + '</span></button>';
     }).join("");
   }
   paintRail();
@@ -1246,7 +2097,7 @@ function renderRail() {
 function paintRail() {
   var s = SCREENS[atScreen] || SCREENS[0];
   document.getElementById("stepname").textContent = screenTitle(s);
-  document.getElementById("count").textContent = (atScreen + 1) + " of " + SCREENS.length;
+  document.getElementById("count").textContent = ui("count")(atScreen + 1, SCREENS.length);
   Array.prototype.forEach.call(rail.children, function (b, i) {
     var st = SCREENS[i];
     if (!st) { return; }
@@ -1258,7 +2109,7 @@ function paintRail() {
     b.dataset.state = i < atScreen ? "done" : i === atScreen ? "now" : "next";
     b.firstChild.firstChild.style.width = fill + "%";
     b.setAttribute("aria-label",
-      "Step " + (i + 1) + " of " + SCREENS.length + ": " + screenTitle(st));
+      ui("stepOf")(i + 1, SCREENS.length, screenTitle(st)));
     if (i === atScreen) { b.setAttribute("aria-current", "step"); }
     else { b.removeAttribute("aria-current"); }
   });
@@ -1287,9 +2138,9 @@ function syncFooter() {
   var ready = (SCREENS[atScreen] || {}).k === "ready";
   document.getElementById("flowactions").hidden = ready;
   document.getElementById("resultactions").hidden = !ready;
-  document.getElementById("submit").textContent = onLast ? "Continue ⏎" : "Next ⏎";
-  setPair("skip", onLast ? "Use all defaults" : "Skip the rest, use defaults",
-                  onLast ? "Defaults" : "Skip");
+  document.getElementById("submit").textContent = onLast ? ui("continue") : ui("next");
+  setPair("skip", onLast ? ui("defaultsWide") : ui("skipWide"),
+                  onLast ? ui("defaultsNarrow") : ui("skipNarrow"));
   document.getElementById("backstep").hidden = atScreen === 0;
 }
 
@@ -1323,9 +2174,9 @@ function paintFileCard(zone, f) {
   zone.innerHTML =
     (isImg ? '<img class="thumb" src="' + f.dataUri + '" alt="">' : '<span class="thumb"></span>') +
     '<span class="meta"><b>' + esc(f.name) + '</b><span>' + bytes(f.size) + '</span></span>' +
-    '<button type="button" class="clear">Remove</button>' +
+    '<button type="button" class="clear">' + esc(ui("remove")) + '</button>' +
     (f.size > MAX_INLINE_BYTES
-      ? '<div class="warn">Large — this inflates the file by ~' + Math.round(f.size * 1.37 / 1024) + ' KB once embedded.</div>'
+      ? '<div class="warn">' + esc(ui("large")(Math.round(f.size * 1.37 / 1024))) + '</div>'
       : "");
 }
 
@@ -1441,7 +2292,7 @@ qlist.addEventListener("click", function (e) {
     var z = clear.closest(".drop");
     delete files[z.dataset.slot];
     z.classList.remove("filled");
-    z.textContent = "Drop a file here, or click to choose";
+    z.textContent = ui("dropOne");
     return;
   }
   var drop = e.target.closest(".drop");
@@ -1679,18 +2530,45 @@ function payloadKey() {
   return JSON.stringify(p);
 }
 
+/* Which of the four end states is on show — "runner", "web", "stopped" or
+   "file", the keys of UI[lang].ready. It is remembered rather than merely
+   rendered, because a language switch has to be able to rewrite the title,
+   the lead, the tip, the fold and the button without re-running submit():
+   re-running it would mint a new `generatedAt`, and the payload the reader
+   is looking at is the one that was already handed over. */
+var readyState = null;
+
+/* Every word of the end state, in the language on show. The state itself
+   decides whether what the reader copies is a prompt or the raw answers —
+   which is what keeps the button, the fold and the tip from ever disagreeing
+   about which of the two it is. */
+function applyReady() {
+  if (!readyState) { return; }
+  var r = ui("ready")[readyState] || UI.en.ready[readyState];
+  var asPrompt = readyState !== "runner";
+  var label = asPrompt ? ui("copyPrompt") : ui("copyAnswers");
+  var btn = document.getElementById("copy");
+  btn.textContent = label;
+  btn.dataset.label = label;
+  document.querySelector("#fallback .fb-title").textContent =
+    asPrompt ? ui("foldPrompt") : ui("foldAnswers");
+  document.getElementById("copytip").textContent = r[2];
+  document.getElementById("resulttitle").textContent = r[0];
+  document.getElementById("resultlead").textContent = r[1];
+}
+
 /* `needsCopy` is the only difference between the two end states: it opens the
    fold and softens the mark. The screen says "done" either way, because it is —
    the answers exist and nothing was lost. */
-function show(title, lead, needsCopy, json) {
+function show(key, needsCopy, json) {
   var r = document.getElementById("result");
+  readyState = key;
   r.classList.toggle("needscopy", !!needsCopy);
   document.getElementById("doneart").hidden = CTX.mode !== "web";
   document.getElementById("teamsline").hidden = CTX.mode !== "web";
-  document.getElementById("resulttitle").textContent = title;
-  document.getElementById("resultlead").textContent = lead;
   document.getElementById("payload").textContent = json;
   document.getElementById("fallback").open = !!needsCopy;
+  applyReady();
   sentKey = payloadKey();
   /* Ready is the rail's last step; goScreen does the showing and hiding. */
   goScreen(SCREENS.length - 1);
@@ -1699,7 +2577,15 @@ function show(title, lead, needsCopy, json) {
 /* Web mode (CTX.mode === "web", injected by the public site's deploy step):
    there is no runner and never will be, so the end state is not a fallback —
    it is the product. The payload becomes one complete paste-ready prompt:
-   preamble plus answers, so a single copy is the whole job. */
+   preamble plus answers, so a single copy is the whole job.
+
+   Both preambles below stay in English in every language, and deliberately.
+   They are not panel chrome — they are the instruction the copied artifact
+   carries to a coding agent, alongside a payload that is itself frozen
+   English ids (references/intake-contract.md). The panel says what to do with
+   the prompt in the reader's own language, four ways: the Ready title, its
+   lead, the tooltip and the button. What travels with the answers is the
+   handover format, and translating that would change what the agent reads. */
 function webPrompt(json) {
   return "Build me a standalone HTML page using\n" +
          "https://github.com/monomind-ai-lab/hi-ted-meet-lisa.\n" +
@@ -1716,27 +2602,10 @@ function localPrompt(json) {
          "again, and hand back one standalone HTML file.\n\n" + json;
 }
 
-/* Relabels the fold, the button and the tip for the states where what the
-   reader copies is a prompt rather than the raw answers. Kept in one place so
-   the three labels can never disagree about which of the two it is. */
-function asPrompt(tip) {
-  var btn = document.getElementById("copy");
-  btn.textContent = "Copy the prompt";
-  btn.dataset.label = "Copy the prompt";
-  document.querySelector("#fallback .fb-title").textContent = "The full prompt";
-  document.getElementById("copytip").textContent = tip;
-}
-
 function submit() {
   var json = JSON.stringify(payload(), null, 2);
   if (CTX.mode === "web") {
-    asPrompt("Paste it into your agent's chat — that is the whole job.");
-    show("Prompt is ready.",
-         "Copy it and paste it to any coding agent — Claude Code, Codex, Pi, " +
-         "OpenCode, Hermes, or anything else that can read a public URL. " +
-         "The agent reads the skill from GitHub, builds it, and hands back " +
-         "one standalone HTML file. Nothing to install.",
-         true, webPrompt(json));
+    show("web", true, webPrompt(json));
     return;
   }
   /* Preferred path: the skill's runner is serving this page and listening on
@@ -1746,22 +2615,11 @@ function submit() {
     fetch("intake", { method: "POST", headers: { "Content-Type": "application/json" }, body: json })
       .then(function (res) {
         if (!res.ok) { throw new Error("HTTP " + res.status); }
-        show("Lisa has your answers.",
-             "You can close this tab — she is building it now.", false, json);
+        show("runner", false, json);
       })
-      .catch(function () {
-        asPrompt("Paste it to the agent you ran /tedandlisa from.");
-        show("Prompt ready to paste.",
-             "The runner stopped answering, so nothing was handed over automatically. " +
-             "Paste this to Lisa instead and she picks up from here.",
-             true, localPrompt(json));
-      });
+      .catch(function () { show("stopped", true, localPrompt(json)); });
   } else {
-    asPrompt("Paste it to the agent you ran /tedandlisa from.");
-    show("Prompt ready to paste.",
-         "This panel was opened straight from a file, so there is no runner to hand the " +
-         "answers to. Paste this to Lisa instead and she picks up from here.",
-         true, localPrompt(json));
+    show("file", true, localPrompt(json));
   }
 }
 
@@ -1782,11 +2640,11 @@ document.getElementById("copy").addEventListener("click", function () {
   var btn = this;
   /* Restore whatever this state called it, not what the mode implies: the two
      local fallbacks copy a prompt too, so mode alone would relabel them wrong. */
-  var label = btn.dataset.label || "Copy answers";
+  var label = btn.dataset.label || ui("copyAnswers");
   track("prompt-copy");
   navigator.clipboard.writeText(document.getElementById("payload").textContent).then(function () {
-    btn.textContent = "Copied \u2713";
-    setTimeout(function () { btn.textContent = label; }, 1800);
+    btn.textContent = ui("copied");
+    setTimeout(function () { btn.textContent = btn.dataset.label || label; }, 1800);
   });
 });
 document.getElementById("back").addEventListener("click", function () {
@@ -1805,7 +2663,7 @@ function renderRefs() {
       (/^image\//.test(r.type) ? '<img src="' + r.dataUri + '" alt="">' : "") +
       '<span class="rn">' + esc(r.name) + '</span>' +
       '<span class="rs">' + bytes(r.size) + '</span>' +
-      '<button type="button" data-ref="' + i + '">Remove</button></li>';
+      '<button type="button" data-ref="' + i + '">' + esc(ui("remove")) + '</button></li>';
   }).join("");
 }
 
@@ -1864,6 +2722,70 @@ document.addEventListener("keydown", function (e) {
   if (e.key === "Escape" && !document.getElementById("pvw").hidden) { closePreview(); }
 });
 
+/* ── the language layer's own wiring ──────────────────────────────
+   Everything the panel writes once and then leaves alone. The drawn strings
+   look after themselves: render() reads the tables every time it runs, so a
+   language change only has to redraw. */
+function applyChrome() {
+  var d = document;
+  d.documentElement.lang = ui("htmlLang");
+  d.title = ui("title");
+  d.querySelector("#screen-prompt h1").textContent = ui("h1");
+  d.getElementById("brieflabel").textContent = ui("briefLabel");
+  d.getElementById("prompttext").placeholder = ui("promptPlaceholder");
+  d.getElementById("promptnote").innerHTML = ui("note");
+  d.getElementById("refslabel").innerHTML = ui("refs");
+  d.getElementById("refdrop").textContent = ui("dropRefs");
+  d.getElementById("rail").setAttribute("aria-label", ui("railLabel"));
+  d.getElementById("backstep").textContent = ui("backStep");
+  d.getElementById("kbdhints").innerHTML = ui("kbd");
+  d.getElementById("doneartcap").textContent = ui("doneCaption");
+  d.getElementById("teamsline").innerHTML = ui("teams");
+  setPair("back", ui("backWide"), ui("backNarrow"));
+  d.getElementById("pvwopen").textContent = ui("pvwOpen");
+  d.getElementById("pvwclose").textContent = ui("pvwClose");
+  d.getElementById("pvwclose").setAttribute("aria-label", ui("pvwCloseLabel"));
+  d.getElementById("pvwframe").setAttribute("title", ui("pvwFrame"));
+  var home = d.getElementById("homebtn");
+  home.setAttribute("aria-label", ui("home"));
+  home.setAttribute("title", ui("home"));
+  var sel = d.getElementById("langsel");
+  sel.setAttribute("aria-label", ui("langLabel"));
+  sel.setAttribute("title", ui("langLabel"));
+  sel.value = lang;
+}
+
+/* The one way the language changes, whoever asked — the selector, the site's
+   message, or the boot. render() rebuilds every drawn string from the tables,
+   applyReady() rewrites the end state without re-minting the payload, and
+   nothing here touches `state`, so an answer is the same id either side of a
+   switch and the reader keeps their place on the rail. */
+function setLanguage(code) {
+  var to = normLang(code);
+  if (to === lang) { document.getElementById("langsel").value = lang; return; }
+  lang = to;
+  applyChrome();
+  applyReady();
+  render();
+}
+
+document.getElementById("langsel").addEventListener("change", function () {
+  setLanguage(this.value);
+});
+
+/* Web mode: the site hands its language over on the frame's URL when the
+   panel opens, and posts a message if the reader switches while the overlay
+   is still up — switched in place rather than by reloading the frame, because
+   a reload would throw away a half-answered form the way a preview used to
+   (D-014). Same origin and same parent only; a top-level panel has no parent
+   to hear from and ignores everything. */
+window.addEventListener("message", function (e) {
+  if (window.parent === window) { return; }
+  if (e.origin !== location.origin || e.source !== window.parent) { return; }
+  if (!e.data || e.data.tedandlisa !== "lang") { return; }
+  setLanguage(e.data.lang);
+});
+
 /* Leaving the panel. The href is real, so ⌘-click and middle-click still open
    a tab and the status bar still tells the truth about where it goes; this
    only guards the plain click, and only once there is something to lose.
@@ -1873,9 +2795,7 @@ document.addEventListener("keydown", function (e) {
 var pristineKey = null;
 document.getElementById("homebtn").addEventListener("click", function (e) {
   if (pristineKey === null || payloadKey() === pristineKey) { return; }
-  if (!window.confirm("Leave the panel? Your answers are not saved anywhere.")) {
-    e.preventDefault();
-  }
+  if (!window.confirm(ui("leaveConfirm"))) { e.preventDefault(); }
 });
 
 rebuildOrder();
@@ -1883,6 +2803,12 @@ document.getElementById("prompttext").value = CTX.prompt || "";
 if (CTX.prompt) {
   document.getElementById("prompttext").rows = 3;
 }
+/* The brief is in the textarea by now, which is what startLang reads it from
+   in local mode. Detected once, at the open: re-detecting as the reader typed
+   would swap the interface out from under them mid-sentence, and the selector
+   is the override for every case the script heuristic gets wrong. */
+lang = startLang();
+applyChrome();
 render();
 pristineKey = payloadKey();
 </script>
