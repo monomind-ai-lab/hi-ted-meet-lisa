@@ -171,6 +171,28 @@
       ],
       "preview": "previews/evidence-deck.html",
       "thumb_source": "previews/evidence-deck.html"
+    },
+    {
+      "id": "paper-brief",
+      "name": "Paper brief",
+      "tagline": "Light paper slides paced in chapters — mega numbers, bar charts, decision boxes.",
+      "file": "assets/tedandlisa-template-paper-brief.html",
+      "patterns": "references/slide-patterns-paper-brief.md",
+      "thumb": "templates/thumbs/paper-brief.png",
+      "kind": "slides",
+      "best_for": "A briefing that will be read at desk distance and forwarded: a planning input, a review, a recommendation someone prints.",
+      "navigation": "Vertical scroll-snap, arrow keys, swipe; progress bar and nav dots, with inverted chapter pages marking the seams.",
+      "languages": "Traditional Chinese, single language, Noto Sans TC over Archivo — no toggle, no translation service.",
+      "dependencies": "Google Fonts only — Archivo and Noto Sans TC.",
+      "features": [
+        "inverted chapter pages",
+        "animated bar charts",
+        "decision boxes",
+        "twelve-column grid field",
+        "numbered spec lists"
+      ],
+      "preview": "previews/paper-brief.html",
+      "thumb_source": "previews/paper-brief.html"
     }
   ]
 }
