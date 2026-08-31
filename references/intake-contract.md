@@ -76,7 +76,7 @@ An entry arrives in one of two shapes, and you must handle both:
 | `style.designFile` | file object or `null` | A `design.md` whose rules override template defaults. |
 | `style.notes` | string or `null` | Free-text style direction. |
 | `elements` | array of `chart` `graph` `diagram` `table` `workflow` `quote` `agenda` `twocol` `image` `code` | Must-include components. Not a whitelist — other patterns stay available. |
-| `languages` | array of tags, always includes `en` | Drives the language switch. Never contains the literal `other`. |
+| `languages` | array of tags, always includes `en` | Drives the language switch **in the generated file**. Nothing to do with the language the panel itself was read in — see below. Never contains the literal `other`. |
 | `noTranslate` | array of strings | Extend the language-switch term list with every one of these. |
 | `menu` | object — see below | Which menu, and what is in it. |
 | `siteType` | `marketing` \| `ecommerce` \| `product` \| `docs` \| `editorial` \| `internal`, or free text | **`sitemap-ia` only.** Decides what the top level is made of. |
@@ -131,14 +131,32 @@ in the panel, because base64 inflates it by about 37% in the final file.
   for filenames, paths, commands, and the MonoMind term list.
 - **Do not persist a payload containing uploads into the repository.** It holds
   the user's artwork inline. Write the deck; leave `intake.json` untracked.
+- **The panel's own language never reaches the payload.** It is read in
+  English, Korean or Traditional Chinese, and every answer is still the same
+  English **id** in all three — a reader who answered in Korean sends
+  `"theme": "dark"`, never `"다크"`. The payload is byte-identical across the
+  three, so nothing here tells you which one was on show and nothing should
+  try to infer it. Two consequences worth stating plainly:
+  - **`languages` is the deck's languages, not the reader's.** Someone reading
+    the panel in Korean has not asked for a Korean deck; only the `languages`
+    answer says that, and it keeps its own defaults.
+  - **The prompt and every free-text answer arrive in whatever language the
+    user actually typed** — `prompt`, `noTranslate`, `style.notes`, the
+    `sitemap-ia` notes fields, and the `other` text behind `siteType`,
+    `slideCount` and `languages`. Read them as written. A Korean brief with
+    `languages: ["en"]` means an English deck built from a Korean brief, and
+    that is a coherent request, not a contradiction to resolve.
 
 ## Questions scoped to one template
 
 A question may carry `kinds` (narrowing it to a shape) or `templates`
 (narrowing it to named template ids), or both, in which case both must pass.
 It also carries a `chapter`, which is the screen of the panel it is asked on —
-**presentation only, and never in the payload.** Do not look for it, and do not
-infer anything from the order the answers arrive in beyond what this file says.
+**presentation only, and never in the payload.** The panel's UI language is the
+same sort of thing: presentation, absent from the payload, and carried on the
+panel's URL as `?lang=en|ko|zh-TW` when the public site opens it in a frame.
+Do not look for either, and do not infer anything from the order the answers
+arrive in beyond what this file says.
 The `sitemap-ia` keys above are the first of the second sort: they are asked
 only when that template is chosen and are **absent from every other payload**.
 
