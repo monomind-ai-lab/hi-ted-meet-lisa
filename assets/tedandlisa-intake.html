@@ -359,7 +359,14 @@ h1 { font-family: var(--font-display); font-size: clamp(28px, 4.4vw, 40px); line
 .opt.sm { padding: var(--space-2) var(--space-3); font-size: var(--text-sm); }
 
 /* ── template gallery ────────────────────────────────────────── */
-.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3); }
+/* auto-FILL, not auto-fit. The two are identical while the grid is full,
+   and they part company the moment the type filter leaves one card
+   standing: auto-fit collapses the empty tracks, so that lone card
+   stretches to the whole row and reads as a different component. auto-fill
+   keeps the tracks, so a filtered card is the same size as an unfiltered
+   one. Same shape of trap as L-028 — a distribution rule that only becomes
+   wrong when the set it describes changes size. */
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--space-3); }
 .tpl { display: flex; flex-direction: column; gap: 0; text-align: left; font: inherit; cursor: pointer;
   color: var(--fg-inv); background: transparent; padding: 0; overflow: hidden;
   border: 1px solid var(--glass-hair); border-radius: var(--radius-sm);
@@ -380,6 +387,44 @@ h1 { font-family: var(--font-display); font-size: clamp(28px, 4.4vw, 40px); line
 .tpl .note { display: block; font-size: var(--text-sm); color: var(--muted-inv); margin-top: 2px; }
 .tpl .dep { display: block; font-family: var(--font-mono); font-size: var(--text-xs);
   color: var(--muted-inv); margin-top: var(--space-2); }
+/* What the template is *for* — the `type` axis, which is presentation only
+   and never reaches the payload. Deliberately the quietest thing on the
+   card: mono, small, muted, no fill. It is a flag you read after the name,
+   not a headline that competes with it. `kind` (slides / document /
+   external) is not shown at all — it is machinery that decides which
+   questions get asked, and a reader choosing a template has no use for it. */
+.tpl .ttype { display: inline-block; margin-top: var(--space-2);
+  font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.4;
+  color: var(--muted-inv); border: 1px solid var(--glass-hair);
+  border-radius: var(--radius-pill); padding: 1px 8px; }
+.tpl[aria-checked="true"] .ttype { color: var(--accent); border-color: var(--accent-hair); }
+
+/* ── type filters ─────────────────────────────────────────────── */
+/* A row of real buttons above the gallery. flex-wrap + gap and nothing
+   else: no space-between, because the row's length changes with the
+   registry and a distribution rule stops meaning what it meant the moment
+   the set changes size (L-028). */
+.tplfilter { margin-bottom: var(--space-3); }
+.tplfilterrow { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.tfbtn { font: inherit; font-family: var(--font-mono); font-size: var(--text-xs);
+  line-height: 1.4; cursor: pointer; color: var(--muted-inv);
+  background: transparent; border: 1px solid var(--glass-hair);
+  border-radius: var(--radius-pill); padding: 4px 12px;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: color var(--motion-fast) var(--ease-standard),
+              border-color var(--motion-fast) var(--ease-standard),
+              background var(--motion-fast) var(--ease-standard); }
+.tfbtn:hover { color: var(--fg-inv); border-color: var(--accent); }
+.tfbtn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.tfbtn[aria-pressed="true"] { color: var(--accent-on); border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 18%, transparent); }
+.tfbtn .fcount { font-size: 10px; opacity: 0.7; }
+/* The spoken half of the filter: a live region that says how many cards are
+   on show. It sits outside .gallery so a redraw of the cards never replaces
+   it — a live region minted along with its own content is not announced. */
+.filterstat { margin: var(--space-2) 0 0; font-size: var(--text-xs);
+  font-family: var(--font-mono); color: var(--muted-inv); }
+
 .tplcell { display: flex; flex-direction: column; gap: var(--space-2); }
 .tplcell .tpl { flex: 1; }
 .tplpreview { align-self: flex-start; font-size: var(--text-sm); color: var(--accent);
@@ -892,6 +937,19 @@ var UI = {
     defaultMark: "default",
     previewLink: "Preview ↗",
     noshot: "no preview",
+    /* The `type` axis — what a template is *for*. Keyed by the registry's own
+       type ids, so a card's flag and its filter button are one string and can
+       never drift apart. Missing entry falls back to the raw id. */
+    types: { present: "to present", read: "to read",
+             diagram: "to diagram", site: "to publish" },
+    filterLabel: "Filter templates by type",
+    filterAll: "All",
+    /* `kept` is true when the reader's current pick does not match the filter
+       and is being shown anyway — an answer that vanishes reads as an answer
+       that was thrown away. */
+    filterStat: function (shown, total, kept) {
+      return shown + " of " + total + (kept ? " · your pick is still shown" : "");
+    },
     next: "Next ⏎",
     continue: "Continue ⏎",
     backStep: "Back",
@@ -971,6 +1029,13 @@ var UI = {
     defaultMark: "기본값",
     previewLink: "미리보기 ↗",
     noshot: "미리보기 없음",
+    types: { present: "발표용", read: "읽기용",
+             diagram: "다이어그램용", site: "사이트용" },
+    filterLabel: "템플릿을 유형으로 좁히기",
+    filterAll: "전체",
+    filterStat: function (shown, total, kept) {
+      return total + "개 중 " + shown + "개" + (kept ? " · 고른 것은 그대로 보입니다" : "");
+    },
     next: "다음 ⏎",
     continue: "계속 ⏎",
     backStep: "뒤로",
@@ -1049,6 +1114,13 @@ var UI = {
     defaultMark: "預設",
     previewLink: "預覽 ↗",
     noshot: "沒有預覽",
+    types: { present: "上台用", read: "細讀用",
+             diagram: "圖解用", site: "上線用" },
+    filterLabel: "依用途篩選範本",
+    filterAll: "全部",
+    filterStat: function (shown, total, kept) {
+      return total + " 個中的 " + shown + " 個" + (kept ? " · 你選的那個仍然看得到" : "");
+    },
     next: "下一步 ⏎",
     continue: "繼續 ⏎",
     backStep: "上一步",
@@ -1604,20 +1676,32 @@ function tcheck(q, key, f, o) {
 
 var MAX_INLINE_BYTES = 1500000; /* ~1.5 MB — past this the deck gets heavy */
 
+/* `kind` is the shape — it decides which questions get asked (D-007, D-017).
+   `type` is what the template is *for*, and it decides nothing: it is a flag
+   on the card and a filter above the gallery, and it never reaches the
+   payload. The two are separate axes on purpose and cut across each other —
+   `paper-brief` is slides you read, `architecture` is a document you draw in.
+   This list is only the no-registry fallback; the real one is
+   templates/templates.json, injected as CTX.templates. */
 var TEMPLATES = CTX.templates || [
-  { id: "monomind-deck", name: "MonoMind deck", kind: "slides",
+  { id: "monomind-deck", name: "MonoMind deck", kind: "slides", type: "present",
     tagline: "Horizontal presentation deck, dark ink and accent halos." },
-  { id: "web-document", name: "Web document", kind: "document",
+  { id: "web-document", name: "Web document", kind: "document", type: "read",
     tagline: "Reads like a website page: top nav, sections, diagrams." },
-  { id: "mermaid-master", name: "Multi-page Diagrams", kind: "slides",
+  { id: "mermaid-master", name: "Multi-page Diagrams", kind: "slides", type: "diagram",
     tagline: "Diagram-first deck on light paper, one drawing per slide." },
-  { id: "architecture", name: "Architecture diagram", kind: "document",
+  { id: "architecture", name: "Architecture diagram", kind: "document", type: "diagram",
     tagline: "System diagrams on slate, where colour means something — one view or several." },
-  { id: "sitemap-ia", name: "Sitemap & IA proposal", kind: "document",
+  { id: "sitemap-ia", name: "Sitemap & IA proposal", kind: "document", type: "read",
     tagline: "Argue an information architecture, with the navigation wired up to click through." },
-  { id: "slide-design", name: "Slide design", kind: "external", badge: "HTML",
+  { id: "slide-design", name: "Slide design", kind: "external", type: "present", badge: "HTML",
     tagline: "Not a MonoMind template — style presets and animated HTML slides." }
 ];
+
+/* Display order for the filter row. A type the registry does not use gets no
+   button; a type this list has never heard of is appended rather than
+   dropped, so adding one to templates.json is a one-word change there. */
+var TYPE_ORDER = ["present", "read", "diagram", "site"];
 
 /* `chapter` groups a question onto one screen of the flow. It is presentation
    and nothing else: the payload never carries it, and the contract
@@ -1843,6 +1927,37 @@ function kindOf(id) {
   return t ? (t.kind || "slides") : "slides";
 }
 
+/* ── type: what a template is for ─────────────────────────────────
+   The whole of the type axis lives between here and paintGallery(). It is
+   read at draw time and nowhere else — rebuildOrder(), ORDER, the rail and
+   payload() never see it, which is what keeps `kind`'s question filtering
+   and the frozen payload out of its reach. */
+function typeOf(id) {
+  var t = TEMPLATES.filter(function (x) { return x.id === id; })[0];
+  return (t && t.type) || "";
+}
+function typeLabel(ty) { return (ui("types") || {})[ty] || ty; }
+function typesPresent() {
+  var seen = [];
+  TEMPLATES.forEach(function (t) {
+    if (t.type && seen.indexOf(t.type) === -1) { seen.push(t.type); }
+  });
+  return TYPE_ORDER.filter(function (ty) { return seen.indexOf(ty) !== -1; })
+    .concat(seen.filter(function (ty) { return TYPE_ORDER.indexOf(ty) === -1; }));
+}
+function typeCount(ty) {
+  return TEMPLATES.filter(function (t) { return t.type === ty; }).length;
+}
+
+/* "" is the all state. A filter narrows what the gallery draws and nothing
+   else: it never touches `state`, so no answer moves and no template is
+   deselected by filtering. */
+var tplFilter = "";
+/* The option ids the gallery last drew, in the order it drew them. The number
+   keys read this rather than q.options, so the badge on a card and the key
+   that picks it are written from one list and cannot disagree. */
+var galleryShown = [];
+
 function rebuildOrder() {
   var kind = kindOf(state.template);
   /* `kinds` narrows a question to a shape; `templates` narrows it to specific
@@ -1971,9 +2086,52 @@ function revealHtml(q) {
   }).join("");
 }
 
+/* Which cards the filter leaves on show. The reader's current pick is always
+   one of them: an answer that disappears when a filter is applied reads as an
+   answer that was thrown away, and the panel has no persistence to reassure
+   anyone otherwise. Evaluated only when the gallery is drawn, so cards appear
+   and disappear when the reader touches the filter row — never underneath a
+   pick they have just made. */
+function tplShown(q, o) {
+  return !tplFilter || typeOf(o.id) === tplFilter || state[q.id] === o.id;
+}
+
+/* The buttons and the live region. Kept outside .gallery so that redrawing
+   the cards never replaces them: the row would lose the focused button, and a
+   live region minted along with its own text is not announced at all. */
+function filterHtml(q) {
+  var types = typesPresent();
+  if (types.length < 2) { return ""; }   /* nothing to narrow */
+  function btn(ty, label, n) {
+    return '<button type="button" class="tfbtn" data-type="' + esc(ty) + '"' +
+      ' aria-pressed="' + (tplFilter === ty) + '">' +
+      '<span>' + esc(label) + '</span>' +
+      '<span class="fcount">' + n + '</span></button>';
+  }
+  return '<div class="tplfilter">' +
+    '<div class="tplfilterrow" role="group" aria-label="' + esc(ui("filterLabel")) + '">' +
+    btn("", ui("filterAll"), TEMPLATES.length) +
+    types.map(function (ty) { return btn(ty, typeLabel(ty), typeCount(ty)); }).join("") +
+    '</div><p class="filterstat" role="status">' + esc(statText(q)) + '</p></div>';
+}
+
+function statText(q) {
+  var shown = q.options.filter(function (o) { return tplShown(q, o); });
+  var kept = !!tplFilter && shown.filter(function (o) {
+    return typeOf(o.id) !== tplFilter;
+  }).length > 0;
+  return ui("filterStat")(shown.length, q.options.length, kept);
+}
+
 function galleryHtml(q) {
+  return filterHtml(q) + cardsHtml(q);
+}
+
+function cardsHtml(q) {
+  var shown = q.options.filter(function (o) { return tplShown(q, o); });
+  galleryShown = shown.map(function (o) { return o.id; });
   return '<div class="gallery" role="radiogroup" aria-label="' + esc(tq(q)) + '">' +
-    q.options.map(function (o, i) {
+    shown.map(function (o, i) {
       var t = o.tpl || {};
       var on = state[q.id] === o.id;
       /* The card's four strings come off the registry entry, so they are
@@ -1983,21 +2141,29 @@ function galleryHtml(q) {
       var tag  = tplText(o.id, 1, o.note || "");
       var best = tplText(o.id, 2, t.best_for);
       var deps = tplText(o.id, 3, t.dependencies);
+      var ty   = typeOf(o.id);
       var preview = t.preview
         ? '<a class="tplpreview" href="' + esc(t.preview) + '" target="_blank" rel="noopener noreferrer">' +
           esc(ui("previewLink")) + '</a>'
         : "";
+      /* The type joins the accessible name rather than sitting in the card as
+         a stray word: a screen reader hears "Evidence deck, to present" the
+         way a sighted reader sees the name with its flag under it. */
+      var aria = ty ? name + ", " + typeLabel(ty) : name;
       return '<div class="tplcell">' +
         '<button type="button" class="tpl" role="radio" aria-checked="' + on + '"' +
-        ' aria-label="' + esc(name) + '" data-q="' + q.id + '" data-o="' + o.id + '">' +
+        ' aria-label="' + esc(aria) + '" data-q="' + q.id + '" data-o="' + o.id + '">' +
         (t.thumb
           ? '<img src="' + t.thumb + '" alt="" loading="lazy">'
           : '<span class="noshot">' + esc(t.badge || ui("noshot")) + '</span>') +
-        '<span class="tplmeta"><span class="key">' + (i + 1) + '</span>' +
+        /* Past nine there is no number key to press, so the badge stops
+           claiming one — the same "·" optionsHtml has always used. */
+        '<span class="tplmeta"><span class="key">' + (i < 9 ? i + 1 : "·") + '</span>' +
         '<span><b>' + esc(name) +
         (o.def ? ' <span class="default">' + esc(ui("defaultMark")) + '</span>' : "") + '</b>' +
         '<span class="note">' + esc(tag) + '</span>' +
         (best ? '<span class="note">' + esc(best) + '</span>' : "") +
+        (ty ? '<span class="ttype">' + esc(typeLabel(ty)) + '</span>' : "") +
         (deps ? '<span class="dep">' + esc(deps) + '</span>' : "") +
         '</span></span></button>' + preview + '</div>';
     }).join("") + '</div>';
@@ -2278,6 +2444,23 @@ function paintOptions(q) {
   syncReveals(q);
 }
 
+/* Redraw the cards for the filter that is now on, and nothing else. The
+   button row and its live region are left in place — replacing them would
+   throw away the focus of the reader who just pressed one, and re-mint the
+   live region so the count it reports is never announced. */
+function paintGallery() {
+  var q = QUESTIONS[0];
+  var sec = document.getElementById("q-" + q.id);
+  if (!sec) { return; }
+  var grid = sec.querySelector(".gallery");
+  if (grid) { grid.outerHTML = cardsHtml(q); }
+  Array.prototype.forEach.call(sec.querySelectorAll(".tfbtn"), function (b) {
+    b.setAttribute("aria-pressed", String(b.dataset.type === tplFilter));
+  });
+  var stat = sec.querySelector(".filterstat");
+  if (stat) { stat.textContent = statText(q); }
+}
+
 function choose(qid, oid, viaKey) {
   var q = QUESTIONS.filter(function (x) { return x.id === qid; })[0];
   if (qid === "template") {
@@ -2322,6 +2505,15 @@ qlist.addEventListener("click", function (e) {
   var drop = e.target.closest(".drop");
   if (drop) {
     qlist.querySelector('input[data-for="' + drop.dataset.slot + '"]').click();
+    return;
+  }
+  /* A type filter narrows the gallery and touches nothing else: `state` is
+     not read or written here, so no answer moves and the chosen template
+     stays chosen even when its type is not the one being asked for. */
+  var tf = e.target.closest(".tfbtn");
+  if (tf) {
+    tplFilter = tf.dataset.type || "";
+    paintGallery();
     return;
   }
   /* The preview link is a sibling of the card, not inside it. Force the new
@@ -2448,9 +2640,16 @@ document.addEventListener("keydown", function (e) {
   if (e.key === "ArrowLeft" || e.key === "Left") { e.preventDefault(); prev(); return; }
   if (/^[1-9]$/.test(e.key)) {
     var q = screenQs()[activeAt()];
-    if (q && q.options && q.options[Number(e.key) - 1]) {
+    /* The gallery's badges are written from `galleryShown`, so the key reads
+       the same list: with a type filter on, the nth key is the nth card the
+       reader can actually see. Every other question keys off q.options, which
+       is what it has always been. */
+    var pick = q && (q.type === "gallery"
+      ? galleryShown[Number(e.key) - 1]
+      : (q.options && q.options[Number(e.key) - 1] || {}).id);
+    if (pick) {
       e.preventDefault();
-      choose(q.id, q.options[Number(e.key) - 1].id, true);
+      choose(q.id, pick, true);
     }
   }
 });
