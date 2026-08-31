@@ -148,6 +148,31 @@ body {
 .count { font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.4;
   color: var(--muted-inv); white-space: nowrap; margin-left: auto; }
 
+/* ── back to the site ─────────────────────────────────────────────
+   The home control rides on the brand row because it is the only row in
+   the header with slack in it: the rail below is already a full-width row
+   of buttons, and the footer is a fixed box the flow controls fill edge
+   to edge.
+
+   30px tall against a brand row that is already 38px (a 30px mark inside
+   .brandlink's 4px padding), so it sits *inside* the row's existing
+   height — which is what keeps --top-h at exactly the 156px / 138px it
+   was before it existed.
+
+   margin-left:auto on the group, never justify-content:space-between on
+   the row: the group is the row's only sibling, and space-between pins a
+   lone child to the wrong edge the moment the other one is not there —
+   the same reason .count above carries it rather than the row. */
+.chrome { margin-left: auto; flex: none; display: flex; align-items: center; gap: var(--space-2); }
+.iconbtn { flex: none; width: 30px; height: 30px; display: grid; place-items: center;
+  color: var(--muted-inv); text-decoration: none;
+  border: 1px solid var(--glass-hair); border-radius: var(--radius-pill);
+  transition: color var(--motion-fast) var(--ease-standard),
+              border-color var(--motion-fast) var(--ease-standard); }
+.iconbtn:hover { color: var(--fg-inv); border-color: var(--accent); }
+.iconbtn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.iconbtn svg { width: 15px; height: 15px; display: block; }
+
 h1 { font-family: var(--font-display); font-size: clamp(28px, 4.4vw, 40px); line-height: 1.08;
      letter-spacing: -0.025em; margin: 0 0 var(--space-2); font-weight: 700; }
 .lead { color: var(--muted-inv); font-size: var(--text-base); margin: 0; max-width: 62ch; }
@@ -549,6 +574,25 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
     </span>
     <span class="brandtext"><b translate="no">monomind ai lab</b><span translate="no">hi ted, meet lisa</span></span>
     </a>
+
+    <!-- The way back to the site. A real href, so a middle-click or ⌘-click
+         still opens a tab and the status bar still shows where it goes.
+         `_top`, not `_blank`: in web mode this panel is an iframe inside the
+         site's own overlay, and a plain navigation would nest the site inside
+         itself — and `_blank` is not a new tab in an embedded browser anyway
+         (L-013), it is a same-tab navigation wearing a new tab's clothes.
+         What guards the half-answered form is the confirm in the click
+         handler, not the target. -->
+    <div class="chrome">
+      <a class="iconbtn" id="homebtn" href="https://html.monomind.one/?ref=intake-home"
+         target="_top" aria-label="Hi Ted, Meet Lisa home page"
+         title="Hi Ted, Meet Lisa home page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 10.6 12 3.2l9 7.4"/><path d="M5.6 9.4V20.3h12.8V9.4"/>
+        </svg>
+      </a>
+    </div>
   </div>
 
   <!-- The rail lives outside #intake so it survives the move to the result
@@ -1820,12 +1864,27 @@ document.addEventListener("keydown", function (e) {
   if (e.key === "Escape" && !document.getElementById("pvw").hidden) { closePreview(); }
 });
 
+/* Leaving the panel. The href is real, so ⌘-click and middle-click still open
+   a tab and the status bar still tells the truth about where it goes; this
+   only guards the plain click, and only once there is something to lose.
+   Nothing here is persisted, so an answered panel that navigates away is an
+   answered panel gone — the same hazard D-014 moved previews into an overlay
+   to avoid. `pristineKey` is the panel as it booted, prompt included. */
+var pristineKey = null;
+document.getElementById("homebtn").addEventListener("click", function (e) {
+  if (pristineKey === null || payloadKey() === pristineKey) { return; }
+  if (!window.confirm("Leave the panel? Your answers are not saved anywhere.")) {
+    e.preventDefault();
+  }
+});
+
 rebuildOrder();
 document.getElementById("prompttext").value = CTX.prompt || "";
 if (CTX.prompt) {
   document.getElementById("prompttext").rows = 3;
 }
 render();
+pristineKey = payloadKey();
 </script>
 </body>
 </html>
