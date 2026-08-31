@@ -193,6 +193,28 @@
       ],
       "preview": "previews/paper-brief.html",
       "thumb_source": "previews/paper-brief.html"
+    },
+    {
+      "id": "framed-deck",
+      "name": "Framed deck",
+      "tagline": "A framed 16:9 canvas that scales its own type — projected, clicked through, printed.",
+      "file": "assets/tedandlisa-template-framed-deck.html",
+      "patterns": "references/slide-patterns-framed-deck.md",
+      "thumb": "templates/thumbs/framed-deck.png",
+      "kind": "slides",
+      "best_for": "A short spoken deck that will also be linked and printed unchanged — a launch, a teaching session, a conference talk.",
+      "navigation": "One slide at a time in a fixed 16:9 frame; arrows, space, click zones, prev/next buttons, deep links (#3), f for fullscreen, p to print.",
+      "languages": "One language per deck, written inline — no translation service, works offline.",
+      "dependencies": "Google Fonts only — Geist and Geist Mono, both with real fallbacks.",
+      "features": [
+        "framed 16:9 canvas, type in container units",
+        "deep-linkable slides",
+        "inline SVG diagram frame",
+        "command and reference blocks",
+        "prints 1280x720, one slide per page"
+      ],
+      "preview": "previews/framed-deck.html",
+      "thumb_source": "previews/framed-deck.html"
     }
   ]
 }
