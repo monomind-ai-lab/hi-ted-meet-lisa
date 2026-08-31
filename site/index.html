@@ -1045,14 +1045,44 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
   var frame = document.getElementById("intake-frame");
   var lastFocus = null;
 
+  /* The panel is written in the same three languages this page is, and it has
+     no way of working out which one the reader picked — the choice lives in
+     the language block at the bottom of this file, not in the URL and not in
+     anything the frame can see. So it is handed over rather than guessed at:
+     on the frame's own URL when the panel opens, and by message if the reader
+     switches while the overlay is still up. `__tedandlisaLang` is that block's
+     own `cur`, read live, so there is one source of truth and this is not it.
+     A machine-translated language comes back as its own tag and the panel
+     folds it to English itself. */
+  function siteLang() {
+    try { return window.__tedandlisaLang ? window.__tedandlisaLang() : "en"; }
+    catch (e) { return "en"; }
+  }
+  function intakeSrc(code) { return "intake.html?lang=" + encodeURIComponent(code); }
+
+  var frameReady = false;
+  frame.addEventListener("load", function () { frameReady = true; });
+
   function openIntake() {
     track("intake-open");
     lastFocus = document.activeElement;
-    if (!frame.src) frame.src = "intake.html";
+    if (!frame.src) frame.src = intakeSrc(siteLang());
     overlay.classList.add("on");
     document.body.style.overflow = "hidden";
     document.getElementById("close-intake").focus();
   }
+
+  /* A switch with the overlay open is posted, not re-loaded: the panel holds a
+     half-answered form with nothing behind it, and re-setting `src` would
+     throw every answer away to change a label. Before the frame has finished
+     loading there is nothing listening, so the URL carries it instead — which
+     is also the path a reader who has not opened the panel yet takes, since
+     `openIntake` reads the language fresh every time. */
+  document.addEventListener("tedandlisa:lang", function (e) {
+    if (!frame.src) return;
+    if (!frameReady) { frame.src = intakeSrc(e.detail); return; }
+    frame.contentWindow.postMessage({ tedandlisa: "lang", lang: e.detail }, location.origin);
+  });
   function closeIntake() {
     overlay.classList.remove("on");
     document.body.style.overflow = "";
@@ -1382,12 +1412,24 @@ function googleTranslateElementInit() {
       cur = code;
       applyInline(code);
       document.getElementById('lang-cur').textContent = code.toUpperCase();
+      announce(code);
       toggle(false);
       return;
     }
     document.cookie = 'googtrans=/en/' + code + '; path=/';
     location.reload();
   }
+
+  /* Anything on this page that is not this page. Today that is the intake
+     panel in its iframe, which is a whole second document with its own copy
+     of these three languages and no way of seeing `cur` — see the overlay
+     block above for what listens. The machine-translated tier below never
+     reaches here: it reloads the page, which takes the overlay with it. */
+  function announce(code) {
+    document.dispatchEvent(new CustomEvent('tedandlisa:lang', { detail: code }));
+  }
+  /* The one place that knows which language this page is in. */
+  window.__tedandlisaLang = function () { return cur; };
 
   /* dropdown */
   var btn = document.getElementById('lang-btn');
