@@ -6,7 +6,7 @@
 <title>[DECK TITLE] — [SUBTITLE]</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
 <style>
 /* ===========================================
    THEME TOKENS — change these to restyle everything
@@ -22,9 +22,11 @@
   --rule:#2e2e2e;
   --sig:#FF5722;
   --sig-dim:rgba(255,87,34,.13);
+  --on-sig:#141414;          /* ink that sits on the signal colour */
   --cyan:#22D3EE;
   --cyan-dim:rgba(34,211,238,.11);
   --warn:#FFC400;
+  --chrome-bg:rgba(20,20,20,.74);
 
   --font-display:'Archivo Black',sans-serif;
   --font-body:'Space Grotesk',sans-serif;
@@ -39,6 +41,7 @@
 
   --slide-padding:clamp(1.3rem,4.4vw,4.4rem);
   --gap:clamp(.65rem,1.65vw,1.55rem);
+  --chrome-clear:46px;       /* headroom every slide leaves for the chrome */
 
   --ease:cubic-bezier(.16,1,.3,1);
   --dur:.7s;
@@ -49,15 +52,45 @@
 html{scroll-snap-type:y mandatory;overflow-y:scroll;height:100%;scroll-behavior:smooth}
 body{font-family:var(--font-body);background:var(--bg);color:var(--fg);height:100%;overflow:hidden;-webkit-font-smoothing:antialiased;font-feature-settings:"tnum"}
 
+/* === LANGUAGE ===
+   Both languages are written into the markup and one of them is hidden by
+   CSS. No translation service, so the switch is instant, works offline, and
+   translates text inside a component the same way it translates a heading.
+   Delete a language by deleting its spans and its button. */
+body[data-lang="en"] .ko{display:none !important}
+body[data-lang="ko"] .en{display:none !important}
+/* Archivo Black and Space Grotesk carry no Hangul, so Noto Sans KR is
+   appended to both stacks rather than replacing them: Latin and digits stay
+   in the deck's own faces and only the Hangul falls through. 900 keeps the
+   fallback from reading light beside Archivo Black. */
+body[data-lang="ko"]{
+  --font-display:'Archivo Black','Noto Sans KR',sans-serif;
+  --font-body:'Space Grotesk','Noto Sans KR',sans-serif;
+}
+body[data-lang="ko"] h1,
+body[data-lang="ko"] h2,
+body[data-lang="ko"] .verdict,
+body[data-lang="ko"] .section-card .sn,
+body[data-lang="ko"] .mega{font-weight:900}
+
 /* === SLIDE BASE (NON-NEGOTIABLE) === */
 .slide{
   height:100vh;height:100dvh;overflow:hidden;scroll-snap-align:start;position:relative;
   display:flex;flex-direction:column;justify-content:center;padding:var(--slide-padding);
+  padding-top:max(var(--slide-padding),var(--chrome-clear));
   background:var(--bg-grad);
 }
 .slide::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(to right,rgba(255,255,255,.02) 1px,transparent 1px);background-size:calc(100vw/12) 100%}
 .slide img{max-width:100%;max-height:min(50vh,400px);object-fit:contain}
 .slide-content{width:100%;max-height:100%;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:var(--gap);position:relative;z-index:1}
+
+/* backgrounds: the answer's `upload` mode lands here. Put the data URI on the
+   cover and closing slides as `style="--bg-img:url(data:image/jpeg;base64,…)"`
+   and add `data-bg` to the section; the scrim is what keeps the type legible.
+   Nothing is embedded by default — this deck ships typographic. */
+.slide[data-bg]{background-image:var(--bg-img);background-size:cover;background-position:center}
+.slide[data-bg]::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(150deg,rgba(20,20,20,.88),rgba(18,18,18,.72))}
+.slide[data-bg] .slide-content,.slide[data-bg] .pagenum{z-index:2}
 
 /* === ENTRANCE === */
 .reveal{opacity:0;transform:translateY(24px);transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease)}
@@ -83,10 +116,10 @@ h2{font-family:var(--font-display);font-size:var(--h2-size);line-height:1.08;let
 code,.mono{font-family:var(--font-mono);font-size:.9em;color:var(--warn)}
 
 /* === SECTION CARD === */
-.section-card{background:var(--sig);color:#141414;padding:clamp(1.1rem,3.2vw,3rem);display:flex;flex-direction:column;gap:clamp(.45rem,1.3vw,1rem);max-width:min(100%,58ch)}
+.section-card{background:var(--sig);color:var(--on-sig);padding:clamp(1.1rem,3.2vw,3rem);display:flex;flex-direction:column;gap:clamp(.45rem,1.3vw,1rem);max-width:min(100%,58ch)}
 .section-card .sfor{font-family:var(--font-body);font-weight:700;font-size:var(--micro-size);letter-spacing:.2em;text-transform:uppercase;opacity:.65}
 .section-card .sn{font-family:var(--font-display);font-size:clamp(2.2rem,7.5vw,6rem);line-height:.8;letter-spacing:-.04em}
-.section-card h2{color:#141414}
+.section-card h2{color:var(--on-sig)}
 .section-card p{font-size:var(--body-size);line-height:1.55;font-weight:400;max-width:46ch}
 
 /* === MEGA === */
@@ -138,7 +171,7 @@ table.data tr.good td.num{color:var(--cyan)}
 .card .cd{font-size:var(--body-size);color:var(--fg-soft);font-weight:300;line-height:1.55}
 
 /* === VERDICT === */
-.verdict{background:var(--sig);color:#141414;padding:clamp(.6rem,1.5vw,1.15rem) clamp(.8rem,1.9vw,1.6rem);font-family:var(--font-display);font-size:clamp(.78rem,1.75vw,1.3rem);line-height:1.28;letter-spacing:-.015em;text-transform:uppercase}
+.verdict{background:var(--sig);color:var(--on-sig);padding:clamp(.6rem,1.5vw,1.15rem) clamp(.8rem,1.9vw,1.6rem);font-family:var(--font-display);font-size:clamp(.78rem,1.75vw,1.3rem);line-height:1.28;letter-spacing:-.015em;text-transform:uppercase}
 .verdict.dark{background:var(--panel-2);color:var(--fg);border-left:clamp(4px,.55vw,7px) solid var(--sig)}
 .verdict.cyan-v{background:var(--panel-2);color:var(--fg);border-left:clamp(4px,.55vw,7px) solid var(--cyan)}
 
@@ -153,8 +186,8 @@ table.data tr.good td.num{color:var(--cyan)}
 ul.pts li:last-child{margin-bottom:0}
 
 /* === COLOPHON ===
-   The one line of chrome this template adds beyond the source system: the
-   maker's credit on the closing slide, in the deck's own tokens. */
+   The maker's credit on the closing slide, in the deck's own tokens. Written
+   once per language, product name identical in both. */
 .colophon{font-family:var(--font-body);font-size:var(--micro-size);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-faint);display:flex;flex-wrap:wrap;gap:.75em}
 .colophon a{color:inherit;text-decoration:none;border-bottom:1px solid var(--rule)}
 .colophon a:hover{border-bottom-color:currentColor}
@@ -168,17 +201,73 @@ ul.pts li:last-child{margin-bottom:0}
 .nav-dots{position:fixed;right:clamp(.55rem,1.3vw,1.4rem);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:7px;z-index:1000}
 .nav-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22);cursor:pointer;transition:all .3s ease;border:none;padding:0}
 .nav-dot.active{background:var(--sig);transform:scale(1.45)}
+.nav-dot:focus-visible{outline:2px solid var(--sig);outline-offset:3px}
+
+/* === CHROME: mark · language · menu ===
+   Fixed top right, clear of the nav dots (right edge, vertically centred) and
+   the page number (bottom left). Every control is guarded in the script, so
+   deleting one here is the supported way to switch that answer off. */
+.deck-chrome{position:fixed;top:9px;right:clamp(.55rem,1.3vw,1.4rem);z-index:1100;
+  display:flex;align-items:center;gap:.5rem}
+.deck-mark{display:inline-flex;width:19px;height:19px;flex:none;color:var(--fg-soft);transition:color .18s ease}
+.deck-mark:hover,.deck-mark:focus-visible{color:var(--fg)}
+.deck-mark:focus-visible{outline:2px solid var(--sig);outline-offset:3px}
+.deck-mark svg{width:100%;height:100%}
+.seg{display:flex;border:1px solid var(--rule);background:var(--chrome-bg);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.seg button{height:26px;padding:0 9px;border:0;border-right:1px solid var(--rule);
+  background:transparent;color:var(--fg-soft);font-family:var(--font-body);font-size:11px;
+  font-weight:700;letter-spacing:.08em;cursor:pointer;transition:background .15s,color .15s}
+.seg button:last-child{border-right:0}
+.seg button:hover{color:var(--fg)}
+.seg button[aria-pressed="true"]{background:var(--sig);color:var(--on-sig)}
+.seg button:focus-visible{outline:2px solid var(--sig);outline-offset:2px}
+
+.deck-menu{position:relative}
+.deck-menu-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  width:30px;height:26px;padding:0;border:1px solid var(--rule);background:var(--chrome-bg);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);cursor:pointer}
+.deck-menu-btn span{display:block;width:15px;height:1.5px;background:var(--fg-soft);
+  transition:transform .2s var(--ease),opacity .2s var(--ease),background .15s}
+.deck-menu-btn:hover span{background:var(--fg)}
+.deck-menu-btn:focus-visible{outline:2px solid var(--sig);outline-offset:2px}
+.deck-menu[data-open="true"] .deck-menu-btn span:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+.deck-menu[data-open="true"] .deck-menu-btn span:nth-child(2){opacity:0}
+.deck-menu[data-open="true"] .deck-menu-btn span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+
+.deck-menu-panel{position:absolute;top:calc(100% + 8px);right:0;display:none;flex-direction:column;
+  width:max-content;min-width:min(262px,80vw);max-width:min(320px,86vw);
+  max-height:min(72vh,540px);overflow-y:auto;padding:6px;
+  border:1px solid var(--rule);background:var(--panel);box-shadow:0 18px 48px rgba(0,0,0,.55)}
+.deck-menu[data-open="true"] .deck-menu-panel{display:flex}
+.deck-menu-panel button,.deck-menu-panel a{display:flex;align-items:center;gap:.6rem;width:100%;
+  padding:8px 10px;border:0;background:none;cursor:pointer;text-align:left;text-decoration:none;
+  font-family:var(--font-body);font-size:12.5px;font-weight:400;line-height:1.35;color:var(--fg-soft);
+  transition:background .15s,color .15s}
+.deck-menu-panel button:hover,.deck-menu-panel a:hover{background:var(--panel-2);color:var(--fg)}
+.deck-menu-panel button:focus-visible,.deck-menu-panel a:focus-visible{
+  outline:2px solid var(--sig);outline-offset:-2px;color:var(--fg)}
+.deck-menu-panel svg{flex:0 0 auto;width:15px;height:15px;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.deck-menu-sub{display:flex;flex-direction:column;margin:2px 0 6px;padding-left:10px;
+  border-left:1px solid var(--rule)}
+.deck-menu-sub button{font-size:11.5px;padding:6px 10px}
+.deck-menu-sub .mn{font-family:var(--font-display);font-size:9.5px;letter-spacing:.06em;
+  color:var(--fg-faint);min-width:20px}
+.deck-menu-sub button[aria-current="true"]{color:var(--fg)}
+.deck-menu-sub button[aria-current="true"] .mn{color:var(--sig)}
 
 /* === HEIGHT BREAKPOINTS === */
 @media (max-height:700px){
-  .slide{padding-top:clamp(.5rem,2vh,1rem);padding-bottom:clamp(.5rem,2vh,1rem)}
+  .slide{padding-top:max(clamp(.5rem,2vh,1rem),var(--chrome-clear));padding-bottom:clamp(.5rem,2vh,1rem)}
   h1{font-size:clamp(1.5rem,4.6vh,3rem)}
   h2{font-size:clamp(1.1rem,3.2vh,2rem)}
   .mega{font-size:clamp(2.2rem,13vh,5.5rem)}
   .section-card .sn{font-size:clamp(1.8rem,9vh,4rem)}
 }
 @media (max-height:600px){
-  .slide{justify-content:flex-start;padding-top:1.1rem}
+  :root{--chrome-clear:40px}
+  .slide{justify-content:flex-start;padding-top:max(1.1rem,var(--chrome-clear))}
   h1{font-size:clamp(1.2rem,3.4vh,2rem)}
   h2{font-size:clamp(.95rem,2.8vh,1.55rem)}
   .body,ul.pts li{font-size:clamp(.66rem,1.5vh,.88rem)}
@@ -190,11 +279,12 @@ ul.pts li:last-child{margin-bottom:0}
 /* === REDUCED MOTION === */
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  html{scroll-behavior:auto}
   .reveal{opacity:1;transform:none}
 }
 </style>
 </head>
-<body>
+<body data-lang="en" data-title-en="[DECK TITLE] — [SUBTITLE]" data-title-ko="[덱 제목] — [부제]">
 
 <!-- ============================================================
      EVIDENCE DECK — placeholder skeleton
@@ -207,7 +297,8 @@ ul.pts li:last-child{margin-bottom:0}
 
      1. Every `.reveal` must be a DIRECT child of `.slide-content`. The
         stagger is `nth-child`, so a reveal wrapped in a spare <div> gets
-        the wrapper's delay and the siblings after it shift by one.
+        the wrapper's delay and the siblings after it shift by one. The
+        language spans go INSIDE a reveal, never around it.
      2. The stagger is written for seven children. An eighth reveal appears
         with no delay, which reads as a jump. Group instead of adding one.
      3. `.pagenum` is hardcoded per slide. Renumber every one of them after
@@ -221,18 +312,108 @@ ul.pts li:last-child{margin-bottom:0}
      6. Numbers set in `--font-display` are Archivo Black, which has no
         tabular figures of its own; `font-feature-settings:"tnum"` on body
         is what keeps columns of digits aligned. Leave it alone.
+     7. EVERY reader-visible string is written twice — once in
+        `<span class="en">`, once in `<span class="ko">`. A string with only
+        one of them shows in both languages and reads as a bug. That
+        includes table cells, card labels, the colophon, and the menu labels
+        in `data-label-en` / `data-label-ko` on each `<section>`.
+     8. `data-label-*` on a slide is what the Contents menu lists. Rewrite
+        them to the deck's real sections; the skeleton ships the component
+        names as placeholders.
+     9. Any term that must survive translation — a product name, a command,
+        an identifier — is written IDENTICALLY in both spans and wrapped
+        `<span class="notranslate" translate="no">`, so a reader's own
+        browser translation leaves it alone. That list is the `noTranslate`
+        answer.
      ============================================================ -->
 
 <div class="progress-bar"></div>
 <nav class="nav-dots" id="navDots" aria-label="Slide navigation"></nav>
 
+<!-- CHROME. logo: the mark. menu: the hamburger beside it — delete the whole
+     <nav class="deck-menu"> for `menu: none`, or replace it with a single
+     back-to-the-start button for `menu: minimal`. languages: the segment —
+     delete a button and its spans to drop a language. -->
+<div class="deck-chrome">
+  <!-- logo: replace or delete per the `logo` answer. -->
+  <a class="deck-mark" href="https://monomind.one/?ref=deck-mark" target="_blank" rel="noopener noreferrer" aria-label="MonoMind">
+    <svg viewBox="0 0 512 512" fill="currentColor" aria-hidden="true">
+      <path fill="currentColor" d="M0 0 C21.12 0 42.24 0 64 0 C64.33 9.24 64.66 18.48 65 28 C67.31 28.825 69.62 29.65 72 30.5 C80.67855394 33.70320466 88.83987436 37.66197192 97 42 C98.13824219 42.59296875 99.27648437 43.1859375 100.44921875 43.796875 C114.11283709 51.2237895 126.32645153 60.78564509 138 71 C138.33 53.51 138.66 36.02 139 18 C147.41726708 18 155.23771035 18.11320702 163.5 19.1875 C165.04349121 19.38714355 165.04349121 19.38714355 166.61816406 19.59082031 C209.08178959 25.42223064 247.55036699 43.98420048 278.48925781 73.55664062 C279.51252583 74.53426838 280.54069027 75.50679224 281.57324219 76.47460938 C316.21868127 109.03500379 337.95056536 156.61339058 341 204 C341 209.28 341 214.56 341 220 C319.88 220 298.76 220 277 220 C276.34 213.07 275.68 206.14 275 199 C274.38439297 195.37078182 273.77803562 191.97121696 272.875 188.4375 C272.66327148 187.58655762 272.45154297 186.73561523 272.23339844 185.85888672 C266.69864116 164.72016184 256.75707174 146.80424072 243 130 C242.33226562 129.17757812 241.66453125 128.35515625 240.9765625 127.5078125 C235.93066496 121.55571295 230.17510386 116.74552502 224 112 C223.10023438 111.30777344 222.20046875 110.61554688 221.2734375 109.90234375 C203.20851766 96.39269908 177.88565782 83.53645418 154.625 83.9375 C153.42875 83.958125 152.2325 83.97875 151 84 C151.58265625 84.66902344 152.1653125 85.33804688 152.765625 86.02734375 C185.07129092 123.86967253 203 170.1014647 203 220 C181.88 220 160.76 220 139 220 C138.01 211.75 137.02 203.5 136 195 C129.68082068 166.91475858 117.85438519 144.07221923 98 123 C97.45085937 122.39800781 96.90171875 121.79601562 96.3359375 121.17578125 C86.97145584 111.2807994 75.80572295 104.7461274 64 98 C64 138.26 64 178.52 64 220 C42.88 220 21.76 220 0 220 C0 147.4 0 74.8 0 0 Z" transform="translate(74,141)"/>
+      <path fill="currentColor" d="M0 0 C6.93122125 2.33191353 11.59348712 6.73609933 15 13.15234375 C17.3325015 19.79450622 17.26381755 27.06296996 14.3125 33.5 C10.66303794 39.55276634 5.78715496 43.90906429 -1 46 C-7.43466397 46.85737784 -13.48798557 46.74360867 -19.18359375 43.40234375 C-24.96806721 38.93648145 -29.37878226 33.62316781 -30.37109375 26.23828125 C-30.53935564 18.82486011 -29.62715748 12.97497629 -25 7 C-17.06174054 0.27985277 -10.33089416 -1.10531813 0 0 Z" transform="translate(450,315)"/>
+    </svg>
+  </a>
+
+  <div class="seg" role="group" id="langSeg" aria-label="Language">
+    <button type="button" id="btnEn" aria-pressed="true">EN</button>
+    <button type="button" id="btnKo" aria-pressed="false">한국어</button>
+  </div>
+
+  <nav class="deck-menu" id="deckMenu" data-open="false">
+    <button class="deck-menu-btn" type="button" id="deckMenuBtn"
+            aria-expanded="false" aria-controls="deckMenuPanel" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="deck-menu-panel" id="deckMenuPanel" role="menu" aria-labelledby="deckMenuBtn">
+
+      <!-- menu.items: "start" — always present -->
+      <button type="button" role="menuitem" id="deckMenuStart">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 17.5 11 12l7-5.5v11Z" fill="currentColor" stroke="none"/><path d="M6.5 6v12"/></svg>
+        <span class="en">Back to the start</span><span class="ko">처음으로</span>
+      </button>
+
+      <!-- menu.items: "contents" — the list is built from each slide's
+           data-label-*, so it cannot drift out of sync with the deck. -->
+      <button type="button" role="menuitem" id="deckMenuContents" aria-expanded="false" aria-controls="deckContents">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        <span class="en">Contents</span><span class="ko">목차</span>
+      </button>
+      <div class="deck-menu-sub" id="deckContents" role="none" hidden></div>
+
+      <!-- menu.items: "language" — the same switch as the segment above, for
+           a reader who looks in the menu first. Delete it when `menu.items`
+           omits `language`; the segment in the chrome is unaffected. -->
+      <button type="button" role="menuitem" id="deckMenuLang">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 3 2.6 15 0 18M12 3c-2.6 3-2.6 15 0 18"/></svg>
+        <span class="en">한국어로 보기</span><span class="ko">Read in English</span>
+      </button>
+
+      <!-- menu.items: "home" / "github" — both ship deleted, because their
+           URLs default to null and an item pointing nowhere is worse than no
+           item. Paste one back with a real href when the answer carries one:
+
+      <a role="menuitem" href="[HOME URL]" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7M6.5 9.7V20h11V9.7"/></svg>
+        <span class="en">Home</span><span class="ko">홈</span>
+      </a>
+      <a role="menuitem" href="[REPOSITORY URL]" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4 1.4-4-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.3 4.3 0 0 0-.1-3.2s-1-.3-3.4 1.3a11.6 11.6 0 0 0-6.2 0C6.6 2.8 5.6 3.1 5.6 3.1a4.3 4.3 0 0 0-.1 3.2A4.6 4.6 0 0 0 4.2 9.5c0 4.6 2.7 5.7 5.5 6-.4.4-.5.9-.5 1.6V21"/></svg>
+        <span class="en">Repository</span><span class="ko">저장소</span>
+      </a>
+
+           menu.items: "pdf" / "html" — only when `export` asked for them.
+           There is no print stylesheet in this template, so `export: pdf`
+           means writing the @media print block as well as pasting this:
+
+      <button type="button" role="menuitem" id="deckMenuPdf">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9.5V4h10v5.5M7 18H5.2v-6h13.6v6H17M8.4 15h7.2v5H8.4z"/></svg>
+        <span class="en">Download as PDF</span><span class="ko">PDF로 저장</span>
+      </button>
+      <button type="button" role="menuitem" id="deckMenuHtml">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 3.6-3.6M12 15l-3.6-3.6M5 19h14"/></svg>
+        <span class="en">Download the HTML</span><span class="ko">HTML 내려받기</span>
+      </button>
+      -->
+    </div>
+  </nav>
+</div>
+
 <!-- === 01 TITLE === -->
-<section class="slide">
+<section class="slide" data-label-en="[TITLE]" data-label-ko="[표지]">
   <div class="slide-content">
-    <p class="eyebrow reveal">[AUDIENCE] · [DOCUMENT TYPE] · [VERSION]</p>
-    <h1 class="reveal">[THE CLAIM,<br>IN THREE LINES.]<br><span style="color:var(--sig)">[THE TURN.]</span></h1>
-    <p class="lead reveal">[One sentence saying what this deck is for and what it is built from. Keep it to what a reader needs before slide two.]</p>
-    <div class="verdict reveal">[The single sentence you want remembered if they read nothing else.]</div>
+    <p class="eyebrow reveal"><span class="en">[AUDIENCE] · [DOCUMENT TYPE] · [VERSION]</span><span class="ko">[대상] · [문서 유형] · [버전]</span></p>
+    <h1 class="reveal"><span class="en">[THE CLAIM,<br>IN THREE LINES.]<br><span style="color:var(--sig)">[THE TURN.]</span></span><span class="ko">[핵심 주장을<br>세 줄로.]<br><span style="color:var(--sig)">[뒤집는 한 줄.]</span></span></h1>
+    <p class="lead reveal"><span class="en">[One sentence saying what this deck is for and what it is built from. Keep it to what a reader needs before slide two.]</span><span class="ko">[이 덱이 무엇을 위한 것이고 어떤 자료로 만들어졌는지 한 문장으로. 두 번째 슬라이드 전에 필요한 만큼만.]</span></p>
+    <div class="verdict reveal"><span class="en">[The single sentence you want remembered if they read nothing else.]</span><span class="ko">[다른 건 못 봐도 이 한 문장은 남기고 싶다는 그 문장.]</span></div>
   </div>
   <span class="pagenum">01 / 09</span>
 </section>
@@ -240,13 +421,13 @@ ul.pts li:last-child{margin-bottom:0}
 <!-- === 02 SECTION CARD ===
      An orange full-bleed card marks a new part of the argument. Use one per
      section and no more — four in a nine-slide deck is wallpaper. -->
-<section class="slide">
+<section class="slide" data-label-en="[SECTION 01]" data-label-ko="[섹션 01]">
   <div class="slide-content" style="align-items:flex-start">
     <div class="section-card reveal">
-      <p class="sfor">[WHAT THIS SECTION FEEDS]</p>
+      <p class="sfor"><span class="en">[WHAT THIS SECTION FEEDS]</span><span class="ko">[이 섹션이 무엇으로 이어지는지]</span></p>
       <div class="sn">01</div>
-      <h2>[The section's<br>claim in two<br>short lines]</h2>
-      <p>[One supporting sentence. This is the only body copy the section card should carry.]</p>
+      <h2><span class="en">[The section's<br>claim in two<br>short lines]</span><span class="ko">[이 섹션의 주장을<br>짧은 두 줄로]</span></h2>
+      <p><span class="en">[One supporting sentence. This is the only body copy the section card should carry.]</span><span class="ko">[뒷받침하는 한 문장. 섹션 카드에 들어가는 본문은 이것 하나면 충분합니다.]</span></p>
     </div>
   </div>
   <span class="pagenum">02 / 09</span>
@@ -256,20 +437,24 @@ ul.pts li:last-child{margin-bottom:0}
      `tr.flag` tints a row in the signal colour, `tr.good` in cyan. Use them
      for the rows the reader must not skim past; a table where every row is
      flagged has flagged nothing. -->
-<section class="slide">
+<section class="slide" data-label-en="[DATA TABLE]" data-label-ko="[데이터 표]">
   <div class="slide-content">
-    <p class="eyebrow reveal">[WHAT THE TABLE MEASURES]</p>
-    <h2 class="reveal">[What the table shows, said as a sentence]</h2>
+    <p class="eyebrow reveal"><span class="en">[WHAT THE TABLE MEASURES]</span><span class="ko">[이 표가 측정하는 것]</span></p>
+    <h2 class="reveal"><span class="en">[What the table shows, said as a sentence]</span><span class="ko">[표가 보여주는 것을 한 문장으로]</span></h2>
     <table class="data reveal">
-      <thead><tr><th>[COLUMN]</th><th>[COLUMN]</th><th style="text-align:right">[NUMBER]</th></tr></thead>
+      <thead><tr>
+        <th><span class="en">[COLUMN]</span><span class="ko">[항목]</span></th>
+        <th><span class="en">[COLUMN]</span><span class="ko">[해석]</span></th>
+        <th style="text-align:right"><span class="en">[NUMBER]</span><span class="ko">[수치]</span></th>
+      </tr></thead>
       <tbody>
-        <tr><td class="k">[Row label]</td><td>[Plain reading]</td><td class="num">000</td></tr>
-        <tr><td class="m">[/path/or/identifier]</td><td>[Plain reading]</td><td class="num">000</td></tr>
-        <tr class="flag"><td class="k">[The row that is a problem]</td><td><span class="sig">[Why it is the problem]</span></td><td class="num">000</td></tr>
-        <tr class="good"><td class="k">[The row that is working]</td><td>[Why it is working]</td><td class="num">000</td></tr>
+        <tr><td class="k"><span class="en">[Row label]</span><span class="ko">[행 이름]</span></td><td><span class="en">[Plain reading]</span><span class="ko">[쉬운 설명]</span></td><td class="num">000</td></tr>
+        <tr><td class="m">[/path/or/identifier]</td><td><span class="en">[Plain reading]</span><span class="ko">[쉬운 설명]</span></td><td class="num">000</td></tr>
+        <tr class="flag"><td class="k"><span class="en">[The row that is a problem]</span><span class="ko">[문제가 되는 행]</span></td><td><span class="sig"><span class="en">[Why it is the problem]</span><span class="ko">[왜 문제인지]</span></span></td><td class="num">000</td></tr>
+        <tr class="good"><td class="k"><span class="en">[The row that is working]</span><span class="ko">[이미 잘 되고 있는 행]</span></td><td><span class="en">[Why it is working]</span><span class="ko">[왜 잘 되는지]</span></td><td class="num">000</td></tr>
       </tbody>
     </table>
-    <p class="body reveal">[What follows from the table. Mark the load-bearing phrase with <span class="hl">the highlight class</span>, and the alarming one with <span class="sig">the signal class</span>.]</p>
+    <p class="body reveal"><span class="en">[What follows from the table. Mark the load-bearing phrase with <span class="hl">the highlight class</span>, and the alarming one with <span class="sig">the signal class</span>.]</span><span class="ko">[표에서 따라 나오는 결론. 핵심이 되는 표현은 <span class="hl">강조 클래스</span>로, 위험한 부분은 <span class="sig">시그널 클래스</span>로 표시합니다.]</span></p>
   </div>
   <span class="pagenum">03 / 09</span>
 </section>
@@ -277,16 +462,16 @@ ul.pts li:last-child{margin-bottom:0}
 <!-- === 04 SPLIT CARDS ===
      Two cards, one comparison. `.bad` is the signal colour, `.good` is cyan;
      a plain `.card` is neutral. `.split3` takes three. -->
-<section class="slide">
+<section class="slide" data-label-en="[COMPARISON]" data-label-ko="[대조]">
   <div class="slide-content" style="gap:clamp(.85rem,2.1vw,1.9rem)">
-    <p class="eyebrow reveal">[WHAT IS BEING COMPARED]</p>
-    <h2 class="reveal">[The comparison stated as a conclusion]</h2>
+    <p class="eyebrow reveal"><span class="en">[WHAT IS BEING COMPARED]</span><span class="ko">[무엇을 비교하는지]</span></p>
+    <h2 class="reveal"><span class="en">[The comparison stated as a conclusion]</span><span class="ko">[비교의 결과를 결론으로]</span></h2>
     <div class="split reveal">
-      <div class="card"><div class="ct">[WHAT WAS CLAIMED]</div><div class="cn">000</div><div class="cd">[Where the number comes from, in one line.]</div></div>
-      <div class="card bad"><div class="ct">[WHAT IS ACTUALLY THERE]</div><div class="cn">0,000</div><div class="cd">[Where this number comes from, and why it is the one to trust.]</div></div>
+      <div class="card"><div class="ct"><span class="en">[WHAT WAS CLAIMED]</span><span class="ko">[주장된 수치]</span></div><div class="cn">000</div><div class="cd"><span class="en">[Where the number comes from, in one line.]</span><span class="ko">[이 숫자의 출처를 한 줄로.]</span></div></div>
+      <div class="card bad"><div class="ct"><span class="en">[WHAT IS ACTUALLY THERE]</span><span class="ko">[실제 수치]</span></div><div class="cn">0,000</div><div class="cd"><span class="en">[Where this number comes from, and why it is the one to trust.]</span><span class="ko">[이 숫자의 출처와, 왜 이쪽을 믿어야 하는지.]</span></div></div>
     </div>
-    <p class="body reveal">[The consequence of the gap. One paragraph, no more.]</p>
-    <div class="verdict cyan-v reveal">[Something already settled, or already delivered. Cyan means resolved.]</div>
+    <p class="body reveal"><span class="en">[The consequence of the gap. One paragraph, no more.]</span><span class="ko">[이 격차가 만드는 결과. 한 단락이면 충분합니다.]</span></p>
+    <div class="verdict cyan-v reveal"><span class="en">[Something already settled, or already delivered. Cyan means resolved.]</span><span class="ko">[이미 정리됐거나 이미 전달된 것. 시안색은 해결을 뜻합니다.]</span></div>
   </div>
   <span class="pagenum">04 / 09</span>
 </section>
@@ -294,16 +479,16 @@ ul.pts li:last-child{margin-bottom:0}
 <!-- === 05 MEGA NUMBER ===
      One number, at display size, with the sentence that makes it mean
      something. `.mega.compact` is the smaller size for a long figure. -->
-<section class="slide">
+<section class="slide" data-label-en="[THE NUMBER]" data-label-ko="[핵심 수치]">
   <div class="slide-content">
-    <p class="eyebrow reveal">[WHAT THIS NUMBER IS]</p>
-    <h2 class="reveal">[The headline the number supports]</h2>
+    <p class="eyebrow reveal"><span class="en">[WHAT THIS NUMBER IS]</span><span class="ko">[이 숫자가 무엇인지]</span></p>
+    <h2 class="reveal"><span class="en">[The headline the number supports]</span><span class="ko">[이 숫자가 뒷받침하는 문장]</span></h2>
     <div class="reveal" style="display:flex;flex-direction:column;gap:.45rem">
       <div class="mega">0,000</div>
-      <p class="mega-note">[What the number counts, measured over what period, from which source. A mega number with no provenance is decoration.]</p>
+      <p class="mega-note"><span class="en">[What the number counts, measured over what period, from which source. A mega number with no provenance is decoration.]</span><span class="ko">[이 숫자가 무엇을, 어느 기간에 걸쳐, 어떤 출처에서 센 것인지. 출처 없는 큰 숫자는 장식일 뿐입니다.]</span></p>
     </div>
-    <p class="body reveal"><span class="sig">[Hold this loosely.]</span> [Say plainly what the figure does and does not establish. A deck that marks its own weak evidence is easier to trust than one that does not.]</p>
-    <div class="verdict reveal">[The decision this number should drive.]</div>
+    <p class="body reveal"><span class="en"><span class="sig">[Hold this loosely.]</span> [Say plainly what the figure does and does not establish. A deck that marks its own weak evidence is easier to trust than one that does not.]</span><span class="ko"><span class="sig">[이 수치는 단정하지 않습니다.]</span> [이 숫자가 무엇을 입증하고 무엇을 입증하지 못하는지 분명히 적습니다. 약한 근거를 스스로 표시한 덱이 그렇지 않은 덱보다 더 믿을 만합니다.]</span></p>
+    <div class="verdict reveal"><span class="en">[The decision this number should drive.]</span><span class="ko">[이 숫자가 이끌어야 할 결정.]</span></div>
   </div>
   <span class="pagenum">05 / 09</span>
 </section>
@@ -311,20 +496,20 @@ ul.pts li:last-child{margin-bottom:0}
 <!-- === 06 STAT ROW + THREE CARDS ===
      `.stat` takes `.accent`, `.cyan` or `.warn` on the rule above it. Four
      stats fit comfortably; six wrap and stop being scannable. -->
-<section class="slide">
+<section class="slide" data-label-en="[STAT ROW]" data-label-ko="[지표 요약]">
   <div class="slide-content">
-    <p class="eyebrow reveal">[WHAT THE ROW MEASURES]</p>
-    <h2 class="reveal">[The reading of the row, in one line]</h2>
+    <p class="eyebrow reveal"><span class="en">[WHAT THE ROW MEASURES]</span><span class="ko">[이 지표들이 측정하는 것]</span></p>
+    <h2 class="reveal"><span class="en">[The reading of the row, in one line]</span><span class="ko">[지표들이 말하는 바를 한 줄로]</span></h2>
     <div class="statrow reveal">
-      <div class="stat accent"><div class="n">0,000</div><div class="l">[what it counts,<br>over what period]</div></div>
-      <div class="stat warn"><div class="n">00s</div><div class="l">[the figure that<br>should worry someone]</div></div>
-      <div class="stat cyan"><div class="n">00%</div><div class="l">[the figure that<br>is going well]</div></div>
-      <div class="stat"><div class="n">0</div><div class="l">[the figure that is missing]</div></div>
+      <div class="stat accent"><div class="n">0,000</div><div class="l"><span class="en">[what it counts,<br>over what period]</span><span class="ko">[무엇을 센 숫자인지,<br>어느 기간인지]</span></div></div>
+      <div class="stat warn"><div class="n">00s</div><div class="l"><span class="en">[the figure that<br>should worry someone]</span><span class="ko">[누군가는 걱정해야 할<br>숫자]</span></div></div>
+      <div class="stat cyan"><div class="n">00%</div><div class="l"><span class="en">[the figure that<br>is going well]</span><span class="ko">[잘 되고 있는<br>숫자]</span></div></div>
+      <div class="stat"><div class="n">0</div><div class="l"><span class="en">[the figure that is missing]</span><span class="ko">[아직 없는 숫자]</span></div></div>
     </div>
     <div class="split3 reveal">
-      <div class="card"><div class="ct">[FACET]</div><div class="cn" style="font-size:clamp(.9rem,2.1vw,1.5rem);letter-spacing:0;font-family:var(--font-mono)">[short<br>label]</div><div class="cd">[One line.]</div></div>
-      <div class="card good"><div class="ct">[FACET]</div><div class="cn" style="font-size:clamp(.9rem,2.1vw,1.5rem);letter-spacing:0;font-family:var(--font-mono)">[short<br>label]</div><div class="cd">[One line.]</div></div>
-      <div class="card"><div class="ct">[FACET]</div><div class="cn" style="font-size:clamp(.9rem,2.1vw,1.5rem);letter-spacing:0;font-family:var(--font-mono)">[short<br>label]</div><div class="cd">[One line.]</div></div>
+      <div class="card"><div class="ct"><span class="en">[FACET]</span><span class="ko">[항목]</span></div><div class="cn" style="font-size:clamp(.9rem,2.1vw,1.5rem);letter-spacing:0;font-family:var(--font-mono)"><span class="en">[short<br>label]</span><span class="ko">[짧은<br>이름]</span></div><div class="cd"><span class="en">[One line.]</span><span class="ko">[한 줄.]</span></div></div>
+      <div class="card good"><div class="ct"><span class="en">[FACET]</span><span class="ko">[항목]</span></div><div class="cn" style="font-size:clamp(.9rem,2.1vw,1.5rem);letter-spacing:0;font-family:var(--font-mono)"><span class="en">[short<br>label]</span><span class="ko">[짧은<br>이름]</span></div><div class="cd"><span class="en">[One line.]</span><span class="ko">[한 줄.]</span></div></div>
+      <div class="card"><div class="ct"><span class="en">[FACET]</span><span class="ko">[항목]</span></div><div class="cn" style="font-size:clamp(.9rem,2.1vw,1.5rem);letter-spacing:0;font-family:var(--font-mono)"><span class="en">[short<br>label]</span><span class="ko">[짧은<br>이름]</span></div><div class="cd"><span class="en">[One line.]</span><span class="ko">[한 줄.]</span></div></div>
     </div>
   </div>
   <span class="pagenum">06 / 09</span>
@@ -333,16 +518,16 @@ ul.pts li:last-child{margin-bottom:0}
 <!-- === 07 SPEC LIST ===
      Numbered requirements, each with the evidence underneath it in <em>.
      This is the slide that gets copied into a specification document. -->
-<section class="slide">
+<section class="slide" data-label-en="[REQUIREMENTS]" data-label-ko="[요구사항]">
   <div class="slide-content">
-    <p class="eyebrow reveal">[WHERE THESE GO NEXT]</p>
-    <h2 class="reveal">[How many requirements, and what they are for]</h2>
+    <p class="eyebrow reveal"><span class="en">[WHERE THESE GO NEXT]</span><span class="ko">[이 요구사항이 어디로 가는지]</span></p>
+    <h2 class="reveal"><span class="en">[How many requirements, and what they are for]</span><span class="ko">[몇 개의 요구사항이고, 무엇을 위한 것인지]</span></h2>
     <div class="specs">
-      <div class="spec reveal"><span class="si">01</span><span class="st">[The requirement, written as an instruction]<em>[The measurement that justifies it]</em></span></div>
-      <div class="spec reveal"><span class="si">02</span><span class="st">[The requirement, written as an instruction]<em>[The measurement that justifies it]</em></span></div>
-      <div class="spec reveal"><span class="si">03</span><span class="st">[The requirement, written as an instruction]<em>[The measurement that justifies it]</em></span></div>
-      <div class="spec reveal"><span class="si">04</span><span class="st">[The requirement, written as an instruction]<em>[The measurement that justifies it]</em></span></div>
-      <div class="spec reveal"><span class="si">05</span><span class="st">[The requirement, written as an instruction]<em>[The measurement that justifies it]</em></span></div>
+      <div class="spec reveal"><span class="si">01</span><span class="st"><span class="en">[The requirement, written as an instruction]<em>[The measurement that justifies it]</em></span><span class="ko">[요구사항을 지시문으로]<em>[이를 뒷받침하는 측정값]</em></span></span></div>
+      <div class="spec reveal"><span class="si">02</span><span class="st"><span class="en">[The requirement, written as an instruction]<em>[The measurement that justifies it]</em></span><span class="ko">[요구사항을 지시문으로]<em>[이를 뒷받침하는 측정값]</em></span></span></div>
+      <div class="spec reveal"><span class="si">03</span><span class="st"><span class="en">[The requirement, written as an instruction]<em>[The measurement that justifies it]</em></span><span class="ko">[요구사항을 지시문으로]<em>[이를 뒷받침하는 측정값]</em></span></span></div>
+      <div class="spec reveal"><span class="si">04</span><span class="st"><span class="en">[The requirement, written as an instruction]<em>[The measurement that justifies it]</em></span><span class="ko">[요구사항을 지시문으로]<em>[이를 뒷받침하는 측정값]</em></span></span></div>
+      <div class="spec reveal"><span class="si">05</span><span class="st"><span class="en">[The requirement, written as an instruction]<em>[The measurement that justifies it]</em></span><span class="ko">[요구사항을 지시문으로]<em>[이를 뒷받침하는 측정값]</em></span></span></div>
     </div>
   </div>
   <span class="pagenum">07 / 09</span>
@@ -351,35 +536,36 @@ ul.pts li:last-child{margin-bottom:0}
 <!-- === 08 NUMBERED POINTS ===
      `data-n` sets the marker, so it can be Q1, 01, — or anything short.
      Each <li> is its own reveal; five is the comfortable maximum. -->
-<section class="slide">
+<section class="slide" data-label-en="[OPEN QUESTIONS]" data-label-ko="[미결 사항]">
   <div class="slide-content">
-    <p class="eyebrow reveal">[WHO THIS IS BLOCKED ON]</p>
-    <h2 class="reveal">[The group of open questions, named]</h2>
+    <p class="eyebrow reveal"><span class="en">[WHO THIS IS BLOCKED ON]</span><span class="ko">[누구의 결정을 기다리는지]</span></p>
+    <h2 class="reveal"><span class="en">[The group of open questions, named]</span><span class="ko">[이 미결 질문들의 이름]</span></h2>
     <ul class="pts">
-      <li data-n="Q1" class="reveal"><span class="hl">[The question in bold.]</span> [Why it blocks what it blocks. <span class="sig">[Say plainly if everything waits on it.]</span>]</li>
-      <li data-n="Q2" class="reveal"><span class="hl">[The question in bold.]</span> [What the answer decides.]</li>
-      <li data-n="Q3" class="reveal"><span class="hl">[The question in bold.]</span> [What the answer decides. Paths and identifiers go in <code>code</code>.]</li>
-      <li data-n="Q4" class="reveal"><span class="hl">[The question in bold.]</span> [What the answer decides.]</li>
+      <li data-n="Q1" class="reveal"><span class="en"><span class="hl">[The question in bold.]</span> [Why it blocks what it blocks. <span class="sig">[Say plainly if everything waits on it.]</span>]</span><span class="ko"><span class="hl">[질문 자체를 굵게.]</span> [이것이 무엇을 막고 있는지. <span class="sig">[전부 이것에 달려 있다면 그대로 적습니다.]</span>]</span></li>
+      <li data-n="Q2" class="reveal"><span class="en"><span class="hl">[The question in bold.]</span> [What the answer decides.]</span><span class="ko"><span class="hl">[질문 자체를 굵게.]</span> [답이 무엇을 결정하는지.]</span></li>
+      <li data-n="Q3" class="reveal"><span class="en"><span class="hl">[The question in bold.]</span> [What the answer decides. Paths and identifiers go in <code>code</code>.]</span><span class="ko"><span class="hl">[질문 자체를 굵게.]</span> [답이 무엇을 결정하는지. 경로와 식별자는 <code>code</code> 안에.]</span></li>
+      <li data-n="Q4" class="reveal"><span class="en"><span class="hl">[The question in bold.]</span> [What the answer decides.]</span><span class="ko"><span class="hl">[질문 자체를 굵게.]</span> [답이 무엇을 결정하는지.]</span></li>
     </ul>
   </div>
   <span class="pagenum">08 / 09</span>
 </section>
 
 <!-- === 09 CLOSING === -->
-<section class="slide">
+<section class="slide" data-label-en="[NEXT STEPS]" data-label-ko="[다음 단계]">
   <div class="slide-content">
-    <p class="eyebrow reveal">[WHAT HAPPENS NEXT]</p>
-    <h2 class="reveal">[The closing line — the thing they should do on Monday]</h2>
-    <p class="body reveal">[Where the underlying data lives, who owns the next step, and by when.]</p>
-    <div class="verdict dark reveal">[The one sentence that survives the meeting.]</div>
+    <p class="eyebrow reveal"><span class="en">[WHAT HAPPENS NEXT]</span><span class="ko">[다음에 일어날 일]</span></p>
+    <h2 class="reveal"><span class="en">[The closing line — the thing they should do on Monday]</span><span class="ko">[마지막 한 줄 — 월요일에 할 일]</span></h2>
+    <p class="body reveal"><span class="en">[Where the underlying data lives, who owns the next step, and by when.]</span><span class="ko">[원자료가 어디에 있고, 다음 단계는 누가 맡으며, 언제까지인지.]</span></p>
+    <div class="verdict dark reveal"><span class="en">[The one sentence that survives the meeting.]</span><span class="ko">[회의가 끝나도 남는 한 문장.]</span></div>
     <p class="colophon reveal">
       <!-- logo: the identity line. Replace or delete per the `logo` answer. -->
       <a href="https://monomind.one/?ref=deck-mark" target="_blank" rel="noopener noreferrer">monomind ai lab</a>
       <!-- credit: the maker's colophon. Ships by default; remove the <a> below
-           (only) when the intake answered `credit: false`. The product name is
-           wrapped notranslate so a reader's browser translation leaves it
-           alone — "Made with" is meant to translate. -->
-      <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer">Made with <span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></a>
+           (only) when the intake answered `credit: false`. Written once per
+           language, with the product name identical in both and wrapped
+           notranslate so a reader's browser translation leaves it alone —
+           "Made with" is meant to translate. -->
+      <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer"><span class="en">Made with <span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></span><span class="ko"><span class="notranslate" translate="no">Hi Ted, Meet Lisa</span>로 제작</span></a>
     </p>
   </div>
   <span class="pagenum">09 / 09</span>
@@ -388,6 +574,9 @@ ul.pts li:last-child{margin-bottom:0}
 <script>
 /* ===========================================
    SLIDE PRESENTATION CONTROLLER
+   Load-bearing. Extend it — the last two lines publish window.__deckGo so
+   the chrome can move the deck without reimplementing scrolling — but do
+   not rewrite the class.
    =========================================== */
 class SlidePresentation {
   constructor(){
@@ -450,7 +639,198 @@ class SlidePresentation {
     document.querySelectorAll('.nav-dot').forEach((d,i)=>d.classList.toggle('active',i===this.currentSlide));
   }
 }
-new SlidePresentation();
+var __deck = new SlidePresentation();
+window.__deckGo = function (i) { __deck.goTo(i); };
+</script>
+
+<script>
+/* ===========================================
+   CHROME — language, menu, contents.
+
+   Its own block, so it cannot disturb the controller above. Every control
+   is looked up by id and guarded, so deleting a control's markup is the
+   supported way to switch that intake answer off. Nothing here
+   reimplements scrolling: slide movement always goes through
+   window.__deckGo.
+   =========================================== */
+(function () {
+  "use strict";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var body = document.body;
+  var LANG_KEY = "monomind-evidence-lang";
+  var LANGS = ["en", "ko"];
+
+  /* Strings the reader sees that are not text nodes — titles and labels. */
+  var UI = {
+    en: { nav: "Slide navigation", dot: "Go to slide ", menu: "Menu" },
+    ko: { nav: "슬라이드 탐색", dot: "이동: 슬라이드 ", menu: "메뉴" }
+  };
+
+  var slides = document.querySelectorAll(".slide");
+  var menu = $("deckMenu");
+  var menuBtn = $("deckMenuBtn");
+  var panel = $("deckMenuPanel");
+  var contents = $("deckContents");
+  var chrome = document.querySelector(".deck-chrome");
+
+  /* ---- language ---------------------------------------------------------
+     Both languages are in the markup; this only flips the attribute the CSS
+     reads, then repairs the strings CSS cannot reach. ---------------------- */
+  function applyLang(l) {
+    if (LANGS.indexOf(l) === -1) { l = LANGS[0]; }
+    body.setAttribute("data-lang", l);
+    document.documentElement.lang = l;
+
+    var t = body.getAttribute("data-title-" + l);
+    if (t) { document.title = t; }
+
+    var ui = UI[l] || UI.en;
+    var dots = $("navDots");
+    if (dots) {
+      dots.setAttribute("aria-label", ui.nav);
+      Array.prototype.forEach.call(dots.querySelectorAll(".nav-dot"), function (d, i) {
+        d.setAttribute("aria-label", ui.dot + (i + 1));
+      });
+    }
+    if (menuBtn) { menuBtn.setAttribute("aria-label", ui.menu); }
+
+    LANGS.forEach(function (code) {
+      var b = $("btn" + code.charAt(0).toUpperCase() + code.slice(1));
+      if (b) { b.setAttribute("aria-pressed", String(code === l)); }
+    });
+    try { localStorage.setItem(LANG_KEY, l); } catch (e) {}
+  }
+  function currentLang() { return body.getAttribute("data-lang") || LANGS[0]; }
+
+  LANGS.forEach(function (code) {
+    var b = $("btn" + code.charAt(0).toUpperCase() + code.slice(1));
+    if (b) { b.addEventListener("click", function () { applyLang(code); }); }
+  });
+
+  var saved = null;
+  try { saved = localStorage.getItem(LANG_KEY); } catch (e) {}
+  applyLang(saved || body.getAttribute("data-lang") || LANGS[0]);
+
+  /* ---- menu ------------------------------------------------------------- */
+  function setOpen(open) {
+    if (!menu || !menuBtn) { return; }
+    menu.setAttribute("data-open", open ? "true" : "false");
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  function isOpen() { return !!menu && menu.getAttribute("data-open") === "true"; }
+  function items() {
+    return panel ? panel.querySelectorAll('[role="menuitem"]:not([hidden])') : [];
+  }
+
+  if (menu && menuBtn && panel) {
+    menuBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var open = !isOpen();
+      setOpen(open);
+      if (open) {
+        var first = items()[0];
+        if (first) { first.focus(); }
+      }
+    });
+    document.addEventListener("click", function (e) {
+      if (isOpen() && !menu.contains(e.target)) { setOpen(false); }
+    });
+
+    var start = $("deckMenuStart");
+    if (start) {
+      start.addEventListener("click", function () {
+        setOpen(false);
+        if (typeof window.__deckGo === "function") { window.__deckGo(0); }
+        menuBtn.focus();
+      });
+    }
+
+    var langItem = $("deckMenuLang");
+    if (langItem) {
+      langItem.addEventListener("click", function () {
+        applyLang(currentLang() === "en" ? "ko" : "en");
+      });
+    }
+
+    /* ---- contents ------------------------------------------------------
+       Built from each slide's data-label-*, both languages written in and
+       toggled by the same CSS as the rest of the deck. It cannot drift out
+       of sync with the slide list the way a hand-written menu would. ------ */
+    var contentsBtn = $("deckMenuContents");
+    if (contentsBtn && contents) {
+      Array.prototype.forEach.call(slides, function (slide, i) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.setAttribute("role", "menuitem");
+        var n = document.createElement("span");
+        n.className = "mn";
+        n.textContent = String(i + 1).length < 2 ? "0" + (i + 1) : String(i + 1);
+        b.appendChild(n);
+        LANGS.forEach(function (code) {
+          var s = document.createElement("span");
+          s.className = code;
+          s.textContent = slide.getAttribute("data-label-" + code) ||
+                          slide.getAttribute("data-label-" + LANGS[0]) ||
+                          "Slide " + (i + 1);
+          b.appendChild(s);
+        });
+        b.addEventListener("click", function () {
+          setOpen(false);
+          if (typeof window.__deckGo === "function") { window.__deckGo(i); }
+        });
+        contents.appendChild(b);
+      });
+      contentsBtn.addEventListener("click", function () {
+        var show = contents.hidden;
+        contents.hidden = !show;
+        contentsBtn.setAttribute("aria-expanded", String(show));
+      });
+
+      /* Mark where the reader is. Its own observer, so the controller above
+         stays untouched. */
+      var mark = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) { return; }
+          var at = Array.prototype.indexOf.call(slides, entry.target);
+          Array.prototype.forEach.call(contents.children, function (b, i) {
+            if (i === at) { b.setAttribute("aria-current", "true"); }
+            else { b.removeAttribute("aria-current"); }
+          });
+        });
+      }, { threshold: 0.5 });
+      Array.prototype.forEach.call(slides, function (s) { mark.observe(s); });
+    }
+  }
+
+  /* ---- keyboard ---------------------------------------------------------
+     The controller listens for keys on `document`, so a key pressed inside
+     the chrome would also drive the deck — Space on a focused button would
+     be swallowed by its preventDefault. One capture listener on the chrome
+     stops that. stopPropagation does not cancel a default action, so Enter
+     and Space still activate the buttons themselves. ----------------------- */
+  if (chrome) {
+    chrome.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && isOpen()) {
+        setOpen(false);
+        if (menuBtn) { menuBtn.focus(); }
+      } else if (isOpen() && (e.key === "ArrowDown" || e.key === "ArrowUp" ||
+                              e.key === "Home" || e.key === "End")) {
+        var list = Array.prototype.slice.call(items());
+        if (list.length) {
+          var at = list.indexOf(document.activeElement);
+          var to = e.key === "Home" ? 0
+                 : e.key === "End" ? list.length - 1
+                 : e.key === "ArrowDown" ? (at + 1 + list.length) % list.length
+                 : (at - 1 + list.length) % list.length;
+          e.preventDefault();
+          list[to].focus();
+        }
+      }
+      e.stopPropagation();
+    }, true);
+  }
+})();
 </script>
 </body>
 </html>
