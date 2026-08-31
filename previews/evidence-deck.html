@@ -6,7 +6,7 @@
 <title>Hi Ted, Meet Lisa &middot; Many shapes, one system</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
 <style>
 /* ===========================================
    THEME TOKENS — change these to restyle everything
@@ -22,9 +22,11 @@
   --rule:#2e2e2e;
   --sig:#FF5722;
   --sig-dim:rgba(255,87,34,.13);
+  --on-sig:#141414;          /* ink that sits on the signal colour */
   --cyan:#22D3EE;
   --cyan-dim:rgba(34,211,238,.11);
   --warn:#FFC400;
+  --chrome-bg:rgba(20,20,20,.74);
 
   --font-display:'Archivo Black',sans-serif;
   --font-body:'Space Grotesk',sans-serif;
@@ -39,6 +41,7 @@
 
   --slide-padding:clamp(1.3rem,4.4vw,4.4rem);
   --gap:clamp(.65rem,1.65vw,1.55rem);
+  --chrome-clear:46px;       /* headroom every slide leaves for the chrome */
 
   --ease:cubic-bezier(.16,1,.3,1);
   --dur:.7s;
@@ -49,15 +52,45 @@
 html{scroll-snap-type:y mandatory;overflow-y:scroll;height:100%;scroll-behavior:smooth}
 body{font-family:var(--font-body);background:var(--bg);color:var(--fg);height:100%;overflow:hidden;-webkit-font-smoothing:antialiased;font-feature-settings:"tnum"}
 
+/* === LANGUAGE ===
+   Both languages are written into the markup and one of them is hidden by
+   CSS. No translation service, so the switch is instant, works offline, and
+   translates text inside a component the same way it translates a heading.
+   Delete a language by deleting its spans and its button. */
+body[data-lang="en"] .ko{display:none !important}
+body[data-lang="ko"] .en{display:none !important}
+/* Archivo Black and Space Grotesk carry no Hangul, so Noto Sans KR is
+   appended to both stacks rather than replacing them: Latin and digits stay
+   in the deck's own faces and only the Hangul falls through. 900 keeps the
+   fallback from reading light beside Archivo Black. */
+body[data-lang="ko"]{
+  --font-display:'Archivo Black','Noto Sans KR',sans-serif;
+  --font-body:'Space Grotesk','Noto Sans KR',sans-serif;
+}
+body[data-lang="ko"] h1,
+body[data-lang="ko"] h2,
+body[data-lang="ko"] .verdict,
+body[data-lang="ko"] .section-card .sn,
+body[data-lang="ko"] .mega{font-weight:900}
+
 /* === SLIDE BASE (NON-NEGOTIABLE) === */
 .slide{
   height:100vh;height:100dvh;overflow:hidden;scroll-snap-align:start;position:relative;
   display:flex;flex-direction:column;justify-content:center;padding:var(--slide-padding);
+  padding-top:max(var(--slide-padding),var(--chrome-clear));
   background:var(--bg-grad);
 }
 .slide::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(to right,rgba(255,255,255,.02) 1px,transparent 1px);background-size:calc(100vw/12) 100%}
 .slide img{max-width:100%;max-height:min(50vh,400px);object-fit:contain}
 .slide-content{width:100%;max-height:100%;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:var(--gap);position:relative;z-index:1}
+
+/* backgrounds: the answer's `upload` mode lands here. Put the data URI on the
+   cover and closing slides as `style="--bg-img:url(data:image/jpeg;base64,…)"`
+   and add `data-bg` to the section; the scrim is what keeps the type legible.
+   Nothing is embedded by default — this deck ships typographic. */
+.slide[data-bg]{background-image:var(--bg-img);background-size:cover;background-position:center}
+.slide[data-bg]::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(150deg,rgba(20,20,20,.88),rgba(18,18,18,.72))}
+.slide[data-bg] .slide-content,.slide[data-bg] .pagenum{z-index:2}
 
 /* === ENTRANCE === */
 .reveal{opacity:0;transform:translateY(24px);transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease)}
@@ -83,10 +116,10 @@ h2{font-family:var(--font-display);font-size:var(--h2-size);line-height:1.08;let
 code,.mono{font-family:var(--font-mono);font-size:.9em;color:var(--warn)}
 
 /* === SECTION CARD === */
-.section-card{background:var(--sig);color:#141414;padding:clamp(1.1rem,3.2vw,3rem);display:flex;flex-direction:column;gap:clamp(.45rem,1.3vw,1rem);max-width:min(100%,58ch)}
+.section-card{background:var(--sig);color:var(--on-sig);padding:clamp(1.1rem,3.2vw,3rem);display:flex;flex-direction:column;gap:clamp(.45rem,1.3vw,1rem);max-width:min(100%,58ch)}
 .section-card .sfor{font-family:var(--font-body);font-weight:700;font-size:var(--micro-size);letter-spacing:.2em;text-transform:uppercase;opacity:.65}
 .section-card .sn{font-family:var(--font-display);font-size:clamp(2.2rem,7.5vw,6rem);line-height:.8;letter-spacing:-.04em}
-.section-card h2{color:#141414}
+.section-card h2{color:var(--on-sig)}
 .section-card p{font-size:var(--body-size);line-height:1.55;font-weight:400;max-width:46ch}
 
 /* === MEGA === */
@@ -138,7 +171,7 @@ table.data tr.good td.num{color:var(--cyan)}
 .card .cd{font-size:var(--body-size);color:var(--fg-soft);font-weight:300;line-height:1.55}
 
 /* === VERDICT === */
-.verdict{background:var(--sig);color:#141414;padding:clamp(.6rem,1.5vw,1.15rem) clamp(.8rem,1.9vw,1.6rem);font-family:var(--font-display);font-size:clamp(.78rem,1.75vw,1.3rem);line-height:1.28;letter-spacing:-.015em;text-transform:uppercase}
+.verdict{background:var(--sig);color:var(--on-sig);padding:clamp(.6rem,1.5vw,1.15rem) clamp(.8rem,1.9vw,1.6rem);font-family:var(--font-display);font-size:clamp(.78rem,1.75vw,1.3rem);line-height:1.28;letter-spacing:-.015em;text-transform:uppercase}
 .verdict.dark{background:var(--panel-2);color:var(--fg);border-left:clamp(4px,.55vw,7px) solid var(--sig)}
 .verdict.cyan-v{background:var(--panel-2);color:var(--fg);border-left:clamp(4px,.55vw,7px) solid var(--cyan)}
 
@@ -153,8 +186,8 @@ table.data tr.good td.num{color:var(--cyan)}
 ul.pts li:last-child{margin-bottom:0}
 
 /* === COLOPHON ===
-   The one line of chrome this template adds beyond the source system: the
-   maker's credit on the closing slide, in the deck's own tokens. */
+   The maker's credit on the closing slide, in the deck's own tokens. Written
+   once per language, product name identical in both. */
 .colophon{font-family:var(--font-body);font-size:var(--micro-size);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-faint);display:flex;flex-wrap:wrap;gap:.75em}
 .colophon a{color:inherit;text-decoration:none;border-bottom:1px solid var(--rule)}
 .colophon a:hover{border-bottom-color:currentColor}
@@ -168,17 +201,73 @@ ul.pts li:last-child{margin-bottom:0}
 .nav-dots{position:fixed;right:clamp(.55rem,1.3vw,1.4rem);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:7px;z-index:1000}
 .nav-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22);cursor:pointer;transition:all .3s ease;border:none;padding:0}
 .nav-dot.active{background:var(--sig);transform:scale(1.45)}
+.nav-dot:focus-visible{outline:2px solid var(--sig);outline-offset:3px}
+
+/* === CHROME: mark · language · menu ===
+   Fixed top right, clear of the nav dots (right edge, vertically centred) and
+   the page number (bottom left). Every control is guarded in the script, so
+   deleting one here is the supported way to switch that answer off. */
+.deck-chrome{position:fixed;top:9px;right:clamp(.55rem,1.3vw,1.4rem);z-index:1100;
+  display:flex;align-items:center;gap:.5rem}
+.deck-mark{display:inline-flex;width:19px;height:19px;flex:none;color:var(--fg-soft);transition:color .18s ease}
+.deck-mark:hover,.deck-mark:focus-visible{color:var(--fg)}
+.deck-mark:focus-visible{outline:2px solid var(--sig);outline-offset:3px}
+.deck-mark svg{width:100%;height:100%}
+.seg{display:flex;border:1px solid var(--rule);background:var(--chrome-bg);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.seg button{height:26px;padding:0 9px;border:0;border-right:1px solid var(--rule);
+  background:transparent;color:var(--fg-soft);font-family:var(--font-body);font-size:11px;
+  font-weight:700;letter-spacing:.08em;cursor:pointer;transition:background .15s,color .15s}
+.seg button:last-child{border-right:0}
+.seg button:hover{color:var(--fg)}
+.seg button[aria-pressed="true"]{background:var(--sig);color:var(--on-sig)}
+.seg button:focus-visible{outline:2px solid var(--sig);outline-offset:2px}
+
+.deck-menu{position:relative}
+.deck-menu-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  width:30px;height:26px;padding:0;border:1px solid var(--rule);background:var(--chrome-bg);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);cursor:pointer}
+.deck-menu-btn span{display:block;width:15px;height:1.5px;background:var(--fg-soft);
+  transition:transform .2s var(--ease),opacity .2s var(--ease),background .15s}
+.deck-menu-btn:hover span{background:var(--fg)}
+.deck-menu-btn:focus-visible{outline:2px solid var(--sig);outline-offset:2px}
+.deck-menu[data-open="true"] .deck-menu-btn span:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+.deck-menu[data-open="true"] .deck-menu-btn span:nth-child(2){opacity:0}
+.deck-menu[data-open="true"] .deck-menu-btn span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+
+.deck-menu-panel{position:absolute;top:calc(100% + 8px);right:0;display:none;flex-direction:column;
+  width:max-content;min-width:min(262px,80vw);max-width:min(320px,86vw);
+  max-height:min(72vh,540px);overflow-y:auto;padding:6px;
+  border:1px solid var(--rule);background:var(--panel);box-shadow:0 18px 48px rgba(0,0,0,.55)}
+.deck-menu[data-open="true"] .deck-menu-panel{display:flex}
+.deck-menu-panel button,.deck-menu-panel a{display:flex;align-items:center;gap:.6rem;width:100%;
+  padding:8px 10px;border:0;background:none;cursor:pointer;text-align:left;text-decoration:none;
+  font-family:var(--font-body);font-size:12.5px;font-weight:400;line-height:1.35;color:var(--fg-soft);
+  transition:background .15s,color .15s}
+.deck-menu-panel button:hover,.deck-menu-panel a:hover{background:var(--panel-2);color:var(--fg)}
+.deck-menu-panel button:focus-visible,.deck-menu-panel a:focus-visible{
+  outline:2px solid var(--sig);outline-offset:-2px;color:var(--fg)}
+.deck-menu-panel svg{flex:0 0 auto;width:15px;height:15px;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.deck-menu-sub{display:flex;flex-direction:column;margin:2px 0 6px;padding-left:10px;
+  border-left:1px solid var(--rule)}
+.deck-menu-sub button{font-size:11.5px;padding:6px 10px}
+.deck-menu-sub .mn{font-family:var(--font-display);font-size:9.5px;letter-spacing:.06em;
+  color:var(--fg-faint);min-width:20px}
+.deck-menu-sub button[aria-current="true"]{color:var(--fg)}
+.deck-menu-sub button[aria-current="true"] .mn{color:var(--sig)}
 
 /* === HEIGHT BREAKPOINTS === */
 @media (max-height:700px){
-  .slide{padding-top:clamp(.5rem,2vh,1rem);padding-bottom:clamp(.5rem,2vh,1rem)}
+  .slide{padding-top:max(clamp(.5rem,2vh,1rem),var(--chrome-clear));padding-bottom:clamp(.5rem,2vh,1rem)}
   h1{font-size:clamp(1.5rem,4.6vh,3rem)}
   h2{font-size:clamp(1.1rem,3.2vh,2rem)}
   .mega{font-size:clamp(2.2rem,13vh,5.5rem)}
   .section-card .sn{font-size:clamp(1.8rem,9vh,4rem)}
 }
 @media (max-height:600px){
-  .slide{justify-content:flex-start;padding-top:1.1rem}
+  :root{--chrome-clear:40px}
+  .slide{justify-content:flex-start;padding-top:max(1.1rem,var(--chrome-clear))}
   h1{font-size:clamp(1.2rem,3.4vh,2rem)}
   h2{font-size:clamp(.95rem,2.8vh,1.55rem)}
   .body,ul.pts li{font-size:clamp(.66rem,1.5vh,.88rem)}
@@ -190,140 +279,188 @@ ul.pts li:last-child{margin-bottom:0}
 /* === REDUCED MOTION === */
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  html{scroll-behavior:auto}
   .reveal{opacity:1;transform:none}
 }
 </style>
 </head>
-<body>
+<body data-lang="en" data-title-en="Hi Ted, Meet Lisa &middot; Many shapes, one system" data-title-ko="Hi Ted, Meet Lisa &middot; 형태는 여럿, 체계는 하나">
+
 <div class="progress-bar"></div>
 <nav class="nav-dots" id="navDots" aria-label="Slide navigation"></nav>
 
-<section class="slide">
+<div class="deck-chrome">
+
+  <a class="deck-mark" href="https://monomind.one/?ref=deck-mark" target="_blank" rel="noopener noreferrer" aria-label="MonoMind">
+    <svg viewBox="0 0 512 512" fill="currentColor" aria-hidden="true">
+      <path fill="currentColor" d="M0 0 C21.12 0 42.24 0 64 0 C64.33 9.24 64.66 18.48 65 28 C67.31 28.825 69.62 29.65 72 30.5 C80.67855394 33.70320466 88.83987436 37.66197192 97 42 C98.13824219 42.59296875 99.27648437 43.1859375 100.44921875 43.796875 C114.11283709 51.2237895 126.32645153 60.78564509 138 71 C138.33 53.51 138.66 36.02 139 18 C147.41726708 18 155.23771035 18.11320702 163.5 19.1875 C165.04349121 19.38714355 165.04349121 19.38714355 166.61816406 19.59082031 C209.08178959 25.42223064 247.55036699 43.98420048 278.48925781 73.55664062 C279.51252583 74.53426838 280.54069027 75.50679224 281.57324219 76.47460938 C316.21868127 109.03500379 337.95056536 156.61339058 341 204 C341 209.28 341 214.56 341 220 C319.88 220 298.76 220 277 220 C276.34 213.07 275.68 206.14 275 199 C274.38439297 195.37078182 273.77803562 191.97121696 272.875 188.4375 C272.66327148 187.58655762 272.45154297 186.73561523 272.23339844 185.85888672 C266.69864116 164.72016184 256.75707174 146.80424072 243 130 C242.33226562 129.17757812 241.66453125 128.35515625 240.9765625 127.5078125 C235.93066496 121.55571295 230.17510386 116.74552502 224 112 C223.10023438 111.30777344 222.20046875 110.61554688 221.2734375 109.90234375 C203.20851766 96.39269908 177.88565782 83.53645418 154.625 83.9375 C153.42875 83.958125 152.2325 83.97875 151 84 C151.58265625 84.66902344 152.1653125 85.33804688 152.765625 86.02734375 C185.07129092 123.86967253 203 170.1014647 203 220 C181.88 220 160.76 220 139 220 C138.01 211.75 137.02 203.5 136 195 C129.68082068 166.91475858 117.85438519 144.07221923 98 123 C97.45085937 122.39800781 96.90171875 121.79601562 96.3359375 121.17578125 C86.97145584 111.2807994 75.80572295 104.7461274 64 98 C64 138.26 64 178.52 64 220 C42.88 220 21.76 220 0 220 C0 147.4 0 74.8 0 0 Z" transform="translate(74,141)"/>
+      <path fill="currentColor" d="M0 0 C6.93122125 2.33191353 11.59348712 6.73609933 15 13.15234375 C17.3325015 19.79450622 17.26381755 27.06296996 14.3125 33.5 C10.66303794 39.55276634 5.78715496 43.90906429 -1 46 C-7.43466397 46.85737784 -13.48798557 46.74360867 -19.18359375 43.40234375 C-24.96806721 38.93648145 -29.37878226 33.62316781 -30.37109375 26.23828125 C-30.53935564 18.82486011 -29.62715748 12.97497629 -25 7 C-17.06174054 0.27985277 -10.33089416 -1.10531813 0 0 Z" transform="translate(450,315)"/>
+    </svg>
+  </a>
+
+  <div class="seg" role="group" id="langSeg" aria-label="Language">
+    <button type="button" id="btnEn" aria-pressed="true">EN</button>
+    <button type="button" id="btnKo" aria-pressed="false">한국어</button>
+  </div>
+
+  <nav class="deck-menu" id="deckMenu" data-open="false">
+    <button class="deck-menu-btn" type="button" id="deckMenuBtn"
+            aria-expanded="false" aria-controls="deckMenuPanel" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="deck-menu-panel" id="deckMenuPanel" role="menu" aria-labelledby="deckMenuBtn">
+
+      <button type="button" role="menuitem" id="deckMenuStart">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 17.5 11 12l7-5.5v11Z" fill="currentColor" stroke="none"/><path d="M6.5 6v12"/></svg>
+        <span class="en">Back to the start</span><span class="ko">처음으로</span>
+      </button>
+
+      <button type="button" role="menuitem" id="deckMenuContents" aria-expanded="false" aria-controls="deckContents">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        <span class="en">Contents</span><span class="ko">목차</span>
+      </button>
+      <div class="deck-menu-sub" id="deckContents" role="none" hidden></div>
+
+      <button type="button" role="menuitem" id="deckMenuLang">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 3 2.6 15 0 18M12 3c-2.6 3-2.6 15 0 18"/></svg>
+        <span class="en">한국어로 보기</span><span class="ko">Read in English</span>
+      </button>
+
+    </div>
+  </nav>
+</div>
+
+<section class="slide" data-label-en="Title" data-label-ko="표지">
   <div class="slide-content">
-    <p class="eyebrow reveal">Hi Ted, Meet Lisa &middot; Template gallery &middot; 2026</p>
-    <h1 class="reveal">Many shapes.<br>One system.<br><span style="color:var(--sig)">Zero installs.</span></h1>
-    <p class="lead reveal">An open-source repository that turns one prompt into one finished HTML file. This deck is itself the evidence &mdash; it was generated from the template it is describing.</p>
-    <div class="verdict reveal">A template carries the machinery. It never carries the material.</div>
+    <p class="eyebrow reveal"><span class="en"><span class="notranslate" translate="no">Hi Ted, Meet Lisa</span> &middot; Template gallery &middot; 2026</span><span class="ko"><span class="notranslate" translate="no">Hi Ted, Meet Lisa</span> &middot; 템플릿 갤러리 &middot; 2026</span></p>
+    <h1 class="reveal"><span class="en">Many shapes.<br>One system.<br><span style="color:var(--sig)">Zero installs.</span></span><span class="ko">형태는 여럿.<br>체계는 하나.<br><span style="color:var(--sig)">설치는 없음.</span></span></h1>
+    <p class="lead reveal"><span class="en">An open-source repository that turns one prompt into one finished HTML file. This deck is itself the evidence &mdash; it was generated from the template it is describing.</span><span class="ko">하나의 프롬프트를 완성된 HTML 파일 하나로 바꾸는 오픈소스 저장소입니다. 이 덱 자체가 그 증거입니다 &mdash; 지금 설명하고 있는 그 템플릿으로 만들어졌습니다.</span></p>
+    <div class="verdict reveal"><span class="en">A template carries the machinery. It never carries the material.</span><span class="ko">템플릿이 옮기는 것은 장치입니다. 내용물은 절대 옮기지 않습니다.</span></div>
   </div>
   <span class="pagenum">01 / 09</span>
 </section>
 
-<section class="slide">
+<section class="slide" data-label-en="One file, one idea" data-label-ko="파일 하나, 생각 하나">
   <div class="slide-content" style="align-items:flex-start">
     <div class="section-card reveal">
-      <p class="sfor">Feeds: choosing a shape</p>
+      <p class="sfor"><span class="en">Feeds: choosing a shape</span><span class="ko">쓰임: 형태 고르기</span></p>
       <div class="sn">01</div>
-      <h2>Every template<br>is one file<br>and one idea</h2>
-      <p>Ten entries in the registry. Nine are built here; the tenth hands off to a different pipeline and says so.</p>
+      <h2><span class="en">Every template<br>is one file<br>and one idea</span><span class="ko">템플릿 하나는<br>파일 하나이자<br>생각 하나</span></h2>
+      <p><span class="en">Nine entries in the registry. Eight are built here; the ninth hands off to a different pipeline and says so on its own card.</span><span class="ko">레지스트리에는 아홉 개의 항목이 있습니다. 여덟 개는 여기서 만들고, 나머지 하나는 다른 파이프라인으로 넘긴다고 자기 카드에 적어 둡니다.</span></p>
     </div>
   </div>
   <span class="pagenum">02 / 09</span>
 </section>
 
-<section class="slide">
+<section class="slide" data-label-en="The registry" data-label-ko="레지스트리">
   <div class="slide-content">
-    <p class="eyebrow reveal">The registry, as it stands</p>
-    <h2 class="reveal">Shape first, subject never</h2>
+    <p class="eyebrow reveal"><span class="en">The registry, as it stands</span><span class="ko">지금 이 순간의 레지스트리</span></p>
+    <h2 class="reveal"><span class="en">Shape first, subject never</span><span class="ko">형태가 먼저, 주제는 아님</span></h2>
     <table class="data reveal">
-      <thead><tr><th>Template</th><th>How it reads</th><th style="text-align:right">Skeleton</th></tr></thead>
+      <thead><tr>
+        <th><span class="en">Template</span><span class="ko">템플릿</span></th>
+        <th><span class="en">How it reads</span><span class="ko">어떻게 읽히는가</span></th>
+        <th style="text-align:right"><span class="en">Skeleton</span><span class="ko">골격</span></th>
+      </tr></thead>
       <tbody>
-        <tr><td class="k">Architecture diagram</td><td class="m">pasted into a review</td><td class="num">21 KB</td></tr>
-        <tr><td class="k">Evidence deck</td><td class="m">argued from numbers</td><td class="num">24 KB</td></tr>
-        <tr><td class="k">Paper brief</td><td class="m">read at desk distance</td><td class="num">26 KB</td></tr>
-        <tr class="flag"><td class="k">MonoMind deck</td><td class="m">read across a room</td><td class="num">192 KB</td></tr>
+        <tr><td class="k"><span class="en">Architecture diagram</span><span class="ko">아키텍처 다이어그램</span></td><td class="m"><span class="en">pasted into a review</span><span class="ko">리뷰 문서에 붙여넣는</span></td><td class="num">22 KB</td></tr>
+        <tr><td class="k"><span class="en">Evidence deck</span><span class="ko">근거 덱</span></td><td class="m"><span class="en">argued from numbers</span><span class="ko">숫자로 주장하는</span></td><td class="num">53 KB</td></tr>
+        <tr><td class="k"><span class="en">Paper brief</span><span class="ko">페이퍼 브리프</span></td><td class="m"><span class="en">read at desk distance</span><span class="ko">책상 거리에서 읽는</span></td><td class="num">55 KB</td></tr>
+        <tr class="flag"><td class="k"><span class="en">MonoMind deck</span><span class="ko">MonoMind 덱</span></td><td class="m"><span class="en">read across a room</span><span class="ko">회의실 건너에서 읽는</span></td><td class="num">193 KB</td></tr>
       </tbody>
     </table>
-    <p class="body reveal">The names describe the <span class="hl">reading mode</span>, not the subject. An earlier name, <code>techdoc</code>, implied a topic the template did not actually care about &mdash; it became <code>web-document</code> and the rule stuck. The one heavy skeleton is heavy because it embeds its own photography.</p>
-    <div class="verdict cyan-v reveal">Nine skeletons, nine pattern references, ten live previews. Nothing is described that cannot be opened.</div>
+    <p class="body reveal"><span class="en">The names describe the <span class="hl">reading mode</span>, not the subject. An earlier name, <code>techdoc</code>, implied a topic the template did not actually care about &mdash; it became <code>web-document</code> and the rule stuck. The one heavy skeleton is heavy because it embeds its own photography.</span><span class="ko">이름은 주제가 아니라 <span class="hl">읽는 방식</span>을 가리킵니다. 예전 이름이던 <code>techdoc</code>은 템플릿이 상관하지도 않는 주제를 암시했고 &mdash; 그래서 <code>web-document</code>가 되었으며, 그 규칙은 그대로 남았습니다. 유독 무거운 골격 하나는 사진을 파일 안에 품고 있어서 무겁습니다.</span></p>
+    <div class="verdict cyan-v reveal"><span class="en">Eight skeletons, eight pattern references, nine live previews. Nothing is described that cannot be opened.</span><span class="ko">골격 여덟 개, 패턴 참조 문서 여덟 개, 열어 볼 수 있는 미리보기 아홉 개. 열어 볼 수 없는 것은 설명하지 않습니다.</span></div>
   </div>
   <span class="pagenum">03 / 09</span>
 </section>
 
-<section class="slide">
+<section class="slide" data-label-en="What extraction keeps" data-label-ko="추출이 남기는 것">
   <div class="slide-content" style="gap:clamp(.85rem,2.1vw,1.9rem)">
-    <p class="eyebrow reveal">What a template extraction keeps</p>
-    <h2 class="reveal">The design survives. The document does not.</h2>
+    <p class="eyebrow reveal"><span class="en">What a template extraction keeps</span><span class="ko">템플릿 추출이 남기는 것</span></p>
+    <h2 class="reveal"><span class="en">The design survives. The document does not.</span><span class="ko">디자인은 남고, 문서는 남지 않습니다.</span></h2>
     <div class="split reveal">
-      <div class="card bad"><div class="ct">Never enters the repository</div><div class="cn" style="font-size:clamp(.95rem,2.3vw,1.7rem);letter-spacing:0;font-family:var(--font-mono)">the source<br>document</div><div class="cd">Client names, hostnames, prices, headcounts, dates, internal URLs. The file itself is never committed.</div></div>
-      <div class="card good"><div class="ct">Ships as the template</div><div class="cn" style="font-size:clamp(.95rem,2.3vw,1.7rem);letter-spacing:0;font-family:var(--font-mono)">tokens<br>components<br>scripts</div><div class="cd">The stylesheet, the chrome, the controller, and one example of every component with its content replaced.</div></div>
+      <div class="card bad"><div class="ct"><span class="en">Never enters the repository</span><span class="ko">저장소에 들어가지 않는 것</span></div><div class="cn" style="font-size:clamp(.95rem,2.3vw,1.7rem);letter-spacing:0;font-family:var(--font-mono)"><span class="en">the source<br>document</span><span class="ko">원본<br>문서</span></div><div class="cd"><span class="en">Client names, hostnames, prices, headcounts, dates, internal URLs. The file itself is never committed.</span><span class="ko">고객사 이름, 호스트명, 금액, 인원수, 날짜, 내부 URL. 원본 파일 자체는 절대 커밋되지 않습니다.</span></div></div>
+      <div class="card good"><div class="ct"><span class="en">Ships as the template</span><span class="ko">템플릿으로 남는 것</span></div><div class="cn" style="font-size:clamp(.95rem,2.3vw,1.7rem);letter-spacing:0;font-family:var(--font-mono)"><span class="en">tokens<br>components<br>scripts</span><span class="ko">토큰<br>컴포넌트<br>스크립트</span></div><div class="cd"><span class="en">The stylesheet, the chrome, the controller, and one example of every component with its content replaced.</span><span class="ko">스타일시트, 크롬, 컨트롤러, 그리고 내용이 교체된 컴포넌트 예시 하나씩.</span></div></div>
     </div>
-    <p class="body reveal">Scripts in a working deck encode fixes for problems nobody can see any more, so they are copied <span class="hl">verbatim</span> rather than tidied. The subject matter is replaced wholesale &mdash; not scrubbed, replaced.</p>
-    <div class="verdict reveal">Grep the finished skeleton, case-insensitively, and prove the source is gone before registering it.</div>
+    <p class="body reveal"><span class="en">Scripts in a working deck encode fixes for problems nobody can see any more, so they are copied <span class="hl">verbatim</span> rather than tidied. The subject matter is replaced wholesale &mdash; not scrubbed, replaced.</span><span class="ko">동작하는 덱의 스크립트에는 지금은 아무도 볼 수 없는 문제를 고친 흔적이 들어 있습니다. 그래서 정리하지 않고 <span class="hl">그대로</span> 복사합니다. 내용은 지우는 것이 아니라 통째로 교체합니다.</span></p>
+    <div class="verdict reveal"><span class="en">Grep the finished skeleton, case-insensitively, and prove the source is gone before registering it.</span><span class="ko">등록하기 전에, 완성된 골격을 대소문자 구분 없이 grep 해서 원본이 사라졌음을 증명합니다.</span></div>
   </div>
   <span class="pagenum">04 / 09</span>
 </section>
 
-<section class="slide">
+<section class="slide" data-label-en="One file" data-label-ko="파일 하나">
   <div class="slide-content">
-    <p class="eyebrow reveal">The constraint everything else follows from</p>
-    <h2 class="reveal">One file. No build step. No runtime.</h2>
+    <p class="eyebrow reveal"><span class="en">The constraint everything else follows from</span><span class="ko">나머지 전부가 따라 나오는 제약</span></p>
+    <h2 class="reveal"><span class="en">One file. No build step. No runtime.</span><span class="ko">파일 하나. 빌드 없음. 런타임 없음.</span></h2>
     <div class="reveal" style="display:flex;flex-direction:column;gap:.45rem">
       <div class="mega">1</div>
-      <p class="mega-note">HTML file per deliverable. It opens from a USB stick, attaches to an email, and survives the folder it was dragged into. Six of the nine templates reach nothing at all beyond Google Fonts.</p>
+      <p class="mega-note"><span class="en">HTML file per deliverable. It opens from a USB stick, attaches to an email, and survives the folder it was dragged into. Six of the eight built here reach nothing at all beyond Google Fonts.</span><span class="ko">결과물 하나당 HTML 파일 하나. USB에서 열리고, 메일에 첨부되며, 어느 폴더에 끌어다 놓아도 살아남습니다. 여기서 만드는 여덟 개 중 여섯 개는 Google Fonts 말고는 아무 데도 접속하지 않습니다.</span></p>
     </div>
-    <p class="body reveal"><span class="sig">The exception is deliberate.</span> Two templates load a diagram runtime from a CDN rather than inlining several megabytes of it, and answering <code>delivery: standalone</code> at intake is what inlines it anyway. That is a choice the reader makes, not one the repository makes for them.</p>
-    <div class="verdict reveal">If it needs a server to render, it is not finished.</div>
+    <p class="body reveal"><span class="en"><span class="sig">The exception is deliberate.</span> Two templates load a diagram runtime from a CDN rather than inlining several megabytes of it, and answering <code>delivery: standalone</code> at intake is what inlines it anyway. That is a choice the reader makes, not one the repository makes for them.</span><span class="ko"><span class="sig">예외는 의도된 것입니다.</span> 두 템플릿은 수 메가바이트를 파일에 넣는 대신 다이어그램 런타임을 CDN에서 불러옵니다. 인테이크에서 <code>delivery: standalone</code>이라고 답하면 결국 파일 안에 넣습니다. 그것은 저장소가 대신 정해 주는 것이 아니라 읽는 사람이 하는 선택입니다.</span></p>
+    <div class="verdict reveal"><span class="en">If it needs a server to render, it is not finished.</span><span class="ko">렌더링하는 데 서버가 필요하다면, 아직 끝난 것이 아닙니다.</span></div>
   </div>
   <span class="pagenum">05 / 09</span>
 </section>
 
-<section class="slide">
+<section class="slide" data-label-en="The gallery, counted" data-label-ko="갤러리, 숫자로">
   <div class="slide-content">
-    <p class="eyebrow reveal">The gallery, counted</p>
-    <h2 class="reveal">Three ways to read, ten ways to start</h2>
+    <p class="eyebrow reveal"><span class="en">The gallery, counted</span><span class="ko">갤러리를 숫자로</span></p>
+    <h2 class="reveal"><span class="en">Three ways to read, nine ways to start</span><span class="ko">읽는 방식은 셋, 시작하는 길은 아홉</span></h2>
     <div class="statrow reveal">
-      <div class="stat accent"><div class="n">10</div><div class="l">entries in the registry<br>nine built here</div></div>
-      <div class="stat cyan"><div class="n">9</div><div class="l">pattern references, one<br>per template</div></div>
-      <div class="stat warn"><div class="n">20 KB</div><div class="l">the smallest skeleton,<br>complete</div></div>
-      <div class="stat"><div class="n">0</div><div class="l">installs required</div></div>
+      <div class="stat accent"><div class="n">9</div><div class="l"><span class="en">entries in the registry<br>eight built here</span><span class="ko">레지스트리 항목<br>그중 여덟은 여기서</span></div></div>
+      <div class="stat cyan"><div class="n">8</div><div class="l"><span class="en">pattern references, one<br>per template</span><span class="ko">패턴 참조 문서,<br>템플릿마다 하나씩</span></div></div>
+      <div class="stat warn"><div class="n">22 KB</div><div class="l"><span class="en">the smallest skeleton,<br>complete</span><span class="ko">가장 작은 골격,<br>그대로 완성본</span></div></div>
+      <div class="stat"><div class="n">0</div><div class="l"><span class="en">installs required</span><span class="ko">필요한 설치</span></div></div>
     </div>
     <div class="split3 reveal">
-      <div class="card"><div class="ct">Slides</div><div class="cn" style="font-size:clamp(.9rem,2.1vw,1.5rem);letter-spacing:0;font-family:var(--font-mono)">read across<br>a room</div><div class="cd">Five shapes, each with its own navigation.</div></div>
-      <div class="card good"><div class="ct">Document</div><div class="cn" style="font-size:clamp(.9rem,2.1vw,1.5rem);letter-spacing:0;font-family:var(--font-mono)">read at desk<br>distance</div><div class="cd">Four shapes, hash-routed and linkable.</div></div>
-      <div class="card"><div class="ct">External</div><div class="cn" style="font-size:clamp(.9rem,2.1vw,1.5rem);letter-spacing:0;font-family:var(--font-mono)">handed off<br>elsewhere</div><div class="cd">One path that says plainly it is not built here.</div></div>
+      <div class="card"><div class="ct"><span class="en">Slides</span><span class="ko">슬라이드</span></div><div class="cn" style="font-size:clamp(.9rem,2.1vw,1.5rem);letter-spacing:0;font-family:var(--font-mono)"><span class="en">read across<br>a room</span><span class="ko">회의실 건너에서<br>읽는</span></div><div class="cd"><span class="en">Four shapes, each with its own navigation.</span><span class="ko">네 가지 형태, 각자 자기 내비게이션을 가집니다.</span></div></div>
+      <div class="card good"><div class="ct"><span class="en">Document</span><span class="ko">문서</span></div><div class="cn" style="font-size:clamp(.9rem,2.1vw,1.5rem);letter-spacing:0;font-family:var(--font-mono)"><span class="en">read at desk<br>distance</span><span class="ko">책상 거리에서<br>읽는</span></div><div class="cd"><span class="en">Four shapes, hash-routed and linkable.</span><span class="ko">네 가지 형태, 해시 라우팅으로 링크할 수 있습니다.</span></div></div>
+      <div class="card"><div class="ct"><span class="en">External</span><span class="ko">외부</span></div><div class="cn" style="font-size:clamp(.9rem,2.1vw,1.5rem);letter-spacing:0;font-family:var(--font-mono)"><span class="en">handed off<br>elsewhere</span><span class="ko">다른 곳으로<br>넘기는</span></div><div class="cd"><span class="en">One path that says plainly it is not built here.</span><span class="ko">여기서 만들지 않는다고 분명히 밝히는 경로 하나.</span></div></div>
     </div>
   </div>
   <span class="pagenum">06 / 09</span>
 </section>
 
-<section class="slide">
+<section class="slide" data-label-en="Rules inherited" data-label-ko="물려받는 규칙">
   <div class="slide-content">
-    <p class="eyebrow reveal">The rules a new template inherits</p>
-    <h2 class="reveal">Five decisions, already made</h2>
+    <p class="eyebrow reveal"><span class="en">The rules a new template inherits</span><span class="ko">새 템플릿이 물려받는 규칙</span></p>
+    <h2 class="reveal"><span class="en">Six decisions, already made</span><span class="ko">이미 내려진 여섯 가지 결정</span></h2>
     <div class="specs">
-      <div class="spec reveal"><span class="si">01</span><span class="st">One self-contained file, or it is not a deliverable<em>No build step, no server, no asset folder travelling alongside it</em></span></div>
-      <div class="spec reveal"><span class="si">02</span><span class="st">Export is the browser&rsquo;s own print dialogue and a self-download<em>Never html2canvas, never jsPDF &mdash; a bundled exporter would make every file depend on a CDN at read time</em></span></div>
-      <div class="spec reveal"><span class="si">03</span><span class="st">Animation is CSS, or the Web Animations API when it must be scripted<em>No animation library; the one that arrived with borrowed work could not be redistributed at all</em></span></div>
-      <div class="spec reveal"><span class="si">04</span><span class="st">One template per shape, never one template with switches<em>Every switch multiplies the states somebody has to review, and the shapes share no navigation to begin with</em></span></div>
-      <div class="spec reveal"><span class="si">05</span><span class="st">Third-party work is carried by the lightest mechanism that preserves attribution<em>Copied, submoduled, or derived &mdash; and recorded in NOTICE either way</em></span></div>
+      <div class="spec reveal"><span class="si">01</span><span class="st"><span class="en">One self-contained file, or it is not a deliverable<em>No build step, no server, no asset folder travelling alongside it</em></span><span class="ko">자기 완결적인 파일 하나가 아니면 결과물이 아닙니다<em>빌드 단계도, 서버도, 옆에 딸려 다니는 애셋 폴더도 없습니다</em></span></span></div>
+      <div class="spec reveal"><span class="si">02</span><span class="st"><span class="en">Every template inherits the house features: a language switch and a menu<em>Both languages are written into the markup and toggled by CSS, so the file still works offline</em></span><span class="ko">모든 템플릿은 기본 기능을 물려받습니다: 언어 전환과 메뉴<em>두 언어를 모두 마크업에 적어 두고 CSS로 전환하므로 오프라인에서도 그대로 동작합니다</em></span></span></div>
+      <div class="spec reveal"><span class="si">03</span><span class="st"><span class="en">Export is the browser&rsquo;s own print dialogue and a self-download<em>Never html2canvas, never jsPDF &mdash; a bundled exporter would make every file depend on a CDN at read time</em></span><span class="ko">내보내기는 브라우저 자체의 인쇄 대화상자와 자기 자신을 저장하는 기능입니다<em>html2canvas도 jsPDF도 쓰지 않습니다 &mdash; 번들된 내보내기 도구는 모든 파일을 읽는 순간 CDN에 묶어 버립니다</em></span></span></div>
+      <div class="spec reveal"><span class="si">04</span><span class="st"><span class="en">Animation is CSS, or the Web Animations API when it must be scripted<em>No animation library; the one that arrived with borrowed work could not be redistributed at all</em></span><span class="ko">애니메이션은 CSS로, 꼭 스크립트가 필요하면 Web Animations API로<em>애니메이션 라이브러리는 쓰지 않습니다. 빌려온 작업에 딸려 온 것은 재배포 자체가 불가능했습니다</em></span></span></div>
+      <div class="spec reveal"><span class="si">05</span><span class="st"><span class="en">One template per shape, never one template with switches<em>Every switch multiplies the states somebody has to review, and the shapes share no navigation to begin with</em></span><span class="ko">형태마다 템플릿 하나, 스위치가 달린 템플릿 하나가 아닙니다<em>스위치 하나가 누군가 검토해야 할 상태를 곱절로 늘리고, 애초에 형태끼리 내비게이션을 공유하지도 않습니다</em></span></span></div>
+      <div class="spec reveal"><span class="si">06</span><span class="st"><span class="en">Third-party work is carried by the lightest mechanism that preserves attribution<em>Copied, submoduled, or derived &mdash; and recorded in NOTICE either way</em></span><span class="ko">서드파티 작업은 출처 표기를 지키는 가장 가벼운 방식으로 옮깁니다<em>복사하든, 서브모듈로 걸든, 파생하든 &mdash; 어느 쪽이든 NOTICE에 남깁니다</em></span></span></div>
     </div>
   </div>
   <span class="pagenum">07 / 09</span>
 </section>
 
-<section class="slide">
+<section class="slide" data-label-en="What the intake asks" data-label-ko="인테이크가 묻는 것">
   <div class="slide-content">
-    <p class="eyebrow reveal">What the intake asks before anything is built</p>
-    <h2 class="reveal">The questions that change the file</h2>
+    <p class="eyebrow reveal"><span class="en">What the intake asks before anything is built</span><span class="ko">무언가를 만들기 전에 인테이크가 묻는 것</span></p>
+    <h2 class="reveal"><span class="en">The questions that change the file</span><span class="ko">파일을 바꾸는 질문들</span></h2>
     <ul class="pts">
-      <li data-n="Q1" class="reveal"><span class="hl">Which shape?</span> Asked first, because every later question is filtered by the answer. <span class="sig">A document is never asked about slide count.</span></li>
-      <li data-n="Q2" class="reveal"><span class="hl">Does it need to work offline?</span> <code>delivery: standalone</code> inlines the fonts and any library, at the cost of file size.</li>
-      <li data-n="Q3" class="reveal"><span class="hl">Which languages?</span> Some shapes write both languages inline and toggle them with CSS; one loads a translator on demand. The mechanism belongs to the template, not to the answer.</li>
-      <li data-n="Q4" class="reveal"><span class="hl">Keep the credit line?</span> One quiet colophon ships by default, and switching it off deletes exactly one element.</li>
+      <li data-n="Q1" class="reveal"><span class="en"><span class="hl">Which shape?</span> Asked first, because every later question is filtered by the answer. <span class="sig">A document is never asked about slide count.</span></span><span class="ko"><span class="hl">어떤 형태인가?</span> 가장 먼저 묻습니다. 이후의 모든 질문이 이 답으로 걸러지기 때문입니다. <span class="sig">문서에게 슬라이드 장수를 묻는 일은 없습니다.</span></span></li>
+      <li data-n="Q2" class="reveal"><span class="en"><span class="hl">Does it need to work offline?</span> <code>delivery: standalone</code> inlines the fonts and any library, at the cost of file size.</span><span class="ko"><span class="hl">오프라인에서도 동작해야 하는가?</span> <code>delivery: standalone</code>은 폰트와 라이브러리를 파일 안에 넣습니다. 대가는 용량입니다.</span></li>
+      <li data-n="Q3" class="reveal"><span class="en"><span class="hl">Which languages?</span> The slide and document shapes write both languages inline and toggle them with CSS; the talk deck loads a translator on demand. The mechanism belongs to the template, not to the answer.</span><span class="ko"><span class="hl">어떤 언어인가?</span> 슬라이드와 문서 형태는 두 언어를 마크업에 함께 적고 CSS로 전환합니다. 발표용 덱만 필요할 때 번역기를 불러옵니다. 방식은 답이 아니라 템플릿에 속합니다.</span></li>
+      <li data-n="Q4" class="reveal"><span class="en"><span class="hl">Which menu?</span> A full menu is a hamburger beside the brand mark that lists the slides and jumps to them. The default is on, so a template without one is a template that is lying about its own answers.</span><span class="ko"><span class="hl">어떤 메뉴인가?</span> 전체 메뉴는 브랜드 마크 옆의 햄버거로, 슬라이드를 나열하고 그곳으로 이동합니다. 기본값이 켜짐이므로, 메뉴가 없는 템플릿은 자기 답에 대해 거짓말을 하고 있는 템플릿입니다.</span></li>
     </ul>
   </div>
   <span class="pagenum">08 / 09</span>
 </section>
 
-<section class="slide">
+<section class="slide" data-label-en="Where to start" data-label-ko="어디서 시작하나">
   <div class="slide-content">
-    <p class="eyebrow reveal">Where to start</p>
-    <h2 class="reveal">Paste one prompt. Get one file.</h2>
-    <p class="body reveal">Point any coding agent at the repository, answer the intake, and read what comes back. The templates are MIT-licensed; the work you put through them stays yours.</p>
-    <div class="verdict dark reveal">This deck is a preview of the Evidence deck template. Everything on it is real except the deck itself.</div>
+    <p class="eyebrow reveal"><span class="en">Where to start</span><span class="ko">어디서 시작하나</span></p>
+    <h2 class="reveal"><span class="en">Paste one prompt. Get one file.</span><span class="ko">프롬프트 하나를 붙여넣고, 파일 하나를 받습니다.</span></h2>
+    <p class="body reveal"><span class="en">Point any coding agent at the repository, answer the intake, and read what comes back. The templates are MIT-licensed; the work you put through them stays yours.</span><span class="ko">아무 코딩 에이전트에게나 저장소를 가리키고, 인테이크에 답한 뒤, 돌아온 것을 읽으면 됩니다. 템플릿은 MIT 라이선스이고, 그 안에 넣은 작업은 그대로 당신 것입니다.</span></p>
+    <div class="verdict dark reveal"><span class="en">This deck is a preview of the Evidence deck template. Everything on it is real except the deck itself.</span><span class="ko">이 덱은 Evidence deck 템플릿의 미리보기입니다. 덱 자체를 빼면 여기 적힌 것은 전부 사실입니다.</span></div>
     <p class="colophon reveal">
       <a href="https://monomind.one/?ref=deck-mark" target="_blank" rel="noopener noreferrer">monomind ai lab</a>
-      <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer">Made with <span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></a>
+      <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer"><span class="en">Made with <span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></span><span class="ko"><span class="notranslate" translate="no">Hi Ted, Meet Lisa</span>로 제작</span></a>
     </p>
   </div>
   <span class="pagenum">09 / 09</span>
@@ -332,6 +469,9 @@ ul.pts li:last-child{margin-bottom:0}
 <script>
 /* ===========================================
    SLIDE PRESENTATION CONTROLLER
+   Load-bearing. Extend it — the last two lines publish window.__deckGo so
+   the chrome can move the deck without reimplementing scrolling — but do
+   not rewrite the class.
    =========================================== */
 class SlidePresentation {
   constructor(){
@@ -394,7 +534,198 @@ class SlidePresentation {
     document.querySelectorAll('.nav-dot').forEach((d,i)=>d.classList.toggle('active',i===this.currentSlide));
   }
 }
-new SlidePresentation();
+var __deck = new SlidePresentation();
+window.__deckGo = function (i) { __deck.goTo(i); };
+</script>
+
+<script>
+/* ===========================================
+   CHROME — language, menu, contents.
+
+   Its own block, so it cannot disturb the controller above. Every control
+   is looked up by id and guarded, so deleting a control's markup is the
+   supported way to switch that intake answer off. Nothing here
+   reimplements scrolling: slide movement always goes through
+   window.__deckGo.
+   =========================================== */
+(function () {
+  "use strict";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var body = document.body;
+  var LANG_KEY = "monomind-evidence-lang";
+  var LANGS = ["en", "ko"];
+
+  /* Strings the reader sees that are not text nodes — titles and labels. */
+  var UI = {
+    en: { nav: "Slide navigation", dot: "Go to slide ", menu: "Menu" },
+    ko: { nav: "슬라이드 탐색", dot: "이동: 슬라이드 ", menu: "메뉴" }
+  };
+
+  var slides = document.querySelectorAll(".slide");
+  var menu = $("deckMenu");
+  var menuBtn = $("deckMenuBtn");
+  var panel = $("deckMenuPanel");
+  var contents = $("deckContents");
+  var chrome = document.querySelector(".deck-chrome");
+
+  /* ---- language ---------------------------------------------------------
+     Both languages are in the markup; this only flips the attribute the CSS
+     reads, then repairs the strings CSS cannot reach. ---------------------- */
+  function applyLang(l) {
+    if (LANGS.indexOf(l) === -1) { l = LANGS[0]; }
+    body.setAttribute("data-lang", l);
+    document.documentElement.lang = l;
+
+    var t = body.getAttribute("data-title-" + l);
+    if (t) { document.title = t; }
+
+    var ui = UI[l] || UI.en;
+    var dots = $("navDots");
+    if (dots) {
+      dots.setAttribute("aria-label", ui.nav);
+      Array.prototype.forEach.call(dots.querySelectorAll(".nav-dot"), function (d, i) {
+        d.setAttribute("aria-label", ui.dot + (i + 1));
+      });
+    }
+    if (menuBtn) { menuBtn.setAttribute("aria-label", ui.menu); }
+
+    LANGS.forEach(function (code) {
+      var b = $("btn" + code.charAt(0).toUpperCase() + code.slice(1));
+      if (b) { b.setAttribute("aria-pressed", String(code === l)); }
+    });
+    try { localStorage.setItem(LANG_KEY, l); } catch (e) {}
+  }
+  function currentLang() { return body.getAttribute("data-lang") || LANGS[0]; }
+
+  LANGS.forEach(function (code) {
+    var b = $("btn" + code.charAt(0).toUpperCase() + code.slice(1));
+    if (b) { b.addEventListener("click", function () { applyLang(code); }); }
+  });
+
+  var saved = null;
+  try { saved = localStorage.getItem(LANG_KEY); } catch (e) {}
+  applyLang(saved || body.getAttribute("data-lang") || LANGS[0]);
+
+  /* ---- menu ------------------------------------------------------------- */
+  function setOpen(open) {
+    if (!menu || !menuBtn) { return; }
+    menu.setAttribute("data-open", open ? "true" : "false");
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  function isOpen() { return !!menu && menu.getAttribute("data-open") === "true"; }
+  function items() {
+    return panel ? panel.querySelectorAll('[role="menuitem"]:not([hidden])') : [];
+  }
+
+  if (menu && menuBtn && panel) {
+    menuBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var open = !isOpen();
+      setOpen(open);
+      if (open) {
+        var first = items()[0];
+        if (first) { first.focus(); }
+      }
+    });
+    document.addEventListener("click", function (e) {
+      if (isOpen() && !menu.contains(e.target)) { setOpen(false); }
+    });
+
+    var start = $("deckMenuStart");
+    if (start) {
+      start.addEventListener("click", function () {
+        setOpen(false);
+        if (typeof window.__deckGo === "function") { window.__deckGo(0); }
+        menuBtn.focus();
+      });
+    }
+
+    var langItem = $("deckMenuLang");
+    if (langItem) {
+      langItem.addEventListener("click", function () {
+        applyLang(currentLang() === "en" ? "ko" : "en");
+      });
+    }
+
+    /* ---- contents ------------------------------------------------------
+       Built from each slide's data-label-*, both languages written in and
+       toggled by the same CSS as the rest of the deck. It cannot drift out
+       of sync with the slide list the way a hand-written menu would. ------ */
+    var contentsBtn = $("deckMenuContents");
+    if (contentsBtn && contents) {
+      Array.prototype.forEach.call(slides, function (slide, i) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.setAttribute("role", "menuitem");
+        var n = document.createElement("span");
+        n.className = "mn";
+        n.textContent = String(i + 1).length < 2 ? "0" + (i + 1) : String(i + 1);
+        b.appendChild(n);
+        LANGS.forEach(function (code) {
+          var s = document.createElement("span");
+          s.className = code;
+          s.textContent = slide.getAttribute("data-label-" + code) ||
+                          slide.getAttribute("data-label-" + LANGS[0]) ||
+                          "Slide " + (i + 1);
+          b.appendChild(s);
+        });
+        b.addEventListener("click", function () {
+          setOpen(false);
+          if (typeof window.__deckGo === "function") { window.__deckGo(i); }
+        });
+        contents.appendChild(b);
+      });
+      contentsBtn.addEventListener("click", function () {
+        var show = contents.hidden;
+        contents.hidden = !show;
+        contentsBtn.setAttribute("aria-expanded", String(show));
+      });
+
+      /* Mark where the reader is. Its own observer, so the controller above
+         stays untouched. */
+      var mark = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) { return; }
+          var at = Array.prototype.indexOf.call(slides, entry.target);
+          Array.prototype.forEach.call(contents.children, function (b, i) {
+            if (i === at) { b.setAttribute("aria-current", "true"); }
+            else { b.removeAttribute("aria-current"); }
+          });
+        });
+      }, { threshold: 0.5 });
+      Array.prototype.forEach.call(slides, function (s) { mark.observe(s); });
+    }
+  }
+
+  /* ---- keyboard ---------------------------------------------------------
+     The controller listens for keys on `document`, so a key pressed inside
+     the chrome would also drive the deck — Space on a focused button would
+     be swallowed by its preventDefault. One capture listener on the chrome
+     stops that. stopPropagation does not cancel a default action, so Enter
+     and Space still activate the buttons themselves. ----------------------- */
+  if (chrome) {
+    chrome.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && isOpen()) {
+        setOpen(false);
+        if (menuBtn) { menuBtn.focus(); }
+      } else if (isOpen() && (e.key === "ArrowDown" || e.key === "ArrowUp" ||
+                              e.key === "Home" || e.key === "End")) {
+        var list = Array.prototype.slice.call(items());
+        if (list.length) {
+          var at = list.indexOf(document.activeElement);
+          var to = e.key === "Home" ? 0
+                 : e.key === "End" ? list.length - 1
+                 : e.key === "ArrowDown" ? (at + 1 + list.length) % list.length
+                 : (at - 1 + list.length) % list.length;
+          e.preventDefault();
+          list[to].focus();
+        }
+      }
+      e.stopPropagation();
+    }, true);
+  }
+})();
 </script>
 </body>
 </html>
