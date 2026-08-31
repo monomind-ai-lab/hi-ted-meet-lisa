@@ -149,6 +149,28 @@
       ],
       "preview": "previews/project-website.html",
       "thumb_source": "previews/project-website.html"
+    },
+    {
+      "id": "evidence-deck",
+      "name": "Evidence deck",
+      "tagline": "Dark full-bleed slides that argue from numbers — tables, stat rows, verdict bars.",
+      "file": "assets/tedandlisa-template-evidence-deck.html",
+      "patterns": "references/slide-patterns-evidence-deck.md",
+      "thumb": "templates/thumbs/evidence-deck.png",
+      "kind": "slides",
+      "best_for": "An argument someone will push back on: an audit, a diagnosis, a recommendation that has to show its evidence.",
+      "navigation": "Vertical scroll-snap, arrow keys, swipe; fixed progress bar and nav dots down the right edge.",
+      "languages": "One language per deck, written inline — no translation service, works offline.",
+      "dependencies": "Google Fonts only — Archivo Black, Space Grotesk, JetBrains Mono.",
+      "features": [
+        "data tables with flagged rows",
+        "stat rows and mega numbers",
+        "verdict bars",
+        "orange section cards",
+        "numbered spec lists"
+      ],
+      "preview": "previews/evidence-deck.html",
+      "thumb_source": "previews/evidence-deck.html"
     }
   ]
 }
