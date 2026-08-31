@@ -225,6 +225,7 @@ Before handing the file over:
 | `skills/tedandlisa-design/` | The wrapper for the vendored Slides AI pipeline (animated HTML). |
 | `vendor/slides-ai-plugin/` | Git submodule, MIT. `git submodule update --init` if empty. |
 | `scripts/tedandlisa_thumbs.py` | Captures template thumbnails for the gallery. |
+| `scripts/tedandlisa_intake_fallback.py` | Regenerates the intake panel's `file://` fallback template list from the registry. |
 | `scripts/tedandlisa_new_template.py` | Analyzes a source document and registers a new template. |
 | `skills/tedandlisa-new-template/` | The skill that turns an HTML file into a template. |
 | `references/slide-patterns.md` | Verbatim markup for every component. |

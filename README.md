@@ -338,6 +338,9 @@ python3 scripts/tedandlisa_new_template.py analyze SOURCE.html
 python3 scripts/tedandlisa_new_template.py register --id ID --name "NAME" \
   --file assets/tedandlisa-template-ID.html --kind slides
 python3 scripts/tedandlisa_thumbs.py --only ID
+
+# regenerate the intake panel's file:// fallback list from the registry
+python3 scripts/tedandlisa_intake_fallback.py
 ```
 
 Everything is Python standard library. Thumbnail capture uses headless Chrome

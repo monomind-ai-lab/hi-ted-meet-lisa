@@ -98,7 +98,8 @@ def register(args) -> int:
     })
     REGISTRY.write_text(json.dumps(reg, indent=2, ensure_ascii=False) + "\n")
     print(f"registered {args.id}. Now run:\n"
-          f"  python3 scripts/tedandlisa_thumbs.py --only {args.id}")
+          f"  python3 scripts/tedandlisa_thumbs.py --only {args.id}\n"
+          f"  python3 scripts/tedandlisa_intake_fallback.py")
     return 0
 
 

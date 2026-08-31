@@ -34,6 +34,11 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - name: Check the intake panel's fallback list against the registry
+        # The panel's file:// fallback copy of templates/templates.json is
+        # generated, not hand-maintained. Fail here rather than ship a
+        # canonical HTML file whose offline gallery is missing a template.
+        run: python3 scripts/tedandlisa_intake_fallback.py --check
       - name: Assemble the deployable site folder
         run: bash site/sync.sh
         env:

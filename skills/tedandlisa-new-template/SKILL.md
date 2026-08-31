@@ -83,10 +83,13 @@ confirm before doing it.
    `paper-brief` is `slides` you `read`, `architecture` is a `document` you
    `diagram` in. Pick the type from the reader's purpose, not the file's
    shape.
-7. **Capture its thumbnail** so it appears in the intake gallery:
+7. **Capture its thumbnail** so it appears in the intake gallery, and
+   regenerate the panel's `file://` fallback list so the template is
+   offerable with nothing injected:
 
    ```sh
    python3 scripts/tedandlisa_thumbs.py --only ID
+   python3 scripts/tedandlisa_intake_fallback.py
    ```
 8. **Verify in a browser**, served over http, not `file://`:
    - Every page or slide reachable; navigation, routing, and deep links work.

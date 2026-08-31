@@ -1673,8 +1673,12 @@ var MAX_INLINE_BYTES = 1500000; /* ~1.5 MB — past this the deck gets heavy */
    on the card and a filter above the gallery, and it never reaches the
    payload. The two are separate axes on purpose and cut across each other —
    `paper-brief` is slides you read, `architecture` is a document you draw in.
-   This list is only the no-registry fallback; the real one is
-   templates/templates.json, injected as CTX.templates. */
+   The list below is only the no-registry fallback — what a reader sees when
+   the panel is opened straight from file:// and neither the runner nor
+   site/sync.sh has injected CTX.templates. It is GENERATED from
+   templates/templates.json; do not hand-edit it. Regenerate after any change
+   to the registry, and CI fails the deploy if the two drift apart:
+       python3 scripts/tedandlisa_intake_fallback.py */
 var TEMPLATES = CTX.templates || [
   { id: "monomind-deck", name: "MonoMind deck", kind: "slides", type: "present",
     tagline: "Horizontal presentation deck, dark ink and accent halos." },
@@ -1684,10 +1688,16 @@ var TEMPLATES = CTX.templates || [
     tagline: "Diagram-first deck on light paper, one drawing per slide." },
   { id: "architecture", name: "Architecture diagram", kind: "document", type: "diagram",
     tagline: "System diagrams on slate, where colour means something — one view or several." },
+  { id: "slide-design", name: "Slide design", kind: "external", type: "present", skill: "/tedandlisa-design", badge: "HTML",
+    tagline: "Not a MonoMind template — twelve style presets and animated HTML slides." },
   { id: "sitemap-ia", name: "Sitemap & IA proposal", kind: "document", type: "read",
     tagline: "Argue an information architecture, with the navigation wired up to click through." },
-  { id: "slide-design", name: "Slide design", kind: "external", type: "present", badge: "HTML",
-    tagline: "Not a MonoMind template — style presets and animated HTML slides." }
+  { id: "project-website", name: "Project website", kind: "document", type: "site",
+    tagline: "A project's public face: sticky nav, hash-routed pages, dark ink and a blue halo." },
+  { id: "evidence-deck", name: "Evidence deck", kind: "slides", type: "present",
+    tagline: "Dark full-bleed slides that argue from numbers — tables, stat rows, verdict bars." },
+  { id: "paper-brief", name: "Paper brief", kind: "slides", type: "read",
+    tagline: "Light paper slides paced in chapters — mega numbers, bar charts, decision boxes." }
 ];
 
 /* Display order for the filter row. A type the registry does not use gets no

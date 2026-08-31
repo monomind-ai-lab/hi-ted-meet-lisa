@@ -33,6 +33,11 @@ python3 scripts/tedandlisa_new_template.py register --id ID --name "NAME" \
 # Re-capture gallery thumbnails after adding/changing a template's opening
 # screen. Needs a local Chrome/Chromium; degrades to a text card if absent.
 python3 scripts/tedandlisa_thumbs.py [--only ID]
+
+# Regenerate the intake panel's file:// fallback template list from the
+# registry. Run after any change to templates/templates.json; --check is
+# what CI runs before deploying.
+python3 scripts/tedandlisa_intake_fallback.py [--check]
 ```
 
 There is no automated test suite. Verification is manual and browser-based —
