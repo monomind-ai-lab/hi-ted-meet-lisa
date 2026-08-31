@@ -147,7 +147,6 @@ template's pattern reference before writing anything.
 | `project-website` | Hash-routed pages behind a sticky nav, one shared footer | Both languages written inline | Yes, fonts aside |
 | `evidence-deck` | Dark full-bleed scroll-snap slides that argue from numbers | One language per deck, written inline | Yes, fonts aside |
 | `paper-brief` | Light paper slides paced by inverted chapter pages | Traditional Chinese, single language | Yes, fonts aside |
-| `framed-deck` | One slide at a time on a framed 16:9 canvas, type in container units | One language per deck, written inline | Yes, fonts aside |
 
 The translation-safety section below applies to `monomind-deck`. The technical
 document needs none of it: nothing is machine-translated, so nothing needs
@@ -223,8 +222,6 @@ Before handing the file over:
 | `references/slide-patterns-evidence-deck.md` | Component markup for the evidence-deck template. |
 | `assets/tedandlisa-template-paper-brief.html` | The paper-brief template: light paper, chapter pages, bar charts, decision boxes. |
 | `references/slide-patterns-paper-brief.md` | Component markup for the paper-brief template. |
-| `assets/tedandlisa-template-framed-deck.html` | The framed-deck template: a 16:9 canvas sized in container units. |
-| `references/slide-patterns-framed-deck.md` | Component markup for the framed-deck template. |
 | `skills/tedandlisa-design/` | The wrapper for the vendored Slides AI pipeline (animated HTML). |
 | `vendor/slides-ai-plugin/` | Git submodule, MIT. `git submodule update --init` if empty. |
 | `scripts/tedandlisa_thumbs.py` | Captures template thumbnails for the gallery. |

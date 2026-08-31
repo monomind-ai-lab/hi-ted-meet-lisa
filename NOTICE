@@ -37,29 +37,6 @@ the Architecture Diagram Generator skill.
              replaced with print-to-PDF and a self-download so the file has no
              runtime dependency.
 
---------------------------------------------------------------------------
-agent-skills teaching decks — assets/tedandlisa-template-framed-deck.html
---------------------------------------------------------------------------
-The framed-deck template's visual system — black ground with a mask-faded
-grid field, Geist and Geist Mono, a single blue accent, and the framed 16:9
-canvas whose type is measured in container-query units — is derived from the
-agent-skills teaching decks published at skills.addy.ie.
-
-  Upstream:  https://skills.addy.ie/teach/decks/agent-skills-101
-  Source:    https://github.com/addyosmani/skills.addy.ie
-             (public/teach/decks/, licensed MIT in that repository's README,
-             "MIT - same as agent-skills")
-  Project:   https://github.com/addyosmani/agent-skills
-  Author:    Addy Osmani
-  License:   MIT
-  Changes:   Derived, not copied. Rewritten as a MonoMind template: all
-             subject matter replaced with bracketed placeholder slots, the
-             upstream artwork and diagrams dropped and replaced with an
-             original placeholder drawing, the colophon and identity line
-             added, and the traps documented in comments and in
-             references/slide-patterns-framed-deck.md. The stylesheet and the
-             navigation script are kept as they are, which is the point of a
-             template.
 
 --------------------------------------------------------------------------
 Slides AI Plugin onboarding deck — previews/slide-design.html
