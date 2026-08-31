@@ -145,6 +145,9 @@ template's pattern reference before writing anything.
 | `architecture` | System diagrams on slate, colour is semantic; one view or several, switchable | Both languages inline, labels included | Yes, fonts aside |
 | `sitemap-ia` | Hash-routed pages, plus a clickable navigation prototype | Both languages written inline | Only if `delivery: standalone` — otherwise mermaid, Font Awesome and Tailwind load from a CDN |
 | `project-website` | Hash-routed pages behind a sticky nav, one shared footer | Both languages written inline | Yes, fonts aside |
+| `evidence-deck` | Dark full-bleed scroll-snap slides that argue from numbers | One language per deck, written inline | Yes, fonts aside |
+| `paper-brief` | Light paper slides paced by inverted chapter pages | Traditional Chinese, single language | Yes, fonts aside |
+| `framed-deck` | One slide at a time on a framed 16:9 canvas, type in container units | One language per deck, written inline | Yes, fonts aside |
 
 The translation-safety section below applies to `monomind-deck`. The technical
 document needs none of it: nothing is machine-translated, so nothing needs
@@ -216,6 +219,12 @@ Before handing the file over:
 | `references/slide-patterns-architecture.md` | Component markup for the architecture template. |
 | `assets/tedandlisa-template-project-website.html` | The project-website template: sticky nav, hash-routed pages, inline bilingual, no CDN. |
 | `references/slide-patterns-project-website.md` | Component markup for the project-website template. |
+| `assets/tedandlisa-template-evidence-deck.html` | The evidence-deck template: dark scroll-snap slides, data tables, verdict bars. |
+| `references/slide-patterns-evidence-deck.md` | Component markup for the evidence-deck template. |
+| `assets/tedandlisa-template-paper-brief.html` | The paper-brief template: light paper, chapter pages, bar charts, decision boxes. |
+| `references/slide-patterns-paper-brief.md` | Component markup for the paper-brief template. |
+| `assets/tedandlisa-template-framed-deck.html` | The framed-deck template: a 16:9 canvas sized in container units. |
+| `references/slide-patterns-framed-deck.md` | Component markup for the framed-deck template. |
 | `skills/tedandlisa-design/` | The wrapper for the vendored Slides AI pipeline (animated HTML). |
 | `vendor/slides-ai-plugin/` | Git submodule, MIT. `git submodule update --init` if empty. |
 | `scripts/tedandlisa_thumbs.py` | Captures template thumbnails for the gallery. |

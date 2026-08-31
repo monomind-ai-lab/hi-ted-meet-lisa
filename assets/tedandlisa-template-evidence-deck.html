@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[DECK TITLE] — [SUBTITLE]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ===========================================
+   THEME TOKENS — change these to restyle everything
+   =========================================== */
+:root{
+  --bg:#141414;
+  --bg-grad:linear-gradient(150deg,#141414 0%,#1f1f1f 48%,#121212 100%);
+  --panel:#1c1c1c;
+  --panel-2:#232323;
+  --fg:#f5f3f0;
+  --fg-soft:#9a958e;
+  --fg-faint:#615d58;
+  --rule:#2e2e2e;
+  --sig:#FF5722;
+  --sig-dim:rgba(255,87,34,.13);
+  --cyan:#22D3EE;
+  --cyan-dim:rgba(34,211,238,.11);
+  --warn:#FFC400;
+
+  --font-display:'Archivo Black',sans-serif;
+  --font-body:'Space Grotesk',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+
+  --title-size:clamp(2rem,6.6vw,5.4rem);
+  --h2-size:clamp(1.28rem,3.5vw,2.72rem);
+  --lead-size:clamp(.9rem,1.7vw,1.35rem);
+  --body-size:clamp(.76rem,1.13vw,1rem);
+  --micro-size:clamp(.58rem,.8vw,.74rem);
+  --mega-size:clamp(2.8rem,11.5vw,9.5rem);
+
+  --slide-padding:clamp(1.3rem,4.4vw,4.4rem);
+  --gap:clamp(.65rem,1.65vw,1.55rem);
+
+  --ease:cubic-bezier(.16,1,.3,1);
+  --dur:.7s;
+}
+
+/* === BASE === */
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-snap-type:y mandatory;overflow-y:scroll;height:100%;scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg);color:var(--fg);height:100%;overflow:hidden;-webkit-font-smoothing:antialiased;font-feature-settings:"tnum"}
+
+/* === SLIDE BASE (NON-NEGOTIABLE) === */
+.slide{
+  height:100vh;height:100dvh;overflow:hidden;scroll-snap-align:start;position:relative;
+  display:flex;flex-direction:column;justify-content:center;padding:var(--slide-padding);
+  background:var(--bg-grad);
+}
+.slide::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(to right,rgba(255,255,255,.02) 1px,transparent 1px);background-size:calc(100vw/12) 100%}
+.slide img{max-width:100%;max-height:min(50vh,400px);object-fit:contain}
+.slide-content{width:100%;max-height:100%;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:var(--gap);position:relative;z-index:1}
+
+/* === ENTRANCE === */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease)}
+.slide.visible .reveal{opacity:1;transform:none}
+.slide.visible .reveal:nth-child(1){transition-delay:.05s}
+.slide.visible .reveal:nth-child(2){transition-delay:.13s}
+.slide.visible .reveal:nth-child(3){transition-delay:.21s}
+.slide.visible .reveal:nth-child(4){transition-delay:.29s}
+.slide.visible .reveal:nth-child(5){transition-delay:.37s}
+.slide.visible .reveal:nth-child(6){transition-delay:.45s}
+.slide.visible .reveal:nth-child(7){transition-delay:.53s}
+
+/* === TYPE === */
+.eyebrow{font-family:var(--font-body);font-weight:700;font-size:var(--micro-size);letter-spacing:.26em;text-transform:uppercase;color:var(--sig);display:flex;align-items:center;gap:.75em}
+.eyebrow::after{content:'';flex:1;height:1px;background:var(--rule);max-width:24vw}
+h1{font-family:var(--font-display);font-size:var(--title-size);line-height:.95;letter-spacing:-.025em;text-transform:uppercase}
+h2{font-family:var(--font-display);font-size:var(--h2-size);line-height:1.08;letter-spacing:-.02em;text-transform:uppercase}
+.lead{font-size:var(--lead-size);line-height:1.58;color:var(--fg-soft);max-width:58ch;font-weight:300}
+.body{font-size:var(--body-size);line-height:1.68;color:var(--fg-soft);max-width:66ch;font-weight:300}
+.hl{color:var(--fg);font-weight:500}
+.sig{color:var(--sig);font-weight:500}
+.cyan{color:var(--cyan);font-weight:500}
+code,.mono{font-family:var(--font-mono);font-size:.9em;color:var(--warn)}
+
+/* === SECTION CARD === */
+.section-card{background:var(--sig);color:#141414;padding:clamp(1.1rem,3.2vw,3rem);display:flex;flex-direction:column;gap:clamp(.45rem,1.3vw,1rem);max-width:min(100%,58ch)}
+.section-card .sfor{font-family:var(--font-body);font-weight:700;font-size:var(--micro-size);letter-spacing:.2em;text-transform:uppercase;opacity:.65}
+.section-card .sn{font-family:var(--font-display);font-size:clamp(2.2rem,7.5vw,6rem);line-height:.8;letter-spacing:-.04em}
+.section-card h2{color:#141414}
+.section-card p{font-size:var(--body-size);line-height:1.55;font-weight:400;max-width:46ch}
+
+/* === MEGA === */
+.mega{font-family:var(--font-display);font-size:var(--mega-size);line-height:.84;letter-spacing:-.05em;color:var(--sig)}
+.mega.compact{font-size:clamp(2rem,5.8vw,4.6rem)}
+.mega-note{font-size:var(--body-size);color:var(--fg-soft);font-weight:300;max-width:48ch;line-height:1.62}
+
+/* === STATS === */
+.statrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(clamp(105px,14.5vw,185px),1fr));gap:clamp(.55rem,1.4vw,1.5rem)}
+.stat{border-top:2px solid var(--rule);padding-top:clamp(.4rem,.9vw,.75rem)}
+.stat.accent{border-top-color:var(--sig)}
+.stat.cyan{border-top-color:var(--cyan)}
+.stat.warn{border-top-color:var(--warn)}
+.stat .n{font-family:var(--font-display);font-size:clamp(1.2rem,3.3vw,2.7rem);line-height:1;letter-spacing:-.035em}
+.stat.accent .n{color:var(--sig)}
+.stat.cyan .n{color:var(--cyan)}
+.stat.warn .n{color:var(--warn)}
+.stat .l{font-size:var(--micro-size);color:var(--fg-soft);margin-top:.5em;line-height:1.45;font-weight:400}
+
+/* === LISTS === */
+ul.pts{list-style:none;display:flex;flex-direction:column;gap:clamp(.48rem,1.1vw,1rem)}
+ul.pts li{font-size:var(--body-size);line-height:1.6;color:var(--fg-soft);font-weight:300;padding-left:2em;position:relative;max-width:68ch}
+ul.pts li::before{content:attr(data-n);position:absolute;left:0;top:.02em;font-family:var(--font-display);font-size:.8em;color:var(--sig)}
+
+/* === TABLE === */
+table.data{width:100%;border-collapse:collapse;font-size:clamp(.65rem,.99vw,.89rem)}
+table.data th{text-align:left;font-family:var(--font-body);font-weight:700;font-size:var(--micro-size);letter-spacing:.14em;text-transform:uppercase;color:var(--fg-faint);padding:.5em .7em .5em 0;border-bottom:2px solid var(--rule)}
+table.data td{padding:.5em .7em .5em 0;border-bottom:1px solid var(--rule);color:var(--fg-soft);font-weight:300;vertical-align:baseline}
+table.data td.k{color:var(--fg);font-weight:500}
+table.data td.m{font-family:var(--font-mono);font-size:.92em;color:var(--fg-soft)}
+table.data td.num{font-family:var(--font-display);color:var(--fg);text-align:right;white-space:nowrap;letter-spacing:-.02em}
+table.data tr.flag td{background:var(--sig-dim)}
+table.data tr.flag td.num{color:var(--sig)}
+table.data tr.good td{background:var(--cyan-dim)}
+table.data tr.good td.num{color:var(--cyan)}
+
+/* === SPLIT CARDS === */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(.65rem,1.9vw,2.2rem);align-items:stretch}
+.split3{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(.55rem,1.5vw,1.7rem);align-items:stretch}
+.card{border:2px solid var(--rule);padding:clamp(.75rem,1.8vw,1.7rem);display:flex;flex-direction:column;gap:.5em;justify-content:center;background:var(--panel)}
+.card.bad{border-color:var(--sig);background:var(--sig-dim)}
+.card.good{border-color:var(--cyan);background:var(--cyan-dim)}
+.card .ct{font-family:var(--font-body);font-weight:700;font-size:var(--micro-size);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-faint)}
+.card.bad .ct{color:var(--sig)}
+.card.good .ct{color:var(--cyan)}
+.card .cn{font-family:var(--font-display);font-size:clamp(1.35rem,4vw,3.2rem);line-height:.96;letter-spacing:-.04em}
+.card.bad .cn{color:var(--sig)}
+.card.good .cn{color:var(--cyan)}
+.card .cd{font-size:var(--body-size);color:var(--fg-soft);font-weight:300;line-height:1.55}
+
+/* === VERDICT === */
+.verdict{background:var(--sig);color:#141414;padding:clamp(.6rem,1.5vw,1.15rem) clamp(.8rem,1.9vw,1.6rem);font-family:var(--font-display);font-size:clamp(.78rem,1.75vw,1.3rem);line-height:1.28;letter-spacing:-.015em;text-transform:uppercase}
+.verdict.dark{background:var(--panel-2);color:var(--fg);border-left:clamp(4px,.55vw,7px) solid var(--sig)}
+.verdict.cyan-v{background:var(--panel-2);color:var(--fg);border-left:clamp(4px,.55vw,7px) solid var(--cyan)}
+
+/* === SPEC LIST === */
+.specs{display:flex;flex-direction:column;gap:clamp(.34rem,.88vw,.76rem)}
+.spec{display:grid;grid-template-columns:auto 1fr;gap:clamp(.55rem,1.25vw,1.15rem);align-items:start;padding-bottom:clamp(.34rem,.82vw,.68rem);border-bottom:1px solid var(--rule)}
+.spec .si{font-family:var(--font-display);font-size:clamp(.78rem,1.5vw,1.15rem);color:var(--sig);letter-spacing:-.03em;line-height:1.5}
+.spec .st{font-size:var(--body-size);color:var(--fg);font-weight:400;line-height:1.48}
+.spec .st em{display:block;font-style:normal;font-size:.85em;color:var(--fg-faint);font-weight:300;margin-top:.16em}
+
+.specs .spec:last-child{border-bottom:none;padding-bottom:0}
+ul.pts li:last-child{margin-bottom:0}
+
+/* === COLOPHON ===
+   The one line of chrome this template adds beyond the source system: the
+   maker's credit on the closing slide, in the deck's own tokens. */
+.colophon{font-family:var(--font-body);font-size:var(--micro-size);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-faint);display:flex;flex-wrap:wrap;gap:.75em}
+.colophon a{color:inherit;text-decoration:none;border-bottom:1px solid var(--rule)}
+.colophon a:hover{border-bottom-color:currentColor}
+
+/* === PAGE NUM === */
+.pagenum{position:absolute;bottom:calc(var(--slide-padding) * .55);left:var(--slide-padding);font-family:var(--font-display);font-size:var(--micro-size);letter-spacing:.18em;color:var(--fg-faint);z-index:2}
+
+/* === PROGRESS + DOTS === */
+.progress-bar{position:fixed;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,.07);z-index:1000}
+.progress-bar::after{content:'';position:absolute;top:0;left:0;height:100%;background:var(--sig);width:var(--progress,0%);transition:width .35s var(--ease)}
+.nav-dots{position:fixed;right:clamp(.55rem,1.3vw,1.4rem);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:7px;z-index:1000}
+.nav-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22);cursor:pointer;transition:all .3s ease;border:none;padding:0}
+.nav-dot.active{background:var(--sig);transform:scale(1.45)}
+
+/* === HEIGHT BREAKPOINTS === */
+@media (max-height:700px){
+  .slide{padding-top:clamp(.5rem,2vh,1rem);padding-bottom:clamp(.5rem,2vh,1rem)}
+  h1{font-size:clamp(1.5rem,4.6vh,3rem)}
+  h2{font-size:clamp(1.1rem,3.2vh,2rem)}
+  .mega{font-size:clamp(2.2rem,13vh,5.5rem)}
+  .section-card .sn{font-size:clamp(1.8rem,9vh,4rem)}
+}
+@media (max-height:600px){
+  .slide{justify-content:flex-start;padding-top:1.1rem}
+  h1{font-size:clamp(1.2rem,3.4vh,2rem)}
+  h2{font-size:clamp(.95rem,2.8vh,1.55rem)}
+  .body,ul.pts li{font-size:clamp(.66rem,1.5vh,.88rem)}
+}
+@media (max-width:820px){
+  .split,.split3{grid-template-columns:1fr}
+}
+
+/* === REDUCED MOTION === */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     EVIDENCE DECK — placeholder skeleton
+     ============================================================
+     A dark, full-bleed scroll-snap deck for an argument made out of
+     measurements. Fill the [BRACKETED] slots and delete the slides you
+     do not need.
+
+     Traps, in the order they bite:
+
+     1. Every `.reveal` must be a DIRECT child of `.slide-content`. The
+        stagger is `nth-child`, so a reveal wrapped in a spare <div> gets
+        the wrapper's delay and the siblings after it shift by one.
+     2. The stagger is written for seven children. An eighth reveal appears
+        with no delay, which reads as a jump. Group instead of adding one.
+     3. `.pagenum` is hardcoded per slide. Renumber every one of them after
+        adding or deleting a slide — nothing computes it.
+     4. The nav dots and the progress bar are generated from
+        `document.querySelectorAll('.slide')`, so they follow the slide
+        count on their own. Do not hand-write dots.
+     5. `.slide` and `.slide-content` both clip. A slide that overflows
+        loses its bottom silently rather than scrolling — check every slide
+        at 375px wide and at 600px tall before shipping.
+     6. Numbers set in `--font-display` are Archivo Black, which has no
+        tabular figures of its own; `font-feature-settings:"tnum"` on body
+        is what keeps columns of digits aligned. Leave it alone.
+     ============================================================ -->
+
+<div class="progress-bar"></div>
+<nav class="nav-dots" id="navDots" aria-label="Slide navigation"></nav>
+
+<!-- === 01 TITLE === -->
+<section class="slide">
+  <div class="slide-content">
+    <p class="eyebrow reveal">[AUDIENCE] · [DOCUMENT TYPE] · [VERSION]</p>
+    <h1 class="reveal">[THE CLAIM,<br>IN THREE LINES.]<br><span style="color:var(--sig)">[THE TURN.]</span></h1>
+    <p class="lead reveal">[One sentence saying what this deck is for and what it is built from. Keep it to what a reader needs before slide two.]</p>
+    <div class="verdict reveal">[The single sentence you want remembered if they read nothing else.]</div>
+  </div>
+  <span class="pagenum">01 / 09</span>
+</section>
+
+<!-- === 02 SECTION CARD ===
+     An orange full-bleed card marks a new part of the argument. Use one per
+     section and no more — four in a nine-slide deck is wallpaper. -->
+<section class="slide">
+  <div class="slide-content" style="align-items:flex-start">
+    <div class="section-card reveal">
+      <p class="sfor">[WHAT THIS SECTION FEEDS]</p>
+      <div class="sn">01</div>
+      <h2>[The section's<br>claim in two<br>short lines]</h2>
+      <p>[One supporting sentence. This is the only body copy the section card should carry.]</p>
+    </div>
+  </div>
+  <span class="pagenum">02 / 09</span>
+</section>
+
+<!-- === 03 DATA TABLE ===
+     `tr.flag` tints a row in the signal colour, `tr.good` in cyan. Use them
+     for the rows the reader must not skim past; a table where every row is
+     flagged has flagged nothing. -->
+<section class="slide">
+  <div class="slide-content">
+    <p class="eyebrow reveal">[WHAT THE TABLE MEASURES]</p>
+    <h2 class="reveal">[What the table shows, said as a sentence]</h2>
+    <table class="data reveal">
+      <thead><tr><th>[COLUMN]</th><th>[COLUMN]</th><th style="text-align:right">[NUMBER]</th></tr></thead>
+      <tbody>
+        <tr><td class="k">[Row label]</td><td>[Plain reading]</td><td class="num">000</td></tr>
+        <tr><td class="m">[/path/or/identifier]</td><td>[Plain reading]</td><td class="num">000</td></tr>
+        <tr class="flag"><td class="k">[The row that is a problem]</td><td><span class="sig">[Why it is the problem]</span></td><td class="num">000</td></tr>
+        <tr class="good"><td class="k">[The row that is working]</td><td>[Why it is working]</td><td class="num">000</td></tr>
+      </tbody>
+    </table>
+    <p class="body reveal">[What follows from the table. Mark the load-bearing phrase with <span class="hl">the highlight class</span>, and the alarming one with <span class="sig">the signal class</span>.]</p>
+  </div>
+  <span class="pagenum">03 / 09</span>
+</section>
+
+<!-- === 04 SPLIT CARDS ===
+     Two cards, one comparison. `.bad` is the signal colour, `.good` is cyan;
+     a plain `.card` is neutral. `.split3` takes three. -->
+<section class="slide">
+  <div class="slide-content" style="gap:clamp(.85rem,2.1vw,1.9rem)">
+    <p class="eyebrow reveal">[WHAT IS BEING COMPARED]</p>
+    <h2 class="reveal">[The comparison stated as a conclusion]</h2>
+    <div class="split reveal">
+      <div class="card"><div class="ct">[WHAT WAS CLAIMED]</div><div class="cn">000</div><div class="cd">[Where the number comes from, in one line.]</div></div>
+      <div class="card bad"><div class="ct">[WHAT IS ACTUALLY THERE]</div><div class="cn">0,000</div><div class="cd">[Where this number comes from, and why it is the one to trust.]</div></div>
+    </div>
+    <p class="body reveal">[The consequence of the gap. One paragraph, no more.]</p>
+    <div class="verdict cyan-v reveal">[Something already settled, or already delivered. Cyan means resolved.]</div>
+  </div>
+  <span class="pagenum">04 / 09</span>
+</section>
+
+<!-- === 05 MEGA NUMBER ===
+     One number, at display size, with the sentence that makes it mean
+     something. `.mega.compact` is the smaller size for a long figure. -->
+<section class="slide">
+  <div class="slide-content">
+    <p class="eyebrow reveal">[WHAT THIS NUMBER IS]</p>
+    <h2 class="reveal">[The headline the number supports]</h2>
+    <div class="reveal" style="display:flex;flex-direction:column;gap:.45rem">
+      <div class="mega">0,000</div>
+      <p class="mega-note">[What the number counts, measured over what period, from which source. A mega number with no provenance is decoration.]</p>
+    </div>
+    <p class="body reveal"><span class="sig">[Hold this loosely.]</span> [Say plainly what the figure does and does not establish. A deck that marks its own weak evidence is easier to trust than one that does not.]</p>
+    <div class="verdict reveal">[The decision this number should drive.]</div>
+  </div>
+  <span class="pagenum">05 / 09</span>
+</section>
+
+<!-- === 06 STAT ROW + THREE CARDS ===
+     `.stat` takes `.accent`, `.cyan` or `.warn` on the rule above it. Four
+     stats fit comfortably; six wrap and stop being scannable. -->
+<section class="slide">
+  <div class="slide-content">
+    <p class="eyebrow reveal">[WHAT THE ROW MEASURES]</p>
+    <h2 class="reveal">[The reading of the row, in one line]</h2>
+    <div class="statrow reveal">
+      <div class="stat accent"><div class="n">0,000</div><div class="l">[what it counts,<br>over what period]</div></div>
+      <div class="stat warn"><div class="n">00s</div><div class="l">[the figure that<br>should worry someone]</div></div>
+      <div class="stat cyan"><div class="n">00%</div><div class="l">[the figure that<br>is going well]</div></div>
+      <div class="stat"><div class="n">0</div><div class="l">[the figure that is missing]</div></div>
+    </div>
+    <div class="split3 reveal">
+      <div class="card"><div class="ct">[FACET]</div><div class="cn" style="font-size:clamp(.9rem,2.1vw,1.5rem);letter-spacing:0;font-family:var(--font-mono)">[short<br>label]</div><div class="cd">[One line.]</div></div>
+      <div class="card good"><div class="ct">[FACET]</div><div class="cn" style="font-size:clamp(.9rem,2.1vw,1.5rem);letter-spacing:0;font-family:var(--font-mono)">[short<br>label]</div><div class="cd">[One line.]</div></div>
+      <div class="card"><div class="ct">[FACET]</div><div class="cn" style="font-size:clamp(.9rem,2.1vw,1.5rem);letter-spacing:0;font-family:var(--font-mono)">[short<br>label]</div><div class="cd">[One line.]</div></div>
+    </div>
+  </div>
+  <span class="pagenum">06 / 09</span>
+</section>
+
+<!-- === 07 SPEC LIST ===
+     Numbered requirements, each with the evidence underneath it in <em>.
+     This is the slide that gets copied into a specification document. -->
+<section class="slide">
+  <div class="slide-content">
+    <p class="eyebrow reveal">[WHERE THESE GO NEXT]</p>
+    <h2 class="reveal">[How many requirements, and what they are for]</h2>
+    <div class="specs">
+      <div class="spec reveal"><span class="si">01</span><span class="st">[The requirement, written as an instruction]<em>[The measurement that justifies it]</em></span></div>
+      <div class="spec reveal"><span class="si">02</span><span class="st">[The requirement, written as an instruction]<em>[The measurement that justifies it]</em></span></div>
+      <div class="spec reveal"><span class="si">03</span><span class="st">[The requirement, written as an instruction]<em>[The measurement that justifies it]</em></span></div>
+      <div class="spec reveal"><span class="si">04</span><span class="st">[The requirement, written as an instruction]<em>[The measurement that justifies it]</em></span></div>
+      <div class="spec reveal"><span class="si">05</span><span class="st">[The requirement, written as an instruction]<em>[The measurement that justifies it]</em></span></div>
+    </div>
+  </div>
+  <span class="pagenum">07 / 09</span>
+</section>
+
+<!-- === 08 NUMBERED POINTS ===
+     `data-n` sets the marker, so it can be Q1, 01, — or anything short.
+     Each <li> is its own reveal; five is the comfortable maximum. -->
+<section class="slide">
+  <div class="slide-content">
+    <p class="eyebrow reveal">[WHO THIS IS BLOCKED ON]</p>
+    <h2 class="reveal">[The group of open questions, named]</h2>
+    <ul class="pts">
+      <li data-n="Q1" class="reveal"><span class="hl">[The question in bold.]</span> [Why it blocks what it blocks. <span class="sig">[Say plainly if everything waits on it.]</span>]</li>
+      <li data-n="Q2" class="reveal"><span class="hl">[The question in bold.]</span> [What the answer decides.]</li>
+      <li data-n="Q3" class="reveal"><span class="hl">[The question in bold.]</span> [What the answer decides. Paths and identifiers go in <code>code</code>.]</li>
+      <li data-n="Q4" class="reveal"><span class="hl">[The question in bold.]</span> [What the answer decides.]</li>
+    </ul>
+  </div>
+  <span class="pagenum">08 / 09</span>
+</section>
+
+<!-- === 09 CLOSING === -->
+<section class="slide">
+  <div class="slide-content">
+    <p class="eyebrow reveal">[WHAT HAPPENS NEXT]</p>
+    <h2 class="reveal">[The closing line — the thing they should do on Monday]</h2>
+    <p class="body reveal">[Where the underlying data lives, who owns the next step, and by when.]</p>
+    <div class="verdict dark reveal">[The one sentence that survives the meeting.]</div>
+    <p class="colophon reveal">
+      <!-- logo: the identity line. Replace or delete per the `logo` answer. -->
+      <a href="https://monomind.one/?ref=deck-mark" target="_blank" rel="noopener noreferrer">monomind ai lab</a>
+      <!-- credit: the maker's colophon. Ships by default; remove the <a> below
+           (only) when the intake answered `credit: false`. The product name is
+           wrapped notranslate so a reader's browser translation leaves it
+           alone — "Made with" is meant to translate. -->
+      <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer">Made with <span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></a>
+    </p>
+  </div>
+  <span class="pagenum">09 / 09</span>
+</section>
+
+<script>
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER
+   =========================================== */
+class SlidePresentation {
+  constructor(){
+    this.slides=document.querySelectorAll('.slide');
+    this.currentSlide=0;
+    this.setupIntersectionObserver();
+    this.setupKeyboardNav();
+    this.setupTouchNav();
+    this.setupNavDots();
+    this.updateProgress();
+  }
+  setupIntersectionObserver(){
+    const observer=new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          entry.target.classList.add('visible');
+          this.currentSlide=Array.from(this.slides).indexOf(entry.target);
+          this.updateProgress();
+          this.updateNavDots();
+        }
+      });
+    },{threshold:.5});
+    this.slides.forEach(s=>observer.observe(s));
+  }
+  goTo(i){
+    if(i<0||i>=this.slides.length)return;
+    this.slides[i].scrollIntoView({behavior:'smooth'});
+  }
+  setupKeyboardNav(){
+    document.addEventListener('keydown',e=>{
+      if(['ArrowDown','ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault();this.goTo(this.currentSlide+1)}
+      if(['ArrowUp','ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();this.goTo(this.currentSlide-1)}
+      if(e.key==='Home'){e.preventDefault();this.goTo(0)}
+      if(e.key==='End'){e.preventDefault();this.goTo(this.slides.length-1)}
+    });
+  }
+  setupTouchNav(){
+    let startY=0;
+    document.addEventListener('touchstart',e=>{startY=e.touches[0].clientY},{passive:true});
+    document.addEventListener('touchend',e=>{
+      const d=startY-e.changedTouches[0].clientY;
+      if(Math.abs(d)>50)this.goTo(this.currentSlide+(d>0?1:-1));
+    },{passive:true});
+  }
+  updateProgress(){
+    const pct=(this.currentSlide/(this.slides.length-1))*100;
+    document.querySelector('.progress-bar').style.setProperty('--progress',pct+'%');
+  }
+  setupNavDots(){
+    const nav=document.getElementById('navDots');
+    this.slides.forEach((_,i)=>{
+      const dot=document.createElement('button');
+      dot.className='nav-dot'+(i===0?' active':'');
+      dot.setAttribute('aria-label','Go to slide '+(i+1));
+      dot.addEventListener('click',()=>this.goTo(i));
+      nav.appendChild(dot);
+    });
+  }
+  updateNavDots(){
+    document.querySelectorAll('.nav-dot').forEach((d,i)=>d.classList.toggle('active',i===this.currentSlide));
+  }
+}
+new SlidePresentation();
+</script>
+</body>
+</html>

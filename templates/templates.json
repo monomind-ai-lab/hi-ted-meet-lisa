@@ -149,6 +149,72 @@
       ],
       "preview": "previews/project-website.html",
       "thumb_source": "previews/project-website.html"
+    },
+    {
+      "id": "evidence-deck",
+      "name": "Evidence deck",
+      "tagline": "Dark full-bleed slides that argue from numbers — tables, stat rows, verdict bars.",
+      "file": "assets/tedandlisa-template-evidence-deck.html",
+      "patterns": "references/slide-patterns-evidence-deck.md",
+      "thumb": "templates/thumbs/evidence-deck.png",
+      "kind": "slides",
+      "best_for": "An argument someone will push back on: an audit, a diagnosis, a recommendation that has to show its evidence.",
+      "navigation": "Vertical scroll-snap, arrow keys, swipe; fixed progress bar and nav dots down the right edge.",
+      "languages": "One language per deck, written inline — no translation service, works offline.",
+      "dependencies": "Google Fonts only — Archivo Black, Space Grotesk, JetBrains Mono.",
+      "features": [
+        "data tables with flagged rows",
+        "stat rows and mega numbers",
+        "verdict bars",
+        "orange section cards",
+        "numbered spec lists"
+      ],
+      "preview": "previews/evidence-deck.html",
+      "thumb_source": "previews/evidence-deck.html"
+    },
+    {
+      "id": "paper-brief",
+      "name": "Paper brief",
+      "tagline": "Light paper slides paced in chapters — mega numbers, bar charts, decision boxes.",
+      "file": "assets/tedandlisa-template-paper-brief.html",
+      "patterns": "references/slide-patterns-paper-brief.md",
+      "thumb": "templates/thumbs/paper-brief.png",
+      "kind": "slides",
+      "best_for": "A briefing that will be read at desk distance and forwarded: a planning input, a review, a recommendation someone prints.",
+      "navigation": "Vertical scroll-snap, arrow keys, swipe; progress bar and nav dots, with inverted chapter pages marking the seams.",
+      "languages": "Traditional Chinese, single language, Noto Sans TC over Archivo — no toggle, no translation service.",
+      "dependencies": "Google Fonts only — Archivo and Noto Sans TC.",
+      "features": [
+        "inverted chapter pages",
+        "animated bar charts",
+        "decision boxes",
+        "twelve-column grid field",
+        "numbered spec lists"
+      ],
+      "preview": "previews/paper-brief.html",
+      "thumb_source": "previews/paper-brief.html"
+    },
+    {
+      "id": "framed-deck",
+      "name": "Framed deck",
+      "tagline": "A framed 16:9 canvas that scales its own type — projected, clicked through, printed.",
+      "file": "assets/tedandlisa-template-framed-deck.html",
+      "patterns": "references/slide-patterns-framed-deck.md",
+      "thumb": "templates/thumbs/framed-deck.png",
+      "kind": "slides",
+      "best_for": "A short spoken deck that will also be linked and printed unchanged — a launch, a teaching session, a conference talk.",
+      "navigation": "One slide at a time in a fixed 16:9 frame; arrows, space, click zones, prev/next buttons, deep links (#3), f for fullscreen, p to print.",
+      "languages": "One language per deck, written inline — no translation service, works offline.",
+      "dependencies": "Google Fonts only — Geist and Geist Mono, both with real fallbacks.",
+      "features": [
+        "framed 16:9 canvas, type in container units",
+        "deep-linkable slides",
+        "inline SVG diagram frame",
+        "command and reference blocks",
+        "prints 1280x720, one slide per page"
+      ],
+      "preview": "previews/framed-deck.html",
+      "thumb_source": "previews/framed-deck.html"
     }
   ]
 }
