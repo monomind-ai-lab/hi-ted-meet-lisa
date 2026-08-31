@@ -31,7 +31,7 @@ entries = json.loads((root / "templates/templates.json").read_text())["templates
 cards = []
 for t in entries:
     card = {k: t.get(k) for k in
-            ("id", "name", "tagline", "kind", "best_for", "dependencies",
+            ("id", "name", "tagline", "kind", "type", "best_for", "dependencies",
              "languages", "preview", "skill", "badge") if t.get(k) is not None}
     thumb = root / t.get("thumb", "")
     if t.get("thumb") and thumb.is_file():

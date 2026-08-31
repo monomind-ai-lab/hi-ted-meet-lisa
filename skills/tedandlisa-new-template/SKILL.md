@@ -71,9 +71,18 @@ confirm before doing it.
    ```sh
    python3 scripts/tedandlisa_new_template.py register --id ID --name "NAME" \
      --file assets/tedandlisa-template-ID.html --kind slides|document \
+     --type present|read|diagram|site \
      --tagline "..." --patterns references/slide-patterns-ID.md \
      --best-for "..." --dependencies "..."
    ```
+
+   `--kind` is the **shape** and decides which intake questions are asked
+   (`D-007`, `D-017`). `--type` is what the template is **for** — it is the
+   flag on the gallery card and the filter above it, and it never reaches
+   the payload (`D-034`). They are separate axes and cut across each other:
+   `paper-brief` is `slides` you `read`, `architecture` is a `document` you
+   `diagram` in. Pick the type from the reader's purpose, not the file's
+   shape.
 7. **Capture its thumbnail** so it appears in the intake gallery:
 
    ```sh

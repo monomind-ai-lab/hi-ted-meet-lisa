@@ -3,7 +3,8 @@
 
     python3 scripts/tedandlisa_new_template.py analyze SOURCE.html
     python3 scripts/tedandlisa_new_template.py register --id ID --name NAME \
-        --file assets/FILE.html --kind slides|document [--tagline ...]
+        --file assets/FILE.html --kind slides|document \
+        --type present|read|diagram|site [--tagline ...]
 
 `analyze` is read-only. It reports what a document is made of — tokens, class
 inventory, chrome, scripts, external dependencies, and how it handles language —
@@ -88,6 +89,7 @@ def register(args) -> int:
         "patterns": args.patterns or "",
         "thumb": f"templates/thumbs/{args.id}.png",
         "kind": args.kind,
+        "type": args.type,
         "best_for": args.best_for or "",
         "navigation": args.navigation or "",
         "languages": args.languages or "",
@@ -112,7 +114,12 @@ def main() -> int:
     r.add_argument("--id", required=True)
     r.add_argument("--name", required=True)
     r.add_argument("--file", required=True, help="repo-relative path to the skeleton")
-    r.add_argument("--kind", required=True, choices=["slides", "document"])
+    r.add_argument("--kind", required=True, choices=["slides", "document"],
+                   help="the shape — it decides which intake questions are asked")
+    r.add_argument("--type", required=True,
+                   choices=["present", "read", "diagram", "site"],
+                   help="what it is for — the gallery flag and filter, never "
+                        "the payload")
     r.add_argument("--tagline")
     r.add_argument("--patterns")
     r.add_argument("--best-for", dest="best_for")

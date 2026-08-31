@@ -47,8 +47,8 @@ def load_templates() -> list[dict]:
     out = []
     for t in entries:
         card = {k: t.get(k) for k in
-                ("id", "name", "tagline", "kind", "best_for", "dependencies", "languages",
-                 "preview", "skill", "badge")}
+                ("id", "name", "tagline", "kind", "type", "best_for", "dependencies",
+                 "languages", "preview", "skill", "badge")}
         thumb = ROOT / t.get("thumb", "")
         if t.get("thumb") and thumb.is_file():
             card["thumb"] = "data:image/png;base64," + base64.b64encode(thumb.read_bytes()).decode()
