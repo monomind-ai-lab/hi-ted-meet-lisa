@@ -10,30 +10,66 @@ input, a review, a recommendation someone prints. Use `evidence-deck` when the
 same argument has to survive a projector, and `web-document` when it wants a
 URL per section.
 
-## Language
+## Language — Traditional Chinese and English, written inline
 
-The template ships in Traditional Chinese, single language, exactly as its
-source system did — `<html lang="zh-Hant">`, `Noto Sans TC` for body copy and
-`Archivo` for display. There is no toggle and no translation runtime; unlike
-`web-document` and `mermaid-master` there is no second language written inline
-(`D-010` covers the bilingual shapes, not this one).
+The house inline-bilingual mechanism: both languages are written into the
+markup and one of them is hidden by CSS. No translation service, so the switch
+is instant and the file still opens with no network.
 
-Two consequences worth stating before a deck is built:
+**The pair is `zh-TW` + `en`, and `zh-TW` is what it opens in.** `D-010` makes
+English and Korean the default pair for the inline-bilingual shapes, but this
+template already had a language when it arrived: Traditional Chinese is half
+its type system — `Noto Sans TC` is not decoration here, it is the body face —
+and deleting it to satisfy a default would throw away the identity the template
+exists to carry. English is the second language because English is the one
+language `languages` always ships. Korean is an addition like any other: a
+third set of spans, a third button, and `Noto Sans KR` appended to both stacks.
 
-- **Changing language means changing the font stack.** `--font-body` and
-  `--font-display` are the whole mechanism. A deck written in English on
-  `Noto Sans TC` will render, and will look subtly wrong.
+```css
+body[data-lang="zh-TW"] .en{display:none !important}
+body[data-lang="en"] .zh{display:none !important}
+/* Latin body copy moves to Archivo, so English is set in the same family as
+   the display face rather than in the Latin of a CJK font. */
+body[data-lang="en"]{--font-body:'Archivo','Noto Sans TC',sans-serif}
+```
+
+```html
+<p class="lead reveal"><span class="zh">[中文句子。]</span><span class="en">[The English sentence.]</span></p>
+```
+
+Four things that go wrong:
+
+- **A string written once shows in both languages.** No fallback, no warning.
+  Table cells, bar labels, card headings, the `data-label-*` menu names and the
+  署名 all need the pair.
+- **The spans go INSIDE the reveal, never around it.** The stagger is
+  `nth-child`; a language span wrapped around a reveal steals its delay.
+- **English is longer than Chinese, and the pages clip.** `.slide` and
+  `.slide-content` both `overflow:hidden`, so a page that fits in Chinese can
+  lose its bottom in English without a scrollbar to say so. Check every page in
+  both languages at 375px wide and 600px tall.
 - **Mixed CJK and Latin numerals are the point.** `font-feature-settings:"tnum"`
-  on `body` keeps the Latin figures aligned inside CJK sentences.
+  on `body` keeps the Latin figures aligned inside CJK sentences, in both
+  languages.
+
+A term that must survive translation — a product name, a command, an identifier
+— is written **identically in both spans** and wrapped
+`<span class="notranslate" translate="no">`. That is what the `noTranslate`
+answer means here; see the answers section at the foot.
+
+Dropping a language means deleting its spans *and* its button; every control is
+guarded in the script, so nothing breaks when one is gone.
 
 ## The shape of a slide
 
+`data-label-zh` / `data-label-en` are what the 目錄 menu lists.
+
 ```html
-<section class="slide">
+<section class="slide" data-label-zh="[頁面名稱]" data-label-en="[PAGE NAME]">
   <div class="slide-content">
-    <p class="eyebrow reveal">[這一頁在談什麼]</p>
-    <h2 class="reveal">[把結論寫成一句話]</h2>
-    <p class="body reveal">[支持這個結論的一段話。]</p>
+    <p class="eyebrow reveal"><span class="zh">[這一頁在談什麼]</span><span class="en">[WHAT THIS PAGE IS ABOUT]</span></p>
+    <h2 class="reveal"><span class="zh">[把結論寫成一句話]</span><span class="en">[The conclusion, as a sentence]</span></h2>
+    <p class="body reveal"><span class="zh">[支持這個結論的一段話。]</span><span class="en">[The paragraph that supports it.]</span></p>
   </div>
   <span class="pagenum">01</span>
 </section>
@@ -196,14 +232,96 @@ a decision box with no verb in it is a summary wearing a decision's clothes.
 `<em>` is restyled as a block sub-line, not italics. `data-n` is the list
 marker, drawn by `::before`, so it takes `Q1`, `01`, `—` or any short string.
 
+## The chrome — mark, language switch, menu
+
+One fixed cluster at the top right, clear of the nav dots (right edge, centred)
+and the page number (bottom left). `--chrome-clear` is the headroom every page
+leaves for it: `.slide` sets `padding-top:max(var(--slide-padding),
+var(--chrome-clear))`. That is also what keeps the title pages' red rule below
+the cluster on a narrow screen, where `--slide-padding` bottoms out at 1.4rem.
+
+```html
+<div class="deck-chrome">
+  <!-- logo -->
+  <a class="deck-mark" href="https://monomind.one/?ref=deck-mark" target="_blank" rel="noopener noreferrer" aria-label="MonoMind">
+    <svg viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><!-- the mark's two paths --></svg>
+  </a>
+
+  <!-- languages -->
+  <div class="seg" role="group" id="langSeg" aria-label="語言">
+    <button type="button" id="btnZh" aria-pressed="true">繁中</button>
+    <button type="button" id="btnEn" aria-pressed="false">EN</button>
+  </div>
+
+  <!-- menu: "full" -->
+  <nav class="deck-menu" id="deckMenu" data-open="false">
+    <button class="deck-menu-btn" type="button" id="deckMenuBtn"
+            aria-expanded="false" aria-controls="deckMenuPanel" aria-label="選單">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="deck-menu-panel" id="deckMenuPanel" role="menu" aria-labelledby="deckMenuBtn">
+      <button type="button" role="menuitem" id="deckMenuStart">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 17.5 11 12l7-5.5v11Z" fill="currentColor" stroke="none"/><path d="M6.5 6v12"/></svg>
+        <span class="zh">回到第一頁</span><span class="en">Back to the start</span>
+      </button>
+      <button type="button" role="menuitem" id="deckMenuContents" aria-expanded="false" aria-controls="deckContents">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        <span class="zh">目錄</span><span class="en">Contents</span>
+      </button>
+      <div class="deck-menu-sub" id="deckContents" role="none" hidden></div>
+      <button type="button" role="menuitem" id="deckMenuLang">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 3 2.6 15 0 18M12 3c-2.6 3-2.6 15 0 18"/></svg>
+        <span class="zh">Read in English</span><span class="en">改看繁體中文</span>
+      </button>
+    </div>
+  </nav>
+</div>
+```
+
+**目錄 is generated, never hand-written.** The script walks
+`document.querySelectorAll('.slide')` and builds one button per page from its
+`data-label-zh` / `data-label-en`, writing *both* spans so the language switch
+moves the menu too. It cannot drift out of sync with the page list.
+
+**Applying the `menu` answer is deleting markup, not editing script.** Every
+control is looked up by id and guarded:
+
+| Answer | What to do |
+| --- | --- |
+| `menu: full` | Ships as above. |
+| `menu: minimal` | Delete `<nav class="deck-menu">` and put one back-to-the-start button in the cluster, wired to `window.__deckGo(0)`. |
+| `menu: none` | Delete `<nav class="deck-menu">`. The language segment is a different answer and stays. |
+| `menu.items` without `contents` | Delete `#deckMenuContents` and `#deckContents`. |
+| `menu.items` without `language` | Delete `#deckMenuLang`; the chrome segment is unaffected. |
+| `menu.items` with `home` / `github` | Both ship commented out, because their URLs default to `null` and an item pointing nowhere is worse than no item. Uncomment and set a real `href`. |
+| `menu.items` with `pdf` / `html` | Also commented out, and `pdf` needs the `@media print` block written first. |
+
+Three keyboard details, already handled — do not undo them:
+
+- **One capture-phase `keydown` listener on `.deck-chrome` stops propagation.**
+  The controller listens on `document`, so without it a Space press on a
+  focused chrome button would be swallowed by the controller's `preventDefault`
+  and turn the page instead. `stopPropagation` does not cancel a default
+  action, so Enter and Space still activate the buttons.
+- **Escape closes the menu and returns focus to the hamburger**; Arrow
+  Up/Down/Home/End rove between the open panel's `[role="menuitem"]`s.
+- **Nothing here reimplements scrolling.** `window.__deckGo(i)` is published by
+  the controller's own last two lines.
+
 ## Chrome — do not rewrite
 
 - The controller is one class at the foot of the file — `IntersectionObserver`
   for `.visible`, plus keyboard, touch, progress bar and nav dots. It counts
   `.slide` itself; never hand-write dots.
+- The class body is untouched from the source system. Its only extension is the
+  last two lines, publishing `window.__deckGo` so the menu reuses `goTo`. New
+  behaviour goes in a **new script block**.
 - `html{scroll-snap-type:y mandatory}` with `body{overflow:hidden}` is the snap.
+  A consequence worth knowing when measuring: **`body` is the scroller, not
+  `documentElement`** — a check reading `document.scrollingElement.scrollTop`
+  reports 0 forever.
 - `.slide` and `.slide-content` both clip: an overflowing page loses its bottom
-  in silence. Check every page at 375px wide and 600px tall.
+  in silence. Check every page at 375px wide and 600px tall, in both languages.
 - The grid field is `background-size:calc(100vw/12)`, so it is genuinely twelve
   columns at any width. Chapter pages switch it off; nothing else should.
 
@@ -212,18 +330,52 @@ marker, drawn by `::before`, so it takes `Q1`, `01`, `—` or any short string.
 The closing page's meta row carries the credit as its last item, in the row's
 own micro type. It ships by default; remove that last `<span>` (only) when the
 intake answered `credit: false` — the `monomind ai lab` span before it belongs
-to the `logo` answer. The product name is wrapped `notranslate` so a reader's
-browser translation leaves it alone.
+to the `logo` answer. It is written once per language — the Chinese form keeps
+its Chinese wording — with the product name identical in both and wrapped
+`notranslate` so a reader's browser translation leaves it alone.
 
 ```html
-<span><a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer">以 <span class="notranslate" translate="no">Hi Ted, Meet Lisa</span> 製作</a></span>
+<span><a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer"><span class="zh">以 <span class="notranslate" translate="no">Hi Ted, Meet Lisa</span> 製作</span><span class="en">Made with <span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></span></a></span>
 ```
+
+## The intake answers this template cannot take at face value
+
+Four answers reach a `slides` template whose wording assumes `monomind-deck`.
+What each one actually means here:
+
+- **`backgrounds`.** Its default reads "the two images already embedded in the
+  template". **Nothing is embedded here** — this brief is paper and type — so
+  `monomind` and `gradient` produce the same file. `upload` is real: put the
+  data URI on the cover and closing pages and the white scrim keeps the type
+  legible.
+
+  ```html
+  <section class="slide title-slide" data-bg style="--bg-img:url(data:image/jpeg;base64,…)">
+  ```
+- **`noTranslate`.** The question is written for Google Translate, which this
+  template does not use — but the list still applies twice over. Every term on
+  it must be written **identically in both language spans**, and wrapped
+  `<span class="notranslate" translate="no">` so a reader's own browser
+  translation leaves it alone.
+- **`theme`.** The question's hint says "It ships dark". **This one ships
+  light** — white paper is the template, not a setting — so `theme: light` is
+  the no-op and `theme: dark` is the work. The tokens now cover the whole
+  ground, including the ones that used to be hardcoded: `--track` (the bar
+  channel), `--decision-bg`, and `--invert-bg` / `--invert-ink` /
+  `--invert-soft` for the chapter pages, which are already the inverse and must
+  invert *back* if the deck goes dark. **`theme: toggle` is not supported**: a
+  runtime switch would need a second full palette reviewed on every page,
+  chapter inversions included. Say so rather than shipping a half switch.
+- **`export`.** Neither format ships. `html` is a few lines (clone the
+  document, clear the generated 目錄, Blob it) and `pdf` needs the
+  `@media print` block written.
 
 ## Dependencies
 
-Google Fonts only — Archivo and Noto Sans TC. `delivery: standalone` inlines
-both, and Noto Sans TC is the expensive half: subset it to the glyphs the deck
-actually uses or the file gains several megabytes.
+Google Fonts only — Archivo (300 through 900; the 300 is what English body copy
+is set in) and Noto Sans TC. `delivery: standalone` inlines both, and Noto Sans
+TC is the expensive half: subset it to the glyphs the deck actually uses or the
+file gains several megabytes.
 
 There is no print stylesheet. Answering `export: pdf` on this template means
 writing the `@media print` block, not switching one on.

@@ -167,15 +167,17 @@
       "kind": "slides",
       "type": "present",
       "best_for": "An argument someone will push back on: an audit, a diagnosis, a recommendation that has to show its evidence.",
-      "navigation": "Vertical scroll-snap, arrow keys, swipe; fixed progress bar and nav dots down the right edge.",
-      "languages": "One language per deck, written inline — no translation service, works offline.",
-      "dependencies": "Google Fonts only — Archivo Black, Space Grotesk, JetBrains Mono.",
+      "navigation": "Vertical scroll-snap, arrow keys, swipe; progress bar and nav dots down the right edge, plus a hamburger menu beside the mark that lists every slide and jumps to it.",
+      "languages": "English and Korean written inline and toggled instantly — no translation service, works offline.",
+      "dependencies": "Google Fonts only — Archivo Black, Space Grotesk, JetBrains Mono, Noto Sans KR.",
       "features": [
         "data tables with flagged rows",
         "stat rows and mega numbers",
         "verdict bars",
         "orange section cards",
-        "numbered spec lists"
+        "numbered spec lists",
+        "menu with generated contents",
+        "English/Korean switch in the chrome"
       ],
       "preview": "previews/evidence-deck.html",
       "thumb_source": "previews/evidence-deck.html"
@@ -190,15 +192,17 @@
       "kind": "slides",
       "type": "read",
       "best_for": "A briefing that will be read at desk distance and forwarded: a planning input, a review, a recommendation someone prints.",
-      "navigation": "Vertical scroll-snap, arrow keys, swipe; progress bar and nav dots, with inverted chapter pages marking the seams.",
-      "languages": "Traditional Chinese, single language, Noto Sans TC over Archivo — no toggle, no translation service.",
+      "navigation": "Vertical scroll-snap, arrow keys, swipe; progress bar and nav dots, inverted chapter pages marking the seams, and a hamburger menu beside the mark that lists every page and jumps to it.",
+      "languages": "Traditional Chinese and English written inline and toggled instantly — opens in Chinese on Noto Sans TC, no translation service, works offline.",
       "dependencies": "Google Fonts only — Archivo and Noto Sans TC.",
       "features": [
         "inverted chapter pages",
         "animated bar charts",
         "decision boxes",
         "twelve-column grid field",
-        "numbered spec lists"
+        "numbered spec lists",
+        "menu with generated contents",
+        "Chinese/English switch in the chrome"
       ],
       "preview": "previews/paper-brief.html",
       "thumb_source": "previews/paper-brief.html"
