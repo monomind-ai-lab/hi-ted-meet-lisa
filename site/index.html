@@ -541,6 +541,49 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
   .overlay .sheet { border-width: 0; height: 100%; }
   .overlay .close { top: 12px; right: 12px; transform: none; }
 }
+
+/* ── preview lightbox ──────────────────────────────────────────
+   The gallery's previews are framed here rather than thrown into a new
+   tab. Same overlay / sheet / close furniture as the intake panel above,
+   plus a bar naming the template and carrying a real new-tab link — the
+   treatment `assets/tedandlisa-intake.html`'s `.pvw` already uses.
+   The title grows into the space with its own `flex: 1` rather than the
+   row distributing its children, so the link keeps the right edge however
+   long or short the name is (`L-028`). */
+#preview-overlay .sheet { display: flex; flex-direction: column; }
+.pvw-bar {
+  flex: 0 0 auto; display: flex; align-items: center; gap: 16px;
+  padding: 11px 16px; border-bottom: 1px solid var(--hair);
+  background: var(--bg-lift);
+}
+.pvw-title {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--cream-dim);
+}
+.pvw-open { font-size: 13px; color: var(--terracotta); text-decoration: none; white-space: nowrap; }
+.pvw-open:hover { text-decoration: underline; }
+#preview-overlay iframe { flex: 1 1 auto; height: auto; min-height: 0; background: #fff; }
+/* Two zero-size tab stops, one at each end of the sheet. Focus landing on
+   either bounces to the far end, which is the only way to keep a Tab inside
+   a dialog that frames a whole second document: key events never cross that
+   boundary, but the browser's own tab order walks out of the frame into
+   whatever follows it here — and what follows it is the trailing stop. */
+.pvw-edge { flex: 0 0 0; width: 0; height: 0; overflow: hidden; outline: none; }
+@media (max-width: 720px) {
+  /* Below this width the close button moves inside the sheet — leave it room
+     rather than let it sit on top of the new-tab link. */
+  .pvw-bar { padding-right: 60px; }
+}
+/* Words for a screen reader on a button whose visible label is a glyph. Not
+   `display: none`, which would take them out of the accessible name too. They
+   live in `T` like every other hand-written string, which an `aria-label`
+   could not: `applyInline` writes innerHTML, never attributes. */
+.vh {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%);
+  white-space: nowrap; border: 0;
+}
 </style>
 </head>
 <body>
@@ -780,6 +823,25 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
           <p class="prov">This preview is a real open-source project's deck,
           rebranded — the same move a private pack makes with yours.</p></div>
         </a>
+        <!-- Appended after the seven cards that were already here, and before
+             the bridge card below. Several gallery entries in `T` are keyed on
+             `.gallery .card:nth-child(N)` for N = 1…7, so inserting anywhere
+             above would silently point them at the wrong card; appending
+             leaves 1…7 where they were. The bridge card is renumbered from 8
+             to 10 by this, and every one of its entries is keyed on
+             `.card.yours`, so nothing of its moves. -->
+        <a class="card" target="_blank" href="previews/evidence-deck.html" rel="noopener noreferrer">
+          <div class="frame"><img src="previews/evidence-deck.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
+          <div class="meta"><h3>Evidence Deck <span class="kind">slides</span></h3>
+          <p>Slides that argue from numbers. Vertical scroll-snap on dark
+          ground — data tables with flagged rows, stat rows, verdict bars.</p></div>
+        </a>
+        <a class="card" target="_blank" href="previews/paper-brief.html" rel="noopener noreferrer">
+          <div class="frame"><img src="previews/paper-brief.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
+          <div class="meta"><h3>Paper Brief <span class="kind">brief</span></h3>
+          <p>A briefing on light paper, paced in chapters. Oversized numbers,
+          bar charts, decision boxes — inverted pages mark the seams.</p></div>
+        </a>
         <a class="card yours" href="#for-teams">
           <div class="frame empty"><span class="yours-hint">your look here</span><span class="open">See how</span></div>
           <div class="meta"><h3>Your Template <span class="kind">yours</span></h3>
@@ -977,6 +1039,23 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
   </div>
 </div>
 
+<!-- ── preview lightbox ────────────────────────────────────────────
+     Where a gallery card's preview opens. The dialog names itself with the
+     template's own name — the bar title, written on open — so there is no
+     third string to translate here. -->
+<div class="overlay" id="preview-overlay" role="dialog" aria-modal="true" aria-labelledby="preview-title">
+  <div class="sheet">
+    <span class="pvw-edge" tabindex="0"></span>
+    <div class="pvw-bar">
+      <span class="pvw-title" id="preview-title"></span>
+      <a class="pvw-open" id="preview-open" href="#" target="_blank" rel="noopener noreferrer">Open in a new tab &#8599;</a>
+    </div>
+    <button class="close" id="close-preview" type="button"><span aria-hidden="true">&times;</span><span class="vh">Close the preview</span></button>
+    <iframe id="preview-frame" title="Template preview"></iframe>
+    <span class="pvw-edge" tabindex="0"></span>
+  </div>
+</div>
+
 <script>
 (function () {
   "use strict";
@@ -1095,6 +1174,108 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
   overlay.addEventListener("click", function (e) { if (e.target === overlay) closeIntake(); });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && overlay.classList.contains("on")) closeIntake();
+  });
+
+  /* ---- gallery preview lightbox -----------------------------------
+     A card used to be a plain `target="_blank"` link, which threw the reader
+     out of the page to look at a preview. The preview is framed here instead,
+     in the same overlay furniture the intake panel above uses, with the
+     template's name, a real new-tab link and a close button.
+
+     The anchor keeps its genuine `href` and `target`, so it is still a real
+     link — modifier-click, middle-click, "open in new tab" and a reader with
+     no JavaScript all get what they always got. Only the plain primary click
+     is intercepted.
+
+     Anything that is not a local file falls through to the anchor's own path:
+     an external site sends `X-Frame-Options` and would frame as an empty box.
+     That is the rule `assets/tedandlisa-intake.html`'s `.pvw` already follows.
+     Every gallery preview is local today, so nothing takes that branch — it is
+     here for the first card that points somewhere hosted. */
+  var pvw = document.getElementById("preview-overlay");
+  var pvwFrame = document.getElementById("preview-frame");
+  var pvwOpen = document.getElementById("preview-open");
+  var pvwTitle = document.getElementById("preview-title");
+  var pvwClose = document.getElementById("close-preview");
+  var pvwLastFocus = null;
+
+  /* The card's own name, without the `kind` badge sitting beside it in the
+     same heading. Read off the DOM rather than kept in a second table, so it
+     is whatever the card says — including after the machine translator has
+     chopped the heading into protected term spans. */
+  function cardName(card) {
+    var h3 = card.querySelector(".meta h3");
+    if (!h3) return "";
+    var copy = h3.cloneNode(true);
+    var kind = copy.querySelector(".kind");
+    if (kind) kind.parentNode.removeChild(kind);
+    return copy.textContent.replace(/\s+/g, " ").trim();
+  }
+
+  function openPreview(href, name) {
+    pvwLastFocus = document.activeElement;
+    pvwFrame.src = href;
+    pvwOpen.href = href;
+    pvwTitle.textContent = name;
+    pvw.classList.add("on");
+    document.body.style.overflow = "hidden";
+    pvwClose.focus();
+  }
+
+  /* `about:blank` on the way out, so a closed preview stops running. The
+     framed files are whole documents carrying their own scripts, timers and
+     scroll handlers; a merely hidden iframe keeps every one of them alive. */
+  function closePreview() {
+    pvw.classList.remove("on");
+    pvwFrame.src = "about:blank";
+    document.body.style.overflow = "";
+    if (pvwLastFocus) pvwLastFocus.focus();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gallery a[href^="previews/"]'), function (a) {
+    a.addEventListener("click", function (e) {
+      /* Leave every deliberate new-tab gesture alone. Chrome fires `auxclick`
+         rather than `click` for the middle button, so that one never arrives
+         here at all; the `button` test covers the browsers that still send it. */
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var href = a.getAttribute("href") || "";
+      if (/^https?:/i.test(href)) return;
+      e.preventDefault();
+      openPreview(href, cardName(a));
+    });
+  });
+
+  pvwClose.addEventListener("click", closePreview);
+  pvw.addEventListener("click", function (e) { if (e.target === pvw) closePreview(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && pvw.classList.contains("on")) closePreview();
+  });
+
+  /* Focus is trapped by the two zero-size stops at the ends of the sheet
+     rather than by counting focusable elements: the frame's own tab order is
+     part of the ring, and it belongs to a second document this one cannot
+     enumerate. Whichever end the browser walks out of, it walks straight into
+     a stop, and the stop sends it to the other end. */
+  var pvwEdges = pvw.querySelectorAll(".pvw-edge");
+  pvwEdges[0].addEventListener("focus", function () { pvwFrame.focus(); });
+  pvwEdges[1].addEventListener("focus", function () { pvwOpen.focus(); });
+
+  pvwFrame.addEventListener("load", function () {
+    /* Escape has to work from inside the preview too. Key events do not cross
+       a document boundary, so once the reader has clicked into the frame the
+       handler above never hears them again. The previews are same-origin, so
+       the framed document can carry its own copy; `about:blank` on close
+       arrives here as well and is harmless. Guarded, because a preview that is
+       ever cross-origin throws on `contentDocument` — and that is the same
+       preview the click handler above already refuses to frame. */
+    try {
+      var d = pvwFrame.contentDocument;
+      if (d) {
+        d.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && pvw.classList.contains("on")) closePreview();
+        });
+      }
+    } catch (err) {}
   });
 
   /* ---- path chooser (tabs) --------------------------------------- */
@@ -1248,6 +1429,14 @@ function googleTranslateElementInit() {
     ['.gallery .card:nth-child(7) .kind', '핸드오프', '交接'],
     ['.gallery .card:nth-child(7) .meta p', '하우스 스타일 너머 — 동반 디자인 파이프라인의 12가지 프리셋과 애니메이션 슬라이드. 그래도 HTML 파일 하나.', '跳脫預設風格 — 由附屬設計管線提供十二種預設與動畫投影片。依然是一個 HTML 檔。'],
     ['.card.handoff .prov', '이 미리보기는 실제 오픈소스 프로젝트의 덱을 리브랜딩한 것입니다 — 비공개 팩이 당신의 브랜드로 하는 일과 똑같습니다.', '這個預覽是把一個真實開源專案的簡報換上新品牌 — 私有範本包對你的品牌做的，就是同一件事。'],
+    /* The two newest cards are keyed on their own preview href, not on
+       `:nth-child` — the seven entries above are positional and only stay
+       correct while nothing above them renumbers. A card keyed on its own
+       href takes its selector with it wherever it ends up. */
+    ['.gallery a[href="previews/evidence-deck.html"] .kind', '슬라이드', '投影片'],
+    ['.gallery a[href="previews/evidence-deck.html"] .meta p', '숫자로 논증하는 슬라이드. 어두운 바탕에 세로 스크롤 스냅 — 강조된 행이 있는 데이터 표, 수치 행, 판정 바.', '用數字論證的投影片。深色底、垂直捲動吸附 — 會標出重點列的資料表、數據列、結論條。'],
+    ['.gallery a[href="previews/paper-brief.html"] .kind', '브리프', '簡報'],
+    ['.gallery a[href="previews/paper-brief.html"] .meta p', '밝은 종이 위, 챕터로 끊어 읽는 브리핑. 큼직한 숫자, 막대 차트, 의사결정 박스 — 반전된 페이지가 이음매를 표시합니다.', '淺色紙面上、以章節分段的簡報。放大的數字、長條圖、決策方塊 — 反白頁面標出每一段的接縫。'],
     ['.card.yours .yours-hint', '당신의 스타일 자리', '你的風格在這'],
     ['.card.yours .open', '방법 보기', '看怎麼做'],
     ['.card.yours .meta h3', '나의 템플릿 <span class="kind">나의 것</span>', '你的範本 <span class="kind">你的</span>'],
@@ -1301,7 +1490,16 @@ function googleTranslateElementInit() {
 
     ['.foot a[href*="SKILL.md"]', '스킬', '技能'],
     ['.foot a[href*="LICENSE"]', 'MIT + Commons Clause', 'MIT + Commons Clause'],
-    ['.foot a[href="#for-teams"]', '팀을 위해', '團隊方案']
+    ['.foot a[href="#for-teams"]', '팀을 위해', '團隊方案'],
+
+    /* The preview lightbox's own chrome. Keyed on ids: it sits at the very
+       bottom of the page, outside every positional selector above, and the
+       wording is the intake panel's `pvwOpen` / `pvwCloseLabel` verbatim so
+       the two lightboxes read the same in all three languages. The dialog's
+       own label is the template name in the bar, written on open, so there is
+       no third string here. */
+    ['#preview-open', '새 탭에서 열기 ↗', '在新分頁開啟 ↗'],
+    ['#close-preview .vh', '미리보기 닫기', '關閉預覽']
   ];
   var UI = {
     en: { search: 'Search languages…', instant: 'Instant', mt: 'Machine translated' },
