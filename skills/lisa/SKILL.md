@@ -16,10 +16,39 @@ Generate a **single standalone HTML file** that is a MonoMind-branded slide
 deck. No build step, no dependencies, no network calls except Google Fonts and
 (only when a reader picks a non-English language) Google Translate.
 
+One limit worth knowing before you offer languages: Google Translate drives
+the deck's switch through a cookie, and cookies do not persist on `file://`.
+A downloaded deck opened by double-clicking it therefore cannot translate, and
+the template hides the switch there rather than showing a dead button. Served
+over http it works normally. Every other template in this repository writes
+both languages inline instead and has no such limit.
+
 The design system is not yours to invent. It ships inside
 `assets/tedandlisa-template.html`: 68 design tokens, a typographic scale, a
 component library, deck navigation, a menu, and the language switch. Your job
 is to **fill the template with content**, not to restyle it.
+
+## If you cannot open a browser, start here
+
+In a hosted chat app there is no browser and no way to serve a port to the
+reader, so the panel below cannot run. That is the first thing to establish,
+and it costs nothing. When it is the case, your whole first move is to hand
+over the hosted panel and wait — do not ask for a brief, do not interview, do
+not read anything else first. Say roughly this, adapted to their wording:
+
+> Lisa builds one standalone HTML file, and she takes the brief through a
+> short visual panel rather than a conversation:
+>
+> **https://html.monomind.one/intake.html**
+>
+> Put your brief on the first screen, pick a template from the gallery, then
+> answer as much or as little as you like — every question carries a default,
+> so accepting them all still gets you a finished deck. It asks nine to
+> sixteen questions depending on the template. The last step hands you a block
+> of text: paste that back here and I will build it.
+
+Then stop and wait. Step 1 has the detail; the rest of this file only matters
+once the payload is in hand.
 
 ## Invocation
 
@@ -301,7 +330,7 @@ feature the user did not choose.
 | `style: designmd` | Read the supplied `design.md` and apply it to the token block, not to individual rules. Report any rule you could not honour. |
 | `style: prompt` | Apply `style.notes` the same way — through the tokens. |
 | `elements` | Every named component must actually appear. If the content gives one nothing to say, say so rather than inventing filler for it. |
-| `languages` | Trim or extend the language switch to exactly this set. English always stays. |
+| `languages` | Trim or extend the language switch to exactly this set. English always stays — and when English is *all* that is left, **delete the switch, the `#google_translate_element` div and the translate script entirely**, not just the surplus buttons. A one-language switch is a control that does nothing. Never infer a language from the subject: a deck *about* a Taiwanese client is not a request for Chinese. Only this answer decides. |
 | `noTranslate` | Append every term to the protection list in the language-switch script (MonoMind deck). The web document needs no list — nothing is machine-translated. |
 | `menu.mode: full` | Keep the menu; delete the items not in `menu.items`. |
 | `menu.items` | `contents` builds itself from `data-screen-label`. `home` and `github` take their URLs from `menu.home` / `menu.github` — delete the item if its URL is empty. `theme`, `html` must agree with the theme and export answers. |

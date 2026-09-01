@@ -1632,6 +1632,31 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
     }
 
     function init() {
+      /*
+        Google Translate drives this switch through the `googtrans` cookie.
+        On file:// Chrome accepts `document.cookie = ...` and then reads it
+        back empty, so the cookie never survives the reload and the page comes
+        back untranslated — a button that looks live and does nothing.
+
+        A deck is made to be downloaded and opened, so this is the common case,
+        not the edge one. Hide the switch rather than ship a dead control, and
+        say why in the console for whoever goes looking. Serve the file over
+        http (or open it from a URL) and the switch returns on its own.
+
+        Only this template needs the guard: every other Hi Ted, Meet Lisa
+        template writes both languages inline and never machine-translates.
+      */
+      if (location.protocol === 'file:') {
+        document.querySelectorAll('.lang-switch').forEach(function (el) {
+          el.hidden = true;
+        });
+        console.info(
+          'Hi Ted, Meet Lisa: language switch hidden. Google Translate needs ' +
+          'a cookie, and cookies do not persist on file:// — serve this file ' +
+          'over http to switch languages.'
+        );
+        return;
+      }
       var cur = currentLang();
       document.querySelectorAll('.lang-switch button').forEach(function (btn) {
         if (btn.getAttribute('data-lang') === cur) btn.classList.add('active');
