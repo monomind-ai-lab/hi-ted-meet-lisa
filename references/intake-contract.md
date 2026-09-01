@@ -75,8 +75,9 @@ An entry arrives in one of two shapes, and you must handle both:
 | `style.mode` | `default` \| `designmd` \| `prompt` | |
 | `style.designFile` | file object or `null` | A `design.md` whose rules override template defaults. |
 | `style.notes` | string or `null` | Free-text style direction. |
+| `accent` | `"default"` or a hex string like `"#e8590c"` | The primary colour. `default` keeps the template's own accent. A hex value is applied **through the template's design tokens only** — repoint the accent token(s) and let everything that wears them move together; never recolour per element. Templates whose colour is semantic (`architecture`, where colour encodes meaning) may honour it partially or not at all — say so in the handover rather than silently repainting meaning. |
 | `elements` | array of `chart` `graph` `diagram` `table` `workflow` `quote` `agenda` `twocol` `image` `code` | Must-include components. Not a whitelist — other patterns stay available. |
-| `languages` | array of tags, always includes `en` | Drives the language switch **in the generated file**. Nothing to do with the language the panel itself was read in — see below. Never contains the literal `other`. |
+| `languages` | array of tags, always includes `en` | Drives the language switch **in the generated file**. Nothing to do with the language the panel itself was read in — see below. Never contains the literal `other`. The panel defaults this to English plus the language the **brief** is written in (detected from its script), nothing more — every template except `monomind-deck` writes each language inline, so each one adds roughly a full build's worth of writing. Languages are also **stageable**: a finished file can have more layered onto it later, so build the ones asked for and never pad the list. |
 | `noTranslate` | array of strings | Extend the language-switch term list with every one of these. |
 | `menu` | object — see below | Which menu, and what is in it. |
 | `siteType` | `marketing` \| `ecommerce` \| `product` \| `docs` \| `editorial` \| `internal`, or free text | **`sitemap-ia` only.** Decides what the top level is made of. |
@@ -88,6 +89,7 @@ An entry arrives in one of two shapes, and you must handle both:
 | `delivery` | `cdn` \| `standalone` | **`sitemap-ia` only.** `standalone` inlines mermaid, the webfonts, Font Awesome and Tailwind. |
 | `export` | array of `html` | Adds a self-download control to the deck chrome. |
 | `credit` | `true` \| `false` | Whether the file keeps its colophon — the "Made with Hi Ted, Meet Lisa" line linking to html.monomind.one. Every template ships it; `false` means delete that one line (never the logo or identity links, which belong to `logo`). Asked for **every** shape, the external handoff included, so it is present in both the runner's payload and the web panel's paste-ready prompt alike. |
+| `review` | `after` \| `inline` \| `none` | When the design review runs, relative to handover. `after` (the default): build, deliver the file, **then** offer and run the design pass as a follow-up (`/lisa-review`) — the file reaches the user's hands first. `inline`: run the full design pass (`references/design-review.md`) **before** handover, accepting the extra minutes it costs. `none`: run only the tooling-free floor checklist — the built-in structural checks that every build gets regardless. Whatever the value, the structural floor is never skipped. |
 
 ## The menu object
 
@@ -152,11 +154,17 @@ in the panel, because base64 inflates it by about 37% in the final file.
 A question may carry `kinds` (narrowing it to a shape) or `templates`
 (narrowing it to named template ids), or both, in which case both must pass.
 It also carries a `chapter`, which is the screen of the panel it is asked on —
-**presentation only, and never in the payload.** The panel's UI language is the
-same sort of thing: presentation, absent from the payload, and carried on the
+**presentation only, and never in the payload.** The panel splits its flow
+into content-bearing **questions** first and output-configuration
+**preferences** after, on one "Preferences" screen just before Ready
+(`languages`, `noTranslate`, `theme`, `style`, `accent`, `delivery`,
+`export`, `credit`, `review`). That split is the same sort of thing as a
+chapter: a screen grouping, absent from the payload, changing nothing about
+which keys arrive or in what order. The panel's UI language is presentation
+too: absent from the payload, and carried on the
 panel's URL as `?lang=en|ko|zh-TW` when the public site opens it in a frame.
-Do not look for either, and do not infer anything from the order the answers
-arrive in beyond what this file says.
+Do not look for any of these, and do not infer anything from the order the
+answers arrive in beyond what this file says.
 The `sitemap-ia` keys above are the first of the second sort: they are asked
 only when that template is chosen and are **absent from every other payload**.
 
