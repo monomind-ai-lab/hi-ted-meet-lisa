@@ -38,32 +38,4 @@ the Architecture Diagram Generator skill.
              runtime dependency.
 
 
---------------------------------------------------------------------------
-Slides AI Plugin onboarding deck — previews/slide-design.html
---------------------------------------------------------------------------
-The preview behind option five is proyecto26's own onboarding deck, rebranded.
-The slide architecture, GSAP choreography, and animation work are theirs; the
-palette, typography, mark, and copy are MonoMind's.
-
-  Upstream:  https://proyecto26.com/slides-ai-plugin/
-  Author:    proyecto26
-  License:   MIT
-  Changes:   Rebranded and rewritten to describe the design path as reached
-             from this repository. The Prism theme (MIT) is inlined. GSAP is
-             removed rather than bundled — it is "all rights reserved" under
-             the GreenSock Standard License, and it was only performing two
-             decorative entrances, which the Web Animations API does natively.
-             The preview is self-contained apart from Google Fonts.
-
---------------------------------------------------------------------------
-Slides AI Plugin — vendor/slides-ai-plugin/ (git submodule)
---------------------------------------------------------------------------
-Referenced as a submodule, not copied into this repository. Drives
-/tedandlisa-design for animated HTML decks and editable .pptx output.
-
-  Upstream:  https://github.com/proyecto26/slides-ai-plugin
-  Author:    proyecto26
-  License:   MIT
-  Changes:   None. Vendored by reference; MonoMind branding is applied by the
-             wrapper skill in skills/tedandlisa-design/.
 

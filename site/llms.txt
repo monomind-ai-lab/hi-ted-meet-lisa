@@ -11,20 +11,20 @@ To build one for a user, read and follow the skill — it is plain Markdown and
 carries the whole procedure, starting with a visual intake panel that asks what
 shape the output should take:
 
-- Skill: https://raw.githubusercontent.com/monomind-ai-lab/hi-ted-meet-lisa/main/SKILL.md
+- Skill: https://html.monomind.one/SKILL.md
 - Repository: https://github.com/monomind-ai-lab/hi-ted-meet-lisa
 
 A minimal working prompt for any coding agent:
 
     Build me a standalone HTML page using
     https://github.com/monomind-ai-lab/hi-ted-meet-lisa.
-    Read and follow `SKILL.md`, starting with its intake panel.
-    This is about [SUBJECT], for [AUDIENCE].
+    Read and follow https://html.monomind.one/SKILL.md, starting with
+    its intake panel. This is about [SUBJECT], for [AUDIENCE].
 
 ## Docs
 
 - [README](https://raw.githubusercontent.com/monomind-ai-lab/hi-ted-meet-lisa/main/README.md): what it is, the template shapes, install
-- [SKILL.md](https://raw.githubusercontent.com/monomind-ai-lab/hi-ted-meet-lisa/main/SKILL.md): the full generation procedure agents follow
+- [SKILL.md](https://html.monomind.one/SKILL.md): the full generation procedure agents follow
 - [Intake contract](https://raw.githubusercontent.com/monomind-ai-lab/hi-ted-meet-lisa/main/references/intake-contract.md): the answers payload an intake produces
 
 ## Website

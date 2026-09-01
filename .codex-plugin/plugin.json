@@ -1,0 +1,22 @@
+{
+  "name": "hi-ted-meet-lisa",
+  "version": "1.0.0",
+  "description": "Turns a brief into a finished, self-contained HTML deck, web document, diagram, or site. One file, no build step.",
+  "author": {
+    "name": "MonoMind AI Lab",
+    "url": "https://monomind.one"
+  },
+  "homepage": "https://html.monomind.one",
+  "repository": "https://github.com/monomind-ai-lab/hi-ted-meet-lisa",
+  "license": "MIT + Commons Clause",
+  "keywords": [
+    "slides",
+    "presentation",
+    "deck",
+    "html",
+    "design",
+    "branding",
+    "diagram"
+  ],
+  "skills": "./skills/"
+}

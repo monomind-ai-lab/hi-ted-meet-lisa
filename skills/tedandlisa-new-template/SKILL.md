@@ -5,10 +5,12 @@ description: "Use when the user wants to turn an existing HTML deck, document, o
 
 # New Hi Ted, Meet Lisa template
 
-> Every path below — `scripts/`, `assets/`, `references/`, `vendor/` — is
-> relative to the **Hi Ted, Meet Lisa repository root**, which is this skill's
-> own directory when installed as `~/.claude/skills/tedandlisa`. Resolve them
-> there, not against whatever project you happen to be working in.
+> Every path below — `assets/`, `references/`, `scripts/`, `templates/` —
+> is relative to the **Hi Ted, Meet Lisa root**: the plugin's own
+> directory when installed as a plugin (`${CLAUDE_PLUGIN_ROOT}` in Claude
+> Code), or the repository checkout when you are reading this from source.
+> Resolve them there, not against whatever project you happen to be working
+> in.
 
 Turn one finished HTML file into a template `/tedandlisa` can build from.
 

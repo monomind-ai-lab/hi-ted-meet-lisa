@@ -11,7 +11,8 @@ package manager, no test suite. The only runtime dependencies are Python's
 stdlib (for the two helper scripts) and, for thumbnail capture, a local Chrome
 binary. Do not look for `npm`/`pip` build or lint commands — there are none.
 
-The full skill protocol lives in [`SKILL.md`](SKILL.md) — read it before making
+The full skill protocol lives in [`skills/tedandlisa/SKILL.md`](skills/tedandlisa/SKILL.md)
+— read it before making
 any change to the skill's behavior. This file only orients you to the codebase
 shape and the commands you'll actually run.
 

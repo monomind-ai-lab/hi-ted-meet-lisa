@@ -409,11 +409,9 @@ section { padding: clamp(64px, 10vh, 128px) var(--pad); }
 }
 .card .meta p { margin-top: 6px; font-size: 13.5px; color: var(--cream-dim); }
 /* Provenance note under a card that has one — quieter than the body copy. */
-.card .meta p.prov { margin-top: 9px; font-size: 12.5px; color: var(--cream-faint); }
 .card.yours .meta p b { color: var(--cream); font-weight: 700; }
 .card:focus-visible { outline: none; }
 .card:focus-visible .frame { outline: 3px solid var(--terracotta); outline-offset: 3px; }
-.card.handoff .frame { border-style: dashed; border-width: 2px; border-color: var(--hair-strong); }
 .card.yours .frame.empty {
   border-style: dashed; border-width: 2px; border-color: var(--hair-strong);
   display: grid; place-items: center; box-shadow: none;
@@ -709,7 +707,7 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
           <div>
             <div class="promptbox" id="prompt-text-paste">Build me a standalone HTML page using
 https://github.com/monomind-ai-lab/hi-ted-meet-lisa.
-Read and follow `SKILL.md`, starting with its intake panel.<button class="copybtn" data-copy="prompt-text-paste" type="button">Copy</button></div>
+Read and follow https://html.monomind.one/SKILL.md, starting with its intake panel.<button class="copybtn" data-copy="prompt-text-paste" type="button">Copy</button></div>
             <p class="gen-note">Nothing to edit — share this prompt directly with anyone
             who wants to give it a quick try.</p>
           </div>
@@ -721,28 +719,18 @@ Read and follow `SKILL.md`, starting with its intake panel.<button class="copybt
         <div class="install-grid">
           <div>
             <div class="cmdstep">
-              <div class="lbl"><span class="n">01</span><b>Clone it into your skills directory</b></div>
-              <p class="why">One clone, available in every project. Other agents have their
-              own skills directory — the layout is the same.</p>
-              <div class="cmd">git clone --recurse-submodules \
-  https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git \
-  ~/.claude/skills/tedandlisa<button class="copybtn" data-copy-raw="git clone --recurse-submodules https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git ~/.claude/skills/tedandlisa" type="button">Copy</button></div>
+              <div class="lbl"><span class="n">01</span><b>Install the plugin</b></div>
+              <p class="why">One install, both skills, available in every project. Other
+              agents have their own plugin or skills directory — the layout is the same.</p>
+              <div class="cmd">/plugin marketplace add monomind-ai-lab/hi-ted-meet-lisa
+/plugin install hi-ted-meet-lisa@monomind<button class="copybtn" data-copy-raw="/plugin marketplace add monomind-ai-lab/hi-ted-meet-lisa" type="button">Copy</button></div>
             </div>
             <div class="cmdstep">
-              <div class="lbl"><span class="n">02</span><b>Link the two companion skills</b></div>
-              <p class="why">They ride along in the clone — the links just make them
-              commands of their own.</p>
-              <div class="cmd">ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-design \
-      ~/.claude/skills/tedandlisa-design
-ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
-      ~/.claude/skills/tedandlisa-new-template<button class="copybtn" data-copy-raw="ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-design ~/.claude/skills/tedandlisa-design && ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template ~/.claude/skills/tedandlisa-new-template" type="button">Copy</button></div>
-            </div>
-            <div class="cmdstep">
-              <div class="lbl"><span class="n">03</span><b>Use it, whenever</b></div>
+              <div class="lbl"><span class="n">02</span><b>Use it, whenever</b></div>
               <div class="cmd">/tedandlisa an architecture overview for the platform team, as a web document</div>
             </div>
             <div class="cmdstep">
-              <div class="lbl"><span class="n">04</span><b>Teach it your own look</b></div>
+              <div class="lbl"><span class="n">03</span><b>Teach it your own look</b></div>
               <p class="why">This is the part people miss: hand it any finished HTML file
               you like, and its visual system becomes a reusable template — extracted,
               stripped of its content, registered, thumbnailed. It's then one of your
@@ -757,8 +745,6 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
               your browser and picks the answers up itself — no copying.</span></li>
               <li><span><b>Your own templates.</b> Hand <code>/tedandlisa-new-template</code>
               a page you like and its look becomes a permanent choice in the gallery.</span></li>
-              <li><span><b>The design pipeline.</b> <code>/tedandlisa-design</code> for
-              twelve style presets and animated slides — still one HTML file.</span></li>
               <li><span><b>Every agent you use.</b> The skill is plain Markdown and HTML —
               Claude Code, Codex, Pi, OpenCode, Hermes all read the same files.</span></li>
             </ul>
@@ -815,20 +801,12 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
           <p>A project's public face — sticky nav, eight hash-routed pages,
           one shared footer. This very site's sibling.</p></div>
         </a>
-        <a class="card handoff" target="_blank" href="previews/slide-design.html" rel="noopener noreferrer">
-          <div class="frame"><img src="previews/slide-design.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
-          <div class="meta"><h3>Slide Design <span class="kind">handoff</span></h3>
-          <p>Beyond the house style — twelve style presets and animated slides
-          via the companion design pipeline. Still one HTML file.</p>
-          <p class="prov">This preview is a real open-source project's deck,
-          rebranded — the same move a private pack makes with yours.</p></div>
-        </a>
-        <!-- Appended after the seven cards that were already here, and before
+        <!-- Appended after the six cards that were already here, and before
              the bridge card below. Several gallery entries in `T` are keyed on
-             `.gallery .card:nth-child(N)` for N = 1…7, so inserting anywhere
+             `.gallery .card:nth-child(N)` for N = 1…6, so inserting anywhere
              above would silently point them at the wrong card; appending
-             leaves 1…7 where they were. The bridge card is renumbered from 8
-             to 10 by this, and every one of its entries is keyed on
+             leaves 1…6 where they were. The bridge card is renumbered from 7
+             to 9 by this, and every one of its entries is keyed on
              `.card.yours`, so nothing of its moves. -->
         <a class="card" target="_blank" href="previews/evidence-deck.html" rel="noopener noreferrer">
           <div class="frame"><img src="previews/evidence-deck.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
@@ -1024,7 +1002,7 @@ ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
     </a>
     <div style="display:flex; gap:24px;">
       <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa" rel="noopener">GitHub</a>
-      <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa/blob/main/SKILL.md" rel="noopener">The skill</a>
+      <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa/blob/main/skills/tedandlisa/SKILL.md" rel="noopener">The skill</a>
       <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa/blob/main/LICENSE" rel="noopener">MIT + Commons Clause</a>
       <a href="#for-teams">For teams</a>
     </div>
@@ -1396,18 +1374,15 @@ function googleTranslateElementInit() {
     ['#pane-try .pane-cta .btn', '인테이크 패널 열기', '打開 intake 面板'],
     ['#pane-install .gen-side p', '짧은 프롬프트를 복사하세요 — 채워 넣을 것이 없습니다. 에이전트가 스킬을 받아와 같은 인테이크 패널을 내 브라우저에서 열어 주고, 거기서 답하면 됩니다. 가볍게 써보고 싶은 사람에게 보내기 좋을 만큼 짧습니다.', '複製這段短提示詞 — 沒有任何要填的地方。你的 agent 會抓取技能，並在你自己的瀏覽器裡打開同一份 intake 面板讓你作答。短到可以直接傳給任何想快速試試的人。'],
     ['#pane-install .gen-note', '수정할 것이 없습니다 — 가볍게 써보고 싶은 사람에게 이 프롬프트를 그대로 보내세요.', '沒有需要修改的地方 — 直接把這段提示詞分享給任何想快速試試的人。'],
-    ['#pane-both .cmdstep:nth-child(1) b', '스킬 디렉터리에 클론하기', 'clone 到你的技能目錄'],
-    ['#pane-both .cmdstep:nth-child(1) .why', '클론 한 번이면 모든 프로젝트에서 사용할 수 있습니다. 다른 에이전트도 각자의 스킬 디렉터리가 있고, 구조는 같습니다.', 'clone 一次，每個專案都能用。其他 agent 有自己的技能目錄 — 結構是一樣的。'],
-    ['#pane-both .cmdstep:nth-child(2) b', '두 개의 동반 스킬 연결하기', '連結兩個附屬技能'],
-    ['#pane-both .cmdstep:nth-child(2) .why', '클론에 함께 들어 있습니다 — 링크는 각각을 독립된 명령으로 만들어 줄 뿐입니다.', '它們已經在 clone 裡了 — 建立連結只是讓它們各自成為指令。'],
-    ['#pane-both .cmdstep:nth-child(3) b', '언제든 사용하기', '隨時使用'],
-    ['#pane-both .cmdstep:nth-child(4) b', '나만의 스타일 가르치기', '教它你自己的風格'],
-    ['#pane-both .cmdstep:nth-child(4) .why', '많이들 놓치는 부분입니다. 마음에 드는 HTML 파일을 건네면 그 비주얼 시스템이 재사용 가능한 템플릿이 됩니다 — 추출하고, 내용을 비우고, 등록하고, 섬네일까지. 그 후로는 갤러리에서 영구히 선택할 수 있습니다.', '這是最容易被忽略的部分：把任何你喜歡的 HTML 檔案交給它，它的視覺系統就會變成可重複使用的範本 — 抽取樣式、清除內容、註冊、產生縮圖。之後它就永久成為圖庫裡的選項之一。'],
+    ['#pane-both .cmdstep:nth-child(1) b', '플러그인 설치하기', '安裝外掛'],
+    ['#pane-both .cmdstep:nth-child(1) .why', '한 번 설치하면 두 스킬을 모든 프로젝트에서 쓸 수 있습니다. 다른 에이전트도 각자의 플러그인 또는 스킬 디렉터리가 있고, 구조는 같습니다.', '安裝一次，兩個技能在每個專案都能用。其他 agent 有自己的外掛或技能目錄 — 結構是一樣的。'],
+    ['#pane-both .cmdstep:nth-child(2) b', '언제든 사용하기', '隨時使用'],
+    ['#pane-both .cmdstep:nth-child(3) b', '나만의 스타일 가르치기', '教它你自己的風格'],
+    ['#pane-both .cmdstep:nth-child(3) .why', '많이들 놓치는 부분입니다. 마음에 드는 HTML 파일을 건네면 그 비주얼 시스템이 재사용 가능한 템플릿이 됩니다 — 추출하고, 내용을 비우고, 등록하고, 섬네일까지. 그 후로는 갤러리에서 영구히 선택할 수 있습니다.', '這是最容易被忽略的部分：把任何你喜歡的 HTML 檔案交給它，它的視覺系統就會變成可重複使用的範本 — 抽取樣式、清除內容、註冊、產生縮圖。之後它就永久成為圖庫裡的選項之一。'],
     ['#pane-both .gen-side h3', '설치하면 얻는 것', '安裝後你會得到'],
     ['#pane-both .getlist li:nth-child(1) > span', '<b>로컬로 실행되는 인테이크 패널.</b> 에이전트가 브라우저에 패널을 띄우고 답변도 직접 가져갑니다 — 복사할 필요가 없습니다.', '<b>在本機執行的 intake 面板。</b>agent 會在瀏覽器打開它，並自己取回答案 — 不用複製。'],
     ['#pane-both .getlist li:nth-child(2) > span', '<b>나만의 템플릿.</b> 마음에 드는 페이지를 <code>/tedandlisa-new-template</code>에 건네면 그 스타일이 갤러리의 영구 선택지가 됩니다.', '<b>你自己的範本。</b>把喜歡的頁面交給 <code>/tedandlisa-new-template</code>，它的樣式就會永久加入圖庫。'],
-    ['#pane-both .getlist li:nth-child(3) > span', '<b>디자인 파이프라인.</b> <code>/tedandlisa-design</code>으로 12가지 스타일 프리셋과 애니메이션 슬라이드를 — 여전히 HTML 파일 하나로.', '<b>設計管線。</b><code>/tedandlisa-design</code> 提供十二種風格預設與動畫投影片 — 依然是一個 HTML 檔。'],
-    ['#pane-both .getlist li:nth-child(4) > span', '<b>어떤 에이전트에서든.</b> 스킬은 평범한 Markdown과 HTML입니다 — Claude Code, Codex, Pi, OpenCode, Hermes 모두 같은 파일을 읽습니다.', '<b>你用的每個 agent。</b>技能就是純 Markdown 和 HTML — Claude Code、Codex、Pi、OpenCode、Hermes 讀的都是同一份檔案。'],
+    ['#pane-both .getlist li:nth-child(3) > span', '<b>어떤 에이전트에서든.</b> 스킬은 평범한 Markdown과 HTML입니다 — Claude Code, Codex, Pi, OpenCode, Hermes 모두 같은 파일을 읽습니다.', '<b>你用的每個 agent。</b>技能就是純 Markdown 和 HTML — Claude Code、Codex、Pi、OpenCode、Hermes 讀的都是同一份檔案。'],
 
 
     ['#templates .section-head .kicker', '템플릿', '範本'],
@@ -1426,11 +1401,8 @@ function googleTranslateElementInit() {
     ['.gallery .card:nth-child(5) .meta p', '페이지로 논증하는 사이트 구조 — 두 가지 화면 크기에서 클릭되는 내비게이션 프로토타입으로 마무리.', '用頁面論證網站結構，最後附上兩種斷點下可點擊的導覽原型。'],
     ['.gallery .card:nth-child(6) .kind', '사이트', '網站'],
     ['.gallery .card:nth-child(6) .meta p', '프로젝트의 공개 얼굴 — 고정 내비게이션, 여덟 개의 해시 라우팅 페이지, 하나의 공용 푸터. 바로 이 사이트의 형제입니다.', '專案的門面 — 固定導覽列、八個 hash 路由頁面、一個共用頁尾。就是這個網站的兄弟。'],
-    ['.gallery .card:nth-child(7) .kind', '핸드오프', '交接'],
-    ['.gallery .card:nth-child(7) .meta p', '하우스 스타일 너머 — 동반 디자인 파이프라인의 12가지 프리셋과 애니메이션 슬라이드. 그래도 HTML 파일 하나.', '跳脫預設風格 — 由附屬設計管線提供十二種預設與動畫投影片。依然是一個 HTML 檔。'],
-    ['.card.handoff .prov', '이 미리보기는 실제 오픈소스 프로젝트의 덱을 리브랜딩한 것입니다 — 비공개 팩이 당신의 브랜드로 하는 일과 똑같습니다.', '這個預覽是把一個真實開源專案的簡報換上新品牌 — 私有範本包對你的品牌做的，就是同一件事。'],
     /* The two newest cards are keyed on their own preview href, not on
-       `:nth-child` — the seven entries above are positional and only stay
+       `:nth-child` — the six entries above are positional and only stay
        correct while nothing above them renumbers. A card keyed on its own
        href takes its selector with it wherever it ends up. */
     ['.gallery a[href="previews/evidence-deck.html"] .kind', '슬라이드', '投影片'],

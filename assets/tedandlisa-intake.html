@@ -1221,10 +1221,6 @@ var L10N = {
         "승인할 사람들이 책상 앞에서 읽습니다.",
         "문서에는 Google Fonts와 CDN의 mermaid, 프로토타입에는 CDN의 Font Awesome과 " +
         "Tailwind. delivery 답변으로 넷 다 인라인할 수 있습니다."],
-      "slide-design": ["슬라이드 디자인",
-        "MonoMind 템플릿이 아닙니다 — 열두 가지 스타일 프리셋과 애니메이션 HTML 슬라이드.",
-        "하우스 스타일로는 담기지 않는 덱 — 다른 룩, 또는 애니메이션.",
-        "서브모듈 vendor/slides-ai-plugin."],
       "project-website": ["프로젝트 웹사이트",
         "프로젝트의 공개된 얼굴: 고정 내비게이션, 해시 라우팅 페이지, 짙은 잉크와 푸른 헤일로.",
         "프로젝트 자체의 사이트 — 런치 페이지, 도구의 홈, 프로그램의 정문. 책상 앞에서 " +
@@ -1442,10 +1438,6 @@ var L10N = {
         "的人在桌前讀。",
         "文件用 Google Fonts 和 CDN 上的 mermaid；原型另外從 CDN 載入 Font Awesome 和 " +
         "Tailwind。delivery 那題可以把四個都內嵌。"],
-      "slide-design": ["投影片設計",
-        "不是 MonoMind 範本 — 十二種風格預設，加上會動的 HTML 投影片。",
-        "自家風格裝不下的簡報 — 另一種樣子，或是要動起來。",
-        "子模組 vendor/slides-ai-plugin。"],
       "project-website": ["專案網站",
         "一個專案的對外門面：固定導覽、hash 路由的頁面、深色底配藍色光暈。",
         "專案自己的網站 — 上線頁、工具的首頁、一個計畫的正門。在桌前讀、被連結，也常常" +
@@ -1688,8 +1680,6 @@ var TEMPLATES = CTX.templates || [
     tagline: "Diagram-first deck on light paper, one drawing per slide." },
   { id: "architecture", name: "Architecture diagram", kind: "document", type: "diagram",
     tagline: "System diagrams on slate, where colour means something — one view or several." },
-  { id: "slide-design", name: "Slide design", kind: "external", type: "present", skill: "/tedandlisa-design", badge: "HTML",
-    tagline: "Not a MonoMind template — twelve style presets and animated HTML slides." },
   { id: "sitemap-ia", name: "Sitemap & IA proposal", kind: "document", type: "read",
     tagline: "Argue an information architecture, with the navigation wired up to click through." },
   { id: "project-website", name: "Project website", kind: "document", type: "site",
@@ -2814,13 +2804,14 @@ function show(key, needsCopy, json) {
 function webPrompt(json) {
   return "Build me a standalone HTML page using\n" +
          "https://github.com/monomind-ai-lab/hi-ted-meet-lisa.\n" +
-         "Read and follow `SKILL.md`. My intake answers are below — apply them\n" +
-         "instead of asking again, and hand back one standalone HTML file.\n\n" + json;
+         "Read and follow https://html.monomind.one/SKILL.md. My intake\n" +
+         "answers are below — apply them instead of asking again, and hand\n" +
+         "back one standalone HTML file.\n\n" + json;
 }
 
 /* The local variant. Both fallbacks below are reached only from a copy of this
    panel the reader opened themselves, so they are already running /tedandlisa
-   and the skill is on disk. webPrompt's "read SKILL.md from GitHub" line would
+   and the skill is on disk. webPrompt's "read SKILL.md from the web" line would
    send their agent to fetch what it already has. */
 function localPrompt(json) {
   return "Here are my /tedandlisa intake answers. Apply them instead of asking\n" +

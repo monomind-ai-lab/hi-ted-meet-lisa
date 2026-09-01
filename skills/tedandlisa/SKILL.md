@@ -5,6 +5,13 @@ description: "Use when the user asks for a MonoMind-branded slide deck, presenta
 
 # Hi Ted, Meet Lisa
 
+> Every path below — `assets/`, `references/`, `scripts/`, `templates/` —
+> is relative to the **Hi Ted, Meet Lisa root**: the plugin's own
+> directory when installed as a plugin (`${CLAUDE_PLUGIN_ROOT}` in Claude
+> Code), or the repository checkout when you are reading this from source.
+> Resolve them there, not against whatever project you happen to be working
+> in.
+
 Generate a **single standalone HTML file** that is a MonoMind-branded slide
 deck. No build step, no dependencies, no network calls except Google Fonts and
 (only when a reader picks a non-English language) Google Translate.
@@ -155,11 +162,6 @@ language. See `references/slide-patterns-web-document.md`.
 
 To add a template, use `/tedandlisa-new-template`.
 
-When none of them is the right shape — the deck needs a look the house style
-does not have — use
-`/tedandlisa-design`, which drives the vendored Slides AI pipeline with
-MonoMind branding applied. See `skills/tedandlisa-design/SKILL.md`.
-
 ## Translation safety (do not skip)
 
 Google Translate will happily translate a filename into nonsense. Anything that
@@ -222,8 +224,6 @@ Before handing the file over:
 | `references/slide-patterns-evidence-deck.md` | Component markup for the evidence-deck template. |
 | `assets/tedandlisa-template-paper-brief.html` | The paper-brief template: light paper, chapter pages, bar charts, decision boxes. |
 | `references/slide-patterns-paper-brief.md` | Component markup for the paper-brief template. |
-| `skills/tedandlisa-design/` | The wrapper for the vendored Slides AI pipeline (animated HTML). |
-| `vendor/slides-ai-plugin/` | Git submodule, MIT. `git submodule update --init` if empty. |
 | `scripts/tedandlisa_thumbs.py` | Captures template thumbnails for the gallery. |
 | `scripts/tedandlisa_intake_fallback.py` | Regenerates the intake panel's `file://` fallback template list from the registry. |
 | `scripts/tedandlisa_new_template.py` | Analyzes a source document and registers a new template. |

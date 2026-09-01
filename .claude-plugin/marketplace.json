@@ -1,0 +1,14 @@
+{
+  "name": "monomind",
+  "owner": {
+    "name": "MonoMind AI Lab",
+    "url": "https://monomind.one"
+  },
+  "plugins": [
+    {
+      "name": "hi-ted-meet-lisa",
+      "source": "./",
+      "description": "Turns a brief into a finished, self-contained HTML deck, web document, diagram, or site. One file, no build step."
+    }
+  ]
+}

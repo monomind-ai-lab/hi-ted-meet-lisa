@@ -32,24 +32,36 @@ intake panel, and copy one paste-ready prompt for any coding agent — Claude
 Code, Codex, Pi, OpenCode, Hermes, or anything else that reads a public URL.
 Nothing to install.
 
-Prefer it as a standing command? Install it once, then it is three commands
-you have for good.
+Prefer it as a standing command? Install the plugin once — it carries both
+skills, and then they are two commands you have for good.
 
 ```sh
-git clone --recurse-submodules \
-  https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git \
-  ~/.claude/skills/tedandlisa
+/plugin marketplace add monomind-ai-lab/hi-ted-meet-lisa
+/plugin install hi-ted-meet-lisa@monomind
+```
 
-ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-design \
-      ~/.claude/skills/tedandlisa-design
-ln -s ~/.claude/skills/tedandlisa/skills/tedandlisa-new-template \
-      ~/.claude/skills/tedandlisa-new-template
+In Codex, the same two steps are one:
+
+```sh
+codex plugin marketplace add monomind-ai-lab/hi-ted-meet-lisa
+```
+
+Prefer to install by hand, or using another agent? Clone the repository and
+symlink the skills you want:
+
+```sh
+git clone https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git \
+  ~/.monomind/hi-ted-meet-lisa
+
+for s in tedandlisa tedandlisa-new-template; do
+  ln -s ~/.monomind/hi-ted-meet-lisa/skills/$s ~/.claude/skills/$s
+done
 ```
 
 `~/.claude/skills/` makes them available in every project. For one project only,
-clone into that project's `.claude/skills/` instead. Other agents have their own
-skills directory — the layout is the same: one directory per skill, each with a
-`SKILL.md` at its top.
+symlink into that project's `.claude/skills/` instead. Other agents have their
+own skills directory — the layout is the same: one directory per skill, each
+with a `SKILL.md` at its top. Every skill here lives under `skills/`.
 
 **Then, whenever you need something:**
 
@@ -70,21 +82,14 @@ machinery into a placeholder skeleton, strips the original's subject matter,
 registers it, and captures its gallery thumbnail. It is then one of your choices
 in the panel, permanently.
 
-```text
-/tedandlisa-design a launch deck, glassmorphism, with animated slides
-```
-
-For when the house templates are the wrong shape — style presets and
-animated HTML.
-
 **Just trying it once?** You do not have to install anything. The
 [website](https://html.monomind.one) hands you a finished prompt — or paste
 this to any agent that can read a URL:
 
 ```text
 Build me a deck using https://github.com/monomind-ai-lab/hi-ted-meet-lisa.
-Read and follow `SKILL.md`, starting with its intake panel. The deck is about
-[YOUR SUBJECT], for [AUDIENCE].
+Read and follow https://html.monomind.one/SKILL.md, starting with its intake
+panel. The deck is about [YOUR SUBJECT], for [AUDIENCE].
 ```
 
 **What you get**
@@ -102,10 +107,6 @@ Read and follow `SKILL.md`, starting with its intake panel. The deck is about
   PDF and HTML download — whichever of these you asked for.
 - **A design pass before handover** that measures contrast in both themes and
   behaviour at phone width, then reports what it fixed.
-
-Want a look the house style does not cover? The gallery's last
-card hands off to [`tedandlisa-design`](skills/tedandlisa-design/), which drives
-a vendored Slides AI pipeline with MonoMind branding applied.
 
 
 ---
@@ -148,11 +149,13 @@ apart.
 
 ### How agents find the instructions
 
-1. Harnesses that support the Agent Skills convention discover `SKILL.md` at the
-   repository root as `/tedandlisa`, and
-   `skills/tedandlisa-new-template/SKILL.md` as its companion.
-2. Any other agent can be pointed at `SKILL.md` directly; it is plain Markdown
-   and carries the whole procedure.
+1. Harnesses that support the Agent Skills convention discover both skills
+   under `skills/` — `/tedandlisa` and `/tedandlisa-new-template` — whether
+   installed as a plugin or symlinked.
+2. Any other agent can be pointed at <https://html.monomind.one/SKILL.md>
+   directly; it is plain Markdown and carries the whole procedure. That URL is
+   a deploy artifact copied from `skills/tedandlisa/SKILL.md`, so it stays put
+   however the repository is rearranged.
 
 
 
@@ -273,32 +276,6 @@ than eyeballed.
 
 ---
 
-## ✅ When a template is the wrong shape
-
-Some decks should not be a MonoMind template at all: the look needs to be
-someone else's.
-
-```text
-/tedandlisa-design
-```
-
-This wraps [Slides AI Plugin](https://github.com/proyecto26/slides-ai-plugin)
-(MIT), carried here as a git submodule at `vendor/slides-ai-plugin/`. It brings
-twelve style presets and animated single-file HTML decks — with MonoMind
-branding applied unless you pick a
-preset. 
-
-The install above uses `--recurse-submodules`, so this is already populated. If
-you cloned without it:
-
-```sh
-git submodule update --init --recursive
-```
-
-One thing it will not do: edit anything under `vendor/` — fixes belong
-upstream. Every deliverable stays a standalone HTML file; the pipeline's
-`.pptx` output is retired here. Because the story is just about Ted and Lisa, not about Peter Parker and Tony. 
-
 ## ✅ Add your own template
 
 Any finished HTML page can become a template:
@@ -324,8 +301,6 @@ carry the machinery, never the material.
 - **A visual intake panel** with a template gallery, plus its payload contract.
 - **A template registry** (`templates/templates.json`) and thumbnail tooling.
 - **A bundled design reviewer**, so the review works without a separate install.
-- **`tedandlisa-design`** — a branded wrapper over the vendored Slides AI
-  pipeline, for decks that need a different look or animation.
 
 
 
@@ -385,7 +360,6 @@ themselves: not alone, not bundled, not as a port.
 This distribution bundles some awesome projects:  
 
 - [Impeccable](https://github.com/pbakaus/impeccable) under the Apache License 2.0
-- derives the architecture template's visual system from [Architecture Diagram Generator](https://github.com/Cocoon-AI/architecture-diagram-generator) (MIT)
-- and carries [Slides AI Plugin](https://github.com/proyecto26/slides-ai-plugin) (MIT) as a submodule.
+- and derives the architecture template's visual system from [Architecture Diagram Generator](https://github.com/Cocoon-AI/architecture-diagram-generator) (MIT).
 
 See [NOTICE](NOTICE) and [`.agents/skills/impeccable/VENDORED.md`](.agents/skills/impeccable/VENDORED.md).
