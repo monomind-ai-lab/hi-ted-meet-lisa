@@ -231,7 +231,7 @@ sticks while a screen scrolls. Chapters with nothing to ask never appear, so
 the rail is shorter for a slide handoff than for a sitemap proposal.
 
 <p align="left">
-  <img src="assets/tedandlisa-intake-panel.jpg" alt="The intake panel's first screen: a progress rail naming the chapters — Prompt, Template, Shape, Look, Language, Handover, Ready — above an editable prompt field and a drop zone for reference files." style="width: 100%; max-width: 100%;">
+  <img src="/assets/tedandlisa-intake-panel.jpg" alt="The intake panel's first screen: a progress rail naming the chapters — Prompt, Template, Shape, Look, Language, Handover, Ready — above an editable prompt field and a drop zone for reference files." style="width: 100%; max-width: 100%;">
 </p>
 
 The runner serves it on loopback and captures the answers:
