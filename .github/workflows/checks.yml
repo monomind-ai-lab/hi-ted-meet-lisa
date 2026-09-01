@@ -1,0 +1,116 @@
+# Repository checks: the stdlib-only verifications this repo already carries,
+# run on every change plus a weekly tick (templates and registry can drift
+# apart through merges that each looked fine alone).
+#
+# Everything here is Python stdlib against local files — no pip, no network,
+# no Chrome. build_skill_zips.py --check stages the bundles in a temp dir and
+# validates size/file-count/SKILL.md limits without writing or capturing
+# anything; the thumbnail script (which does need Chrome) is deliberately not
+# run here. The runner's system python3 is all any step needs, so there is no
+# actions/setup-python and nothing to cache.
+
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    # Weekly, Monday 05:17 UTC — off-peak, off the top of the hour.
+    - cron: "17 5 * * 1"
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Run the apply-script test suite
+        run: python3 scripts/test_tedandlisa_apply.py
+
+      - name: Check the intake panel's fallback list against the registry
+        run: python3 scripts/tedandlisa_intake_fallback.py --check
+
+      - name: Validate the skill upload bundles (staged, nothing written)
+        run: python3 scripts/build_skill_zips.py --check
+
+      - name: Check template registry integrity
+        # Every first-party entry in templates/templates.json must have its
+        # template file and pattern reference on disk, properly paired
+        # LISA:CONTENT-START/END fences in order, and a trailing </html>.
+        # External hand-off entries (kind: external, no file) are skipped.
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, re, sys
+          root = pathlib.Path(".")
+          # Actual fence comments only — the LISA:CONTENT-MAP header names the
+          # markers in prose ("LISA:CONTENT-START/END"), which must not count.
+          FENCE = re.compile(r"<!--\s*LISA:CONTENT-(START|END)\b")
+          reg = json.loads((root / "templates/templates.json").read_text())
+          bad = []
+          n = 0
+          for t in reg["templates"]:
+              if t.get("kind") == "external" or not t.get("file"):
+                  continue  # hand-off entries carry no file of their own
+              n += 1
+              tid = t["id"]
+              f = root / t["file"]
+              if not f.is_file():
+                  bad.append(f"{tid}: template file missing: {t['file']}")
+                  continue
+              if not t.get("patterns") or not (root / t["patterns"]).is_file():
+                  bad.append(f"{tid}: pattern reference missing: {t.get('patterns')}")
+              html = f.read_text()
+              marks = [m.group(1) for m in FENCE.finditer(html)]
+              if not marks:
+                  bad.append(f"{tid}: no LISA:CONTENT fences at all")
+              elif marks != ["START", "END"] * (len(marks) // 2):
+                  bad.append(f"{tid}: fences unbalanced or out of order: "
+                             f"{marks.count('START')} START / {marks.count('END')} END")
+              if not html.rstrip().endswith("</html>"):
+                  bad.append(f"{tid}: file does not end with </html>")
+          for line in bad:
+              print("FAIL:", line)
+          print(f"checked {n} first-party templates"
+                + ("" if not bad else f", {len(bad)} problems"))
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: Check every SKILL.md parses as frontmatter + body
+        run: |
+          python3 - <<'PY'
+          import pathlib, sys
+          bad = []
+          files = sorted(pathlib.Path("skills").glob("*/SKILL.md"))
+          if not files:
+              print("FAIL: no skills/*/SKILL.md found")
+              sys.exit(1)
+          for f in files:
+              lines = f.read_text().splitlines()
+              if not lines or lines[0].strip() != "---":
+                  bad.append(f"{f}: does not open with a --- frontmatter fence")
+                  continue
+              try:
+                  close = next(i for i, l in enumerate(lines[1:], 1)
+                               if l.strip() == "---")
+              except StopIteration:
+                  bad.append(f"{f}: frontmatter fence never closes")
+                  continue
+              fm = lines[1:close]
+              body = "\n".join(lines[close + 1:]).strip()
+              if not any(l.startswith("name:") for l in fm):
+                  bad.append(f"{f}: frontmatter has no name:")
+              if not any(l.startswith("description:") for l in fm):
+                  bad.append(f"{f}: frontmatter has no description:")
+              if not body:
+                  bad.append(f"{f}: no body after the frontmatter")
+          for line in bad:
+              print("FAIL:", line)
+          print(f"checked {len(files)} SKILL.md files"
+                + ("" if not bad else f", {len(bad)} problems"))
+          sys.exit(1 if bad else 0)
+          PY

@@ -133,6 +133,11 @@ Two further traps specific to this deck:
 
 ## Reporting
 
-Report findings grouped as **fix now**, **worth considering**, and **left
-alone**, with a reason for anything in the third group. Apply the fixes, then
-re-run the responsive check, because layout fixes are what regress it.
+The pass applies its findings by default, then reports what it did. Group
+them as **fix now** (always applied), **worth considering** (applied too,
+when the change is safe and stays inside the template's own system), and
+**left alone** — anything that would change the design system, change what
+the content says, or needs the user's call — with a reason for each item in
+the third group. After the fixes, re-run the responsive check, because layout
+fixes are what regress it. The report then reads as what was improved and
+what was left alone and why.

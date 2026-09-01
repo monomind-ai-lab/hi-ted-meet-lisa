@@ -1,6 +1,6 @@
 ---
 name: lisa-review
-description: "Use when a finished HTML deck, document, or page needs a design review — including phrases like /lisa-review, \"review the deck\", \"design review this HTML\", or \"polish the deck\". Runs the Hi Ted, Meet Lisa design pass on a file /lisa produced, or on any standalone HTML deck or page the user points at: picks the reviewer, runs the deck-specific checks, applies the fixes, and reports the findings."
+description: "Use when a finished HTML deck, document, or page needs a design review — including phrases like /lisa-review, \"review the deck\", \"design review this HTML\", or \"polish the deck\". Runs the Hi Ted, Meet Lisa design pass on a file /lisa produced, or on any standalone HTML deck or page the user points at: picks the reviewer, runs the deck-specific checks, applies the improvements, and reports what was improved and what was left alone."
 ---
 
 # Hi Ted, Meet Lisa review
@@ -42,13 +42,19 @@ more than one candidate is plausible, ask rather than guess.
    at `.agents/skills/impeccable/`, then the checklist floor — followed by the
    deck-specific checks. Say which reviewer ran; never imply a full review
    when only the floor happened.
-3. **Apply the fix-now findings.** Never rewrite the template's design tokens
-   or load-bearing scripts — the same rule `/lisa` builds under. A finding
-   against the shipped system is reported, not silently applied.
+3. **Apply the findings.** This pass improves the file, not just describes
+   it. Fix-now findings are always applied; worth-considering improvements are
+   applied too when they are safe and stay inside the template's own system —
+   its tokens, its type scale, its components. What stays **left alone**:
+   anything that would change the design system, change what the content
+   says, or needs the user's call — each with its reason. Never rewrite the
+   template's design tokens or load-bearing scripts — the same rule `/lisa`
+   builds under. A finding against the shipped system is reported, not
+   silently applied.
 4. **Re-run the responsive check** after the fixes. Layout fixes are exactly
    what regress it.
-5. **Report** the findings grouped as the reference specifies — fix now, worth
-   considering, left alone — with a reason for anything in the third group.
+5. **Report** as the reference specifies: what was improved, and what was
+   left alone and why.
 
 ## In a sandbox
 

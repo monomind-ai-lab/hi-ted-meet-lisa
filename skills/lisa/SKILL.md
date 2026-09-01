@@ -110,7 +110,8 @@ The prompt carries the brief. Everything else comes from the intake panel.
    regions — each language is roughly another complete writing pass, which is
    what the intake told the user, so narrate the same way: "English done,
    starting Korean." For `monomind-deck` it is just the switch and the
-   protection list, which the apply script handles next.
+   protection list, which the apply script handles next. A file already
+   delivered gets its extra languages through `/lisa-lang`, not a rebuild.
 
 6. **Protect literals for translation** (`monomind-deck` only). Anything that
    is code, a path, a filename, a command, a product name, or an identity
@@ -226,7 +227,9 @@ branding — see `skills/lisa-design/SKILL.md`.
 | `scripts/tedandlisa_apply.py` | Applies the mechanical answers, reports the rest. |
 | `scripts/tedandlisa_new_template.py`, `_thumbs.py`, `_intake_fallback.py` | Registry, thumbnail, and panel-fallback maintenance. |
 | `skills/lisa-review/` | The design pass as its own command, `/lisa-review`. |
+| `skills/lisa-lang/` | Layers more languages onto a delivered file, `/lisa-lang`. |
 | `skills/lisa-design/` | The wrapper for the vendored Slides AI pipeline. |
 | `skills/lisa-new-template/` | Turns a finished HTML file into a template. |
+| `skills/lisa-help/` | The utility explainer, `/lisa-help`. |
 | `vendor/slides-ai-plugin/` | Slides AI Plugin, MIT, vendored verbatim — see its `VENDORED.md`. |
 | `.agents/skills/impeccable/` | Bundled Impeccable, Apache 2.0, unmodified — see its `VENDORED.md`. |

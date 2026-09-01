@@ -105,6 +105,20 @@ UPLOAD_NOTES = {
     "lisa-new-template": "registry writes and thumbnails need a local checkout — "
                          "a hosted upload can only hand back a skeleton",
 }
+
+# Bundled WITHOUT the shared payload. /lisa-help answers from its own text and
+# reads no other file unless asked to go deeper — deeper reading is a checkout
+# or plugin concern, not an upload one. A help command is worth a panel slot
+# precisely because it costs a few kilobytes, so it gets a bundle, just not
+# 2.6 MB of templates it never opens. (Contrast /lisa-lang, which is NOT here:
+# it reads templates/templates.json, the pattern references, and the template
+# files to mirror a family's language mechanism, so it rides with the full
+# payload like /lisa. It also cites skills/lisa/SKILL.md, which no bundle
+# carries — the skill names the raw.githubusercontent fallback for that.)
+NO_PAYLOAD = {
+    "lisa-help": "self-contained: it answers from its own SKILL.md, so the "
+                 "shared payload stays out and the bundle is a few kilobytes",
+}
 PAYLOAD_FILES = ("LICENSE", "NOTICE")
 
 # Claude caps a custom skill upload at 30 MB uncompressed and states a 200-file
@@ -144,11 +158,12 @@ def stage(skill: pathlib.Path, into: pathlib.Path) -> pathlib.Path:
         else:
             shutil.copy2(extra, dest)
 
-    for name in PAYLOAD_DIRS:
-        src = ROOT / name
-        if not src.is_dir():
-            sys.exit(f"payload directory missing: {name}/")
-        shutil.copytree(src, folder / name, ignore=IGNORE)
+    if skill.name not in NO_PAYLOAD:
+        for name in PAYLOAD_DIRS:
+            src = ROOT / name
+            if not src.is_dir():
+                sys.exit(f"payload directory missing: {name}/")
+            shutil.copytree(src, folder / name, ignore=IGNORE)
     for name in PAYLOAD_FILES:
         src = ROOT / name
         if src.is_file():
@@ -220,6 +235,10 @@ def main() -> int:
     for name, note in UPLOAD_NOTES.items():
         if any(s.name == name for s in skills):
             print(f"\nnote: {name} — {note}")
+
+    for name, why in NO_PAYLOAD.items():
+        if any(s.name == name for s in skills):
+            print(f"\nno payload: {name} — {why}")
 
     if oversize:
         print(f"\nover the {MAX_UNCOMPRESSED//1024//1024} MB upload limit: "

@@ -56,7 +56,7 @@ call the agent always does), with the exceptions noted inline.
 | `prototype: both` | [agent] | Keep both `.mmfig` cards and all six payload blocks. |
 | `prototype: desktop` | [agent] | Delete the mobile card, `mmStyleMobile`, `mmBodyMobile`, `mmScriptMobile`, and the `popup('mobile')` handler. |
 | `prototype: none` | [agent] | Delete the whole `megamenu` page, its nav entry, its `PAGES` entry, the payload blocks, the mount script, and the `.mm*` CSS. |
-| `delivery: cdn` | [agent] | Leave the four CDN references as they are. |
+| `delivery: cdn` | [agent] | The shipped state — leave the CDN references as they are. Nothing to do. |
 | `delivery: standalone` | [agent] | Inline mermaid, the webfonts, Font Awesome and Tailwind. **Subset the webfonts to the glyphs the document actually renders** — the CJK family is several megabytes unsubsetted, and Google Fonts' `text=` parameter does the subsetting for you. Each family arrives as one variable font: declare it once across a weight range rather than once per weight. |
 | `export: html` | [script] | Keep the self-download control. `mermaid-master` ships none — adding one there is the agent's work, and the script says so. |
 | no export | [script] | Delete the self-download control. The `@media print` block stays — it serves the browser's own print, not an export control. |
