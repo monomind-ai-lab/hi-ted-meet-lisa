@@ -39,9 +39,12 @@ the Architecture Diagram Generator skill.
 
 
 --------------------------------------------------------------------------
-Slides AI Plugin onboarding deck — previews/slide-design.html
+Slides AI Plugin onboarding deck — https://html.monomind.one/previews/slide-design.html
 --------------------------------------------------------------------------
 The preview behind option five is proyecto26's own onboarding deck, rebranded.
+It is published by the website repository (monomind-ai-lab/ted-and-lisa), which
+is where the file itself lives; the attribution is recorded here because the
+`slide-design` card in this repository's template registry links to it.
 The slide architecture, GSAP choreography, and animation work are theirs; the
 palette, typography, mark, and copy are MonoMind's.
 

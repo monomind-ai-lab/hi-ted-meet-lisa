@@ -1,7 +1,7 @@
 # Hi Ted, Meet Lisa
 
 <p align="left">
-  <img src="assets/tedmeetslisa.jpg" alt="Hi Ted, Meet Lisa — Turn ideas into compelling slide decks" style="width: 100%; max-width: 100%;">
+  <img src="https://html.monomind.one/assets/tedmeetslisa.jpg" alt="Hi Ted, Meet Lisa — Turn ideas into compelling slide decks" style="width: 100%; max-width: 100%;">
 </p>
 
 > **Turn ideas into compelling slide decks — one standalone HTML file, no build step.**
@@ -154,7 +154,7 @@ Hi Ted, Meet Lisa answers those directly:
 ---
 
 <p align="left">
-  <img src="assets/tedlisaidea.jpg" alt="When Ted meets Lisa, ideas come to life in HTML" style="width: 100%; max-width: 100%;">
+  <img src="https://html.monomind.one/assets/tedlisaidea.jpg" alt="When Ted meets Lisa, ideas come to life in HTML" style="width: 100%; max-width: 100%;">
 </p>
 
 ---
@@ -166,11 +166,13 @@ visual intake panel, a template registry, and the tooling that ties them
 together. An agent uses them to produce a deck without asking you to run
 anything yourself.
 
-It also carries its own public face: [`site/`](site/) is the source of
-[html.monomind.one](https://html.monomind.one), a static page assembled at
-deploy time by `site/sync.sh` from the same previews, thumbnails, and intake
-panel this repository ships — so the website and the skill can never drift
-apart.
+Its public face lives next door.
+[html.monomind.one](https://html.monomind.one) is built from
+[`monomind-ai-lab/ted-and-lisa`](https://github.com/monomind-ai-lab/ted-and-lisa),
+which holds the landing page and the live previews. That build checks this
+repository out and reads the template registry, the gallery thumbnails, the
+intake panel and the MonoMind mark straight from it — so the website and the
+skill still cannot drift apart, they just ship on their own schedules now.
 
 ### How agents find the instructions
 
@@ -179,8 +181,8 @@ apart.
    `/lisa-new-template` — whether installed as a plugin or symlinked.
 2. Any other agent can be pointed at <https://html.monomind.one/SKILL.md>
    directly; it is plain Markdown and carries the whole procedure. That URL is
-   a deploy artifact copied from `skills/lisa/SKILL.md`, so it stays put
-   however the repository is rearranged.
+   a deploy artifact the website build copies from `skills/lisa/SKILL.md`, so
+   it stays put however this repository is rearranged.
 
 
 

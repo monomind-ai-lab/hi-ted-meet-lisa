@@ -29,9 +29,13 @@ and cannot reach a sibling.
     python3 scripts/build_skill_zips.py            # write dist/*.zip
     python3 scripts/build_skill_zips.py --check    # validate, write nothing
 
-Excluded on purpose: `previews/` and `site/` are website artifacts that no
-skill reads at runtime, `vendor/` no longer exists, and `.git/` is 14 MB of
-history the panels have no use for.
+Not in the payload: the public website. `site/`, `functions/` and the nine
+preview decks under `previews/` moved to monomind-ai-lab/ted-and-lisa, so
+there is nothing left in this repository to leave out. `previews/` was never
+purely a website artifact — the intake runner used to serve those decks to the
+panel's "Preview" links — but it points them at html.monomind.one now, so a
+bundle without them is still a bundle that works. `.git/` is left out too:
+14 MB of history the panels have no use for.
 """
 
 from __future__ import annotations

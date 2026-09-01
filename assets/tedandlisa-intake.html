@@ -8,7 +8,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* Tokens are lifted from tedandlisa-template.html so the intake panel and
+/* This panel is canonical here and is also read across a repository split:
+   the public site (monomind-ai-lab/ted-and-lisa) checks this repository out
+   at deploy time and its sync.sh injects the "web" context referred to below.
+   Every "the website repo's ..." path in the comments means a file in that
+   repository, not this one.
+
+   Tokens are lifted from tedandlisa-template.html so the intake panel and
    the deck it configures read as one system. Ground is the deck's deep ink
    (--fg) under the same accent halos used by .slide.dark. */
 :root {
@@ -68,9 +74,10 @@
          shell stretches the header and footer apart with nothing between
          them, so the height is capped and the shell centres in the ground.
 
-       web  (body[data-mode="web"], set from CTX.mode by site/sync.sh)
-         site/index.html frames this in an iframe filling `.overlay .sheet`,
-         which is already `height: min(1040px, 100%)`. Inside the iframe
+       web  (body[data-mode="web"], set from CTX.mode by the website
+            repo's sync.sh)
+         The website repo's index.html frames this in an iframe filling
+         `.overlay .sheet`, which is already `height: min(1040px, 100%)`. Inside the iframe
          100dvh *is* that sheet, so the panel fills it exactly — capping it
          a second time would leave a dead band inside the frame.
 
@@ -622,8 +629,9 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
 }
 </style>
 </head>
-<!-- data-mode is the shell's height switch (see --panel-h). It starts local and
-     the script flips it to "web" when site/sync.sh has injected that context. -->
+<!-- data-mode is the shell's height switch (see --panel-h). It starts local
+     and the script flips it to "web" when the website repo's sync.sh has
+     injected that context. -->
 <body data-mode="local">
 <main class="shell">
   <div class="topbar">
@@ -741,10 +749,10 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
     </details>
 
     <!-- Web mode only. `show()` gates this exactly the way it gates the
-         artwork above (CTX.mode === "web", injected by site/sync.sh), so the
-         locally-served runner never shows commercial copy. The link is the
-         only place in this file that carries it — see PAID_LANDING in
-         site/index.html for the others. -->
+         artwork above (CTX.mode === "web", injected by the website repo's
+         sync.sh), so the locally-served runner never shows commercial copy.
+         The link is the only place in this file that carries it — see
+         PAID_LANDING in the website repo's index.html for the others. -->
     <p class="teamsline" id="teamsline" hidden>This will arrive in the house
       style. Teams that want their own — tokens, patterns, protected terms —
       have MonoMind build it as a private pack:
@@ -807,16 +815,17 @@ var CTX = window.__MONOMIND_INTAKE__ || {};
 
 /* The shell's height switch — see --panel-h in the stylesheet. The markup
    ships data-mode="local" so a browser that never reaches this line still
-   gets a sane panel; web mode only exists when site/sync.sh injected it. */
+   gets a sane panel; web mode only exists when the website repo's sync.sh
+   injected it. */
 document.body.dataset.mode = CTX.mode === "web" ? "web" : "local";
 
 /* Web mode only, gated exactly the way #teamsline is (CTX.mode === "web",
-   injected by site/sync.sh) so the locally-served runner and a file:// copy
-   stay silent — nothing to send, nowhere to send it. The public site counts
+   injected by the website repo's sync.sh) so the locally-served runner and a
+   file:// copy stay silent — nothing to send, nowhere to send it. The public site counts
    one moment from in here: the prompt was copied. The whole payload is that
    one word; no answers, no prompt text, no id, no cookie ever leave. The
    beacon is queued and forgotten, so the copy button never waits on it.
-   See the funnel-events note in site/index.html for the other four. */
+   See the funnel-events note in the website repo's index.html for the other four. */
 function track(name) {
   try {
     if (CTX.mode !== "web" || !navigator.sendBeacon) return;
@@ -827,7 +836,8 @@ function track(name) {
 /* ══ language ══════════════════════════════════════════════════════
    English, Korean and Traditional Chinese, all three written by hand.
    This is the same "instant" tier the public site keeps (the `T` table in
-   site/index.html) and deliberately not the same *mechanism*: the site can
+   the website repo's index.html) and deliberately not the same *mechanism*:
+   the site can
    translate a static page in place because its copy sits in the DOM, while
    almost every string here is drawn by a function from data. So the copy
    lives in tables and the drawing functions ask for it. There is no machine
@@ -868,9 +878,9 @@ function scriptLang(text) {
 /* Where the opening language comes from, in order:
 
      ?lang=…    web mode. The site owns the choice and hands it over on the
-                frame's URL — openIntake() in site/index.html sets it, and
-                posts a message if the reader switches while the overlay is
-                open. The site is the single source of truth for it; nothing
+                frame's URL — openIntake() in the website repo's index.html
+                sets it, and posts a message if the reader switches while the
+                overlay is open. The site is the single source of truth for it; nothing
                 here re-derives what the site already knows.
      CTX.lang   a runner that wants to say so explicitly. None does today.
      the brief  local mode. There is no site, so the only evidence of who is
@@ -1675,9 +1685,10 @@ var MAX_INLINE_BYTES = 1500000; /* ~1.5 MB — past this the deck gets heavy */
    `paper-brief` is slides you read, `architecture` is a document you draw in.
    The list below is only the no-registry fallback — what a reader sees when
    the panel is opened straight from file:// and neither the runner nor
-   site/sync.sh has injected CTX.templates. It is GENERATED from
+   the website repo's sync.sh has injected CTX.templates. It is GENERATED from
    templates/templates.json; do not hand-edit it. Regenerate after any change
-   to the registry, and CI fails the deploy if the two drift apart:
+   to the registry — the website's deploy runs --check against this checkout
+   and fails if the two drift apart:
        python3 scripts/tedandlisa_intake_fallback.py */
 var TEMPLATES = CTX.templates || [
   { id: "monomind-deck", name: "MonoMind deck", kind: "slides", type: "present",

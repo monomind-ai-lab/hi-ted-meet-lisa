@@ -10,14 +10,5 @@ intake.json
 # symlink; no slash suffix so the symlink itself is ignored, not a directory
 /project-context
 
-# site/ is assembled at deploy time by site/sync.sh
-site/previews/
-site/intake.html
-site/assets/
-site/SKILL.md
-
 # upload bundles built by scripts/build_skill_zips.py
 dist/
-
-# wrangler local state
-.wrangler/

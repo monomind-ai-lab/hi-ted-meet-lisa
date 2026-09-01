@@ -4,7 +4,9 @@
 The panel is a standalone HTML file, so it also works when opened straight from
 disk -- in that mode it falls back to a copy-paste payload. This runner is the
 convenient path: it serves the panel over loopback, waits for the browser to
-POST the answers to /intake, writes them to a file, and exits.
+POST the answers to /intake, writes them to a file, and exits. The gallery's
+"Preview" links point at the hosted previews on html.monomind.one, so they —
+and only they — need a network connection.
 
     python3 scripts/tedandlisa_intake.py --prompt "a deck about X" --out intake.json
 
@@ -27,6 +29,17 @@ HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parent
 PANEL = ROOT / "assets" / "tedandlisa-intake.html"
 REGISTRY = ROOT / "templates" / "templates.json"
+
+# The registry names each preview by its repository-relative path
+# ("previews/<id>.html"), but the previews themselves now live in the website
+# repository (monomind-ai-lab/ted-and-lisa) and are only published at
+# html.monomind.one. This runner therefore has nothing local to serve, so it
+# rewrites each card's `preview` to the hosted copy below. Behaviour change on
+# purpose: the gallery's "Preview" links now need a network connection, where
+# they used to open a file served from this checkout. The panel already treats
+# an absolute http(s) preview as external — it opens in a real new tab instead
+# of the framing overlay — so no change to the panel is needed.
+PREVIEW_BASE = "https://html.monomind.one/previews/"
 MAX_BODY = 64 * 1024 * 1024  # generous: backgrounds arrive as base64 data URIs
 
 
@@ -49,6 +62,8 @@ def load_templates() -> list[dict]:
         card = {k: t.get(k) for k in
                 ("id", "name", "tagline", "kind", "type", "best_for", "dependencies",
                  "languages", "preview", "skill", "badge")}
+        if card.get("preview"):
+            card["preview"] = PREVIEW_BASE + pathlib.PurePosixPath(card["preview"]).name
         thumb = ROOT / t.get("thumb", "")
         if t.get("thumb") and thumb.is_file():
             card["thumb"] = "data:image/png;base64," + base64.b64encode(thumb.read_bytes()).decode()
@@ -77,17 +92,9 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         path = self.path.split("?")[0].split("#")[0]
-        # Preview decks are served alongside the panel so the gallery's
-        # "Preview" links open the real thing. Confined to previews/ and
-        # resolved through the real path, so no traversal escapes it.
-        if path.startswith("/previews/"):
-            target = (ROOT / path.lstrip("/")).resolve()
-            previews = (ROOT / "previews").resolve()
-            if previews in target.parents and target.is_file() and target.suffix == ".html":
-                self._send(200, target.read_bytes(), "text/html; charset=utf-8")
-            else:
-                self._send(404, b'{"error":"not found"}')
-            return
+        # This server used to also serve the preview decks under /previews/ so
+        # the gallery could frame them. They live in the website repository
+        # now (see PREVIEW_BASE), so the panel is the only thing served here.
         if path not in ("/", "/index.html"):
             self._send(404, b'{"error":"not found"}')
             return

@@ -36,8 +36,8 @@ python3 scripts/tedandlisa_new_template.py register --id ID --name "NAME" \
 python3 scripts/tedandlisa_thumbs.py [--only ID]
 
 # Regenerate the intake panel's file:// fallback template list from the
-# registry. Run after any change to templates/templates.json; --check is
-# what CI runs before deploying.
+# registry. Run after any change to templates/templates.json; --check fails
+# when the two have drifted apart.
 python3 scripts/tedandlisa_intake_fallback.py [--check]
 
 # Build the per-skill upload bundles for the Claude and ChatGPT settings
@@ -79,6 +79,22 @@ translate, so a change to one has no bearing on the other:
 its pattern-reference doc (`references/slide-patterns*.md` — verbatim,
 known-good markup for every component), and its thumbnail in
 `templates/thumbs/`.
+
+**The public website is a separate repository.** The landing page, the live
+preview decks and the Cloudflare Pages deploy live in
+[`monomind-ai-lab/ted-and-lisa`](https://github.com/monomind-ai-lab/ted-and-lisa);
+that build checks this repository out and reads `templates/templates.json`,
+`templates/thumbs/`, `assets/tedandlisa-intake.html` and
+`assets/monomind-mark-white.svg` from it, so those four are load-bearing for
+the site and must keep their paths. Nothing here builds or deploys the site.
+The registry's `preview` and `thumb_source` values still name the previews by
+their canonical `previews/<id>.html` path — the path the website builds from —
+and the two scripts that consume them resolve that to
+`https://html.monomind.one/previews/<id>.html` instead: the intake runner
+rewrites each card's `preview` to the hosted URL (so the gallery's "Preview"
+links open over the network, in a new tab rather than the framing overlay), and
+`tedandlisa_thumbs.py` screenshots the hosted page when the local file is
+absent. Both paths that used to be local now need a connection.
 
 **The generation flow spans several files by design:** `SKILL.md` drives the
 process → `scripts/tedandlisa_intake.py` serves `assets/tedandlisa-intake.html`
