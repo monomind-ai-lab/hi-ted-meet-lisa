@@ -163,14 +163,14 @@ reason it appears there: you are choosing how the deck gets made, not first
 choosing between two menus. It is not a template, and nothing in this
 repository builds it — see [when a template is the wrong shape](#-when-a-template-is-the-wrong-shape).
 
-| Template | Shape | Language | Dependencies |
+| Template | Shape | Language | Preview |
 | --- | --- | --- | --- |
-| **MonoMind deck** | Horizontal slides, one idea each, read across a room | Google Translate, loaded only when a reader picks another language | Google Fonts |
-| **Web document** | Hash-routed pages that scroll, read at desk distance | English and Korean written inline, toggled instantly — works offline | Google Fonts, mermaid from a CDN |
-| **Multi-page Diagrams** | Diagram-first on light paper, one drawing per slide | Every slide written twice, so diagram labels translate too | Google Fonts |
-| **Architecture diagram** | System diagrams on slate, where colour means something — one view or several | Both languages inline, including the labels inside the drawing | Google Fonts |
-| **Sitemap & IA proposal** | Pages that argue a site structure, plus the navigation wired up to click through | Both languages written inline | Google Fonts, mermaid, Font Awesome and Tailwind from a CDN — or all four inlined |
-| **Slide design** — *a handoff, not a template* | Twelve style presets and animated HTML | One language per deck — the presets carry no toggle | Vendored Slides AI Plugin |
+| **MonoMind deck** | Horizontal slides, one idea each, read across a room | Google Translate, loaded only when a reader picks another language | [Live preview →](previews/monomind-deck.html) |
+| **Web document** | Hash-routed pages that scroll, read at desk distance | English and Korean written inline, toggled instantly — works offline | [Live preview →](previews/web-document.html) |
+| **Multi-page Diagrams** | Diagram-first on light paper, one drawing per slide | Every slide written twice, so diagram labels translate too | [Live preview →](previews/mermaid-master.html) |
+| **Architecture diagram** | System diagrams on slate, where colour means something — one view or several | Both languages inline, including the labels inside the drawing | [Live preview →](previews/architecture.html) |
+| **Sitemap & IA proposal** | Pages that argue a site structure, plus the navigation wired up to click through | Both languages written inline | [Live preview →](previews/sitemap-ia.html) |
+| **Slide design** — *a handoff, not a template* | Twelve style presets and animated HTML | One language per deck — the presets carry no toggle | [Live preview →](previews/slide-design.html) |
 
 All six have a live preview linked from the intake gallery, so you can look
 before you choose.
