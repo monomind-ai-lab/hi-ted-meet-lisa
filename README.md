@@ -46,10 +46,16 @@ In Codex, the same two steps are one:
 codex plugin marketplace add monomind-ai-lab/hi-ted-meet-lisa
 ```
 
-**Using the Claude or ChatGPT app instead?** Those take a skill as a ZIP
-through a settings panel, one skill at a time — Claude at *Customize → Skills
-→ + → Create skill*, ChatGPT at *Plugins → Skills → Create*. Build the
-bundles, then upload whichever you want:
+**Using the Claude or ChatGPT app instead?** You can, but know what you give
+up. Those sandboxes have no browser and no way to serve a port to you, so the
+intake panel cannot open itself — you answer it at
+[html.monomind.one/intake.html](https://html.monomind.one/intake.html) and
+paste the payload back, and you watch a blank screen while the file is built
+rather than the build itself. The plugin is the better experience by a
+distance. If you still want it: those panels take a skill as a ZIP, one at a
+time — Claude at *Customize → Skills → + → Create skill*, ChatGPT at
+*Plugins → Skills → Create*. Build the bundles, then upload whichever you
+want:
 
 ```sh
 python3 scripts/build_skill_zips.py   # writes dist/lisa.zip and two more

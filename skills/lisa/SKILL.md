@@ -40,13 +40,24 @@ The design system is not yours to invent. It ships inside
 component library, deck navigation, a menu, and the language switch. Your job
 is to **fill the template with content**, not to restyle it.
 
-## If you cannot open a browser, start here
+## First: can you serve a page locally?
 
-In a hosted chat app there is no browser and no way to serve a port to the
-reader, so the panel below cannot run. That is the first thing to establish,
-and it costs nothing. When it is the case, your whole first move is to hand
-over the hosted panel and wait — do not ask for a brief, do not interview, do
-not read anything else first. Say roughly this, adapted to their wording:
+One question, asked before anything else because it costs nothing and decides
+the rest.
+
+**If you can run Python and open a browser on the reader's machine** — Claude
+Code, a terminal agent, anything with a local shell — use the runner in step 1.
+**Prefer it whenever it is available.** It is a materially better experience,
+not merely the older one: the panel opens itself, the answers post straight
+back with no copy-paste, thumbnails are inlined so the gallery works without a
+network, and the reader watches the build happen instead of waiting at a blank
+screen. Skip the rest of this section and go to step 1.
+
+**Only if you cannot** — a hosted chat-app sandbox has no browser and no way to
+serve a port to the reader — fall back to the hosted panel. It is the
+constrained route, not the default. Then your whole first move is to hand it
+over and wait: do not ask for a brief, do not interview, do not read anything
+else first. Say roughly this, adapted to their wording:
 
 > Lisa builds one standalone HTML file, and she takes the brief through a
 > short visual panel rather than a conversation:
@@ -180,6 +191,14 @@ Everything else comes from the intake panel.
    controls, language set, and the protected-term list. Every answer has a
    default and the panel always sends all of them; a missing key is a malformed
    payload, not permission to guess.
+   **Say where you are as you go.** A long build with no output reads as a
+   hung one — fifteen silent minutes is indistinguishable from a crash. Where
+   the harness shows your tool calls the reader can already see progress and
+   you need add nothing; where it shows nothing, emit a short line as you
+   finish each phase — template copied, content written, diagrams in,
+   languages done, checks running. One line each, no commentary. It costs
+   almost nothing and is the difference between waiting and wondering.
+
 9. **Verify before handing over** — see the checklist. Every language named in
    `languages` must have its own control in the switch: content written in a
    language nobody can reach is the same as not writing it. Count the controls
