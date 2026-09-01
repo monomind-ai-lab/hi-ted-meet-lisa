@@ -297,7 +297,7 @@ git submodule update --init --recursive
 
 One thing it will not do: edit anything under `vendor/` — fixes belong
 upstream. Every deliverable stays a standalone HTML file; the pipeline's
-`.pptx` output is retired here. Because the story is just about Ted and Lisa, not about Peter Parker and Ted. 
+`.pptx` output is retired here. Because the story is just about Ted and Lisa, not about Peter Parker and Tony. 
 
 ## ✅ Add your own template
 
