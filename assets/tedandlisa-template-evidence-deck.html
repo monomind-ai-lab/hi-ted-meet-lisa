@@ -390,14 +390,9 @@ ul.pts li:last-child{margin-bottom:0}
         <span class="en">Repository</span><span class="ko">저장소</span>
       </a>
 
-           menu.items: "pdf" / "html" — only when `export` asked for them.
-           There is no print stylesheet in this template, so `export: pdf`
-           means writing the @media print block as well as pasting this:
+           menu.items: "html" — only when `export` asked for it. Paste it
+           back in, and add the handler that clones the document and Blobs it:
 
-      <button type="button" role="menuitem" id="deckMenuPdf">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9.5V4h10v5.5M7 18H5.2v-6h13.6v6H17M8.4 15h7.2v5H8.4z"/></svg>
-        <span class="en">Download as PDF</span><span class="ko">PDF로 저장</span>
-      </button>
       <button type="button" role="menuitem" id="deckMenuHtml">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 3.6-3.6M12 15l-3.6-3.6M5 19h14"/></svg>
         <span class="en">Download the HTML</span><span class="ko">HTML 내려받기</span>

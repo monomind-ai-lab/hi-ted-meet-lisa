@@ -300,9 +300,9 @@ the intake answered `credit: false`.
 - **Routing** — `#/{lang}/{page}`. `go(id)` changes page, `setLang(l)` changes
   language, each preserving the other half, so deep links carry both. An unknown
   page or language falls back to `home` / `en` rather than rendering nothing.
-- **The utility cluster** — theme, PDF (`window.print()`), and HTML
-  self-download. Every control is guarded in the script: deleting its button in
-  the nav is the supported way to switch that feature off.
+- **The utility cluster** — theme and HTML self-download. Every control is
+  guarded in the script: deleting its button in the nav is the supported way to
+  switch that feature off.
 - **The theme toggle** persists to `localStorage` under `monomind-doc-theme`
   and announces the theme it switches *to*, because the control is an icon.
 - **The footer** sits outside the pages, so it renders on all of them and is
@@ -319,15 +319,17 @@ mid-word or pushes the language toggle off the edge. The default spends roughly
 
 ```
 brand 183 + five links 356 + More 68 + gaps 68
-+ link icon 32 + utilbar 104 + language 82 + CTA 99 + padding 48  ≈ 1040
++ link icon 32 + utilbar 73 + language 82 + CTA 99 + padding 48  ≈ 1009
 ```
 
-leaving about 80px. Longer labels and a longer project name eat that headroom.
+leaving about 110px. The utilbar figure is measured, not estimated: it was 104
+with three buttons and is 73 now that the PDF control is gone. Longer labels
+and a longer project name eat that headroom.
 A sixth inline link does not fit — move one into the More dropdown instead.
 Two rules exist only to keep this honest: every nav label is `white-space:
 nowrap`, so a too-long row fails visibly rather than quietly wrapping, and the
-utilbar's PDF/HTML words are hidden by default because they cost 56px the row
-has not got. Measure before adding; do not eyeball.
+utilbar's HTML word is hidden by default because it costs width the row has
+not got. Measure before adding; do not eyeball.
 
 ## Colour and contrast
 

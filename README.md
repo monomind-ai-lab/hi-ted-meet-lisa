@@ -124,8 +124,8 @@ panel. The deck is about [YOUR SUBJECT], for [AUDIENCE].
   the gallery before you choose.
 - **Two languages in the file**, with filenames, commands, and product names
   protected from translation.
-- **Light and dark**, a deck menu, keyboard and touch navigation, and optional
-  PDF and HTML download — whichever of these you asked for.
+- **Light and dark**, a deck menu, keyboard and touch navigation, and an
+  optional HTML download — whichever of these you asked for.
 - **A design pass before handover** that measures contrast in both themes and
   behaviour at phone width, then reports what it fixed.
 

@@ -86,7 +86,7 @@ An entry arrives in one of two shapes, and you must handle both:
 | `evidence` | array of `analytics` `search` `interviews` `cardsort` `support` `seo` `none` | **`sitemap-ia` only.** What the recommendation rests on. Anything absent belongs in the open questions, not in a confident claim. |
 | `prototype` | `both` \| `desktop` \| `none` | **`sitemap-ia` only.** How much of the navigation is clickable. |
 | `delivery` | `cdn` \| `standalone` | **`sitemap-ia` only.** `standalone` inlines mermaid, the webfonts, Font Awesome and Tailwind. |
-| `export` | array of `pdf` `html` | Each adds a control to the deck chrome. |
+| `export` | array of `html` | Adds a self-download control to the deck chrome. |
 | `credit` | `true` \| `false` | Whether the file keeps its colophon — the "Made with Hi Ted, Meet Lisa" line linking to html.monomind.one. Every template ships it; `false` means delete that one line (never the logo or identity links, which belong to `logo`). Asked for **every** shape, the external handoff included, so it is present in both the runner's payload and the web panel's paste-ready prompt alike. |
 
 ## The menu object
@@ -100,11 +100,11 @@ An entry arrives in one of two shapes, and you must handle both:
 `full`.
 
 - `items` always contains `start`; the rest are optional: `contents`, `home`,
-  `github`, `pdf`, `html`, `language`.
+  `github`, `html`, `language`.
 - `home` and `github` are the URLs for those items. **An item whose URL is
   `null` must be deleted from the menu**, not shipped pointing nowhere.
-- `pdf` and `html` in `items` are menu entry points for the `export` answers.
-  If `export` did not ask for a format, the menu item goes too.
+- `html` in `items` is the menu entry point for the `export` answer.
+  If `export` did not ask for it, the menu item goes too.
 
 `minimal` means no menu at all — just a back-to-the-start control beside the
 page counter. `none` means neither.

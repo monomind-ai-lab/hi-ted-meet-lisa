@@ -175,7 +175,7 @@ prototype half-loads:
 ## Chrome you must not rewrite
 
 The mermaid init, the `#/{lang}/{page}` router, the pan-and-zoom viewer, the
-theme/PDF/HTML controls, the reduced-motion wrapper, and the prototype mount
+theme/HTML controls, the reduced-motion wrapper, and the prototype mount
 script. They encode fixes for problems that are not visible in the markup.
 Rewrite only the registers: `PAGES`, the nav entries, and the prototype's
 `sets` indices.

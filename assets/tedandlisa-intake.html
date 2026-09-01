@@ -1402,14 +1402,13 @@ var L10N = {
              "menuitems.github": ["저장소 URL — 메뉴가 저장소로 연결될 때만", "https://github.com/…"] },
         c: { "menuitems.items": {
                start: "처음으로", contents: "목차 — 아무 장으로나 이동", home: "홈 링크",
-               github: "GitHub 링크", pdf: "PDF로 내려받기", html: "HTML 내려받기",
+               github: "GitHub 링크", html: "HTML 내려받기",
                language: "메뉴 안의 언어 전환" } }
       },
       export: {
         q: "읽는 사람이 무엇을 가져갈 수 있나요?",
-        hint: "둘 다 크롬에 작은 컨트롤을 하나씩 더합니다.",
-        o: { pdf:  ["PDF로 내려받기", "인쇄 스타일시트, 가로 한 페이지에 한 장."],
-             html: ["독립 실행형 HTML 내려받기", "파일이 자기 자신의 사본을 저장합니다."] }
+        hint: "크롬에 작은 컨트롤을 하나 더합니다.",
+        o: { html: ["독립 실행형 HTML 내려받기", "파일이 자기 자신의 사본을 저장합니다."] }
       },
       credit: {
         q: "크레딧 한 줄",
@@ -1617,14 +1616,13 @@ var L10N = {
              "menuitems.github": ["儲存庫網址 — 只有選單有連到儲存庫時才需要", "https://github.com/…"] },
         c: { "menuitems.items": {
                start: "回到開頭", contents: "目錄 — 跳到任何一頁", home: "首頁連結",
-               github: "GitHub 連結", pdf: "下載成 PDF", html: "下載 HTML",
+               github: "GitHub 連結", html: "下載 HTML",
                language: "選單裡的語言切換" } }
       },
       export: {
         q: "讀者可以帶走什麼？",
-        hint: "兩個都會在介面上多加一個小控制項。",
-        o: { pdf:  ["下載成 PDF", "列印樣式表，一張投影片一頁橫式。"],
-             html: ["下載獨立的 HTML", "檔案會存下一份自己的副本。"] }
+        hint: "會在介面上多加一個小控制項。",
+        o: { html: ["下載獨立的 HTML", "檔案會存下一份自己的副本。"] }
       },
       credit: {
         q: "署名那一行",
@@ -1886,7 +1884,6 @@ var QUESTIONS = [
         { id: "contents", label: "Contents — jump to any slide", def: true },
         { id: "home",     label: "Home link" },
         { id: "github",   label: "GitHub link" },
-        { id: "pdf",      label: "Download as PDF" },
         { id: "html",     label: "Download the HTML" },
         { id: "language", label: "Language switch inside the menu" } ] },
       { kind: "text", id: "home", label: "Home URL — only if the menu links home",
@@ -1895,9 +1892,8 @@ var QUESTIONS = [
         placeholder: "https://github.com/…" } ] } },
 
   { id: "export", chapter: "Handover", q: "What can a reader take away?", kinds: ["slides", "document"],
-    hint: "Both add a small control to the chrome.",
+    hint: "It adds a small control to the chrome.",
     type: "multi", options: [
-      { id: "pdf",  label: "Download as PDF", note: "Print stylesheet, one slide per landscape page." },
       { id: "html", label: "Download the standalone HTML", note: "The file saves a copy of itself." } ] },
 
   /* No kinds and no templates: the credit line exists in every shape,

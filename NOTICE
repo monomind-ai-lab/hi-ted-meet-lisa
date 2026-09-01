@@ -34,8 +34,8 @@ the Architecture Diagram Generator skill.
              moved from attributes to CSS classes so a theme is a token swap,
              a light palette added, English/Korean labels written inline, the
              MonoMind mark and chrome added, and the html2canvas/jsPDF exports
-             replaced with print-to-PDF and a self-download so the file has no
-             runtime dependency.
+             replaced with a self-download so the file has no runtime
+             dependency.
 
 
 --------------------------------------------------------------------------

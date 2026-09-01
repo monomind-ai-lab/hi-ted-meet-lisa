@@ -394,14 +394,9 @@ ul.pts li:last-child{margin-bottom:0}
         <span class="zh">程式庫</span><span class="en">Repository</span>
       </a>
 
-           menu.items: "pdf" / "html" — 只有 `export` 問到才出現。這個版型沒有
-           列印樣式，所以 `export: pdf` 除了貼回下面這一項，還要自己寫
-           @media print 區塊：
+           menu.items: "html" — 只有 `export` 問到才出現。把下面這一項貼回去，
+           並補上複製整份文件再用 Blob 下載的處理程式：
 
-      <button type="button" role="menuitem" id="deckMenuPdf">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9.5V4h10v5.5M7 18H5.2v-6h13.6v6H17M8.4 15h7.2v5H8.4z"/></svg>
-        <span class="zh">下載 PDF</span><span class="en">Download as PDF</span>
-      </button>
       <button type="button" role="menuitem" id="deckMenuHtml">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 3.6-3.6M12 15l-3.6-3.6M5 19h14"/></svg>
         <span class="zh">下載 HTML</span><span class="en">Download the HTML</span>

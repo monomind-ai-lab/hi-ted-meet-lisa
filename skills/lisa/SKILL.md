@@ -285,7 +285,7 @@ feature the user did not choose.
 | `languages` | Trim or extend the language switch to exactly this set. English always stays. |
 | `noTranslate` | Append every term to the protection list in the language-switch script (MonoMind deck). The web document needs no list — nothing is machine-translated. |
 | `menu.mode: full` | Keep the menu; delete the items not in `menu.items`. |
-| `menu.items` | `contents` builds itself from `data-screen-label`. `home` and `github` take their URLs from `menu.home` / `menu.github` — delete the item if its URL is empty. `theme`, `pdf`, `html` must agree with the theme and export answers. |
+| `menu.items` | `contents` builds itself from `data-screen-label`. `home` and `github` take their URLs from `menu.home` / `menu.github` — delete the item if its URL is empty. `theme`, `html` must agree with the theme and export answers. |
 | `menu.mode: minimal` | Remove `hidden` from `#deck-restart` and delete the whole `.deck-menu` nav. |
 | `menu.mode: none` | Delete both. |
 | `siteType` | Shapes the top level. A documentation site is organised around tasks; a catalogue around browse-and-compare. Do not reuse the template's default seven sections without asking whether they fit. |
@@ -300,9 +300,8 @@ feature the user did not choose.
 | `prototype: none` | Delete the whole `megamenu` page, its nav entry, its `PAGES` entry, the payload blocks, the mount script, and the `.mm*` CSS. |
 | `delivery: cdn` | Leave the four CDN references as they are. |
 | `delivery: standalone` | Inline mermaid, the webfonts, Font Awesome and Tailwind. **Subset the webfonts to the glyphs the document actually renders** — the CJK family is several megabytes unsubsetted, and Google Fonts' `text=` parameter does the subsetting for you. Each family arrives as one variable font: declare it once across a weight range rather than once per weight. |
-| `export: pdf` | Keep the `@media print` block and the PDF control. |
 | `export: html` | Keep the self-download control. |
-| neither export | Delete the print block and both controls. |
+| no export | Delete the self-download control. The `@media print` block stays — it serves the browser's own print, not an export control. |
 | `credit: true` or absent | Keep the colophon — the "Made with Hi Ted, Meet Lisa" line every template carries in its footer or closing slide, linking to html.monomind.one. Each pattern reference shows the exact markup. |
 | `credit: false` | Delete that one line only. The brand mark and any identity links stay — they belong to the `logo` answer, not this one. |
 

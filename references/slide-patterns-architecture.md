@@ -7,7 +7,7 @@ someone will read closely and paste into a review — not a talk.
 The visual system is derived from the Architecture Diagram Generator by Cocoon
 AI (MIT, see `NOTICE`): slate ground, a faint grid field, JetBrains Mono
 throughout, and **colour that means something**. The MonoMind chrome — the mark,
-the English/Korean switch, the theme toggle, PDF and HTML export — is ours.
+the English/Korean switch, the theme toggle, HTML export — is ours.
 
 ## Colour is semantic, and set by class
 
@@ -89,11 +89,11 @@ legend entry implies a component the reader then hunts for.
 
 ## Chrome — do not rewrite
 
-- **Theme, language, PDF, HTML** all live in one guarded script at the foot of
+- **Theme, language, HTML** all live in one guarded script at the foot of
   the file. Deleting a control's markup switches that feature off cleanly.
-- Export is the browser's own print-to-PDF plus a self-download, so the file has
-  **no runtime dependency** beyond Google Fonts. Do not add html2canvas or jsPDF
-  to get an image export; a diagram that needs a bitmap can be screenshotted.
+- Export is a self-download, so the file has **no runtime dependency** beyond
+  Google Fonts. Do not add html2canvas or jsPDF to get an image export; a
+  diagram that needs a bitmap can be screenshotted.
 - The grid pattern's stroke is set in CSS (`#grid path`), not on the element: a
   `var()` inside an SVG presentation attribute never resolves, and the grid
   silently disappears.

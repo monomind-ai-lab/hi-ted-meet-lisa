@@ -202,13 +202,13 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
 .dropmenu a:hover{color:var(--fg-bright);background:var(--surface-3)}
 .dropmenu a.active{color:var(--fg-bright);background:var(--surface-3)}
 
-/* Utility cluster: theme, PDF, self-download. Each control is guarded in the
+/* Utility cluster: theme, self-download. Each control is guarded in the
    script, so deleting a button here is the supported way to switch it off. */
 .utilbar{display:inline-flex;align-items:center;border:1px solid var(--border-strong);border-radius:var(--r-md);overflow:hidden}
 .utilbar button{display:inline-flex;align-items:center;gap:6px;height:34px;padding-inline:10px;background:transparent;border:0;border-inline-start:1px solid var(--border);color:var(--fg-dim);font-size:.78rem;letter-spacing:.02em;white-space:nowrap;transition:color .15s,background .15s}
-/* Icon-only: the PDF and HTML words cost 56px of a row that has none to
-   spare, and both buttons carry a title and an aria-label. Delete this rule
-   to show them, and re-measure the budget above before you do. */
+/* Icon-only: the HTML word costs width the row has none to spare for, and
+   the button carries a title and an aria-label. Delete this rule to show it,
+   and re-measure the budget above before you do. */
 .utilbar button span{display:none}
 .utilbar button:first-child{border-inline-start:0}
 .utilbar button:hover{color:var(--fg-bright);background:var(--surface-2)}
@@ -417,8 +417,8 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
 @media(max-width:780px){.footer-grid{grid-template-columns:1fr 1fr;gap:32px 24px}.footer-brand{grid-column:1 / -1}.footer-bottom{flex-direction:column;gap:6px;align-items:flex-start}}
 
 /* ============================== PRINT ============================== */
-/* The PDF button is window.print(). Every page is printed, not just the
-   routed one, and the chrome is dropped. */
+/* Every page is printed, not just the routed one, and the chrome is
+   dropped. */
 @media print{
   .nav,.nav-mobile,.skip-link{display:none!important}
   .page{display:block!important;break-after:page}
@@ -484,9 +484,6 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
       <div class="utilbar">
         <button id="btnTheme" title="Theme" aria-label="Theme">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg>
-        </button>
-        <button id="btnPdf" title="Download as PDF">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9.5V4h10v5.5M7 18H5.2v-6h13.6v6H17M8.4 15h7.2v5H8.4z"/></svg><span>PDF</span>
         </button>
         <button id="btnHtml" title="Download the HTML">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 3.6-3.6M12 15l-3.6-3.6M5 19h14"/></svg><span>HTML</span>
@@ -1357,7 +1354,7 @@ document.querySelectorAll('[data-copy-root]').forEach(function(root){
   });
 });
 
-/* ---------- theme, PDF, self-download ----------
+/* ---------- theme, self-download ----------
    Kept apart from the routing above so it cannot disturb it. Every
    control is guarded: delete its button in the nav to switch it off. */
 (function(){
@@ -1386,9 +1383,6 @@ document.querySelectorAll('[data-copy-root]').forEach(function(root){
       try { localStorage.setItem(KEY, next); } catch(e) {}
     });
   }
-
-  var pBtn = document.getElementById('btnPdf');
-  if(pBtn) pBtn.addEventListener('click', function(){ window.print(); });
 
   var hBtn = document.getElementById('btnHtml');
   if(hBtn){

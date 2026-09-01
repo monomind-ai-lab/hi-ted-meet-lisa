@@ -220,10 +220,8 @@ html[data-theme="light"] .slide.is-photo {
   color: var(--accent-on);
 }
 
-/* ─── print / PDF ────────────────────────────────────────────────
-   Reader-facing "Download as PDF" is just the browser's own print to PDF,
-   which is why it needs no dependency. One slide per landscape page.
-   Delete this block if the intake said no PDF.                          */
+/* ─── print ──────────────────────────────────────────────────────
+   The reader's own browser print. One slide per landscape page.         */
 @media print {
   @page { size: 1600px 900px; margin: 0; }
   html, body { height: auto; overflow: visible; display: block; }
@@ -1301,15 +1299,6 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
         <span id="deck-theme-label">Light theme</span>
       </button>
 
-      <!-- menu.items: "pdf" — the browser's own print-to-PDF, no dependency -->
-      <button type="button" role="menuitem" id="deck-menu-pdf">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M7 9V4h10v5M7 18H5v-6h14v6h-2M8 15h8v5H8z" stroke="currentColor"
-                stroke-width="1.7" stroke-linejoin="round"/>
-        </svg>
-        Download as PDF
-      </button>
-
       <!-- menu.items: "html" — the deck saves a copy of itself -->
       <button type="button" role="menuitem" id="deck-menu-html">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -1713,7 +1702,7 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
 
   <script>
     /*
-      Block 6 — intake-driven chrome: theme, contents, PDF, HTML, and the
+      Block 6 — intake-driven chrome: theme, contents, HTML, and the
       minimal-menu restart button.
 
       Kept in its own block for the same reason the copy button is: it must
@@ -1784,11 +1773,6 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
           contentsBtn.setAttribute("aria-expanded", String(open));
         });
       }
-
-      /* ---- download as PDF ---------------------------------------------
-         The @media print block does the work; this only opens the dialog.  */
-      var pdfBtn = $("deck-menu-pdf");
-      if (pdfBtn) { pdfBtn.addEventListener("click", function () { window.print(); }); }
 
       /* ---- download the HTML -------------------------------------------
          The deck saves a copy of itself. Chrome is stripped of transient
