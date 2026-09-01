@@ -175,6 +175,10 @@ repository builds it — see [when a template is the wrong shape](#-when-a-templ
 All six have a live preview linked from the intake gallery, so you can look
 before you choose.
 
+<p align="left">
+  <img src="assets/tedandlisa-intake-templates.jpg" alt="The intake panel's template screen: filter chips for All, to present, to read, to diagram and to publish, above a gallery of template cards — each a screenshot of a real generated file, with its shape, dependencies and a Preview link." style="width: 100%; max-width: 100%;">
+</p>
+
 Each of the five templates has a pattern reference in `references/` giving
 verbatim markup for every component, plus the rules that are easy to get wrong.
 The handoff has none — it is not built from markup here.
@@ -227,7 +231,7 @@ sticks while a screen scrolls. Chapters with nothing to ask never appear, so
 the rail is shorter for a slide handoff than for a sitemap proposal.
 
 <p align="left">
-  <img src="assets/tedandlisa-intake-panel.jpg" alt="The Hi Ted, Meet Lisa intake panel: an editable prompt field with a reference drop zone, an eleven-step progress bar, and the template gallery showing MonoMind deck, Web document, and Mermaid master as selectable cards" style="width: 100%; max-width: 100%;">
+  <img src="assets/tedandlisa-intake-panel.jpg" alt="The intake panel's first screen: a progress rail naming the chapters — Prompt, Template, Shape, Look, Language, Handover, Ready — above an editable prompt field and a drop zone for reference files." style="width: 100%; max-width: 100%;">
 </p>
 
 The runner serves it on loopback and captures the answers:
