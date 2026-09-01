@@ -8,9 +8,11 @@ to Impeccable.
 
 1. **The user's own Impeccable**, if their agent already has the skill. Prefer
    it — it is the copy they maintain and configure.
-2. **The bundled copy** at `.agents/skills/impeccable/`, which ships with this
-   repo so the review works for everyone. Read its `SKILL.md` and follow it as
+2. **The bundled copy** at `.agents/skills/impeccable/`, present in a plugin
+   install or a repository checkout. Read its `SKILL.md` and follow it as
    written. Apache 2.0; see `VENDORED.md` before touching anything in there.
+   It is **not** in an uploaded zip — 156 files against a 200-file cap — so a
+   skill running from a chat-app upload goes to 3.
 3. **This file alone**, if neither can run. The checks below are the floor and
    need no tooling.
 
