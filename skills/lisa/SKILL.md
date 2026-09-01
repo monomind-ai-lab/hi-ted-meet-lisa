@@ -50,6 +50,14 @@ not read anything else first. Say roughly this, adapted to their wording:
 Then stop and wait. Step 1 has the detail; the rest of this file only matters
 once the payload is in hand.
 
+**When the payload arrives, say what it implies before you start.** One line is
+enough, and it saves the reader watching a blank screen wondering. Two things
+actually drive the wait: the number of languages, because every reader-visible
+string and every diagram source is written once per language — three languages
+is three times the writing, not a setting — and the number of pages or slides.
+A five-page trilingual document is a quarter of an hour's work. Say so, then
+build.
+
 ## Invocation
 
     /lisa [what the deck is about]
@@ -160,7 +168,16 @@ Everything else comes from the intake panel.
    controls, language set, and the protected-term list. Every answer has a
    default and the panel always sends all of them; a missing key is a malformed
    payload, not permission to guess.
-9. **Verify before handing over** — see the checklist.
+9. **Verify before handing over** — see the checklist. Every language named in
+   `languages` must have its own control in the switch: content written in a
+   language nobody can reach is the same as not writing it. Count the controls
+   against the answer, by hand — it is a static check and needs no browser.
+
+   **In a sandbox you cannot run the browser checks at all.** Say which ones
+   you skipped rather than implying a clean pass, and tell the reader how to
+   run them: open the file over http rather than by double-clicking it, then
+   look for console errors and for horizontal overflow at 375px. Hash routing
+   and the language switch need a real page, not a `file://` snapshot.
 10. **Present the deck for review**, then run the design pass — see
     [references/design-review.md](references/design-review.md). It uses the
     user's own Impeccable when their agent has it, the copy bundled at
