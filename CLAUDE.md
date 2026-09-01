@@ -8,7 +8,7 @@ This is the source repository for **`lisa`**, a Claude Code Skill
 (invoked as `/lisa`) that generates a MonoMind-branded slide deck,
 web document, or diagram set as **one standalone HTML file** — no build step, no bundler, no
 package manager, no test suite. The only runtime dependencies are Python's
-stdlib (for the two helper scripts) and, for thumbnail capture, a local Chrome
+stdlib (for the helper scripts) and, for thumbnail capture, a local Chrome
 binary. Do not look for `npm`/`pip` build or lint commands — there are none.
 
 The full skill protocol lives in [`skills/lisa/SKILL.md`](skills/lisa/SKILL.md)
@@ -54,10 +54,12 @@ switch, check for console errors and horizontal overflow at 375px).
 
 ## Architecture
 
-**Three independent template systems, not variations of one look.** Each is a
-single self-contained HTML file with its own design tokens, chrome, scripts,
-and language mechanism — they differ in shape, navigation, and how they
-translate, so a change to one has no bearing on the other:
+**Independent template systems, not variations of one look.** The registry
+carries eight first-party templates (plus the external `slide-design` entry
+that hands off to `/lisa-design`). Each is a single self-contained HTML file
+with its own design tokens, chrome, scripts, and language mechanism — they
+differ in shape, navigation, and how they translate, so a change to one has no
+bearing on the others. Three of them show how far apart the systems sit:
 
 - `assets/tedandlisa-template.html` (`monomind-deck`) — horizontal
   scroll-snap slides; on-demand Google Translate driven by a
@@ -101,9 +103,18 @@ process → `scripts/tedandlisa_intake.py` serves `assets/tedandlisa-intake.html
 and captures its answers as JSON per `references/intake-contract.md` → the
 skill resolves `answers.template` through `templates/templates.json` → copies
 that template file (never authors from blank) → fills placeholders using the
-matching pattern-reference doc → applies every intake answer as a chrome edit
-(theme/backgrounds/logo/menu/export — see the answers table in `SKILL.md`) →
-runs the design-review pass (`references/design-review.md`).
+matching pattern-reference doc → applies the intake answers: the mechanical
+rows (theme/backgrounds/menu/export/accent/…) by running
+`scripts/tedandlisa_apply.py`, the judgment rows by hand — the answers table
+in `references/applying-answers.md` is the authority for both → the design
+review runs when the intake's `review` answer scheduled it (see below).
+
+**Templates fence what may be edited.** Every first-party template wraps its
+authorable regions in `LISA:CONTENT-START` / `LISA:CONTENT-END` comment pairs
+and opens with a `LISA:CONTENT-MAP` header naming those regions plus the few
+out-of-fence edit points (`<title>`, nav labels, script arrays). Agents `cp`
+the template file and edit only the fenced regions — everything outside is
+load-bearing chrome and embedded artwork, never to be retyped.
 
 **Load-bearing machinery must not be rewritten**, only extended: script block 1
 in the MonoMind deck template, and the hash router + diagram viewer in the
@@ -125,7 +136,10 @@ and registers it. Its cardinal rule: the *source* document is someone's real
 work and must never be committed — only the genericized skeleton, scrubbed of
 every identifying detail, is.
 
-**Design review** (`references/design-review.md`, run as the skill's step 10)
+**Design review** (`references/design-review.md`) is scheduled by the
+intake's `review` answer — default `after`: deliver the file first, then run
+`/lisa-review` when the user says yes; `inline` runs the pass before handover,
+`none` runs only the floor checks. Whichever way it runs, the pass
 prefers the user's own Impeccable install, falls back to the copy vendored
 unmodified at `.agents/skills/impeccable/` (see its `VENDORED.md`), and has a
 tooling-free checklist as the floor.

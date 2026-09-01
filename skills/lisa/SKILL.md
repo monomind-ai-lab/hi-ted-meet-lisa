@@ -50,7 +50,7 @@ The prompt carries the brief. Everything else comes from the intake panel.
    hand over the hosted panel and wait. Say roughly this, adapted:
 
    > Lisa takes the brief through a short visual panel rather than a
-   > conversation: **https://html.monomind.one/intake.html** — put your brief
+   > conversation: **https://html.monomind.one/intake** — put your brief
    > on the first screen, pick a template, answer as much or as little as you
    > like (every question has a default). The last step hands you a block of
    > text: paste it back here and I will build it.
