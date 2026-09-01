@@ -55,6 +55,11 @@ bundles, then upload whichever you want:
 python3 scripts/build_skill_zips.py   # writes dist/lisa.zip and two more
 ```
 
+Upload `lisa` and `lisa-design`. `lisa-new-template` is built for completeness
+but is not worth a panel slot: registering a template and capturing its
+thumbnail both write to a checkout, and the whole point of that skill is a
+template that stays in *your* gallery — which a sandbox cannot give you.
+
 Prefer to install by hand, or using another agent? Clone the repository and
 symlink the skills you want:
 

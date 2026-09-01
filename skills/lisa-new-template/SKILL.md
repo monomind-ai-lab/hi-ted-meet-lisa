@@ -68,6 +68,21 @@ confirm before doing it.
 5. **Write the pattern reference** at `references/slide-patterns-ID.md` —
    verbatim markup for every component, plus the rules that are easy to get
    wrong. Model it on `references/slide-patterns-web-document.md`.
+> **Running in a hosted chat sandbox?** Steps 6 to 8 cannot complete there, and
+> saying so early is the honest thing to do. Registration writes to a checkout
+> that disappears with the session; `tedandlisa_thumbs.py` shells out to a local
+> Chromium binary that is not installed; and there is no browser to verify in.
+>
+> This matters more than it looks. The point of this skill is not an HTML file —
+> it is that the template becomes **a permanent choice in the user's own intake
+> gallery**. That outcome needs their checkout, so it cannot happen here.
+>
+> Do steps 1 to 5, then stop and hand over: give them the skeleton and the
+> pattern reference as files, say which checks you ran and which you could not,
+> and give them the two commands to finish it in their own checkout — the
+> `register` call from step 6 with the values you chose, and step 7's thumbnail
+> and fallback regeneration. Never register, and never call it verified.
+
 6. **Register it:**
 
    ```sh
@@ -115,4 +130,6 @@ step 6. Registration is create-only and refuses to overwrite an existing id.
   choices you would have made differently.
 - Do not merge two sources into one template.
 - Do not add a dependency the source did not have.
-- Do not register a template you have not opened in a browser.
+- Do not register a template you have not opened in a browser. Where no
+  browser exists, say so and hand the file over — do not register it anyway,
+  and do not call it verified.

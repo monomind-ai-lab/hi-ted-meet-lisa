@@ -50,6 +50,21 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # `vendor/` matters: /lisa-design reads vendor/slides-ai-plugin/, so an
 # uploaded bundle without it is a skill that cannot run.
 PAYLOAD_DIRS = ("assets", "references", "scripts", "templates", "vendor")
+
+# Carried only by the bundles that actually use them, and at their original
+# paths, because the skills name those paths. The bundled design reviewer is
+# 3.5 MB and only /lisa runs the design pass (step 10); without it an uploaded
+# /lisa silently drops to the tooling-free floor of references/design-review.md.
+EXTRA_PAYLOAD = {
+    "lisa": (".agents/skills/impeccable",),
+}
+
+# Built for completeness, but say plainly which ones are worth uploading. A
+# bundle is only worth a panel slot if the skill can finish its job there.
+UPLOAD_NOTES = {
+    "lisa-new-template": "registry writes and thumbnails need a local checkout — "
+                         "a hosted upload can only hand back a skeleton",
+}
 PAYLOAD_FILES = ("LICENSE", "NOTICE")
 
 # Claude caps a custom skill upload at 30 MB uncompressed. ChatGPT does not
@@ -92,6 +107,14 @@ def stage(skill: pathlib.Path, into: pathlib.Path) -> pathlib.Path:
         src = ROOT / name
         if src.is_file():
             shutil.copy2(src, folder / name)
+
+    for rel in EXTRA_PAYLOAD.get(skill.name, ()):
+        src = ROOT / rel
+        if not src.is_dir():
+            sys.exit(f"extra payload missing for {skill.name}: {rel}")
+        dest = folder / rel               # original path preserved on purpose
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(src, dest, ignore=IGNORE)
 
     return folder
 
@@ -137,6 +160,10 @@ def main() -> int:
             print(f"{skill.name:26} {files:4d} files  "
                   f"{size/1024/1024:5.1f} MB uncompressed  -> "
                   f"{target.relative_to(ROOT)} ({target.stat().st_size/1024/1024:.1f} MB)")
+
+    for name, note in UPLOAD_NOTES.items():
+        if any(s.name == name for s in skills):
+            print(f"\nnote: {name} — {note}")
 
     if oversize:
         print(f"\nover the {MAX_UNCOMPRESSED//1024//1024} MB upload limit: "
