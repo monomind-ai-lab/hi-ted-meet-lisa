@@ -16,12 +16,24 @@ Generate a **single standalone HTML file** that is a MonoMind-branded slide
 deck. No build step, no dependencies, no network calls except Google Fonts and
 (only when a reader picks a non-English language) Google Translate.
 
-One limit worth knowing before you offer languages: Google Translate drives
-the deck's switch through a cookie, and cookies do not persist on `file://`.
-A downloaded deck opened by double-clicking it therefore cannot translate, and
-the template hides the switch there rather than showing a dead button. Served
-over http it works normally. Every other template in this repository writes
-both languages inline instead and has no such limit.
+Two controls behave differently once the file is downloaded, and the templates
+already handle both — do not undo them:
+
+- **The language switch**, on the MonoMind deck only. It runs on Google
+  Translate, which needs a cookie, and cookies do not persist on `file://`. A
+  downloaded deck cannot translate, so the template hides the switch there
+  rather than showing a dead button. Served over http it works normally. Every
+  other template writes both languages inline and has no such limit.
+- **The self-download**, on every template that offers it. Saving a copy of a
+  file the reader already has is not a feature, so it hides on `file://` too.
+
+The rule behind both: a control that cannot mean anything in the context the
+file is being read in should not be shown there.
+
+What is *not* affected: CDN resources. Mermaid and Google Fonts load fine from
+a downloaded file — `file://` is not the constraint, network is. With no
+network the diagrams fall back to their source and the text is unharmed; that
+is what the `delivery` answer exists to avoid.
 
 The design system is not yours to invent. It ships inside
 `assets/tedandlisa-template.html`: 68 design tokens, a typographic scale, a

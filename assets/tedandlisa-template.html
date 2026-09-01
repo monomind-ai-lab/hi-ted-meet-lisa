@@ -1803,6 +1803,11 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
          The deck saves a copy of itself. Chrome is stripped of transient
          state first so the saved file opens exactly like the original.     */
       var htmlBtn = $("deck-menu-html");
+      /* A self-download offers to save a copy of a file the reader already has, so
+         it earns its place only when this page is being served. On file:// it hands
+         you what is already on your disk — hide it. Same rule as the language
+         switch. Nulled rather than returned: wiring after this block must still run. */
+      if (htmlBtn && location.protocol === 'file:') { htmlBtn.hidden = true; htmlBtn = null; }
       if (htmlBtn) {
         htmlBtn.addEventListener("click", function () {
           var clone = document.documentElement.cloneNode(true);
