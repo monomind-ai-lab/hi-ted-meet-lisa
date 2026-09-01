@@ -286,7 +286,7 @@ This wraps [Slides AI Plugin](https://github.com/proyecto26/slides-ai-plugin)
 (MIT), carried here as a git submodule at `vendor/slides-ai-plugin/`. It brings
 twelve style presets and animated single-file HTML decks — with MonoMind
 branding applied unless you pick a
-preset. PPTX generation needs `bun`.
+preset. 
 
 The install above uses `--recurse-submodules`, so this is already populated. If
 you cloned without it:
@@ -297,7 +297,7 @@ git submodule update --init --recursive
 
 One thing it will not do: edit anything under `vendor/` — fixes belong
 upstream. Every deliverable stays a standalone HTML file; the pipeline's
-`.pptx` output is retired here.
+`.pptx` output is retired here. Because the story is just about Ted and Lisa, not about Peter Parker and Ted. 
 
 ## ✅ Add your own template
 
