@@ -8,8 +8,9 @@
 
 Hi Ted, Meet Lisa is an agent skill that generates a finished, self-contained HTML
 deck. You describe the deck; the agent asks what it cannot infer, builds from a
-template, applies your answers, reviews the result, and hands you a single file
-you can open, present, print, or email.
+template, applies your answers, and hands you a single file you can open,
+present, print, or email — then reviews it, inline or after delivery, whichever
+you chose.
 
 The design system is not improvised per deck. It ships in the repository as
 templates: design tokens, a typographic scale, a component library, navigation,
@@ -32,8 +33,8 @@ intake panel, and copy one paste-ready prompt for any coding agent — Claude
 Code, Codex, Pi, OpenCode, Hermes, or anything else that reads a public URL.
 Nothing to install.
 
-Prefer it as a standing command? Install the plugin once — it carries all three
-skills, and then they are three commands you have for good.
+Prefer it as a standing command? Install the plugin once — it carries all four
+skills, and then they are four commands you have for good.
 
 ```sh
 /plugin marketplace add monomind-ai-lab/hi-ted-meet-lisa
@@ -58,13 +59,17 @@ time — Claude at *Customize → Skills → + → Create skill*, ChatGPT at
 want:
 
 ```sh
-python3 scripts/build_skill_zips.py   # writes dist/lisa.zip and two more
+python3 scripts/build_skill_zips.py   # writes dist/lisa.zip and one more
 ```
 
-Upload `lisa` and `lisa-design`. `lisa-new-template` is built for completeness
-but is not worth a panel slot: registering a template and capturing its
-thumbnail both write to a checkout, and the whole point of that skill is a
-template that stays in *your* gallery — which a sandbox cannot give you.
+Upload `lisa`. `lisa-new-template` is built for completeness but is not worth
+a panel slot: registering a template and capturing its thumbnail both write to
+a checkout, and the whole point of that skill is a template that stays in
+*your* gallery — which a sandbox cannot give you. `lisa-design` and
+`lisa-review` get no bundle at all — each depends on a vendored companion that
+carries SKILL.md files of its own, and an upload permits exactly one; the
+builder prints why it skipped them. An uploaded `lisa` still runs the
+tooling-free review floor, so nothing breaks silently.
 
 Prefer to install by hand, or using another agent? Clone the repository and
 symlink the skills you want:
@@ -73,7 +78,7 @@ symlink the skills you want:
 git clone https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git \
   ~/.monomind/hi-ted-meet-lisa
 
-for s in lisa lisa-design lisa-new-template; do
+for s in lisa lisa-design lisa-review lisa-new-template; do
   ln -s ~/.monomind/hi-ted-meet-lisa/skills/$s ~/.claude/skills/$s
 done
 ```
@@ -90,8 +95,17 @@ with a `SKILL.md` at its top. Every skill here lives under `skills/`.
 ```
 
 Opens the intake panel, asks its questions — nine to sixteen depending on the
-template, every one with a default — builds from the template you picked, runs a
-design review, and hands back one file.
+template, every one with a default — builds from the template you picked, and
+hands back one file.
+
+```text
+/lisa-review the-deck-you-just-got.html
+```
+
+Runs the design pass on a finished deck — the same review `/lisa` can run
+before handover, now on your schedule. By default a build delivers the draft
+first and leaves this to you: run it straight away, or weeks later, on any
+standalone HTML deck or page.
 
 ```text
 /lisa-new-template ./that-deck-i-like.html
@@ -132,8 +146,10 @@ panel. The deck is about [YOUR SUBJECT], for [AUDIENCE].
   protected from translation.
 - **Light and dark**, a deck menu, keyboard and touch navigation, and an
   optional HTML download — whichever of these you asked for.
-- **A design pass before handover** that measures contrast in both themes and
-  behaviour at phone width, then reports what it fixed.
+- **A design pass on your schedule** — inline before handover, or (the
+  default) as `/lisa-review` once the draft is in your hands. It measures
+  contrast in both themes and behaviour at phone width, then reports what it
+  fixed.
 
 Want a look the house style does not cover? The gallery's handoff card passes
 the work to [`lisa-design`](skills/lisa-design/), which drives a
@@ -167,7 +183,7 @@ Hi Ted, Meet Lisa answers those directly:
 
 ## ✅ What this repository does
 
-This repository is an agent-facing package: two skills, eight templates, a
+This repository is an agent-facing package: four skills, eight templates, a
 visual intake panel, a template registry, and the tooling that ties them
 together. An agent uses them to produce a deck without asking you to run
 anything yourself.
@@ -182,8 +198,8 @@ skill still cannot drift apart, they just ship on their own schedules now.
 
 ### How agents find the instructions
 
-1. Harnesses that support the Agent Skills convention discover all three
-   skills under `skills/` — `/lisa`, `/lisa-design`, and
+1. Harnesses that support the Agent Skills convention discover all four
+   skills under `skills/` — `/lisa`, `/lisa-design`, `/lisa-review`, and
    `/lisa-new-template` — whether installed as a plugin or symlinked.
 2. Any other agent can be pointed at <https://html.monomind.one/SKILL.md>
    directly; it is plain Markdown and carries the whole procedure. That URL is
@@ -252,9 +268,11 @@ break.
    template's component library.
 4. **The agent applies your answers** — theme, artwork, logo, menu shape, export
    controls, language set, and the protected-term list.
-5. **The agent reviews the result** for cross-slide consistency, contrast in
-   both themes, and behaviour at phone width, then reports what it fixed.
-6. **You get one HTML file.** No build step, no dependencies to install.
+5. **You get one HTML file.** No build step, no dependencies to install.
+6. **The result gets reviewed** for cross-slide consistency, contrast in both
+   themes, and behaviour at phone width — by default as `/lisa-review` once
+   the draft is delivered, or inline before handover if you asked for that —
+   and the pass reports what it fixed.
 
 
 
@@ -294,8 +312,12 @@ which is the form the templates already embed.
 
 ## ✅ Design review
 
-Before handover, the agent runs a design pass described in
-[`references/design-review.md`](references/design-review.md). It uses your own
+Every deck gets the design pass described in
+[`references/design-review.md`](references/design-review.md) — the intake's
+`review` answer only decides when. By default the draft is delivered first and
+the pass runs as `/lisa-review`, straight away on request or whenever you like;
+`inline` runs it inside the build as before, and `none` keeps just the floor
+checks. The pass uses your own
 [Impeccable](https://github.com/pbakaus/impeccable) install when your agent has
 one, the copy bundled at `.agents/skills/impeccable/` when it does not, and a
 tooling-free checklist as the floor. The agent must say which reviewer ran.
@@ -352,6 +374,8 @@ carry the machinery, never the material.
 ## ✅ What is included
 
 - **`lisa`** — builds a deck: intake, template, content, review.
+- **`lisa-review`** — the design pass as its own command: review any finished
+  deck, on your schedule.
 - **`lisa-new-template`** — turns an existing HTML page into a template.
 - **Eight templates** with a pattern reference each, and a live preview.
 - **A visual intake panel** with a template gallery, plus its payload contract.

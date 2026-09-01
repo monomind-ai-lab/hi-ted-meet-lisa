@@ -1,8 +1,27 @@
 # Design review for a generated deck
 
-Step 10 of the skill. A deck is a presentation surface, not an app screen, so
-this reference names what actually matters here and hands the general craft work
-to Impeccable.
+The design pass for a generated file. It has two entry points — the final step
+of a `/lisa` build, and the standalone `/lisa-review` skill — and reads the
+same from either. A deck is a presentation surface, not an app screen, so this
+reference names what actually matters here and hands the general craft work to
+Impeccable.
+
+## When this runs
+
+The intake's `review` answer schedules the pass:
+
+- **`after`** — the default. `/lisa` delivers the draft first, and the pass
+  runs as `/lisa-review`: immediately afterwards when the user asks, or any
+  time later against the finished file. The reasoning: the review adds minutes
+  to every build, and a draft in hand is worth more than a reviewed file still
+  building.
+- **`inline`** — the pass runs as `/lisa`'s final step, before the file is
+  handed over.
+- **`none`** — only the floor checks below run, inside the build, and the
+  handover must say so. Skipping the review is a choice to state, never one to
+  hide.
+
+Everything below applies unchanged from either entry point.
 
 ## Which reviewer runs
 

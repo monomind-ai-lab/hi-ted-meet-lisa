@@ -14,6 +14,16 @@
        2. the nav entries' data-page="ID"  (desktop AND mobile lists)
        3. the PAGES array in the script at the foot of this file
      =================================================================== -->
+<!-- LISA:CONTENT-MAP
+     Editable regions, fenced by LISA:CONTENT-START/END comments:
+       pages — the 8 hash-routed pages inside <main>
+       footer — brand line, link columns, copyright (keep the credit link per the intake)
+     Named edit points outside the fences:
+       <title> and <meta name="description"> in <head>
+       brand name, nav labels, CTA and external URLs in header.nav (desktop AND mobile lists)
+       the PAGES / DROP_PAGES arrays in the script (must match section ids and nav entries)
+     Everything else (head, CSS, chrome markup, scripts, artwork) is load-bearing:
+     copy this file with cp, never retype it, and edit only what is named here. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -516,6 +526,8 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
   </nav>
 </header>
 
+<!-- LISA:CONTENT-START pages -->
+<!-- Edit between these markers. Everything outside is load-bearing chrome: copy the file with cp, never retype it. -->
 <main id="main">
 
 <!-- ======================== PAGE 1: HOME ======================== -->
@@ -1119,7 +1131,10 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
 </section>
 
 </main>
+<!-- LISA:CONTENT-END pages -->
 
+<!-- LISA:CONTENT-START footer -->
+<!-- Edit between these markers. Everything outside is load-bearing chrome: copy the file with cp, never retype it. -->
 <!-- ==================================================================
      FOOTER. Site chrome, so it sits outside the pages and shows on all
      of them. Column links route with data-page; external links use href.
@@ -1179,6 +1194,7 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
     </div>
   </div>
 </footer>
+<!-- LISA:CONTENT-END footer -->
 
 <script>
 /* ===================================================================

@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+<!-- LISA:CONTENT-MAP
+     Editable regions, fenced by LISA:CONTENT-START/END comments:
+       pages — the 5 hash-routed pages inside <main> (incl. their inline mermaid sources)
+       prototype — the text/plain payload blocks for the desktop/mobile navigation prototype
+     Named edit points outside the fences:
+       <title> in <head>
+       the nav mark label ([PROJECT] / [SECTION])
+       the PAGES array in the script (must match section ids and nav entries)
+       the two prototype <title> strings inside buildDoc()
+     Everything else (head, CSS, chrome markup, scripts, artwork) is load-bearing:
+     copy this file with cp, never retype it, and edit only what is named here. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -372,6 +383,8 @@ footer .mono{color:var(--muted-soft)}
   <button class="burger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
 </nav>
 
+<!-- LISA:CONTENT-START pages -->
+<!-- Edit between these markers. Everything outside is load-bearing chrome: copy the file with cp, never retype it. -->
 <main>
 
 <!-- ================= PAGE 1: OVERVIEW =================
@@ -648,6 +661,7 @@ footer .mono{color:var(--muted-soft)}
 </section>
 
 </main>
+<!-- LISA:CONTENT-END pages -->
 
 <div class="viewer" id="viewer">
   <div class="vbar">
@@ -909,6 +923,8 @@ function vnative(){
 })();
 </script>
 
+<!-- LISA:CONTENT-START prototype -->
+<!-- Edit between these markers. Everything outside is load-bearing chrome: copy the file with cp, never retype it. -->
 <!-- ================================================================
      PROTOTYPE PAYLOAD. Inert text nodes, not executable script: the mount
      script below reassembles them into whole documents at runtime. Font
@@ -1456,6 +1472,7 @@ document.addEventListener('click',function(e){
 document.querySelector('form[action="#"]').addEventListener('submit',function(e){e.preventDefault()});
 applyLanguage();
 openL1='s1';openL2='s1|1';setMenu(true);renderTree();</script>
+<!-- LISA:CONTENT-END prototype -->
 
 <script>
 /* ---------- navigation prototype mount (added when the three decks were merged) ----------

@@ -80,10 +80,23 @@ EXTRA_PAYLOAD = {
 # and renaming them would both fork upstream and contradict the skill's own
 # "do not edit anything under vendor/" rule. So no bundle is built for it —
 # better than emitting a zip the panel will reject.
+#
+# /lisa-review fails it the same way, one step removed. The skill exists to
+# run the bundled reviewer, and `.agents/skills/impeccable/` carries a
+# SKILL.md of its own — besides which its 156 files would put the bundle at
+# 203 against the 200-file line. A bundle without the reviewer would only
+# repeat the tooling-free floor the /lisa bundle already carries, which is
+# not worth a panel slot.
 NOT_UPLOADABLE = {
     "lisa-design": "drives the vendored skill tree, which carries three more "
                    "SKILL.md files; an upload permits exactly one. Use the "
                    "plugin or a checkout.",
+    "lisa-review": "exists to run the bundled reviewer, which cannot ride "
+                   "along: .agents/skills/impeccable/ carries its own "
+                   "SKILL.md (an upload permits exactly one) and would push "
+                   "the bundle past 200 files besides. Without it the skill "
+                   "is the same floor an uploaded /lisa already runs. Use "
+                   "the plugin or a checkout.",
 }
 
 # Built for completeness, but say plainly which ones are worth uploading. A

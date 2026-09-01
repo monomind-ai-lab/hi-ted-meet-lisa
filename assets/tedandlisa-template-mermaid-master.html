@@ -1,4 +1,13 @@
 <!doctype html>
+<!-- LISA:CONTENT-MAP
+     Editable regions, fenced by LISA:CONTENT-START/END comments:
+       slides-en — the English slides (s-en-index, s-en-01, s-en-02)
+       slides-ko — the Korean slides (s-ko-index, s-ko-01, s-ko-02)
+     Named edit points outside the fences:
+       <title> in <head>
+       the ROUTES and TITLES arrays in the script (must stay in step with the slides)
+     Everything else (head, CSS, chrome markup, scripts, artwork) is load-bearing:
+     copy this file with cp, never retype it, and edit only what is named here. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -94,6 +103,8 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
 </div>
 
 <div id="deck">
+<!-- LISA:CONTENT-START slides-en -->
+<!-- Edit between these markers. Everything outside is load-bearing chrome: copy the file with cp, never retype it. -->
 <section class="slide" id="s-en-index" data-lang="en" data-route="index">
   <header>
     <div class="head-l">
@@ -267,7 +278,10 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
 
   <footer>[DOCUMENT · SECTION · NOTE]</footer>
 </section>
+<!-- LISA:CONTENT-END slides-en -->
 
+<!-- LISA:CONTENT-START slides-ko -->
+<!-- Edit between these markers. Everything outside is load-bearing chrome: copy the file with cp, never retype it. -->
 <section class="slide" id="s-ko-index" data-lang="ko" data-route="index">
   <header>
     <div class="head-l">
@@ -438,6 +452,7 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
 
   <footer>[문서 · 섹션 · 비고]</footer>
 </section>
+<!-- LISA:CONTENT-END slides-ko -->
 </div>
 
 <nav id="dnav" aria-label="Deck navigation">

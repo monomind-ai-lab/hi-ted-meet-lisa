@@ -365,6 +365,19 @@ h1 { font-family: var(--font-display); font-size: clamp(28px, 4.4vw, 40px); line
 .opt .default { font-size: var(--text-xs); font-family: var(--font-mono); color: var(--accent); }
 .opt.sm { padding: var(--space-2) var(--space-3); font-size: var(--text-sm); }
 
+/* ── the Preferences screen ───────────────────────────────────────
+   Same cards, same controls, tighter everything: these are settings with
+   sensible defaults, not questions that need room to breathe. The class is
+   set by render() when the chapter on show is Preferences — presentation
+   only, exactly like the chapter grouping itself. */
+.qlist.prefs { gap: var(--space-3); }
+.prefs .q { padding: var(--space-4); border-radius: var(--radius-sm); }
+.prefs .q header { margin-bottom: var(--space-3); }
+.prefs .opts { gap: var(--space-1); }
+.prefs .opt { padding: var(--space-2) var(--space-3); font-size: var(--text-sm); }
+.prefs .opt .note { font-size: var(--text-xs); }
+.prefs textarea, .prefs input[type="text"] { font-size: var(--text-sm); }
+
 /* ── template gallery ────────────────────────────────────────── */
 /* auto-FILL, not auto-fit. The two are identical while the grid is full,
    and they part company the moment the type filter leaves one card
@@ -454,6 +467,19 @@ textarea::placeholder, input::placeholder { color: color-mix(in srgb, var(--acce
 .chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
 .chip { font-family: var(--font-mono); font-size: var(--text-xs); padding: 3px 10px;
   border: 1px solid var(--glass-hair); border-radius: var(--radius-pill); color: var(--muted-inv); }
+
+/* ── the accent colour row ────────────────────────────────────────
+   The swatch is the native colour input wearing the text inputs' own frame;
+   the hex field beside it is a plain data-slot text input, so the payload
+   machinery reads it like any other typed value. The two are kept in step by
+   the input delegate, not by either one owning the other. */
+.colorrow { display: flex; align-items: center; gap: var(--space-2); }
+.colorrow input[type="color"] { flex: none; width: 52px; height: 48px; padding: var(--space-1);
+  background: rgba(0,0,0,0.22); border: 1px solid var(--glass-hair);
+  border-radius: var(--radius-sm); cursor: pointer; }
+.colorrow input[type="color"]:focus-visible { outline: none; border-color: var(--accent);
+  box-shadow: var(--focus-ring); }
+.colorrow input[type="text"] { flex: 1; font-family: var(--font-mono); }
 
 /* ── dropzones ────────────────────────────────────────────────── */
 .drop {
@@ -875,6 +901,16 @@ function scriptLang(text) {
   return null;
 }
 
+/* The same heuristic, asked a different question: not "which of the three
+   panel languages should the UI open in" but "which deck language did the
+   brief arrive in". One refinement the UI never needs: kana says Japanese
+   before Han says Chinese, because a Japanese brief usually carries both —
+   and the deck has a `ja` option even though the panel has no ja interface. */
+function briefDeckLang(text) {
+  if (/[぀-ヿ]/.test(text)) { return "ja"; }
+  return scriptLang(text);
+}
+
 /* Where the opening language comes from, in order:
 
      ?lang=…    web mode. The site owns the choice and hands it over on the
@@ -918,7 +954,8 @@ var UI = {
     h1: "Tell her what you need.",
     lead: function (n) {
       var words = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
-                   "Eight", "Nine", "Ten", "Eleven", "Twelve"];
+                   "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen",
+                   "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen"];
       return (words[n] || n) + " questions, and none of them compulsory. Answer what " +
         "matters and leave the rest — anything untouched takes the value marked " +
         '<span class="default">default</span>.';
@@ -986,7 +1023,7 @@ var UI = {
     pvwCloseLabel: "Close preview",
     pvwFrame: "Template preview",
     chap: { Prompt: "Prompt", Template: "Template", Grounds: "Grounds", Shape: "Shape",
-            Look: "Look", Language: "Language", Handover: "Handover", Ready: "Ready" },
+            Look: "Look", Handover: "Handover", Preferences: "Preferences", Ready: "Ready" },
     ready: {
       runner: ["Lisa has your answers.",
                "You can close this tab — she is building it now.",
@@ -1072,7 +1109,7 @@ var UI = {
     pvwCloseLabel: "미리보기 닫기",
     pvwFrame: "템플릿 미리보기",
     chap: { Prompt: "프롬프트", Template: "템플릿", Grounds: "근거", Shape: "형태",
-            Look: "모양새", Language: "언어", Handover: "인계", Ready: "준비 완료" },
+            Look: "모양새", Handover: "인계", Preferences: "환경 설정", Ready: "준비 완료" },
     ready: {
       runner: ["Lisa가 답변을 받았습니다.",
                "이 탭은 닫으셔도 됩니다 — 지금 만들고 있습니다.",
@@ -1157,7 +1194,7 @@ var UI = {
     pvwCloseLabel: "關閉預覽",
     pvwFrame: "範本預覽",
     chap: { Prompt: "Prompt", Template: "範本", Grounds: "依據", Shape: "形態",
-            Look: "外觀", Language: "語言", Handover: "交付", Ready: "準備好了" },
+            Look: "外觀", Handover: "交付", Preferences: "偏好設定", Ready: "準備好了" },
     ready: {
       runner: ["Lisa 收到你的答案了。",
                "這個分頁可以關了 — 她正在做。",
@@ -1202,8 +1239,9 @@ var L10N = {
       Grounds:  "제안이 근거를 어디에서 얻는가.",
       Shape:    "분량은 얼마나 되고, 어디에서 열려야 하는가.",
       Look:     "지면에서 어떻게 읽히는가.",
-      Language: "누가, 어떤 언어로 읽는가.",
-      Handover: "읽는 사람이 무엇을 가지고 떠나는가."
+      Handover: "읽는 사람이 무엇을 가지고 떠나는가.",
+      Preferences: "파일을 어떻게 만들고 내보낼 것인가. 모두 합리적인 기본값이 " +
+                   "있으니, 신경 쓰지 않는 항목은 그대로 두면 됩니다."
     },
     /* [name, tagline, best_for, dependencies] — the last two come off the
        registry entry rather than the option, which is why they live here
@@ -1381,7 +1419,10 @@ var L10N = {
       },
       languages: {
         q: "어떤 언어를 넣을까요?",
-        hint: "영어는 항상 포함됩니다. 나머지는 읽는 사람이 고를 때만 Google Translate를 불러옵니다.",
+        hint: "영어는 항상 포함됩니다. 추가 언어는 파일 안에 직접 써 넣기 때문에, 언어 " +
+              "하나마다 빌드 한 번 분량의 작성이 더 듭니다 — 읽는 사람이 고를 때 번역하는 " +
+              "MonoMind 덱만 예외입니다. 한 언어로 시작하고, 완성된 파일에 나중에 언어를 " +
+              "더 얹을 수도 있습니다.",
         o: { en: ["영어", "항상 포함됩니다."], ko: ["한국어"], "zh-TW": ["중국어 (번체)"],
              ja: ["일본어"], es: ["스페인어"], other: ["그 밖의 언어"] },
         p: { other: "언어 이름 또는 BCP-47 태그" }
@@ -1415,6 +1456,24 @@ var L10N = {
         hint: "푸터의 “Made with Hi Ted, Meet Lisa” 한 줄. 그대로 두거나, 끄세요.",
         o: { keep: ["그대로 두기", "도구로 연결되는 조용한 한 줄."],
              off:  ["끄기", "만든 이의 표시 없이 나갑니다."] }
+      },
+      accent: {
+        q: "메인 컬러",
+        hint: "템플릿의 디자인 토큰을 통해서만 적용되므로, 액센트를 쓰는 모든 요소가 함께 " +
+              "바뀝니다 — 요소 하나하나를 칠하지는 않습니다. 색이 의미를 갖는 템플릿은 " +
+              "일부만 반영하거나 반영하지 않을 수 있고, 빌드가 그 사실을 알려줍니다.",
+        o: { default: ["템플릿 고유의 액센트"],
+             custom:  ["직접 고르기"] },
+        f: { "accentpick.hex": ["액센트 색 — 비워 두면 템플릿의 색을 그대로 씁니다", "#e8590c"] }
+      },
+      review: {
+        q: "디자인 리뷰",
+        hint: "전체 디자인 패스는 위계, 간격, 대비를 템플릿 자체의 규칙에 비추어 검토하며 " +
+              "몇 분이 걸립니다. 깨진 링크, 넘침, 콘솔 오류 같은 구조 점검은 어느 쪽을 " +
+              "골라도 항상 실행됩니다.",
+        o: { after:  ["첫 초안 이후", "파일을 먼저 전달하고 리뷰는 후속으로 진행합니다 — 파일을 가장 빨리 받는 길입니다."],
+             inline: ["전달 전에", "전체 패스를 마친 뒤에 파일을 받습니다 — 빌드가 몇 분 더 걸립니다."],
+             none:   ["건너뛰기", "기본 구조 점검만 실행합니다."] }
       }
     }
   },
@@ -1425,8 +1484,9 @@ var L10N = {
       Grounds:  "這份提案的依據從哪裡來。",
       Shape:    "有多少份量，又得在哪裡跑起來。",
       Look:     "在頁面上讀起來是什麼樣子。",
-      Language: "誰會讀它，用什麼語言讀。",
-      Handover: "讀的人最後帶走什麼。"
+      Handover: "讀的人最後帶走什麼。",
+      Preferences: "檔案要怎麼做、怎麼交付。每一項都有合理的預設值 — 不在意的項目，" +
+                   "照原樣放著就好。"
     },
     tpl: {
       "monomind-deck": ["MonoMind 簡報",
@@ -1595,7 +1655,9 @@ var L10N = {
       },
       languages: {
         q: "要包含哪些語言？",
-        hint: "英文一定會有。其他語言只有在讀者選了之後，才會載入 Google Translate。",
+        hint: "英文一定會有。每多一種語言，都是直接寫進檔案裡的，大約等於再做一次完整" +
+              "建置的份量 — 只有 MonoMind 簡報例外，它是讀者選了才即時翻譯。也可以先用" +
+              "一種語言做完，之後再把其他語言疊到做好的檔案上。",
         o: { en: ["英文", "一定會包含。"], ko: ["韓文"], "zh-TW": ["中文（繁體）"],
              ja: ["日文"], es: ["西班牙文"], other: ["其他語言"] },
         p: { other: "語言名稱或 BCP-47 標籤" }
@@ -1629,6 +1691,23 @@ var L10N = {
         hint: "頁尾的「Made with Hi Ted, Meet Lisa」。留著，或是關掉。",
         o: { keep: ["留著", "安靜的一行，連回這個工具。"],
              off:  ["關掉", "檔案出去時不帶任何製作者的標記。"] }
+      },
+      accent: {
+        q: "主色",
+        hint: "只透過範本的設計 token 套用，所以所有用到重點色的地方會一起變 — 不會一個" +
+              "元素一個元素去改。顏色本身帶有意義的範本，可能只採用一部分或完全不採用，" +
+              "建置時會說明。",
+        o: { default: ["範本自己的重點色"],
+             custom:  ["自己選一個"] },
+        f: { "accentpick.hex": ["重點色 — 留空就沿用範本原本的顏色", "#e8590c"] }
+      },
+      review: {
+        q: "設計審查",
+        hint: "完整的設計審查會用範本自己的規則檢視層級、間距和對比，需要幾分鐘。至於" +
+              "壞掉的連結、內容溢出、console 錯誤這類結構檢查，不管選哪個都一定會跑。",
+        o: { after:  ["初稿之後", "先把檔案交給你，審查作為後續再跑 — 這是最快拿到檔案的方式。"],
+             inline: ["交付之前", "完整審查跑完才交件 — 建置會多花幾分鐘。"],
+             none:   ["跳過", "只跑內建的結構檢查。"] }
       }
     }
   }
@@ -1798,13 +1877,13 @@ var QUESTIONS = [
       { id: "desktop", label: "Desktop only", note: "One breakpoint, embedded in the page." },
       { id: "none",    label: "No prototype", note: "Diagrams only — a much smaller file." } ] },
 
-  { id: "delivery", chapter: "Shape", q: "Does the file need to work offline?", kinds: ["slides", "document"],
+  { id: "delivery", chapter: "Preferences", q: "Does the file need to work offline?", kinds: ["slides", "document"],
     hint: "Every shape pulls its webfonts from Google, and the diagram-heavy ones also load mermaid and CSS libraries. Standalone inlines all of it \u2014 usually a few hundred KB, and several MB for the heaviest shapes.",
     type: "single", options: [
       { id: "cdn",        label: "Load webfonts and libraries from a CDN", note: "Smaller file; needs a connection to render fully.", def: true },
       { id: "standalone", label: "Fully standalone", note: "Fonts and libraries inlined \u2014 opens from a USB stick with no network at all." } ] },
 
-  { id: "theme", chapter: "Look", q: "Which theme?", kinds: ["slides", "document"], hint: "Most shapes ship dark; the paper ones ship light. This changes whichever ground the template starts from.",
+  { id: "theme", chapter: "Preferences", q: "Which theme?", kinds: ["slides", "document"], hint: "Most shapes ship dark; the paper ones ship light. This changes whichever ground the template starts from.",
     type: "single", options: [
       { id: "dark",   label: "Dark",  note: "Deep ink ground with accent halos.", def: true },
       { id: "light",  label: "Light", note: "Light ground — already the default on the paper shapes." },
@@ -1835,7 +1914,7 @@ var QUESTIONS = [
     reveals: { logofile: [ { kind: "file", id: "file", label: "Logo file", accept: "image/*,.svg" },
                            { kind: "text", id: "href", label: "Link the mark should open (optional)", placeholder: "https://" } ] } },
 
-  { id: "style", chapter: "Look", q: "Visual style",
+  { id: "style", chapter: "Preferences", q: "Visual style",
     type: "single", options: [
       { id: "default", label: "The MonoMind template as-is", def: true },
       { id: "designmd", label: "Follow a design.md I supply", reveal: "designfile" },
@@ -1843,6 +1922,15 @@ var QUESTIONS = [
     reveals: { designfile: [ { kind: "file", id: "file", label: "design.md", accept: ".md,text/markdown,text/plain" } ],
                styletext:  [ { kind: "textarea", id: "text", label: "What should change?",
                                placeholder: "Warmer accent, tighter type scale, no photography on the cover…" } ] } },
+
+  { id: "accent", chapter: "Preferences", q: "Primary colour", kinds: ["slides", "document"],
+    hint: "Applied through the template's design tokens, so everything that wears the accent moves together — never element by element. Templates whose colours carry meaning may honour it only partially, and the build says so.",
+    type: "single", options: [
+      { id: "default", label: "The template's own accent", def: true },
+      { id: "custom",  label: "Pick a colour", reveal: "accentpick" } ],
+    reveals: { accentpick: [
+      { kind: "color", id: "hex", label: "Accent colour — leave empty to keep the template's own",
+        placeholder: "#e8590c" } ] } },
 
   { id: "elements", chapter: "Look", q: "Any element it must include?",
     hint: "Pick as many as apply. Anything not picked is still available if the content calls for it.",
@@ -1858,17 +1946,21 @@ var QUESTIONS = [
       { id: "image",   label: "Full-bleed image slide" },
       { id: "code",    label: "Code or prompt block" } ] },
 
-  { id: "languages", chapter: "Language", q: "Which languages?",
-    hint: "English always ships. Others load Google Translate only when a reader picks them.",
+  /* Only English defaults on. The boot adds the language the brief itself is
+     written in (see the seeding below startLang's call) — every language past
+     those is written into the file at build time and costs a build's worth of
+     writing, so nothing else defaults on. */
+  { id: "languages", chapter: "Preferences", q: "Which languages?",
+    hint: "English always ships. Each extra language is written into the file and adds roughly a full build's worth of writing — except the MonoMind deck, which translates on demand. You can also start in one language and layer more onto the finished file later.",
     type: "multi", options: [
       { id: "en",    label: "English", note: "Always included.", def: true, locked: true },
-      { id: "ko",    label: "Korean",              def: true },
-      { id: "zh-TW", label: "Chinese (Traditional)", def: true },
+      { id: "ko",    label: "Korean" },
+      { id: "zh-TW", label: "Chinese (Traditional)" },
       { id: "ja",    label: "Japanese" },
       { id: "es",    label: "Spanish" },
       { id: "other", label: "Something else", isOther: true, placeholder: "Language name or BCP-47 tag" } ] },
 
-  { id: "noTranslate", chapter: "Language", q: "Terms that must never be translated", kinds: ["slides", "document"],
+  { id: "noTranslate", chapter: "Preferences", q: "Terms that must never be translated", kinds: ["slides", "document"],
     hint: "Comma-separated. Google Translate turned MonoMind AI Lab into 人工智慧實驗室 and MIT into the university — this list is what stops that. Filenames, paths, and commands are protected automatically.",
     type: "textarea", seed: "MonoMind, MonoMind AI Lab, Project Context, GitNexus, Graphify, OpenWiki, MIT",
     placeholder: "MonoMind, Project Context, …" },
@@ -1891,18 +1983,28 @@ var QUESTIONS = [
       { kind: "text", id: "github", label: "Repository URL — only if the menu links to one",
         placeholder: "https://github.com/…" } ] } },
 
-  { id: "export", chapter: "Handover", q: "What can a reader take away?", kinds: ["slides", "document"],
+  { id: "export", chapter: "Preferences", q: "What can a reader take away?", kinds: ["slides", "document"],
     hint: "It adds a small control to the chrome.",
     type: "multi", options: [
       { id: "html", label: "Download the standalone HTML", note: "The file saves a copy of itself." } ] },
 
   /* No kinds and no templates: the credit line exists in every shape,
      the external handoff included, so this is asked for all of them. */
-  { id: "credit", chapter: "Handover", q: "Credit line",
+  { id: "credit", chapter: "Preferences", q: "Credit line",
     hint: "“Made with Hi Ted, Meet Lisa” in the footer. Leave it, or switch it off.",
     type: "single", options: [
       { id: "keep", label: "Leave it", note: "One quiet line, linking to the tool.", def: true },
-      { id: "off",  label: "Switch it off", note: "The file ships with no maker’s mark." } ] }
+      { id: "off",  label: "Switch it off", note: "The file ships with no maker’s mark." } ] },
+
+  { id: "review", chapter: "Preferences", q: "Design review", kinds: ["slides", "document"],
+    hint: "A full design pass judges hierarchy, spacing, and contrast against the template's own rules; it takes several minutes. The structural checks — broken links, overflow, console errors — run on every build whichever you pick.",
+    type: "single", options: [
+      { id: "after",  label: "After the first draft",
+        note: "Deliver the file first, then run the review as a follow-up — the fastest way to get it into your hands.", def: true },
+      { id: "inline", label: "Before handover",
+        note: "The full pass runs before you see the file — adds several minutes to the build." },
+      { id: "none",   label: "Skip it",
+        note: "Only the built-in structural checks run." } ] }
 ];
 
 var state = {};        /* id -> value */
@@ -1919,16 +2021,20 @@ var SCREENS = [];      /* prompt, template, one per surviving chapter, ready */
    decides. A chapter is a heading over a group of questions — never a payload
    key. The leads describe the territory rather than the individual questions,
    because which questions survive depends on the template. */
-var CHAPTER_ORDER = ["Grounds", "Shape", "Look", "Language", "Handover"];
+var CHAPTER_ORDER = ["Grounds", "Shape", "Look", "Handover", "Preferences"];
 /* Template is not a chapter — it is one question on its own screen — but it
-   wears the same heading so every asking screen opens the same way. */
+   wears the same heading so every asking screen opens the same way.
+   Preferences is the last asking screen by construction: it holds the
+   output-configuration questions — every one with a sensible default —
+   so the content questions come first and the settings wait at the end. */
 var CHAPTER_LEAD = {
   Template: "What you are making. It decides which questions follow.",
   Grounds:  "Where the proposal gets its evidence.",
   Shape:    "How much there is, and where it has to run.",
   Look:     "How it reads on the page.",
-  Language: "Who reads it, and in what.",
-  Handover: "What a reader leaves with."
+  Handover: "What a reader leaves with.",
+  Preferences: "How the file is built and delivered. Every one of these has a " +
+    "sensible default — leave anything you don't care about exactly as it is."
 };
 
 function kindOf(id) {
@@ -1982,8 +2088,10 @@ function rebuildOrder() {
 /* Chapters are derived from the *filtered* ORDER, never from QUESTIONS: a
    chapter whose questions were all filtered away by `kinds` / `templates`
    (D-017) has nothing to ask, so it never reaches the rail or the flow. That
-   is why a deck shows Shape, Look, Language and Handover; `sitemap-ia` also
-   shows Grounds; and the external handoff shows only what survives. Question
+   is why a deck shows Shape, Look, Handover and Preferences; `sitemap-ia`
+   also shows Grounds; and the external handoff shows only what survives.
+   Preferences sits last in CHAPTER_ORDER, so its screen lands just before
+   Ready whatever the template filtered away. Question
    order inside a chapter stays ORDER's own — the payload's key order is built
    from ORDER and must not move. */
 function rebuildScreens() {
@@ -2048,6 +2156,17 @@ QUESTIONS.forEach(function (q) {
 });
 
 /* ── render ───────────────────────────────────────────────────── */
+/* A typed colour, normalised to the #rrggbb the native colour input insists
+   on — or null when what was typed is not a hex colour at all. #abc expands;
+   the hash is optional on the way in and always present on the way out. */
+function fullHex(v) {
+  var m = /^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.exec(String(v || "").trim());
+  if (!m) { return null; }
+  var h = m[1].toLowerCase();
+  if (h.length === 3) { h = h.charAt(0) + h.charAt(0) + h.charAt(1) + h.charAt(1) + h.charAt(2) + h.charAt(2); }
+  return "#" + h;
+}
+
 function revealHtml(q) {
   if (!q.reveals) { return ""; }
   return Object.keys(q.reveals).map(function (key) {
@@ -2082,6 +2201,18 @@ function revealHtml(q) {
          away — while the payload quietly still carried it. */
       var typed = (files[slot] && typeof files[slot].text === "string") ? files[slot].text : "";
       var fph = tfield(q, key, f, 1) || "";
+      if (f.kind === "color") {
+        /* The swatch must hold a full #rrggbb at all times, so it wears a
+           stand-in until something real is typed or picked. The text input is
+           the answer — it rides the same data-slot machinery as every other
+           typed value, and empty means "keep the template's own". */
+        return '<div class="field"><label>' + esc(flabel) + '</label>' +
+          '<div class="colorrow">' +
+          '<input type="color" data-color="' + slot + '" value="' + (fullHex(typed) || "#e8590c") +
+          '" aria-label="' + esc(flabel) + '">' +
+          '<input type="text" data-slot="' + slot + '" placeholder="' + esc(fph) +
+          '" value="' + esc(typed) + '"></div></div>';
+      }
       if (f.kind === "textarea") {
         return '<div class="field"><label>' + esc(flabel) + '</label>' +
           '<textarea rows="3" data-slot="' + slot + '" placeholder="' + esc(fph) + '">' +
@@ -2237,6 +2368,10 @@ function render() {
 
   document.getElementById("screen-prompt").hidden = s.k !== "prompt";
   qlist.hidden = !asks;
+  /* Preferences reads as a configuration panel: same cards and controls,
+     tighter rows (see .prefs in the stylesheet). Presentation only — the
+     chapter's English name is the stable key, whatever language is on show. */
+  qlist.classList.toggle("prefs", asks && s.k === "chapter" && s.label === "Preferences");
   document.getElementById("intake").classList.toggle("hidden", s.k === "ready");
   document.getElementById("result").classList.toggle("show", s.k === "ready");
 
@@ -2580,7 +2715,21 @@ qlist.addEventListener("input", function (e) {
   var t = e.target;
   if (t.dataset.seed) { state[t.dataset.seed] = t.value; }
   if (t.dataset.otherInput) { other[t.dataset.otherInput] = t.value; }
-  if (t.dataset.slot) { files[t.dataset.slot] = { text: t.value }; }
+  /* The colour swatch writes the same slot its hex field owns, then fills
+     that field in so the reader sees what they picked as text they can edit. */
+  if (t.dataset.color) {
+    files[t.dataset.color] = { text: t.value };
+    var hx = qlist.querySelector('input[data-slot="' + t.dataset.color + '"]');
+    if (hx) { hx.value = t.value; }
+    return;
+  }
+  if (t.dataset.slot) {
+    files[t.dataset.slot] = { text: t.value };
+    /* And typing a valid hex moves the swatch — the pair never disagree. */
+    var sw = qlist.querySelector('input[data-color="' + t.dataset.slot + '"]');
+    var full = sw && fullHex(t.value);
+    if (full) { sw.value = full; }
+  }
 });
 
 qlist.addEventListener("change", function (e) {
@@ -2707,6 +2856,11 @@ function payload() {
     style: { mode: state.style,
              designFile: state.style === "designmd" ? slot("style", "file") : null,
              notes: state.style === "prompt" && files["style.text"] ? files["style.text"].text : null },
+    /* "default", or one normalised hex string. A custom pick with nothing
+       typed and nothing chosen is still the template's own accent. */
+    accent: state.accent === "custom"
+      ? (fullHex(files["accent.hex"] && files["accent.hex"].text) || "default")
+      : "default",
     siteType: state.siteType === "other" ? (other.siteType || "other") : state.siteType,
     projectStage: { mode: state.projectStage,
                     url: files["projectStage.url"] ? files["projectStage.url"].text || null : null,
@@ -2733,7 +2887,8 @@ function payload() {
     export: state.export,
     /* serialised as a boolean: the UI's option ids are a detail the
        contract never sees. */
-    credit: state.credit !== "off"
+    credit: state.credit !== "off",
+    review: state.review
   };
 
   var answers = {};
@@ -3041,6 +3196,19 @@ if (CTX.prompt) {
    would swap the interface out from under them mid-sentence, and the selector
    is the override for every case the script heuristic gets wrong. */
 lang = startLang();
+/* The deck's languages start at English only — every extra language is
+   written into the file and costs a build's worth of writing — with one
+   exception: the language the brief itself arrived in defaults on, read off
+   the same textarea startLang reads. A default, not a decision: the reader
+   unticks it on the Preferences screen if the heuristic guessed wrong. This
+   deliberately ignores ?lang and the UI language — the panel being *read* in
+   Korean has never meant a Korean deck (references/intake-contract.md). */
+(function () {
+  var briefLang = briefDeckLang(String(document.getElementById("prompttext").value || ""));
+  if (briefLang && state.languages.indexOf(briefLang) === -1) {
+    state.languages.push(briefLang);
+  }
+})();
 applyChrome();
 render();
 pristineKey = payloadKey();
