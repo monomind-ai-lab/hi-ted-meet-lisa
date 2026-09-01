@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repository is
 
-This is the source repository for **`tedandlisa`**, a Claude Code Skill
-(invoked as `/tedandlisa`) that generates a MonoMind-branded slide deck,
+This is the source repository for **`lisa`**, a Claude Code Skill
+(invoked as `/lisa`) that generates a MonoMind-branded slide deck,
 web document, or diagram set as **one standalone HTML file** — no build step, no bundler, no
 package manager, no test suite. The only runtime dependencies are Python's
 stdlib (for the two helper scripts) and, for thumbnail capture, a local Chrome
 binary. Do not look for `npm`/`pip` build or lint commands — there are none.
 
-The full skill protocol lives in [`skills/tedandlisa/SKILL.md`](skills/tedandlisa/SKILL.md)
+The full skill protocol lives in [`skills/lisa/SKILL.md`](skills/lisa/SKILL.md)
 — read it before making
 any change to the skill's behavior. This file only orients you to the codebase
 shape and the commands you'll actually run.
@@ -39,10 +39,16 @@ python3 scripts/tedandlisa_thumbs.py [--only ID]
 # registry. Run after any change to templates/templates.json; --check is
 # what CI runs before deploying.
 python3 scripts/tedandlisa_intake_fallback.py [--check]
+
+# Build the per-skill upload bundles for the Claude and ChatGPT settings
+# panels (Claude Code and Codex install the plugin instead, and need none
+# of this). Writes dist/<skill>.zip; --check validates without writing.
+python3 scripts/build_skill_zips.py [--check]
 ```
 
 There is no automated test suite. Verification is manual and browser-based —
-see the checklists in `SKILL.md` and `skills/tedandlisa-new-template/SKILL.md`
+see the checklists in `skills/lisa/SKILL.md` and
+`skills/lisa-new-template/SKILL.md`
 (open the output `file://` or over `http://`, exercise navigation/menu/language
 switch, check for console errors and horizontal overflow at 375px).
 
@@ -97,7 +103,7 @@ Translate mangles it (real prior failures: "MonoMind AI Lab" → 人工智慧實
 in it is machine-translated.
 
 **Adding a template** goes through the sibling skill
-`skills/tedandlisa-new-template/` (`/tedandlisa-new-template`), which
+`skills/lisa-new-template/` (`/lisa-new-template`), which
 turns a finished HTML file into a placeholder skeleton + pattern-reference doc
 and registers it. Its cardinal rule: the *source* document is someone's real
 work and must never be committed — only the genericized skeleton, scrubbed of

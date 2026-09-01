@@ -409,9 +409,11 @@ section { padding: clamp(64px, 10vh, 128px) var(--pad); }
 }
 .card .meta p { margin-top: 6px; font-size: 13.5px; color: var(--cream-dim); }
 /* Provenance note under a card that has one — quieter than the body copy. */
+.card .meta p.prov { margin-top: 9px; font-size: 12.5px; color: var(--cream-faint); }
 .card.yours .meta p b { color: var(--cream); font-weight: 700; }
 .card:focus-visible { outline: none; }
 .card:focus-visible .frame { outline: 3px solid var(--terracotta); outline-offset: 3px; }
+.card.handoff .frame { border-style: dashed; border-width: 2px; border-color: var(--hair-strong); }
 .card.yours .frame.empty {
   border-style: dashed; border-width: 2px; border-color: var(--hair-strong);
   display: grid; place-items: center; box-shadow: none;
@@ -673,7 +675,7 @@ footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
         <button class="choice" role="tab" id="tab-both" aria-selected="false" aria-controls="pane-both" type="button">
           <span class="n">PATH 03</span>
           <h3>Make it yours</h3>
-          <p>Install the skill so <code>/tedandlisa</code> is a standing command —
+          <p>Install the skill so <code>/lisa</code> is a standing command —
           and teach it templates of your own: any page you like becomes a
           permanent choice in the gallery.</p>
           <span class="pick">Own it, extend it</span>
@@ -727,7 +729,7 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
             </div>
             <div class="cmdstep">
               <div class="lbl"><span class="n">02</span><b>Use it, whenever</b></div>
-              <div class="cmd">/tedandlisa an architecture overview for the platform team, as a web document</div>
+              <div class="cmd">/lisa an architecture overview for the platform team, as a web document</div>
             </div>
             <div class="cmdstep">
               <div class="lbl"><span class="n">03</span><b>Teach it your own look</b></div>
@@ -735,7 +737,7 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
               you like, and its visual system becomes a reusable template — extracted,
               stripped of its content, registered, thumbnailed. It's then one of your
               choices in the gallery, permanently.</p>
-              <div class="cmd">/tedandlisa-new-template ./that-page-i-like.html</div>
+              <div class="cmd">/lisa-new-template ./that-page-i-like.html</div>
             </div>
           </div>
           <div class="gen-side">
@@ -743,8 +745,10 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
             <ul class="getlist">
               <li><span><b>The intake panel, served locally.</b> Your agent opens it in
               your browser and picks the answers up itself — no copying.</span></li>
-              <li><span><b>Your own templates.</b> Hand <code>/tedandlisa-new-template</code>
+              <li><span><b>Your own templates.</b> Hand <code>/lisa-new-template</code>
               a page you like and its look becomes a permanent choice in the gallery.</span></li>
+              <li><span><b>The design pipeline.</b> <code>/lisa-design</code> for
+              twelve style presets and animated slides — still one HTML file.</span></li>
               <li><span><b>Every agent you use.</b> The skill is plain Markdown and HTML —
               Claude Code, Codex, Pi, OpenCode, Hermes all read the same files.</span></li>
             </ul>
@@ -801,13 +805,21 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
           <p>A project's public face — sticky nav, eight hash-routed pages,
           one shared footer. This very site's sibling.</p></div>
         </a>
-        <!-- Appended after the six cards that were already here, and before
+        <!-- Appended after the seven cards that were already here, and before
              the bridge card below. Several gallery entries in `T` are keyed on
-             `.gallery .card:nth-child(N)` for N = 1…6, so inserting anywhere
+             `.gallery .card:nth-child(N)` for N = 1…7, so inserting anywhere
              above would silently point them at the wrong card; appending
-             leaves 1…6 where they were. The bridge card is renumbered from 7
-             to 9 by this, and every one of its entries is keyed on
+             leaves 1…7 where they were. The bridge card is renumbered from 8
+             to 10 by this, and every one of its entries is keyed on
              `.card.yours`, so nothing of its moves. -->
+        <a class="card handoff" target="_blank" href="previews/slide-design.html" rel="noopener noreferrer">
+          <div class="frame"><img src="previews/slide-design.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
+          <div class="meta"><h3>Slide Design <span class="kind">handoff</span></h3>
+          <p>Beyond the house style — twelve style presets and animated slides
+          via the companion design pipeline. Still one HTML file.</p>
+          <p class="prov">This preview is a real open-source project's deck,
+          rebranded — the same move a private pack makes with yours.</p></div>
+        </a>
         <a class="card" target="_blank" href="previews/evidence-deck.html" rel="noopener noreferrer">
           <div class="frame"><img src="previews/evidence-deck.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
           <div class="meta"><h3>Evidence Deck <span class="kind">slides</span></h3>
@@ -824,7 +836,7 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
           <div class="frame empty"><span class="yours-hint">your look here</span><span class="open">See how</span></div>
           <div class="meta"><h3>Your Template <span class="kind">yours</span></h3>
           <p>Any page can become one — a file you made, or a page whose look you
-          want to keep. Install, and <code>/tedandlisa-new-template</code> lifts its
+          want to keep. Install, and <code>/lisa-new-template</code> lifts its
           system into a skeleton; the subject matter never comes along. Or have it
           built: MonoMind turns your brand into a private template pack — tokens,
           patterns, protected terms — installed beside these, in your own agent.
@@ -1002,7 +1014,7 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
     </a>
     <div style="display:flex; gap:24px;">
       <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa" rel="noopener">GitHub</a>
-      <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa/blob/main/skills/tedandlisa/SKILL.md" rel="noopener">The skill</a>
+      <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa/blob/main/skills/lisa/SKILL.md" rel="noopener">The skill</a>
       <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa/blob/main/LICENSE" rel="noopener">MIT + Commons Clause</a>
       <a href="#for-teams">For teams</a>
     </div>
@@ -1367,7 +1379,7 @@ function googleTranslateElementInit() {
     ['#tab-install .pick', '공유하고, 써보기', '分享並試用'],
     ['#tab-both .n', '경로 03', '路徑 03'],
     ['#tab-both h3', '내 것으로 만들기', '變成你的'],
-    ['#tab-both p', '스킬을 설치하면 <code>/tedandlisa</code>가 상시 명령이 됩니다 — 마음에 드는 페이지를 나만의 템플릿으로 등록해 갤러리에 영구히 추가할 수도 있습니다.', '安裝技能後，<code>/tedandlisa</code> 就是常駐指令 — 還能教它你自己的範本：任何你喜歡的頁面都能永久加入圖庫。'],
+    ['#tab-both p', '스킬을 설치하면 <code>/lisa</code>가 상시 명령이 됩니다 — 마음에 드는 페이지를 나만의 템플릿으로 등록해 갤러리에 영구히 추가할 수도 있습니다.', '安裝技能後，<code>/lisa</code> 就是常駐指令 — 還能教它你自己的範本：任何你喜歡的頁面都能永久加入圖庫。'],
     ['#tab-both .pick', '내 것으로, 계속 확장', '擁有它，擴充它'],
 
     ['#pane-try .gen-side p', '이 페이지의 패널을 채우세요 — 무엇에 대한 것인지, 누구를 위한 것인지, 어떤 형태여야 하는지를 묻습니다. 마지막 단계에서 모든 답변이 담긴 프롬프트 하나를 돌려주므로, 에이전트는 더 묻지 않고 바로 만들기 시작합니다.', '在這一頁把面板填完 — 它會問這是關於什麼、給誰看、要做成什麼形態。最後一步會給你一段包含所有答案的提示詞，你的 agent 不會再多問，直接開始製作。'],
@@ -1381,8 +1393,9 @@ function googleTranslateElementInit() {
     ['#pane-both .cmdstep:nth-child(3) .why', '많이들 놓치는 부분입니다. 마음에 드는 HTML 파일을 건네면 그 비주얼 시스템이 재사용 가능한 템플릿이 됩니다 — 추출하고, 내용을 비우고, 등록하고, 섬네일까지. 그 후로는 갤러리에서 영구히 선택할 수 있습니다.', '這是最容易被忽略的部分：把任何你喜歡的 HTML 檔案交給它，它的視覺系統就會變成可重複使用的範本 — 抽取樣式、清除內容、註冊、產生縮圖。之後它就永久成為圖庫裡的選項之一。'],
     ['#pane-both .gen-side h3', '설치하면 얻는 것', '安裝後你會得到'],
     ['#pane-both .getlist li:nth-child(1) > span', '<b>로컬로 실행되는 인테이크 패널.</b> 에이전트가 브라우저에 패널을 띄우고 답변도 직접 가져갑니다 — 복사할 필요가 없습니다.', '<b>在本機執行的 intake 面板。</b>agent 會在瀏覽器打開它，並自己取回答案 — 不用複製。'],
-    ['#pane-both .getlist li:nth-child(2) > span', '<b>나만의 템플릿.</b> 마음에 드는 페이지를 <code>/tedandlisa-new-template</code>에 건네면 그 스타일이 갤러리의 영구 선택지가 됩니다.', '<b>你自己的範本。</b>把喜歡的頁面交給 <code>/tedandlisa-new-template</code>，它的樣式就會永久加入圖庫。'],
-    ['#pane-both .getlist li:nth-child(3) > span', '<b>어떤 에이전트에서든.</b> 스킬은 평범한 Markdown과 HTML입니다 — Claude Code, Codex, Pi, OpenCode, Hermes 모두 같은 파일을 읽습니다.', '<b>你用的每個 agent。</b>技能就是純 Markdown 和 HTML — Claude Code、Codex、Pi、OpenCode、Hermes 讀的都是同一份檔案。'],
+    ['#pane-both .getlist li:nth-child(2) > span', '<b>나만의 템플릿.</b> 마음에 드는 페이지를 <code>/lisa-new-template</code>에 건네면 그 스타일이 갤러리의 영구 선택지가 됩니다.', '<b>你自己的範本。</b>把喜歡的頁面交給 <code>/lisa-new-template</code>，它的樣式就會永久加入圖庫。'],
+    ['#pane-both .getlist li:nth-child(3) > span', '<b>디자인 파이프라인.</b> <code>/lisa-design</code>으로 12가지 스타일 프리셋과 애니메이션 슬라이드를 — 여전히 HTML 파일 하나로.', '<b>設計管線。</b><code>/lisa-design</code> 提供十二種風格預設與動畫投影片 — 依然是一個 HTML 檔。'],
+    ['#pane-both .getlist li:nth-child(4) > span', '<b>어떤 에이전트에서든.</b> 스킬은 평범한 Markdown과 HTML입니다 — Claude Code, Codex, Pi, OpenCode, Hermes 모두 같은 파일을 읽습니다.', '<b>你用的每個 agent。</b>技能就是純 Markdown 和 HTML — Claude Code、Codex、Pi、OpenCode、Hermes 讀的都是同一份檔案。'],
 
 
     ['#templates .section-head .kicker', '템플릿', '範本'],
@@ -1401,8 +1414,11 @@ function googleTranslateElementInit() {
     ['.gallery .card:nth-child(5) .meta p', '페이지로 논증하는 사이트 구조 — 두 가지 화면 크기에서 클릭되는 내비게이션 프로토타입으로 마무리.', '用頁面論證網站結構，最後附上兩種斷點下可點擊的導覽原型。'],
     ['.gallery .card:nth-child(6) .kind', '사이트', '網站'],
     ['.gallery .card:nth-child(6) .meta p', '프로젝트의 공개 얼굴 — 고정 내비게이션, 여덟 개의 해시 라우팅 페이지, 하나의 공용 푸터. 바로 이 사이트의 형제입니다.', '專案的門面 — 固定導覽列、八個 hash 路由頁面、一個共用頁尾。就是這個網站的兄弟。'],
+    ['.gallery .card:nth-child(7) .kind', '핸드오프', '交接'],
+    ['.gallery .card:nth-child(7) .meta p', '하우스 스타일 너머 — 동반 디자인 파이프라인의 12가지 프리셋과 애니메이션 슬라이드. 그래도 HTML 파일 하나.', '跳脫預設風格 — 由附屬設計管線提供十二種預設與動畫投影片。依然是一個 HTML 檔。'],
+    ['.card.handoff .prov', '이 미리보기는 실제 오픈소스 프로젝트의 덱을 리브랜딩한 것입니다 — 비공개 팩이 당신의 브랜드로 하는 일과 똑같습니다.', '這個預覽是把一個真實開源專案的簡報換上新品牌 — 私有範本包對你的品牌做的，就是同一件事。'],
     /* The two newest cards are keyed on their own preview href, not on
-       `:nth-child` — the six entries above are positional and only stay
+       `:nth-child` — the seven entries above are positional and only stay
        correct while nothing above them renumbers. A card keyed on its own
        href takes its selector with it wherever it ends up. */
     ['.gallery a[href="previews/evidence-deck.html"] .kind', '슬라이드', '投影片'],
@@ -1412,7 +1428,7 @@ function googleTranslateElementInit() {
     ['.card.yours .yours-hint', '당신의 스타일 자리', '你的風格在這'],
     ['.card.yours .open', '방법 보기', '看怎麼做'],
     ['.card.yours .meta h3', '나의 템플릿 <span class="kind">나의 것</span>', '你的範本 <span class="kind">你的</span>'],
-    ['.card.yours .meta p', '어떤 페이지든 템플릿이 될 수 있습니다 — 직접 만든 파일이든, 그 룩을 그대로 간직하고 싶은 페이지든. 설치하면 <code>/tedandlisa-new-template</code>가 그 시스템을 골격으로 떠냅니다. 원본의 내용은 절대 따라오지 않습니다. 아니면 맡기셔도 됩니다: MonoMind가 당신의 브랜드를 비공개 템플릿 팩으로 만들어 — 토큰, 패턴, 보호 용어까지 — 이 템플릿들 옆에, 당신의 에이전트 안에 설치해 드립니다. <b>방법 보기 →</b>', '任何頁面都能變成範本 — 你自己做的檔案，或是你想留住那個樣子的頁面。安裝後，<code>/tedandlisa-new-template</code> 會把它的系統抽成骨架，原本的內容一概不會跟過來。也可以交給我們做：MonoMind 把你的品牌做成一份私有範本包 — 設計 token、樣式模式、受保護詞彙 — 就裝在這些範本旁邊，在你自己的 agent 裡。<b>看怎麼做 →</b>'],
+    ['.card.yours .meta p', '어떤 페이지든 템플릿이 될 수 있습니다 — 직접 만든 파일이든, 그 룩을 그대로 간직하고 싶은 페이지든. 설치하면 <code>/lisa-new-template</code>가 그 시스템을 골격으로 떠냅니다. 원본의 내용은 절대 따라오지 않습니다. 아니면 맡기셔도 됩니다: MonoMind가 당신의 브랜드를 비공개 템플릿 팩으로 만들어 — 토큰, 패턴, 보호 용어까지 — 이 템플릿들 옆에, 당신의 에이전트 안에 설치해 드립니다. <b>방법 보기 →</b>', '任何頁面都能變成範本 — 你自己做的檔案，或是你想留住那個樣子的頁面。安裝後，<code>/lisa-new-template</code> 會把它的系統抽成骨架，原本的內容一概不會跟過來。也可以交給我們做：MonoMind 把你的品牌做成一份私有範本包 — 設計 token、樣式模式、受保護詞彙 — 就裝在這些範本旁邊，在你自己的 agent 裡。<b>看怎麼做 →</b>'],
 
     ['#features .section-head .kicker', '모든 파일 안에', '每個檔案裡'],
     ['#feat-h', '작은 파일, 큰 기계장치.', '小檔案，大機關。'],
@@ -1499,7 +1515,7 @@ function googleTranslateElementInit() {
      added once already), so every casing a term actually appears in on this
      page needs its own alternative. Longest form first: `monomind.one` must
      win over the bare `monomind`, or the machine translator gets the `.one`. */
-  var TERMS = /(html\.monomind\.one|monomind\.one|MonoMind(?: AI Lab)?|MONOMIND(?: AI LAB)?|monomind(?: ai lab)?|Branded Deck System|BRANDED DECK SYSTEM|branded deck system|Hi Ted, Meet Lisa|Claude Code|Gemini CLI|OpenCode|Codex|Hermes|claude\.ai|GitHub|Cloudflare|\bTed\b|\bLisa\b|\/tedandlisa(?:-[a-z-]+)?|[A-Za-z0-9_.-]+\.(?:html|md|json|pptx)\b)/g;
+  var TERMS = /(html\.monomind\.one|monomind\.one|MonoMind(?: AI Lab)?|MONOMIND(?: AI LAB)?|monomind(?: ai lab)?|Branded Deck System|BRANDED DECK SYSTEM|branded deck system|Hi Ted, Meet Lisa|Claude Code|Gemini CLI|OpenCode|Codex|Hermes|claude\.ai|GitHub|Cloudflare|\bTed\b|\bLisa\b|\/lisa(?:-[a-z-]+)?|[A-Za-z0-9_.-]+\.(?:html|md|json|pptx)\b)/g;
   var SKIP = /^(SCRIPT|STYLE|CODE|TEXTAREA|NOSCRIPT|IFRAME)$/;
 
   function protect() {

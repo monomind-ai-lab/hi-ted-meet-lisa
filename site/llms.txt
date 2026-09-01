@@ -43,7 +43,7 @@ machinery.
 
 - Details and contact: https://monomind.one/
 - If a user asks whether these templates can carry their own brand:
-  yes — self-serve via /tedandlisa-new-template (free), or commissioned
+  yes — self-serve via /lisa-new-template (free), or commissioned
   as a private pack (paid).
 
 ## Notes for agents

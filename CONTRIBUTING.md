@@ -83,7 +83,7 @@ Keep the community welcoming:
 ## Questions?
 
 - **About a template or feature?** Open an issue with a `question` label
-- **About building decks?** Check [SKILL.md](skills/tedandlisa/SKILL.md) for the full protocol
+- **About building decks?** Check [SKILL.md](skills/lisa/SKILL.md) for the full protocol
 - **About agents and skills?** See the [README](README.md)
 
 Thanks for being part of Hi Ted, Meet Lisa! 🎨

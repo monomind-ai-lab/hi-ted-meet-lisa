@@ -696,7 +696,7 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
         <b id="brieflabel">Your prompt</b>
         <textarea id="prompttext" rows="2"
           placeholder="What is this about, and who is it for?"></textarea>
-        <p class="promptnote" id="promptnote">Passed in as <code translate="no">/tedandlisa [your prompt]</code>. Edit it here if it
+        <p class="promptnote" id="promptnote">Passed in as <code translate="no">/lisa [your prompt]</code>. Edit it here if it
           needs sharpening.</p>
         <div class="refs">
           <label for="refdrop" id="refslabel">References <span>optional — slides, notes, data, an image to match</span></label>
@@ -795,7 +795,7 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
 
 <script>
 "use strict";
-/* Intake panel for the /tedandlisa skill.
+/* Intake panel for the /lisa skill.
    Ported from the shadcn `cursor-questions-panel` (single-select, multi-select,
    other-text, keyboard nav) with one type the original does not have: `files`,
    because backgrounds, the logo, and design.md all arrive as uploads. Files
@@ -915,7 +915,7 @@ var UI = {
     },
     briefLabel: "Your prompt",
     promptPlaceholder: "What is this about, and who is it for?",
-    note: 'Passed in as <code translate="no">/tedandlisa [your prompt]</code>. ' +
+    note: 'Passed in as <code translate="no">/lisa [your prompt]</code>. ' +
           "Edit it here if it needs sharpening.",
     refs: "References <span>optional — slides, notes, data, an image to match</span>",
     dropRefs: "Drop files here, or click to choose",
@@ -990,11 +990,11 @@ var UI = {
       stopped: ["Prompt ready to paste.",
                 "The runner stopped answering, so nothing was handed over automatically. " +
                 "Paste this to Lisa instead and she picks up from here.",
-                "Paste it to the agent you ran /tedandlisa from."],
+                "Paste it to the agent you ran /lisa from."],
       file: ["Prompt ready to paste.",
              "This panel was opened straight from a file, so there is no runner to hand the " +
              "answers to. Paste this to Lisa instead and she picks up from here.",
-             "Paste it to the agent you ran /tedandlisa from."]
+             "Paste it to the agent you ran /lisa from."]
     }
   },
 
@@ -1009,7 +1009,7 @@ var UI = {
     },
     briefLabel: "당신의 프롬프트",
     promptPlaceholder: "무엇에 대한 것이고, 누구를 위한 것인가요?",
-    note: '<code translate="no">/tedandlisa [your prompt]</code> 로 전달된 내용입니다. ' +
+    note: '<code translate="no">/lisa [your prompt]</code> 로 전달된 내용입니다. ' +
           "더 다듬을 부분이 있으면 여기서 고치세요.",
     refs: "참고 자료 <span>선택 사항 — 슬라이드, 메모, 데이터, 맞추고 싶은 이미지</span>",
     dropRefs: "여기에 파일을 놓거나, 눌러서 고르세요",
@@ -1076,11 +1076,11 @@ var UI = {
       stopped: ["붙여넣을 프롬프트가 준비됐습니다.",
                 "러너가 응답을 멈춰서 자동으로 전달된 것은 없습니다. 대신 이걸 Lisa에게 " +
                 "붙여넣으면 여기서부터 이어서 진행합니다.",
-                "/tedandlisa 를 실행한 에이전트에 붙여넣으세요."],
+                "/lisa 를 실행한 에이전트에 붙여넣으세요."],
       file: ["붙여넣을 프롬프트가 준비됐습니다.",
              "이 패널은 파일에서 바로 열렸기 때문에 답변을 건넬 러너가 없습니다. 대신 " +
              "이걸 Lisa에게 붙여넣으면 여기서부터 이어서 진행합니다.",
-             "/tedandlisa 를 실행한 에이전트에 붙여넣으세요."]
+             "/lisa 를 실행한 에이전트에 붙여넣으세요."]
     }
   },
 
@@ -1094,7 +1094,7 @@ var UI = {
     },
     briefLabel: "你的 prompt",
     promptPlaceholder: "這是關於什麼的，又是給誰看的？",
-    note: '這是透過 <code translate="no">/tedandlisa [your prompt]</code> 傳進來的。' +
+    note: '這是透過 <code translate="no">/lisa [your prompt]</code> 傳進來的。' +
           "需要修得更準的話，在這裡改。",
     refs: "參考資料 <span>選填 — 投影片、筆記、資料，或一張想比照的圖</span>",
     dropRefs: "把檔案拖到這裡，或點一下選擇",
@@ -1159,11 +1159,11 @@ var UI = {
             "貼進 agent 的對話框 — 這樣就完成了。"],
       stopped: ["prompt 已經可以貼上了。",
                 "runner 沒有回應，所以沒有自動交出去。把這個貼給 Lisa，她會從這裡接手。",
-                "貼給你執行 /tedandlisa 的那個 agent。"],
+                "貼給你執行 /lisa 的那個 agent。"],
       file: ["prompt 已經可以貼上了。",
              "這個面板是直接從檔案打開的，所以沒有 runner 可以接手答案。把這個貼給 " +
              "Lisa，她會從這裡接手。",
-             "貼給你執行 /tedandlisa 的那個 agent。"]
+             "貼給你執行 /lisa 的那個 agent。"]
     }
   }
 };
@@ -1182,7 +1182,7 @@ var UI = {
    two different things — `c` is the sub-options of a `checks` field, and `p`
    is the free-text placeholder behind an `isOther` option.
 
-   Left verbatim throughout: /tedandlisa, SKILL.md, design.md, intake.json,
+   Left verbatim throughout: /lisa, SKILL.md, design.md, intake.json,
    MonoMind, Hi Ted, Meet Lisa, Ted, Lisa, Project Context, the CSS custom
    property names, the vendor path, and every filename. */
 var L10N = {
@@ -1221,6 +1221,10 @@ var L10N = {
         "승인할 사람들이 책상 앞에서 읽습니다.",
         "문서에는 Google Fonts와 CDN의 mermaid, 프로토타입에는 CDN의 Font Awesome과 " +
         "Tailwind. delivery 답변으로 넷 다 인라인할 수 있습니다."],
+      "slide-design": ["슬라이드 디자인",
+        "MonoMind 템플릿이 아닙니다 — 열두 가지 스타일 프리셋과 애니메이션 HTML 슬라이드.",
+        "하우스 스타일로는 담기지 않는 덱 — 다른 룩, 또는 애니메이션.",
+        "vendor/slides-ai-plugin에 포함되어 있습니다."],
       "project-website": ["프로젝트 웹사이트",
         "프로젝트의 공개된 얼굴: 고정 내비게이션, 해시 라우팅 페이지, 짙은 잉크와 푸른 헤일로.",
         "프로젝트 자체의 사이트 — 런치 페이지, 도구의 홈, 프로그램의 정문. 책상 앞에서 " +
@@ -1438,6 +1442,10 @@ var L10N = {
         "的人在桌前讀。",
         "文件用 Google Fonts 和 CDN 上的 mermaid；原型另外從 CDN 載入 Font Awesome 和 " +
         "Tailwind。delivery 那題可以把四個都內嵌。"],
+      "slide-design": ["投影片設計",
+        "不是 MonoMind 範本 — 十二種風格預設，加上會動的 HTML 投影片。",
+        "自家風格裝不下的簡報 — 另一種樣子，或是要動起來。",
+        "已隨附於 vendor/slides-ai-plugin。"],
       "project-website": ["專案網站",
         "一個專案的對外門面：固定導覽、hash 路由的頁面、深色底配藍色光暈。",
         "專案自己的網站 — 上線頁、工具的首頁、一個計畫的正門。在桌前讀、被連結，也常常" +
@@ -1680,6 +1688,8 @@ var TEMPLATES = CTX.templates || [
     tagline: "Diagram-first deck on light paper, one drawing per slide." },
   { id: "architecture", name: "Architecture diagram", kind: "document", type: "diagram",
     tagline: "System diagrams on slate, where colour means something — one view or several." },
+  { id: "slide-design", name: "Slide design", kind: "external", type: "present", skill: "/lisa-design", badge: "HTML",
+    tagline: "Not a MonoMind template — twelve style presets and animated HTML slides." },
   { id: "sitemap-ia", name: "Sitemap & IA proposal", kind: "document", type: "read",
     tagline: "Argue an information architecture, with the navigation wired up to click through." },
   { id: "project-website", name: "Project website", kind: "document", type: "site",
@@ -2810,11 +2820,11 @@ function webPrompt(json) {
 }
 
 /* The local variant. Both fallbacks below are reached only from a copy of this
-   panel the reader opened themselves, so they are already running /tedandlisa
+   panel the reader opened themselves, so they are already running /lisa
    and the skill is on disk. webPrompt's "read SKILL.md from the web" line would
    send their agent to fetch what it already has. */
 function localPrompt(json) {
-  return "Here are my /tedandlisa intake answers. Apply them instead of asking\n" +
+  return "Here are my /lisa intake answers. Apply them instead of asking\n" +
          "again, and hand back one standalone HTML file.\n\n" + json;
 }
 
@@ -2868,7 +2878,7 @@ document.getElementById("back").addEventListener("click", function () {
 });
 
 /* ---- prompt and references -------------------------------------------
-   The prompt arrives from `/tedandlisa [your prompt]` but stays editable:
+   The prompt arrives from `/lisa [your prompt]` but stays editable:
    what the user typed on the command line is a starting point, not a contract.
    References are whatever they want the deck to draw on — an old deck, notes,
    a data file, an image to match. They ride along in the payload. */

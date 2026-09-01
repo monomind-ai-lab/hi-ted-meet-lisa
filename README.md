@@ -32,8 +32,8 @@ intake panel, and copy one paste-ready prompt for any coding agent — Claude
 Code, Codex, Pi, OpenCode, Hermes, or anything else that reads a public URL.
 Nothing to install.
 
-Prefer it as a standing command? Install the plugin once — it carries both
-skills, and then they are two commands you have for good.
+Prefer it as a standing command? Install the plugin once — it carries all three
+skills, and then they are three commands you have for good.
 
 ```sh
 /plugin marketplace add monomind-ai-lab/hi-ted-meet-lisa
@@ -46,6 +46,15 @@ In Codex, the same two steps are one:
 codex plugin marketplace add monomind-ai-lab/hi-ted-meet-lisa
 ```
 
+**Using the Claude or ChatGPT app instead?** Those take a skill as a ZIP
+through a settings panel, one skill at a time — Claude at *Customize → Skills
+→ + → Create skill*, ChatGPT at *Plugins → Skills → Create*. Build the
+bundles, then upload whichever you want:
+
+```sh
+python3 scripts/build_skill_zips.py   # writes dist/lisa.zip and two more
+```
+
 Prefer to install by hand, or using another agent? Clone the repository and
 symlink the skills you want:
 
@@ -53,7 +62,7 @@ symlink the skills you want:
 git clone https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git \
   ~/.monomind/hi-ted-meet-lisa
 
-for s in tedandlisa tedandlisa-new-template; do
+for s in lisa lisa-design lisa-new-template; do
   ln -s ~/.monomind/hi-ted-meet-lisa/skills/$s ~/.claude/skills/$s
 done
 ```
@@ -66,7 +75,7 @@ with a `SKILL.md` at its top. Every skill here lives under `skills/`.
 **Then, whenever you need something:**
 
 ```text
-/tedandlisa a 12-slide deck on our Q3 roadmap, for the exec team
+/lisa a 12-slide deck on our Q3 roadmap, for the exec team
 ```
 
 Opens the intake panel, asks its questions — nine to sixteen depending on the
@@ -74,13 +83,20 @@ template, every one with a default — builds from the template you picked, runs
 design review, and hands back one file.
 
 ```text
-/tedandlisa-new-template ./that-deck-i-like.html
+/lisa-new-template ./that-deck-i-like.html
 ```
 
 Turns a finished HTML file into a reusable template: extracts its stylesheet and
 machinery into a placeholder skeleton, strips the original's subject matter,
 registers it, and captures its gallery thumbnail. It is then one of your choices
 in the panel, permanently.
+
+```text
+/lisa-design a launch deck, glassmorphism, with animated slides
+```
+
+For when the house templates are the wrong shape — style presets and
+animated HTML.
 
 **Just trying it once?** You do not have to install anything. The
 [website](https://html.monomind.one) hands you a finished prompt — or paste
@@ -107,6 +123,10 @@ panel. The deck is about [YOUR SUBJECT], for [AUDIENCE].
   PDF and HTML download — whichever of these you asked for.
 - **A design pass before handover** that measures contrast in both themes and
   behaviour at phone width, then reports what it fixed.
+
+Want a look the house style does not cover? The gallery's handoff card passes
+the work to [`lisa-design`](skills/lisa-design/), which drives a
+vendored Slides AI pipeline with MonoMind branding applied.
 
 
 ---
@@ -149,12 +169,12 @@ apart.
 
 ### How agents find the instructions
 
-1. Harnesses that support the Agent Skills convention discover both skills
-   under `skills/` — `/tedandlisa` and `/tedandlisa-new-template` — whether
-   installed as a plugin or symlinked.
+1. Harnesses that support the Agent Skills convention discover all three
+   skills under `skills/` — `/lisa`, `/lisa-design`, and
+   `/lisa-new-template` — whether installed as a plugin or symlinked.
 2. Any other agent can be pointed at <https://html.monomind.one/SKILL.md>
    directly; it is plain Markdown and carries the whole procedure. That URL is
-   a deploy artifact copied from `skills/tedandlisa/SKILL.md`, so it stays put
+   a deploy artifact copied from `skills/lisa/SKILL.md`, so it stays put
    however the repository is rearranged.
 
 
@@ -206,7 +226,7 @@ break.
 
 ## ✅ How a deck gets built
 
-1. **You describe the deck.** `/tedandlisa [what the deck is about]`
+1. **You describe the deck.** `/lisa [what the deck is about]`
 2. **The agent opens the intake panel** in your browser: which template, theme,
    artwork, logo, style, required components, languages, protected terms, menu,
    and what a reader can download. Every question has a default, and questions
@@ -276,12 +296,35 @@ than eyeballed.
 
 ---
 
+## ✅ When a template is the wrong shape
+
+Some decks should not be a MonoMind template at all: the look needs to be
+someone else's.
+
+```text
+/lisa-design
+```
+
+This wraps [Slides AI Plugin](https://github.com/proyecto26/slides-ai-plugin)
+(MIT). It brings twelve style presets and animated single-file HTML decks —
+with MonoMind branding applied unless you pick a preset.
+
+It used to be a git submodule, which meant it arrived empty for anyone who
+installed the plugin. The files are copied into `vendor/slides-ai-plugin/`
+instead, so a plugin install carries the whole pipeline and there is nothing to
+initialise. Do not edit anything under `vendor/` — fixes belong upstream, and
+`vendor/slides-ai-plugin/VENDORED.md` records the commit it came from.
+
+Every deliverable stays a standalone HTML file; the pipeline's `.pptx` output is
+retired here. Because the story is just about Ted and Lisa, not about Peter
+Parker and Tony.
+
 ## ✅ Add your own template
 
 Any finished HTML page can become a template:
 
 ```text
-/tedandlisa-new-template path/to/your-deck.html
+/lisa-new-template path/to/your-deck.html
 ```
 
 The skill analyses the file, separates chrome from content, builds a placeholder
@@ -295,12 +338,14 @@ carry the machinery, never the material.
 
 ## ✅ What is included
 
-- **`tedandlisa`** — builds a deck: intake, template, content, review.
-- **`tedandlisa-new-template`** — turns an existing HTML page into a template.
+- **`lisa`** — builds a deck: intake, template, content, review.
+- **`lisa-new-template`** — turns an existing HTML page into a template.
 - **Eight templates** with a pattern reference each, and a live preview.
 - **A visual intake panel** with a template gallery, plus its payload contract.
 - **A template registry** (`templates/templates.json`) and thumbnail tooling.
 - **A bundled design reviewer**, so the review works without a separate install.
+- **`lisa-design`** — a branded wrapper over the vendored Slides AI
+  pipeline, for decks that need a different look or animation.
 
 
 
@@ -360,6 +405,7 @@ themselves: not alone, not bundled, not as a port.
 This distribution bundles some awesome projects:  
 
 - [Impeccable](https://github.com/pbakaus/impeccable) under the Apache License 2.0
-- and derives the architecture template's visual system from [Architecture Diagram Generator](https://github.com/Cocoon-AI/architecture-diagram-generator) (MIT).
+- derives the architecture template's visual system from [Architecture Diagram Generator](https://github.com/Cocoon-AI/architecture-diagram-generator) (MIT)
+- and carries [Slides AI Plugin](https://github.com/proyecto26/slides-ai-plugin) (MIT), copied in under `vendor/`.
 
 See [NOTICE](NOTICE) and [`.agents/skills/impeccable/VENDORED.md`](.agents/skills/impeccable/VENDORED.md).

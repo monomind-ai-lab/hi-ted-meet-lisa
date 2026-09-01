@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Serve the /tedandlisa intake panel and capture its answers.
+"""Serve the /lisa intake panel and capture its answers.
 
 The panel is a standalone HTML file, so it also works when opened straight from
 disk -- in that mode it falls back to a copy-paste payload. This runner is the

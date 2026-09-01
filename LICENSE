@@ -32,6 +32,7 @@ SOFTWARE.
 Third-party components carry their own licenses, which this change does not
 affect:
 
+- vendor/slides-ai-plugin/ - Slides AI Plugin by proyecto26, MIT.
 - .agents/skills/impeccable/ - see its NOTICE.md and VENDORED.md.
 - The architecture template's visual system derives from Architecture Diagram
   Generator by Cocoon AI, MIT. See NOTICE.

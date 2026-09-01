@@ -91,6 +91,27 @@
       "thumb_source": "previews/architecture.html"
     },
     {
+      "id": "slide-design",
+      "name": "Slide design",
+      "tagline": "Not a MonoMind template — twelve style presets and animated HTML slides.",
+      "kind": "external",
+      "type": "present",
+      "skill": "/lisa-design",
+      "badge": "HTML",
+      "best_for": "A deck the house style cannot shape — a different look, or animation.",
+      "navigation": "Whatever the chosen preset provides.",
+      "languages": "One language per deck — the presets carry no toggle.",
+      "dependencies": "Vendored at vendor/slides-ai-plugin.",
+      "preview": "previews/slide-design.html",
+      "features": [
+        "12 style presets",
+        "animated HTML",
+        "converts an existing deck"
+      ],
+      "thumb_source": "previews/slide-design.html",
+      "thumb": "templates/thumbs/slide-design.png"
+    },
+    {
       "id": "sitemap-ia",
       "name": "Sitemap & IA proposal",
       "tagline": "Argue an information architecture, with the navigation wired up to click through.",

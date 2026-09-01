@@ -1,6 +1,6 @@
 ---
-name: tedandlisa-new-template
-description: "Use when the user wants to turn an existing HTML deck, document, or page into a reusable Hi Ted, Meet Lisa template — including phrases like /tedandlisa-new-template, \"make a template from this\", \"add this design as a template\", or when they hand over an HTML file and ask for its style to be reusable. Extracts the visual system and machinery into a placeholder skeleton, registers it, and captures its gallery thumbnail."
+name: lisa-new-template
+description: "Use when the user wants to turn an existing HTML deck, document, or page into a reusable Hi Ted, Meet Lisa template — including phrases like /lisa-new-template, \"make a template from this\", \"add this design as a template\", or when they hand over an HTML file and ask for its style to be reusable. Extracts the visual system and machinery into a placeholder skeleton, registers it, and captures its gallery thumbnail."
 ---
 
 # New Hi Ted, Meet Lisa template
@@ -12,7 +12,7 @@ description: "Use when the user wants to turn an existing HTML deck, document, o
 > Resolve them there, not against whatever project you happen to be working
 > in.
 
-Turn one finished HTML file into a template `/tedandlisa` can build from.
+Turn one finished HTML file into a template `/lisa` can build from.
 
 A template is the **machinery without the content**: the stylesheet, the design
 tokens, the chrome, the scripts, and one example of every component — with every

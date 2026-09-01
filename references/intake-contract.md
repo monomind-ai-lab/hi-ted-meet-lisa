@@ -32,17 +32,17 @@ either way.
 `version` is `1`. Refuse to guess at a payload whose `version` you do not know.
 
 `prompt` is what the panel shows in its **Your prompt** field. It starts as the
-`--prompt` argument — the text after `/tedandlisa` — but the user can edit
+`--prompt` argument — the text after `/lisa` — but the user can edit
 it there. **The payload's prompt wins over the command line.** When
 `promptEdited` is `true` they deliberately changed it; build what the payload
 says, and do not silently merge the two.
 
-`handoff` is `null` for every template in the registry today — every one of
-them is a MonoMind template built here. The field is part of the contract for
-registry entries whose `kind` is `external`: such an entry names a skill to
-hand the work to, and the agent must **stop and invoke that skill instead of
-copying a template.** The answers still apply: they were filtered to the
-questions that path actually asks.
+`handoff` is `null` for every template built here. When the user picks a path
+that is **not** a MonoMind template — a registry entry whose `kind` is
+`external` — it names the skill to hand the work to, currently
+`/lisa-design`. **Stop and invoke that skill instead of copying a
+template.** The answers still apply: they were filtered to the questions that
+path actually asks.
 
 `references` holds whatever the user attached to the prompt: an old deck, notes,
 a data file, an image whose look they want matched. They are **source material,

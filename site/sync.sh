@@ -21,9 +21,9 @@ cp templates/thumbs/*.png site/previews/
 
 # The skill itself, served at https://html.monomind.one/SKILL.md — the stable
 # public URL llms.txt advertises to agents. The canonical file lives at
-# skills/tedandlisa/SKILL.md so the plugin manifests can find it; this copy is
+# skills/lisa/SKILL.md so the plugin manifests can find it; this copy is
 # a deploy artifact, which keeps the public URL still when the layout moves.
-cp skills/tedandlisa/SKILL.md site/SKILL.md
+cp skills/lisa/SKILL.md site/SKILL.md
 
 # The intake panel — built to run from static hosting, falling back to a
 # copy-answers payload when there is no runner. We inject the same

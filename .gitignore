@@ -16,5 +16,8 @@ site/intake.html
 site/assets/
 site/SKILL.md
 
+# upload bundles built by scripts/build_skill_zips.py
+dist/
+
 # wrangler local state
 .wrangler/
