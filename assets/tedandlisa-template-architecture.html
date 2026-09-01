@@ -1,4 +1,14 @@
 <!doctype html>
+<!-- LISA:CONTENT-MAP
+     Editable regions, fenced by LISA:CONTENT-START/END comments:
+       diagram — the architecture SVG (nodes, links, boundary, labels)
+       cards — the legend cards
+     Named edit points outside the fences:
+       <title> in <head>
+       the <h1> and .subtitle in the header (chrome controls sit between them)
+       the footer meta line [PROJECT] · [VERSION] · [DATE]
+     Everything else (head, CSS, chrome markup, scripts, artwork) is load-bearing:
+     copy this file with cp, never retype it, and edit only what is named here. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -179,6 +189,8 @@ footer a { color: inherit; }
     <p class="subtitle"><span class="en">[One or two sentences: what this system is, and what the diagram is meant to settle.]</span><span class="ko">[한두 문장: 이 시스템이 무엇이고, 이 다이어그램이 무엇을 정리하는지.]</span></p>
   </div>
 
+<!-- LISA:CONTENT-START diagram -->
+<!-- Edit between these markers. Everything outside is load-bearing chrome: copy the file with cp, never retype it. -->
   <!-- THE DIAGRAM.
        Node colour is semantic, set by class, never by a fill attribute:
        frontend · backend · data · cloud · security · bus · generic.
@@ -268,7 +280,10 @@ footer a { color: inherit; }
       </g>
     </svg>
   </div>
+<!-- LISA:CONTENT-END diagram -->
 
+<!-- LISA:CONTENT-START cards -->
+<!-- Edit between these markers. Everything outside is load-bearing chrome: copy the file with cp, never retype it. -->
   <!-- Legend cards. One per component family the diagram actually uses;
        delete the families it does not. -->
   <div class="cards">
@@ -292,6 +307,7 @@ footer a { color: inherit; }
       </ul>
     </div>
   </div>
+<!-- LISA:CONTENT-END cards -->
 
   <footer>
     <span class="en">[PROJECT] · [VERSION] · [DATE]</span><span class="ko">[프로젝트] · [버전] · [날짜]</span>

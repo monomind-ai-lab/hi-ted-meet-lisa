@@ -1,5 +1,16 @@
 # Hi Ted, Meet Lisa — component reference
 
+## Content fences (all templates)
+
+Every template's editable content is fenced by paired
+`<!-- LISA:CONTENT-START name -->` / `<!-- LISA:CONTENT-END name -->` comments,
+and a `LISA:CONTENT-MAP` comment at the top of each file lists its region names
+plus the few named edit points outside the fences (`<title>`, nav labels, script
+arrays such as `PAGES`/`ROUTES`/`TITLES`). Read and edit only between the
+markers; everything outside them is load-bearing chrome, scripts, and embedded
+artwork. Copy the template file itself with `cp` — never retype or regenerate
+it — then edit inside the fences.
+
 Every snippet below is lifted verbatim from the reference deck, so the markup
 is known-good. Compose slides from these; do not invent new class names — the
 stylesheet in the template is the whole design system.

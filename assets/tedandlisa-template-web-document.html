@@ -1,4 +1,13 @@
 <!DOCTYPE html>
+<!-- LISA:CONTENT-MAP
+     Editable regions, fenced by LISA:CONTENT-START/END comments:
+       pages — the 4 hash-routed pages
+     Named edit points outside the fences:
+       <title> in <head>
+       nav labels ([PAGE 2], [PAGE 3], [DOC-001 · TITLE]) and the mark label in <nav>
+       the PAGES array in the script (must match section ids and nav entries)
+     Everything else (head, CSS, chrome markup, scripts, artwork) is load-bearing:
+     copy this file with cp, never retype it, and edit only what is named here. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -327,6 +336,8 @@ footer .mono a{color:inherit} /* the colophon link stays as quiet as the line it
   <button class="burger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
 </nav>
 
+<!-- LISA:CONTENT-START pages -->
+<!-- Edit between these markers. Everything outside is load-bearing chrome: copy the file with cp, never retype it. -->
 <!-- ================= PAGE 1: OVERVIEW ================= -->
 <section class="page" id="page-overview">
 
@@ -536,6 +547,7 @@ footer .mono a{color:inherit} /* the colophon link stays as quiet as the line it
     <p><span class="en">[One sentence on what happens next.]</span><span class="ko">[다음 단계.]</span></p>
   </div>
 </section>
+<!-- LISA:CONTENT-END pages -->
 
 <div class="viewer" id="viewer">
   <div class="vbar">
