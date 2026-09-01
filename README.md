@@ -91,10 +91,11 @@ Read and follow `SKILL.md`, starting with its intake panel. The deck is about
 
 - **One standalone `.html` file** — open it, present it, print it, email it. No
   build step and no dependencies to install.
-- **A choice of five shapes** — a presentation deck, a web document, a
-  diagram-first deck, a single architecture diagram, or a sitemap and IA
-  proposal with a clickable navigation prototype. Preview each in the gallery
-  before you choose.
+- **A choice of eight shapes** — a presentation deck, a web document, a
+  diagram-first deck, a single architecture diagram, a sitemap and IA proposal
+  with a clickable navigation prototype, a project website, an evidence deck
+  that argues from numbers, or a paper brief paced in chapters. Preview each in
+  the gallery before you choose.
 - **Two languages in the file**, with filenames, commands, and product names
   protected from translation.
 - **Light and dark**, a deck menu, keyboard and touch navigation, and optional
@@ -130,7 +131,7 @@ Hi Ted, Meet Lisa answers those directly:
 
 ## ✅ What this repository does
 
-This repository is an agent-facing package: two skills, three templates, a
+This repository is an agent-facing package: two skills, eight templates, a
 visual intake panel, a template registry, and the tooling that ties them
 together. An agent uses them to produce a deck without asking you to run
 anything yourself.
@@ -155,10 +156,10 @@ apart.
 
 ## ✅ Templates
 
-Five templates, chosen at the start of the intake. They are not variations of
+Eight templates, chosen at the start of the intake. They are not variations of
 one look — they differ in shape, navigation, and how they handle language.
 
-The intake gallery offers a sixth card beside them, listed here for the same
+The intake gallery offers a ninth card beside them, listed here for the same
 reason it appears there: you are choosing how the deck gets made, not first
 choosing between two menus. It is not a template, and nothing in this
 repository builds it — see [when a template is the wrong shape](#-when-a-template-is-the-wrong-shape).
@@ -170,16 +171,19 @@ repository builds it — see [when a template is the wrong shape](#-when-a-templ
 | **Multi-page Diagrams** | Diagram-first on light paper, one drawing per slide | Every slide written twice, so diagram labels translate too | [Live preview →](https://html.monomind.one/previews/mermaid-master) |
 | **Architecture diagram** | System diagrams on slate, where colour means something — one view or several | Both languages inline, including the labels inside the drawing | [Live preview →](https://html.monomind.one/previews/architecture) |
 | **Sitemap & IA proposal** | Pages that argue a site structure, plus the navigation wired up to click through | Both languages written inline | [Live preview →](https://html.monomind.one/previews/sitemap-ia) |
+| **Project website** | Sticky nav and hash-routed pages — a project's public face, skimmed before it is read | English and Korean written inline, toggled instantly — works offline | [Live preview →](https://html.monomind.one/previews/project-website) |
+| **Evidence deck** | Dark full-bleed slides that argue from numbers — tables, stat rows, verdict bars | English and Korean written inline, toggled instantly — works offline | [Live preview →](https://html.monomind.one/previews/evidence-deck) |
+| **Paper brief** | Light paper slides paced in chapters — mega numbers, bar charts, decision boxes | Traditional Chinese and English written inline; opens in Chinese | [Live preview →](https://html.monomind.one/previews/paper-brief) |
 | **Slide design** — *a handoff, not a template* | Twelve style presets and animated HTML | One language per deck — the presets carry no toggle | [Live preview →](https://html.monomind.one/previews/slide-design) |
 
-All six have a live preview linked from the intake gallery, so you can look
+All nine have a live preview linked from the intake gallery, so you can look
 before you choose.
 
 <p align="left">
   <img src="assets/tedandlisa-intake-templates.jpg" alt="The intake panel's template screen: filter chips for All, to present, to read, to diagram and to publish, above a gallery of template cards — each a screenshot of a real generated file, with its shape, dependencies and a Preview link." style="width: 100%; max-width: 100%;">
 </p>
 
-Each of the five templates has a pattern reference in `references/` giving
+Each of the eight templates has a pattern reference in `references/` giving
 verbatim markup for every component, plus the rules that are easy to get wrong.
 The handoff has none — it is not built from markup here.
 
@@ -224,7 +228,7 @@ break.
 
 `assets/tedandlisa-intake.html` is a standalone page that collects the deck
 settings. It runs as a short wizard: your prompt, then a gallery of template
-screenshots, then one screen per chapter — Grounds, Shape, Look, Language,
+screenshots, then one screen per chapter — Shape, Look, Language,
 Handover — each holding its two to five questions open at once, and finally
 the finished payload. A progress rail across the top names the chapters and
 sticks while a screen scrolls. Chapters with nothing to ask never appear, so
@@ -316,7 +320,7 @@ carry the machinery, never the material.
 
 - **`tedandlisa`** — builds a deck: intake, template, content, review.
 - **`tedandlisa-new-template`** — turns an existing HTML page into a template.
-- **Four templates** with a pattern reference each, and a live preview.
+- **Eight templates** with a pattern reference each, and a live preview.
 - **A visual intake panel** with a template gallery, plus its payload contract.
 - **A template registry** (`templates/templates.json`) and thumbnail tooling.
 - **A bundled design reviewer**, so the review works without a separate install.
