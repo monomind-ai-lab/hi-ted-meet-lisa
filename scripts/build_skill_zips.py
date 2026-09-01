@@ -56,12 +56,13 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 PAYLOAD_DIRS = ("assets", "references", "scripts", "templates", "vendor")
 
 # Carried only by the bundles that actually use them, and at their original
-# paths, because the skills name those paths. The bundled design reviewer is
-# 3.5 MB and only /lisa runs the design pass (step 10); without it an uploaded
-# /lisa silently drops to the tooling-free floor of references/design-review.md.
-EXTRA_PAYLOAD = {
-    "lisa": (".agents/skills/impeccable",),
-}
+# paths, because the skills name those paths.
+#
+# The bundled design reviewer is deliberately NOT here. It is 156 files, and a
+# Claude upload is capped at 200 — carrying it put /lisa at 230 and the panel
+# refused the zip. An uploaded /lisa therefore runs the tooling-free floor of
+# references/design-review.md, which is a supported tier, not a breakage.
+EXTRA_PAYLOAD = {}
 
 # Built for completeness, but say plainly which ones are worth uploading. A
 # bundle is only worth a panel slot if the skill can finish its job there.
@@ -71,9 +72,12 @@ UPLOAD_NOTES = {
 }
 PAYLOAD_FILES = ("LICENSE", "NOTICE")
 
-# Claude caps a custom skill upload at 30 MB uncompressed. ChatGPT does not
-# publish a number; this is the tighter of the two, so it is the one to hold.
+# Claude caps a custom skill upload at 30 MB uncompressed and at 200 files.
+# The file cap is not in the published docs — it surfaced as "Zip contains too
+# many files (maximum 200)" from the upload panel. ChatGPT publishes neither
+# number, so these are the tighter of the two and the ones to hold.
 MAX_UNCOMPRESSED = 30 * 1024 * 1024
+MAX_FILES = 200
 
 IGNORE = shutil.ignore_patterns("__pycache__", "*.pyc", ".DS_Store", "intake.json")
 
@@ -138,6 +142,7 @@ def main() -> int:
     out = ROOT / args.out
     skills = discover_skills()
     oversize = []
+    toomany = []
 
     with tempfile.TemporaryDirectory() as tmp:
         staged = [(s, stage(s, pathlib.Path(tmp))) for s in skills]
@@ -150,6 +155,8 @@ def main() -> int:
             files = sum(1 for f in folder.rglob("*") if f.is_file())
             if size > MAX_UNCOMPRESSED:
                 oversize.append(skill.name)
+            if files > MAX_FILES:
+                toomany.append(f"{skill.name} ({files})")
 
             if args.check:
                 print(f"{skill.name:26} {files:4d} files  "
@@ -172,8 +179,12 @@ def main() -> int:
     if oversize:
         print(f"\nover the {MAX_UNCOMPRESSED//1024//1024} MB upload limit: "
               f"{', '.join(oversize)}", file=sys.stderr)
-        return 1
-    return 0
+    if toomany:
+        print(f"\nover the {MAX_FILES}-file upload limit: {', '.join(toomany)}. "
+              f"The panel rejects these outright — drop a payload directory "
+              f"rather than shipping a zip that cannot be uploaded.",
+              file=sys.stderr)
+    return 1 if (oversize or toomany) else 0
 
 
 if __name__ == "__main__":
