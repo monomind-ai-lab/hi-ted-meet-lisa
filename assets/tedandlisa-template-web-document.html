@@ -65,9 +65,9 @@ html[data-theme="light"] .fig .fig-title,
 html[data-theme="light"] .fig .cap{color:#656c7a}
 html[data-theme="light"] .term-grid{background:#f0f1f4;border-color:#e3e6eb}
 
-/* ---------- print / PDF ----------
-   The reader's own print-to-PDF. Only the open page prints, which matches
-   what they are looking at. Delete if the intake said no PDF. */
+/* ---------- print ----------
+   The reader's own browser print. Only the open page prints, which matches
+   what they are looking at. */
 @media print{
   .nav,.viewer,.burger,.lang-toggle,.figbtn,.ctas{display:none!important}
   .page{display:none!important;padding-top:0}
@@ -314,10 +314,6 @@ footer .mono a{color:inherit} /* the colophon link stays as quiet as the line it
   <div class="utilbar">
     <button id="btnTheme" title="Theme" aria-label="Theme">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg>
-    </button>
-    <button id="btnPdf" title="Download as PDF">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9.5V4h10v5.5M7 18H5.2v-6h13.6v6H17M8.4 15h7.2v5H8.4z"/></svg>
-      <span>PDF</span>
     </button>
     <button id="btnHtml" title="Download the HTML">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 3.6-3.6M12 15l-3.6-3.6M5 19h14"/></svg>
@@ -722,7 +718,7 @@ function vnative(){
 })();
 
 /* ---------- intake-driven controls ----------
-   Theme, PDF, and self-download. Separate from the routing above so it
+   Theme and self-download. Separate from the routing above so it
    cannot disturb it; every control is optional and guarded. */
 (function () {
   var root = document.documentElement;
@@ -756,9 +752,6 @@ function vnative(){
       if (active) { renderFigsIn(active); }
     });
   }
-
-  var pBtn = document.getElementById('btnPdf');
-  if (pBtn) { pBtn.addEventListener('click', function () { window.print(); }); }
 
   var hBtn = document.getElementById('btnHtml');
   if (hBtn) {

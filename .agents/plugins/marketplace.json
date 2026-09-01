@@ -1,0 +1,16 @@
+{
+  "name": "monomind",
+  "interface": {
+    "displayName": "MonoMind AI Lab"
+  },
+  "plugins": [
+    {
+      "name": "hi-ted-meet-lisa",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "category": "Creativity"
+    }
+  ]
+}

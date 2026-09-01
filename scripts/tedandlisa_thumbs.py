@@ -11,6 +11,10 @@ or changing one's opening screen:
 Chrome is the only requirement, and it is used read-only. If it is missing the
 panel falls back to a typographic card, so a missing thumbnail degrades the
 gallery rather than breaking it.
+
+The templates whose `thumb_source` is a preview under previews/ are captured
+from https://html.monomind.one/ — those files live in the website repository
+now — so re-capturing those needs a network connection.
 """
 
 from __future__ import annotations
@@ -25,6 +29,15 @@ import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 REGISTRY = ROOT / "templates" / "templates.json"
+
+# The nine preview decks used to sit in previews/ in this repository. They went
+# with the public website when it was split out into monomind-ai-lab/ted-and-lisa,
+# and the registry deliberately still names them by that canonical path — it is
+# the path the website builds from too. So a `thumb_source` under previews/ that
+# is not on disk is resolved to the published copy instead of skipped: headless
+# Chrome screenshots a URL exactly as it screenshots a file, so the only cost is
+# that re-capturing those nine thumbnails now needs a network connection.
+HOSTED_BASE = "https://html.monomind.one/"
 
 CHROME_CANDIDATES = [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -45,8 +58,9 @@ def find_chrome() -> str | None:
     return shutil.which("chromium") or shutil.which("google-chrome")
 
 
-def capture(chrome: str, html: pathlib.Path, out: pathlib.Path, wait_ms: int,
+def capture(chrome: str, target: str, out: pathlib.Path, wait_ms: int,
             fragment: str = "") -> bool:
+    """Screenshot `target` (a file:// or https:// URL) into `out`."""
     out.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as profile:
         cmd = [
@@ -57,7 +71,7 @@ def capture(chrome: str, html: pathlib.Path, out: pathlib.Path, wait_ms: int,
             f"--force-device-scale-factor={SCALE}",
             f"--virtual-time-budget={wait_ms}",
             f"--screenshot={out}",
-            html.as_uri() + (f"#{fragment}" if fragment else ""),
+            target + (f"#{fragment}" if fragment else ""),
         ]
         # Headless Chrome writes the PNG and then sometimes fails to exit.
         # The file on disk is the real result, so a timeout is not a failure.
@@ -93,14 +107,18 @@ def main() -> int:
         # A template may point its thumbnail at a filled-in preview instead of
         # its own placeholder skeleton, optionally at a specific view:
         #   "thumb_source": "previews/name.html#en/01"
-        source, _, fragment = str(t.get("thumb_source") or t["file"]).partition("#")
-        html = ROOT / source
-        if not html.is_file():
-            print(f"skip {t['id']}: {t['file']} not found", file=sys.stderr)
+        source, _, fragment = str(t.get("thumb_source") or t.get("file") or "").partition("#")
+        local = ROOT / source if source else None
+        if local is not None and local.is_file():
+            target = local.as_uri()
+        elif source.startswith("previews/"):
+            target = HOSTED_BASE + source          # see HOSTED_BASE above
+        else:
+            print(f"skip {t['id']}: {source or '(no file)'} not found", file=sys.stderr)
             failures += 1
             continue
         out = ROOT / t["thumb"]
-        ok = capture(chrome, html, out, args.wait, fragment)
+        ok = capture(chrome, target, out, args.wait, fragment)
         status = f"{out.stat().st_size // 1024} KB" if ok else "FAILED"
         print(f"{t['id']:16} {status}")
         failures += 0 if ok else 1

@@ -294,7 +294,7 @@ control is looked up by id and guarded:
 | `menu.items` without `contents` | Delete `#deckMenuContents` and `#deckContents`. |
 | `menu.items` without `language` | Delete `#deckMenuLang`; the chrome segment is unaffected. |
 | `menu.items` with `home` / `github` | Both ship commented out, because their URLs default to `null` and an item pointing nowhere is worse than no item. Uncomment and set a real `href`. |
-| `menu.items` with `pdf` / `html` | Also commented out, and `pdf` needs the `@media print` block written first. |
+| `menu.items` with `html` | Also commented out; uncomment it to ship the self-download. |
 
 Three keyboard details, already handled — do not undo them:
 
@@ -366,9 +366,8 @@ What each one actually means here:
   invert *back* if the deck goes dark. **`theme: toggle` is not supported**: a
   runtime switch would need a second full palette reviewed on every page,
   chapter inversions included. Say so rather than shipping a half switch.
-- **`export`.** Neither format ships. `html` is a few lines (clone the
-  document, clear the generated 目錄, Blob it) and `pdf` needs the
-  `@media print` block written.
+- **`export`.** It does not ship. `html` is a few lines (clone the
+  document, clear the generated 目錄, Blob it).
 
 ## Dependencies
 
@@ -377,5 +376,4 @@ is set in) and Noto Sans TC. `delivery: standalone` inlines both, and Noto Sans
 TC is the expensive half: subset it to the glyphs the deck actually uses or the
 file gains several megabytes.
 
-There is no print stylesheet. Answering `export: pdf` on this template means
-writing the `@media print` block, not switching one on.
+There is no print stylesheet.

@@ -16,8 +16,8 @@
    Diagram Generator by Cocoon AI (MIT). See NOTICE.
 
    Consolidated with the MonoMind chrome the other templates carry: the
-   mark, an English/Korean switch, a light/dark toggle, and export to PDF
-   and HTML. Node colours are CSS classes, not attributes, so a theme is
+   mark, an English/Korean switch, a light/dark toggle, and HTML export.
+   Node colours are CSS classes, not attributes, so a theme is
    one token swap rather than a rewrite of every shape.
    ───────────────────────────────────────────────────────────────── */
 :root {
@@ -165,10 +165,6 @@ footer a { color: inherit; }
           <button id="btnTheme" title="Theme" aria-label="Theme">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg>
           </button>
-          <button id="btnPdf" title="Download as PDF">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9.5V4h10v5.5M7 18H5.2v-6h13.6v6H17M8.4 15h7.2v5H8.4z"/></svg>
-            <span>PDF</span>
-          </button>
           <button id="btnHtml" title="Download the HTML">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 3.6-3.6M12 15l-3.6-3.6M5 19h14"/></svg>
             <span>HTML</span>
@@ -308,10 +304,10 @@ footer a { color: inherit; }
 
 <script>
 "use strict";
-/* Chrome only: theme, language, and the two exports. No diagram logic lives
+/* Chrome only: theme, language, and the export. No diagram logic lives
    here — the drawing is static SVG, which is what keeps the file portable.
-   Export is the browser's own print-to-PDF and a self-download, so the file
-   has no runtime dependency beyond the fonts. */
+   Export is a self-download, so the file has no runtime dependency beyond
+   the fonts. */
 (function () {
   var root = document.documentElement;
   var body = document.body;
@@ -361,10 +357,7 @@ footer a { color: inherit; }
     }
   });
 
-  /* ---- exports ---- */
-  var pBtn = $('btnPdf');
-  if (pBtn) { pBtn.addEventListener('click', function () { window.print(); }); }
-
+  /* ---- export ---- */
   var hBtn = $('btnHtml');
   if (hBtn) {
     hBtn.addEventListener('click', function () {

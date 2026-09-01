@@ -18,8 +18,9 @@ drifted apart:
 
 The fallback carries only the fields a card needs before anything is injected
 (id, name, kind, type, tagline, plus skill and badge where the registry sets
-them) — the same projection scripts/tedandlisa_intake.py and site/sync.sh make,
-minus the keys that are meaningless without a served site: thumb, preview,
+them) — the same projection scripts/tedandlisa_intake.py and the website
+repository's sync.sh make, minus the keys that are meaningless without a
+served site: thumb, preview,
 best_for and dependencies. Dropping `skill` is not cosmetic — payload()'s
 `handoff` reads it, so an `external` entry without one sends the agent off to
 copy a template that does not exist.

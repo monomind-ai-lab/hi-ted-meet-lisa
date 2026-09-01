@@ -32,7 +32,7 @@ either way.
 `version` is `1`. Refuse to guess at a payload whose `version` you do not know.
 
 `prompt` is what the panel shows in its **Your prompt** field. It starts as the
-`--prompt` argument — the text after `/tedandlisa` — but the user can edit
+`--prompt` argument — the text after `/lisa` — but the user can edit
 it there. **The payload's prompt wins over the command line.** When
 `promptEdited` is `true` they deliberately changed it; build what the payload
 says, and do not silently merge the two.
@@ -40,7 +40,7 @@ says, and do not silently merge the two.
 `handoff` is `null` for every template built here. When the user picks a path
 that is **not** a MonoMind template — a registry entry whose `kind` is
 `external` — it names the skill to hand the work to, currently
-`/tedandlisa-design`. **Stop and invoke that skill instead of copying a
+`/lisa-design`. **Stop and invoke that skill instead of copying a
 template.** The answers still apply: they were filtered to the questions that
 path actually asks.
 
@@ -86,7 +86,7 @@ An entry arrives in one of two shapes, and you must handle both:
 | `evidence` | array of `analytics` `search` `interviews` `cardsort` `support` `seo` `none` | **`sitemap-ia` only.** What the recommendation rests on. Anything absent belongs in the open questions, not in a confident claim. |
 | `prototype` | `both` \| `desktop` \| `none` | **`sitemap-ia` only.** How much of the navigation is clickable. |
 | `delivery` | `cdn` \| `standalone` | **`sitemap-ia` only.** `standalone` inlines mermaid, the webfonts, Font Awesome and Tailwind. |
-| `export` | array of `pdf` `html` | Each adds a control to the deck chrome. |
+| `export` | array of `html` | Adds a self-download control to the deck chrome. |
 | `credit` | `true` \| `false` | Whether the file keeps its colophon — the "Made with Hi Ted, Meet Lisa" line linking to html.monomind.one. Every template ships it; `false` means delete that one line (never the logo or identity links, which belong to `logo`). Asked for **every** shape, the external handoff included, so it is present in both the runner's payload and the web panel's paste-ready prompt alike. |
 
 ## The menu object
@@ -100,11 +100,11 @@ An entry arrives in one of two shapes, and you must handle both:
 `full`.
 
 - `items` always contains `start`; the rest are optional: `contents`, `home`,
-  `github`, `pdf`, `html`, `language`.
+  `github`, `html`, `language`.
 - `home` and `github` are the URLs for those items. **An item whose URL is
   `null` must be deleted from the menu**, not shipped pointing nowhere.
-- `pdf` and `html` in `items` are menu entry points for the `export` answers.
-  If `export` did not ask for a format, the menu item goes too.
+- `html` in `items` is the menu entry point for the `export` answer.
+  If `export` did not ask for it, the menu item goes too.
 
 `minimal` means no menu at all — just a back-to-the-start control beside the
 page counter. `none` means neither.

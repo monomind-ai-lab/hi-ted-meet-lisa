@@ -8,7 +8,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* Tokens are lifted from tedandlisa-template.html so the intake panel and
+/* This panel is canonical here and is also read across a repository split:
+   the public site (monomind-ai-lab/ted-and-lisa) checks this repository out
+   at deploy time and its sync.sh injects the "web" context referred to below.
+   Every "the website repo's ..." path in the comments means a file in that
+   repository, not this one.
+
+   Tokens are lifted from tedandlisa-template.html so the intake panel and
    the deck it configures read as one system. Ground is the deck's deep ink
    (--fg) under the same accent halos used by .slide.dark. */
 :root {
@@ -68,9 +74,10 @@
          shell stretches the header and footer apart with nothing between
          them, so the height is capped and the shell centres in the ground.
 
-       web  (body[data-mode="web"], set from CTX.mode by site/sync.sh)
-         site/index.html frames this in an iframe filling `.overlay .sheet`,
-         which is already `height: min(1040px, 100%)`. Inside the iframe
+       web  (body[data-mode="web"], set from CTX.mode by the website
+            repo's sync.sh)
+         The website repo's index.html frames this in an iframe filling
+         `.overlay .sheet`, which is already `height: min(1040px, 100%)`. Inside the iframe
          100dvh *is* that sheet, so the panel fills it exactly — capping it
          a second time would leave a dead band inside the frame.
 
@@ -622,8 +629,9 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
 }
 </style>
 </head>
-<!-- data-mode is the shell's height switch (see --panel-h). It starts local and
-     the script flips it to "web" when site/sync.sh has injected that context. -->
+<!-- data-mode is the shell's height switch (see --panel-h). It starts local
+     and the script flips it to "web" when the website repo's sync.sh has
+     injected that context. -->
 <body data-mode="local">
 <main class="shell">
   <div class="topbar">
@@ -696,7 +704,7 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
         <b id="brieflabel">Your prompt</b>
         <textarea id="prompttext" rows="2"
           placeholder="What is this about, and who is it for?"></textarea>
-        <p class="promptnote" id="promptnote">Passed in as <code translate="no">/tedandlisa [your prompt]</code>. Edit it here if it
+        <p class="promptnote" id="promptnote">Passed in as <code translate="no">/lisa [your prompt]</code>. Edit it here if it
           needs sharpening.</p>
         <div class="refs">
           <label for="refdrop" id="refslabel">References <span>optional — slides, notes, data, an image to match</span></label>
@@ -741,10 +749,10 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
     </details>
 
     <!-- Web mode only. `show()` gates this exactly the way it gates the
-         artwork above (CTX.mode === "web", injected by site/sync.sh), so the
-         locally-served runner never shows commercial copy. The link is the
-         only place in this file that carries it — see PAID_LANDING in
-         site/index.html for the others. -->
+         artwork above (CTX.mode === "web", injected by the website repo's
+         sync.sh), so the locally-served runner never shows commercial copy.
+         The link is the only place in this file that carries it — see
+         PAID_LANDING in the website repo's index.html for the others. -->
     <p class="teamsline" id="teamsline" hidden>This will arrive in the house
       style. Teams that want their own — tokens, patterns, protected terms —
       have MonoMind build it as a private pack:
@@ -795,7 +803,7 @@ button.ghost:hover { color: var(--fg-inv); border-color: var(--accent-hair); }
 
 <script>
 "use strict";
-/* Intake panel for the /tedandlisa skill.
+/* Intake panel for the /lisa skill.
    Ported from the shadcn `cursor-questions-panel` (single-select, multi-select,
    other-text, keyboard nav) with one type the original does not have: `files`,
    because backgrounds, the logo, and design.md all arrive as uploads. Files
@@ -807,16 +815,17 @@ var CTX = window.__MONOMIND_INTAKE__ || {};
 
 /* The shell's height switch — see --panel-h in the stylesheet. The markup
    ships data-mode="local" so a browser that never reaches this line still
-   gets a sane panel; web mode only exists when site/sync.sh injected it. */
+   gets a sane panel; web mode only exists when the website repo's sync.sh
+   injected it. */
 document.body.dataset.mode = CTX.mode === "web" ? "web" : "local";
 
 /* Web mode only, gated exactly the way #teamsline is (CTX.mode === "web",
-   injected by site/sync.sh) so the locally-served runner and a file:// copy
-   stay silent — nothing to send, nowhere to send it. The public site counts
+   injected by the website repo's sync.sh) so the locally-served runner and a
+   file:// copy stay silent — nothing to send, nowhere to send it. The public site counts
    one moment from in here: the prompt was copied. The whole payload is that
    one word; no answers, no prompt text, no id, no cookie ever leave. The
    beacon is queued and forgotten, so the copy button never waits on it.
-   See the funnel-events note in site/index.html for the other four. */
+   See the funnel-events note in the website repo's index.html for the other four. */
 function track(name) {
   try {
     if (CTX.mode !== "web" || !navigator.sendBeacon) return;
@@ -827,7 +836,8 @@ function track(name) {
 /* ══ language ══════════════════════════════════════════════════════
    English, Korean and Traditional Chinese, all three written by hand.
    This is the same "instant" tier the public site keeps (the `T` table in
-   site/index.html) and deliberately not the same *mechanism*: the site can
+   the website repo's index.html) and deliberately not the same *mechanism*:
+   the site can
    translate a static page in place because its copy sits in the DOM, while
    almost every string here is drawn by a function from data. So the copy
    lives in tables and the drawing functions ask for it. There is no machine
@@ -868,9 +878,9 @@ function scriptLang(text) {
 /* Where the opening language comes from, in order:
 
      ?lang=…    web mode. The site owns the choice and hands it over on the
-                frame's URL — openIntake() in site/index.html sets it, and
-                posts a message if the reader switches while the overlay is
-                open. The site is the single source of truth for it; nothing
+                frame's URL — openIntake() in the website repo's index.html
+                sets it, and posts a message if the reader switches while the
+                overlay is open. The site is the single source of truth for it; nothing
                 here re-derives what the site already knows.
      CTX.lang   a runner that wants to say so explicitly. None does today.
      the brief  local mode. There is no site, so the only evidence of who is
@@ -915,7 +925,7 @@ var UI = {
     },
     briefLabel: "Your prompt",
     promptPlaceholder: "What is this about, and who is it for?",
-    note: 'Passed in as <code translate="no">/tedandlisa [your prompt]</code>. ' +
+    note: 'Passed in as <code translate="no">/lisa [your prompt]</code>. ' +
           "Edit it here if it needs sharpening.",
     refs: "References <span>optional — slides, notes, data, an image to match</span>",
     dropRefs: "Drop files here, or click to choose",
@@ -990,11 +1000,11 @@ var UI = {
       stopped: ["Prompt ready to paste.",
                 "The runner stopped answering, so nothing was handed over automatically. " +
                 "Paste this to Lisa instead and she picks up from here.",
-                "Paste it to the agent you ran /tedandlisa from."],
+                "Paste it to the agent you ran /lisa from."],
       file: ["Prompt ready to paste.",
              "This panel was opened straight from a file, so there is no runner to hand the " +
              "answers to. Paste this to Lisa instead and she picks up from here.",
-             "Paste it to the agent you ran /tedandlisa from."]
+             "Paste it to the agent you ran /lisa from."]
     }
   },
 
@@ -1009,7 +1019,7 @@ var UI = {
     },
     briefLabel: "당신의 프롬프트",
     promptPlaceholder: "무엇에 대한 것이고, 누구를 위한 것인가요?",
-    note: '<code translate="no">/tedandlisa [your prompt]</code> 로 전달된 내용입니다. ' +
+    note: '<code translate="no">/lisa [your prompt]</code> 로 전달된 내용입니다. ' +
           "더 다듬을 부분이 있으면 여기서 고치세요.",
     refs: "참고 자료 <span>선택 사항 — 슬라이드, 메모, 데이터, 맞추고 싶은 이미지</span>",
     dropRefs: "여기에 파일을 놓거나, 눌러서 고르세요",
@@ -1076,11 +1086,11 @@ var UI = {
       stopped: ["붙여넣을 프롬프트가 준비됐습니다.",
                 "러너가 응답을 멈춰서 자동으로 전달된 것은 없습니다. 대신 이걸 Lisa에게 " +
                 "붙여넣으면 여기서부터 이어서 진행합니다.",
-                "/tedandlisa 를 실행한 에이전트에 붙여넣으세요."],
+                "/lisa 를 실행한 에이전트에 붙여넣으세요."],
       file: ["붙여넣을 프롬프트가 준비됐습니다.",
              "이 패널은 파일에서 바로 열렸기 때문에 답변을 건넬 러너가 없습니다. 대신 " +
              "이걸 Lisa에게 붙여넣으면 여기서부터 이어서 진행합니다.",
-             "/tedandlisa 를 실행한 에이전트에 붙여넣으세요."]
+             "/lisa 를 실행한 에이전트에 붙여넣으세요."]
     }
   },
 
@@ -1094,7 +1104,7 @@ var UI = {
     },
     briefLabel: "你的 prompt",
     promptPlaceholder: "這是關於什麼的，又是給誰看的？",
-    note: '這是透過 <code translate="no">/tedandlisa [your prompt]</code> 傳進來的。' +
+    note: '這是透過 <code translate="no">/lisa [your prompt]</code> 傳進來的。' +
           "需要修得更準的話，在這裡改。",
     refs: "參考資料 <span>選填 — 投影片、筆記、資料，或一張想比照的圖</span>",
     dropRefs: "把檔案拖到這裡，或點一下選擇",
@@ -1159,11 +1169,11 @@ var UI = {
             "貼進 agent 的對話框 — 這樣就完成了。"],
       stopped: ["prompt 已經可以貼上了。",
                 "runner 沒有回應，所以沒有自動交出去。把這個貼給 Lisa，她會從這裡接手。",
-                "貼給你執行 /tedandlisa 的那個 agent。"],
+                "貼給你執行 /lisa 的那個 agent。"],
       file: ["prompt 已經可以貼上了。",
              "這個面板是直接從檔案打開的，所以沒有 runner 可以接手答案。把這個貼給 " +
              "Lisa，她會從這裡接手。",
-             "貼給你執行 /tedandlisa 的那個 agent。"]
+             "貼給你執行 /lisa 的那個 agent。"]
     }
   }
 };
@@ -1182,7 +1192,7 @@ var UI = {
    two different things — `c` is the sub-options of a `checks` field, and `p`
    is the free-text placeholder behind an `isOther` option.
 
-   Left verbatim throughout: /tedandlisa, SKILL.md, design.md, intake.json,
+   Left verbatim throughout: /lisa, SKILL.md, design.md, intake.json,
    MonoMind, Hi Ted, Meet Lisa, Ted, Lisa, Project Context, the CSS custom
    property names, the vendor path, and every filename. */
 var L10N = {
@@ -1224,7 +1234,7 @@ var L10N = {
       "slide-design": ["슬라이드 디자인",
         "MonoMind 템플릿이 아닙니다 — 열두 가지 스타일 프리셋과 애니메이션 HTML 슬라이드.",
         "하우스 스타일로는 담기지 않는 덱 — 다른 룩, 또는 애니메이션.",
-        "서브모듈 vendor/slides-ai-plugin."],
+        "vendor/slides-ai-plugin에 포함되어 있습니다."],
       "project-website": ["프로젝트 웹사이트",
         "프로젝트의 공개된 얼굴: 고정 내비게이션, 해시 라우팅 페이지, 짙은 잉크와 푸른 헤일로.",
         "프로젝트 자체의 사이트 — 런치 페이지, 도구의 홈, 프로그램의 정문. 책상 앞에서 " +
@@ -1392,14 +1402,13 @@ var L10N = {
              "menuitems.github": ["저장소 URL — 메뉴가 저장소로 연결될 때만", "https://github.com/…"] },
         c: { "menuitems.items": {
                start: "처음으로", contents: "목차 — 아무 장으로나 이동", home: "홈 링크",
-               github: "GitHub 링크", pdf: "PDF로 내려받기", html: "HTML 내려받기",
+               github: "GitHub 링크", html: "HTML 내려받기",
                language: "메뉴 안의 언어 전환" } }
       },
       export: {
         q: "읽는 사람이 무엇을 가져갈 수 있나요?",
-        hint: "둘 다 크롬에 작은 컨트롤을 하나씩 더합니다.",
-        o: { pdf:  ["PDF로 내려받기", "인쇄 스타일시트, 가로 한 페이지에 한 장."],
-             html: ["독립 실행형 HTML 내려받기", "파일이 자기 자신의 사본을 저장합니다."] }
+        hint: "크롬에 작은 컨트롤을 하나 더합니다.",
+        o: { html: ["독립 실행형 HTML 내려받기", "파일이 자기 자신의 사본을 저장합니다."] }
       },
       credit: {
         q: "크레딧 한 줄",
@@ -1445,7 +1454,7 @@ var L10N = {
       "slide-design": ["投影片設計",
         "不是 MonoMind 範本 — 十二種風格預設，加上會動的 HTML 投影片。",
         "自家風格裝不下的簡報 — 另一種樣子，或是要動起來。",
-        "子模組 vendor/slides-ai-plugin。"],
+        "已隨附於 vendor/slides-ai-plugin。"],
       "project-website": ["專案網站",
         "一個專案的對外門面：固定導覽、hash 路由的頁面、深色底配藍色光暈。",
         "專案自己的網站 — 上線頁、工具的首頁、一個計畫的正門。在桌前讀、被連結，也常常" +
@@ -1607,14 +1616,13 @@ var L10N = {
              "menuitems.github": ["儲存庫網址 — 只有選單有連到儲存庫時才需要", "https://github.com/…"] },
         c: { "menuitems.items": {
                start: "回到開頭", contents: "目錄 — 跳到任何一頁", home: "首頁連結",
-               github: "GitHub 連結", pdf: "下載成 PDF", html: "下載 HTML",
+               github: "GitHub 連結", html: "下載 HTML",
                language: "選單裡的語言切換" } }
       },
       export: {
         q: "讀者可以帶走什麼？",
-        hint: "兩個都會在介面上多加一個小控制項。",
-        o: { pdf:  ["下載成 PDF", "列印樣式表，一張投影片一頁橫式。"],
-             html: ["下載獨立的 HTML", "檔案會存下一份自己的副本。"] }
+        hint: "會在介面上多加一個小控制項。",
+        o: { html: ["下載獨立的 HTML", "檔案會存下一份自己的副本。"] }
       },
       credit: {
         q: "署名那一行",
@@ -1675,9 +1683,10 @@ var MAX_INLINE_BYTES = 1500000; /* ~1.5 MB — past this the deck gets heavy */
    `paper-brief` is slides you read, `architecture` is a document you draw in.
    The list below is only the no-registry fallback — what a reader sees when
    the panel is opened straight from file:// and neither the runner nor
-   site/sync.sh has injected CTX.templates. It is GENERATED from
+   the website repo's sync.sh has injected CTX.templates. It is GENERATED from
    templates/templates.json; do not hand-edit it. Regenerate after any change
-   to the registry, and CI fails the deploy if the two drift apart:
+   to the registry — the website's deploy runs --check against this checkout
+   and fails if the two drift apart:
        python3 scripts/tedandlisa_intake_fallback.py */
 var TEMPLATES = CTX.templates || [
   { id: "monomind-deck", name: "MonoMind deck", kind: "slides", type: "present",
@@ -1688,7 +1697,7 @@ var TEMPLATES = CTX.templates || [
     tagline: "Diagram-first deck on light paper, one drawing per slide." },
   { id: "architecture", name: "Architecture diagram", kind: "document", type: "diagram",
     tagline: "System diagrams on slate, where colour means something — one view or several." },
-  { id: "slide-design", name: "Slide design", kind: "external", type: "present", skill: "/tedandlisa-design", badge: "HTML",
+  { id: "slide-design", name: "Slide design", kind: "external", type: "present", skill: "/lisa-design", badge: "HTML",
     tagline: "Not a MonoMind template — twelve style presets and animated HTML slides." },
   { id: "sitemap-ia", name: "Sitemap & IA proposal", kind: "document", type: "read",
     tagline: "Argue an information architecture, with the navigation wired up to click through." },
@@ -1875,7 +1884,6 @@ var QUESTIONS = [
         { id: "contents", label: "Contents — jump to any slide", def: true },
         { id: "home",     label: "Home link" },
         { id: "github",   label: "GitHub link" },
-        { id: "pdf",      label: "Download as PDF" },
         { id: "html",     label: "Download the HTML" },
         { id: "language", label: "Language switch inside the menu" } ] },
       { kind: "text", id: "home", label: "Home URL — only if the menu links home",
@@ -1884,9 +1892,8 @@ var QUESTIONS = [
         placeholder: "https://github.com/…" } ] } },
 
   { id: "export", chapter: "Handover", q: "What can a reader take away?", kinds: ["slides", "document"],
-    hint: "Both add a small control to the chrome.",
+    hint: "It adds a small control to the chrome.",
     type: "multi", options: [
-      { id: "pdf",  label: "Download as PDF", note: "Print stylesheet, one slide per landscape page." },
       { id: "html", label: "Download the standalone HTML", note: "The file saves a copy of itself." } ] },
 
   /* No kinds and no templates: the credit line exists in every shape,
@@ -2814,16 +2821,17 @@ function show(key, needsCopy, json) {
 function webPrompt(json) {
   return "Build me a standalone HTML page using\n" +
          "https://github.com/monomind-ai-lab/hi-ted-meet-lisa.\n" +
-         "Read and follow `SKILL.md`. My intake answers are below — apply them\n" +
-         "instead of asking again, and hand back one standalone HTML file.\n\n" + json;
+         "Read and follow https://html.monomind.one/SKILL.md. My intake\n" +
+         "answers are below — apply them instead of asking again, and hand\n" +
+         "back one standalone HTML file.\n\n" + json;
 }
 
 /* The local variant. Both fallbacks below are reached only from a copy of this
-   panel the reader opened themselves, so they are already running /tedandlisa
-   and the skill is on disk. webPrompt's "read SKILL.md from GitHub" line would
+   panel the reader opened themselves, so they are already running /lisa
+   and the skill is on disk. webPrompt's "read SKILL.md from the web" line would
    send their agent to fetch what it already has. */
 function localPrompt(json) {
-  return "Here are my /tedandlisa intake answers. Apply them instead of asking\n" +
+  return "Here are my /lisa intake answers. Apply them instead of asking\n" +
          "again, and hand back one standalone HTML file.\n\n" + json;
 }
 
@@ -2877,7 +2885,7 @@ document.getElementById("back").addEventListener("click", function () {
 });
 
 /* ---- prompt and references -------------------------------------------
-   The prompt arrives from `/tedandlisa [your prompt]` but stays editable:
+   The prompt arrives from `/lisa [your prompt]` but stays editable:
    what the user typed on the command line is a starting point, not a contract.
    References are whatever they want the deck to draw on — an old deck, notes,
    a data file, an image to match. They ride along in the payload. */

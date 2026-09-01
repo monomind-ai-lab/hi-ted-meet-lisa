@@ -281,7 +281,7 @@ control is looked up by id and guarded:
 | `menu.items` without `contents` | Delete `#deckMenuContents` and `#deckContents`. |
 | `menu.items` without `language` | Delete `#deckMenuLang`. The chrome segment is unaffected. |
 | `menu.items` with `home` / `github` | The template ships those two commented out, because their URLs default to `null` and an item pointing nowhere is worse than no item. Uncomment and set a real `href`. |
-| `menu.items` with `pdf` / `html` | Also commented out — and `pdf` needs the `@media print` block written first. See Dependencies. |
+| `menu.items` with `html` | Also commented out — uncomment it to ship the self-download. |
 
 Three traps in the keyboard behaviour, all of them already handled — do not
 undo them:
@@ -360,9 +360,8 @@ What each one actually means here:
   hardcoded `#141414`. **`theme: toggle` is not supported**: a second full
   palette would have to be reviewed on every slide, and this deck ships one.
   Say so rather than shipping a switch that half works.
-- **`export`.** Neither format ships. `html` is a few lines (clone the
-  document, clear the generated contents, Blob it) and `pdf` needs the
-  `@media print` block written — see below.
+- **`export`.** It does not ship. `html` is a few lines (clone the
+  document, clear the generated contents, Blob it).
 
 ## Dependencies
 
@@ -372,5 +371,4 @@ deck itself. `delivery: standalone` means subsetting and inlining those four
 families; Noto Sans KR is the expensive one.
 
 There is no print stylesheet. A scroll-snap deck of `100dvh` sections prints as
-one slide per page only by accident; answering `export: pdf` on this template
-means writing the `@media print` block, not enabling one.
+one slide per page only by accident.
