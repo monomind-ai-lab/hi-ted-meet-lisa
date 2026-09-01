@@ -58,9 +58,11 @@ PAYLOAD_DIRS = ("assets", "references", "scripts", "templates", "vendor")
 # Carried only by the bundles that actually use them, and at their original
 # paths, because the skills name those paths.
 #
-# The bundled design reviewer is deliberately NOT here. It is 156 files, and a
-# Claude upload is capped at 200 — carrying it put /lisa at 230 and the panel
-# refused the zip. An uploaded /lisa therefore runs the tooling-free floor of
+# The bundled design reviewer is deliberately NOT here. It is 156 files, which
+# put /lisa at 230 against Claude's stated 200. The panel warns rather than
+# refuses, so the upload proceeds — but it does not say what happens to the
+# excess, and a bundle whose contents you cannot account for is not one to
+# ship. An uploaded /lisa therefore runs the tooling-free floor of
 # references/design-review.md, which is a supported tier, not a breakage.
 EXTRA_PAYLOAD = {}
 
@@ -72,10 +74,12 @@ UPLOAD_NOTES = {
 }
 PAYLOAD_FILES = ("LICENSE", "NOTICE")
 
-# Claude caps a custom skill upload at 30 MB uncompressed and at 200 files.
-# The file cap is not in the published docs — it surfaced as "Zip contains too
-# many files (maximum 200)" from the upload panel. ChatGPT publishes neither
-# number, so these are the tighter of the two and the ones to hold.
+# Claude caps a custom skill upload at 30 MB uncompressed and states a 200-file
+# maximum. The file number is not in the published docs — it surfaced as a
+# "Zip contains too many files (maximum 200)" warning from the upload panel.
+# It is a warning, not a rejection, and the panel does not say whether the
+# excess is dropped or kept. Hold the line anyway: shipping past a stated
+# maximum means shipping a bundle whose contents you cannot verify.
 MAX_UNCOMPRESSED = 30 * 1024 * 1024
 MAX_FILES = 200
 
@@ -181,8 +185,9 @@ def main() -> int:
               f"{', '.join(oversize)}", file=sys.stderr)
     if toomany:
         print(f"\nover the {MAX_FILES}-file upload limit: {', '.join(toomany)}. "
-              f"The panel rejects these outright — drop a payload directory "
-              f"rather than shipping a zip that cannot be uploaded.",
+              f"The panel warns rather than refuses, and does not say what "
+              f"happens to the excess — drop a payload directory rather than "
+              f"ship a bundle whose contents you cannot account for.",
               file=sys.stderr)
     return 1 if (oversize or toomany) else 0
 

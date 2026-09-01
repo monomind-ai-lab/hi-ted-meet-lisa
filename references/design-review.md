@@ -11,8 +11,8 @@ to Impeccable.
 2. **The bundled copy** at `.agents/skills/impeccable/`, present in a plugin
    install or a repository checkout. Read its `SKILL.md` and follow it as
    written. Apache 2.0; see `VENDORED.md` before touching anything in there.
-   It is **not** in an uploaded zip — 156 files against a 200-file cap — so a
-   skill running from a chat-app upload goes to 3.
+   It is **not** in an uploaded zip — it alone is 156 files, and Claude states
+   a 200-file maximum — so a skill running from a chat-app upload goes to 3.
 3. **This file alone**, if neither can run. The checks below are the floor and
    need no tooling.
 
