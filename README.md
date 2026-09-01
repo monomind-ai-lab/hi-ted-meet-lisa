@@ -125,7 +125,11 @@ Hi Ted, Meet Lisa answers those directly:
 3. **Both themes and both widths are measured, not assumed.** A design review
    pass checks contrast and responsive behaviour before handover.
 
+---
 
+<p align="left">
+  <img src="assets/tedlisaidea.jpg" alt="When Ted meets Lisa, ideas come to life in HTML" style="width: 100%; max-width: 100%;">
+</p>
 
 ---
 
@@ -196,10 +200,6 @@ break.
 
 
 ---
-
-<p align="left">
-  <img src="assets/tedlisaidea.jpg" alt="When Ted meets Lisa, ideas come to life in HTML" style="width: 100%; max-width: 100%;">
-</p>
 
 ## ✅ How a deck gets built
 
