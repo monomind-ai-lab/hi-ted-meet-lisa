@@ -53,7 +53,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # plus the licence files, because a ZIP is a redistribution.
 # `vendor/` matters: /lisa-design reads vendor/slides-ai-plugin/, so an
 # uploaded bundle without it is a skill that cannot run.
-PAYLOAD_DIRS = ("assets", "references", "scripts", "templates", "vendor")
+PAYLOAD_DIRS = ("assets", "references", "scripts", "templates")
 
 # Carried only by the bundles that actually use them, and at their original
 # paths, because the skills name those paths.
@@ -64,7 +64,27 @@ PAYLOAD_DIRS = ("assets", "references", "scripts", "templates", "vendor")
 # excess, and a bundle whose contents you cannot account for is not one to
 # ship. An uploaded /lisa therefore runs the tooling-free floor of
 # references/design-review.md, which is a supported tier, not a breakage.
-EXTRA_PAYLOAD = {}
+# `vendor/` is here rather than in PAYLOAD_DIRS because only /lisa-design reads
+# it, and it carries three SKILL.md files of its own — which an upload cannot
+# take (see ONE_SKILL_MD below). /lisa names it once, in a descriptive table
+# row, and never reads it.
+EXTRA_PAYLOAD = {
+    "lisa-design": ("vendor",),
+}
+
+# Claude requires a bundle to contain EXACTLY ONE SKILL.md. That is a hard
+# refusal, not a warning: "Zip must contain exactly one SKILL.md file."
+#
+# /lisa-design cannot satisfy it. Its entire job is to drive the vendored
+# Slides AI skill tree, which is three skills each with their own SKILL.md,
+# and renaming them would both fork upstream and contradict the skill's own
+# "do not edit anything under vendor/" rule. So no bundle is built for it —
+# better than emitting a zip the panel will reject.
+NOT_UPLOADABLE = {
+    "lisa-design": "drives the vendored skill tree, which carries three more "
+                   "SKILL.md files; an upload permits exactly one. Use the "
+                   "plugin or a checkout.",
+}
 
 # Built for completeness, but say plainly which ones are worth uploading. A
 # bundle is only worth a panel slot if the skill can finish its job there.
@@ -82,6 +102,7 @@ PAYLOAD_FILES = ("LICENSE", "NOTICE")
 # maximum means shipping a bundle whose contents you cannot verify.
 MAX_UNCOMPRESSED = 30 * 1024 * 1024
 MAX_FILES = 200
+ONE_SKILL_MD = 1
 
 IGNORE = shutil.ignore_patterns("__pycache__", "*.pyc", ".DS_Store", "intake.json")
 
@@ -144,9 +165,10 @@ def main() -> int:
     args = ap.parse_args()
 
     out = ROOT / args.out
-    skills = discover_skills()
+    skills = [s for s in discover_skills() if s.name not in NOT_UPLOADABLE]
     oversize = []
     toomany = []
+    multiskill = []
 
     with tempfile.TemporaryDirectory() as tmp:
         staged = [(s, stage(s, pathlib.Path(tmp))) for s in skills]
@@ -157,6 +179,9 @@ def main() -> int:
         for skill, folder in staged:
             size = uncompressed_size(folder)
             files = sum(1 for f in folder.rglob("*") if f.is_file())
+            skillmds = sum(1 for f in folder.rglob("SKILL.md"))
+            if skillmds != ONE_SKILL_MD:
+                multiskill.append(f"{skill.name} ({skillmds})")
             if size > MAX_UNCOMPRESSED:
                 oversize.append(skill.name)
             if files > MAX_FILES:
@@ -176,6 +201,9 @@ def main() -> int:
                   f"{size/1024/1024:5.1f} MB uncompressed  -> "
                   f"{target.relative_to(ROOT)} ({target.stat().st_size/1024/1024:.1f} MB)")
 
+    for name, why in NOT_UPLOADABLE.items():
+        print(f"\nskipped: {name} — {why}")
+
     for name, note in UPLOAD_NOTES.items():
         if any(s.name == name for s in skills):
             print(f"\nnote: {name} — {note}")
@@ -183,13 +211,18 @@ def main() -> int:
     if oversize:
         print(f"\nover the {MAX_UNCOMPRESSED//1024//1024} MB upload limit: "
               f"{', '.join(oversize)}", file=sys.stderr)
+    if multiskill:
+        print(f"\nmore than one SKILL.md: {', '.join(multiskill)}. The panel "
+              f"refuses these outright — a bundle must contain exactly one. "
+              f"Scope the payload that carries the extras to the skills that "
+              f"actually read it.", file=sys.stderr)
     if toomany:
         print(f"\nover the {MAX_FILES}-file upload limit: {', '.join(toomany)}. "
               f"The panel warns rather than refuses, and does not say what "
               f"happens to the excess — drop a payload directory rather than "
               f"ship a bundle whose contents you cannot account for.",
               file=sys.stderr)
-    return 1 if (oversize or toomany) else 0
+    return 1 if (oversize or toomany or multiskill) else 0
 
 
 if __name__ == "__main__":
