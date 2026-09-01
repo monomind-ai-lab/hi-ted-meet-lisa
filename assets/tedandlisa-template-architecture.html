@@ -359,6 +359,11 @@ footer a { color: inherit; }
 
   /* ---- export ---- */
   var hBtn = $('btnHtml');
+  /* A self-download offers to save a copy of a file the reader already has, so
+     it earns its place only when this page is being served. On file:// it hands
+     you what is already on your disk — hide it. Same rule as the language
+     switch. Nulled rather than returned: wiring after this block must still run. */
+  if (hBtn && location.protocol === 'file:') { hBtn.hidden = true; hBtn = null; }
   if (hBtn) {
     hBtn.addEventListener('click', function () {
       var clone = root.cloneNode(true);
