@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<!-- LISA:CONTENT-MAP
+     Editable regions, fenced by LISA:CONTENT-START/END comments:
+       head       — mark, brand name, tagline, date and source line
+       colours    — three brand swatches, then the surface-role chips
+       typography — display / body / mono samples and the weight ladder
+       principles — the brand's own stated principles (delete the whole
+                    region when the source states none)
+       lockups    — mark + wordmark, split-weight, accent (delete the
+                    split-weight tile for a single-word brand)
+       foot       — the left-hand file line (the colophon on the right is
+                    chrome: the `credit` answer decides it, nothing else)
+     Named edit points outside the fences:
+       <title> in <head>, and html lang
+       the Google Fonts <link> slot in <head> (one line: paste the link from
+       brand/design.md, or delete the slot when the faces are system-only)
+       the :root token block — every value is a slot; fill it from the
+       design.md token table on the same names, nothing else changes
+     Everything else is load-bearing: the print trio, the page geometry, the
+     section chrome. Copy this file with cp, fill the slots, and never ship a
+     bracketed slot — a grep for an opening square bracket on the finished
+     file must come back empty. Contract: references/brand-extraction.md. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[BRAND NAME] — Brand book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- fonts: replace this comment with the exact Google Fonts <link> line from
+     brand/design.md, e.g.
+     <link href="https://fonts.googleapis.com/css2?family=[DISPLAY+FAMILY]:wght@400;700&family=[BODY+FAMILY]:wght@400;600&display=swap" rel="stylesheet">
+     Delete the comment instead when every face is a system font. The PDF
+     assertion in brand-extraction.md checks the families actually embedded. -->
+<style>
+/* =====================================================================
+   TOKENS — the shared schema (references/brand-extraction.md). Every value
+   here is a slot: the neutral defaults are stand-ins so the skeleton opens,
+   not a palette. Fill from brand/design.md on the same names.
+   ===================================================================== */
+:root {
+  --accent:     #1a1a1a;   /* [ACCENT — design.md --accent] */
+  --accent-on:  #ffffff;   /* [INK ON ACCENT — design.md --accent-on] */
+  --accent-2:   #6b6b6b;   /* [SECONDARY — design.md --accent-2, or delete its swatch] */
+  --accent-3:   #b3b3b3;   /* [TERTIARY — design.md --accent-3, or delete its swatch] */
+  --bg:         #ffffff;   /* [GROUND — design.md --bg] */
+  --surface:    #f4f4f4;   /* [SURFACE — design.md --surface] */
+  --fg:         #111111;   /* [INK — design.md --fg] */
+  --muted:      #6b6b6b;   /* [MUTED INK — design.md --muted] */
+  --border:     #d9d9d9;   /* [HAIRLINE — design.md --border] */
+  --radius:     6px;       /* [RADIUS — design.md --radius, or keep] */
+  --font-display: system-ui, -apple-system, "Segoe UI", sans-serif;   /* [DISPLAY FACE — design.md --font-display] */
+  --font-body:    system-ui, -apple-system, "Segoe UI", sans-serif;   /* [BODY FACE — design.md --font-body] */
+  --font-mono:    ui-monospace, "SF Mono", Menlo, Consolas, monospace; /* [MONO FACE — design.md --font-mono, or keep] */
+}
+
+/* =====================================================================
+   PRINT TRIO — A4, no printer margin, exact colours, a fixed-millimetre page.
+   overflow is VISIBLE on purpose: content that does not fit spills onto a
+   second PDF page, which the page-count assertion catches. Never clip it.
+   ===================================================================== */
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+html, body { margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); }
+.page {
+  width: 210mm; height: 297mm;
+  padding: 16mm 15mm 12mm;
+  background: var(--bg); color: var(--fg);
+  display: flex; flex-direction: column; gap: 6mm;
+  position: relative; overflow: visible;
+}
+/* on screen the sheet sits on a grey desk; print sees none of this */
+@media screen {
+  body { background: #e6e6e6; padding: 10mm 0; }
+  .page { margin: 0 auto; box-shadow: 0 2mm 8mm rgba(0, 0, 0, 0.18); }
+}
+@media print {
+  body { background: var(--bg); padding: 0; }
+  .page { margin: 0; box-shadow: none; page-break-after: avoid; }
+}
+
+/* ---- shared ---------------------------------------------------------- */
+/* Section labels wear the accent as a short bar, never as text: a brand whose
+   accent fails contrast on its own ground (the design.md table says which)
+   would otherwise make its own book illegible at 8.5px. */
+.label { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin: 0 0 2.2mm; display: flex; align-items: center; gap: 2mm; }
+.label::before { content: ""; display: inline-block; width: 4mm; height: 2px; background: var(--accent); flex: 0 0 auto; }
+.card { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 5mm; }
+.mono { font-family: var(--font-mono); }
+.muted { color: var(--muted); }
+a { color: inherit; }
+
+/* ---- head ------------------------------------------------------------ */
+.head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10mm; }
+.brand { display: flex; align-items: center; gap: 5mm; min-width: 0; }
+.mark { width: 22mm; height: 22mm; flex: 0 0 auto; display: flex; align-items: center; justify-content: center; color: var(--fg); }
+.mark svg { width: 100%; height: 100%; }
+/* the labelled placeholder a raster or missing mark leaves behind — never a redrawing */
+.mark-slot { width: 100%; height: 100%; border: 1px dashed var(--border); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.1em; color: var(--muted); text-align: center; padding: 2mm; }
+.brand h1 { margin: 0; font-family: var(--font-display); font-size: 26px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.05; }
+.brand .tagline { margin: 1.5mm 0 0; font-size: 11px; color: var(--muted); line-height: 1.35; }
+.meta { text-align: right; font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); line-height: 1.7; flex: 0 0 auto; }
+.meta .tag { color: var(--fg); }
+
+/* ---- colours --------------------------------------------------------- */
+.swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; }
+.swatch { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
+.swatch .fill { height: 22mm; }
+.swatch .info { padding: 2.5mm 3mm 3mm; }
+.swatch .role { display: block; font-size: 10.5px; font-weight: 700; }
+.swatch .hex { display: block; font-family: var(--font-mono); font-size: 9px; color: var(--muted); margin-top: 0.8mm; }
+.swatch .use { display: block; font-size: 9px; color: var(--muted); line-height: 1.35; margin-top: 1.2mm; }
+.roles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3mm; margin-top: 3mm; }
+.chip { display: flex; align-items: center; gap: 2.5mm; border: 1px solid var(--border); border-radius: var(--radius); padding: 2mm 2.5mm; background: var(--surface); min-width: 0; }
+.chip .dot { width: 7mm; height: 7mm; border-radius: 2mm; border: 1px solid var(--border); flex: 0 0 auto; }
+.chip .name { display: block; font-size: 9px; font-weight: 700; white-space: nowrap; }
+.chip .hex { display: block; font-family: var(--font-mono); font-size: 8px; color: var(--muted); }
+
+/* ---- typography ------------------------------------------------------ */
+.twocol { display: grid; grid-template-columns: 1.25fr 1fr; gap: 5mm; align-items: stretch; }
+.type-display { margin: 0; font-family: var(--font-display); font-size: 30px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.02; }
+.type-body { margin: 3mm 0 0; font-size: 10.5px; line-height: 1.5; color: var(--fg); }
+.type-mono { display: block; margin-top: 3mm; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.06em; color: var(--muted); }
+.type-note { margin: 3mm 0 0; font-size: 8.5px; color: var(--muted); line-height: 1.4; }
+.ladder { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.2mm; }
+.ladder li { display: flex; align-items: baseline; justify-content: space-between; gap: 3mm; border-bottom: 1px solid var(--border); padding-bottom: 1.2mm; }
+.ladder .sample { font-family: var(--font-display); font-size: 15px; line-height: 1.1; }
+.ladder .wt { font-family: var(--font-mono); font-size: 8px; color: var(--muted); letter-spacing: 0.1em; }
+
+/* ---- principles ------------------------------------------------------ */
+.principles ol { margin: 0; padding: 0 0 0 5mm; font-size: 9.5px; line-height: 1.5; color: var(--fg); }
+.principles li { padding-left: 1mm; margin-bottom: 1mm; }
+.principles li::marker { color: var(--muted); font-family: var(--font-mono); font-size: 8.5px; }
+.principles b { font-weight: 700; }
+
+/* ---- lockups --------------------------------------------------------- */
+.lockups { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; }
+.lockups.two { grid-template-columns: repeat(2, 1fr); }
+.wm { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 5mm; min-height: 27mm; display: flex; flex-direction: column; gap: 2mm; }
+.wm .lockup { display: flex; align-items: center; gap: 3mm; flex: 1 0 auto; }
+.wm .lockup svg, .wm .lockup .mark-slot { width: 9mm; height: 9mm; }
+.wm .name { font-family: var(--font-display); font-weight: 800; font-size: 17px; letter-spacing: 0.02em; line-height: 1; color: var(--fg); }
+.wm .name .lo { font-weight: 300; color: var(--muted); }
+.wm .name .ac { color: var(--accent); }
+.wm .note { margin: 0; font-size: 8.5px; color: var(--muted); line-height: 1.4; }
+.wm .kind { font-family: var(--font-mono); font-size: 7.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-top: auto; }
+
+/* ---- foot ------------------------------------------------------------ */
+.foot { margin-top: auto; padding-top: 3mm; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: baseline; gap: 6mm; font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.foot a { text-decoration: none; border-bottom: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- LISA:CONTENT-START head -->
+  <header class="head">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">
+        <!-- mark: paste the sanitised inline SVG from brand/design.md here,
+             replacing the .mark-slot span. No SVG? Keep the span — it is the
+             labelled placeholder — and say so in the handover. Never redraw. -->
+        <span class="mark-slot">[MARK — SVG PENDING]</span>
+      </div>
+      <div>
+        <h1>[BRAND NAME]</h1>
+        <p class="tagline">[TAGLINE — only if the source states one; delete this line otherwise]</p>
+      </div>
+    </div>
+    <div class="meta">
+      Brand book · v1 · [YYYY-MM-DD]<br>
+      <span class="tag">[SOURCE — the URL, screenshot or file it was read from]</span>
+    </div>
+  </header>
+  <!-- LISA:CONTENT-END head -->
+
+  <!-- LISA:CONTENT-START colours -->
+  <section>
+    <p class="label">Colour</p>
+    <div class="swatches">
+      <div class="swatch"><div class="fill" style="background: var(--accent)"></div>
+        <div class="info"><span class="role">Primary</span><span class="hex">[ACCENT HEX] · [fact | approx]</span><span class="use">[Where the brand uses it — buttons, links, the mark]</span></div></div>
+      <!-- delete a swatch the design.md has no token for; two swatches is fine -->
+      <div class="swatch"><div class="fill" style="background: var(--accent-2)"></div>
+        <div class="info"><span class="role">Secondary</span><span class="hex">[ACCENT-2 HEX] · [fact | approx]</span><span class="use">[Its role]</span></div></div>
+      <div class="swatch"><div class="fill" style="background: var(--accent-3)"></div>
+        <div class="info"><span class="role">Tertiary</span><span class="hex">[ACCENT-3 HEX] · [fact | approx]</span><span class="use">[Its role]</span></div></div>
+    </div>
+    <div class="roles">
+      <div class="chip"><span class="dot" style="background: var(--bg)"></span><span><span class="name">Ground</span><span class="hex">[BG HEX]</span></span></div>
+      <div class="chip"><span class="dot" style="background: var(--surface)"></span><span><span class="name">Surface</span><span class="hex">[SURFACE HEX]</span></span></div>
+      <div class="chip"><span class="dot" style="background: var(--fg)"></span><span><span class="name">Ink</span><span class="hex">[FG HEX]</span></span></div>
+      <div class="chip"><span class="dot" style="background: var(--muted)"></span><span><span class="name">Muted</span><span class="hex">[MUTED HEX]</span></span></div>
+      <div class="chip"><span class="dot" style="background: var(--border)"></span><span><span class="name">Hairline</span><span class="hex">[BORDER HEX]</span></span></div>
+    </div>
+  </section>
+  <!-- LISA:CONTENT-END colours -->
+
+  <!-- LISA:CONTENT-START typography -->
+  <section>
+    <p class="label">Typography</p>
+    <div class="twocol">
+      <div class="card">
+        <p class="type-display">[DISPLAY SAMPLE —<br>two short lines]</p>
+        <p class="type-body">[BODY SAMPLE — two or three sentences in the body face, long enough to show its rhythm at reading size. Say what the face is and where the brand uses it.]</p>
+        <span class="type-mono">[MONO FAMILY] · labels · codes · [DELETE THIS LINE IF THE BRAND HAS NO MONO FACE]</span>
+        <p class="type-note">[DISPLAY FAMILY] for display · [BODY FAMILY] for body · [fact | approx — nearest Google Fonts face to X]</p>
+      </div>
+      <div class="card">
+        <!-- weight ladder: keep only the weights the Google Fonts <link> loads.
+             A weight the link does not carry renders synthesised, and the
+             ladder would then show a face the brand does not own. -->
+        <ul class="ladder">
+          <li><span class="sample" style="font-weight: 300">[Aa Sample]</span><span class="wt">300 · LIGHT</span></li>
+          <li><span class="sample" style="font-weight: 400">[Aa Sample]</span><span class="wt">400 · REGULAR</span></li>
+          <li><span class="sample" style="font-weight: 500">[Aa Sample]</span><span class="wt">500 · MEDIUM</span></li>
+          <li><span class="sample" style="font-weight: 600">[Aa Sample]</span><span class="wt">600 · SEMIBOLD</span></li>
+          <li><span class="sample" style="font-weight: 700">[Aa Sample]</span><span class="wt">700 · BOLD</span></li>
+          <li><span class="sample" style="font-weight: 800">[Aa Sample]</span><span class="wt">800 · EXTRABOLD</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <!-- LISA:CONTENT-END typography -->
+
+  <!-- LISA:CONTENT-START principles -->
+  <!-- principles: ONLY the brand's own, stated in the source (an about page,
+       a manifesto, a design page). None stated? Delete this whole region,
+       fences included — the page closes up and stays one A4. -->
+  <section class="principles">
+    <p class="label">Principles</p>
+    <div class="card">
+      <ol>
+        <li><b>[PRINCIPLE 1]</b> — [one line, in the brand's own words]</li>
+        <li><b>[PRINCIPLE 2]</b> — [one line]</li>
+        <li><b>[PRINCIPLE 3]</b> — [one line]</li>
+        <li><b>[PRINCIPLE 4]</b> — [one line — three to six in all, never more]</li>
+      </ol>
+    </div>
+  </section>
+  <!-- LISA:CONTENT-END principles -->
+
+  <!-- LISA:CONTENT-START lockups -->
+  <section>
+    <p class="label">Wordmark · Lockups</p>
+    <!-- a single-word brand does not need the split-weight tile: delete it and
+         add class="two" to .lockups so the remaining pair fills the row. The
+         accent lockup sets text in --accent on --surface: when the design.md
+         contrast table fails that pair at 3:1, delete this tile as well — a
+         treatment the brand cannot read is not a treatment. -->
+    <div class="lockups">
+      <div class="wm">
+        <div class="lockup"><span class="mark-slot" aria-hidden="true">[MARK]</span><span class="name">[BRAND NAME]</span></div>
+        <p class="note">[When this lockup is used — the default treatment beside the mark]</p>
+        <span class="kind">Mark + wordmark</span>
+      </div>
+      <div class="wm">
+        <div class="lockup"><span class="name">[PART ONE]<span class="lo">[PART TWO]</span></span></div>
+        <p class="note">[When the split-weight treatment is used — a group or umbrella name]</p>
+        <span class="kind">Split weight</span>
+      </div>
+      <div class="wm">
+        <div class="lockup"><span class="name"><span class="ac">[PART ONE]</span>[PART TWO]</span></div>
+        <p class="note">[When the accent treatment is used — a studio or a sub-brand]</p>
+        <span class="kind">Accent lockup</span>
+      </div>
+    </div>
+  </section>
+  <!-- LISA:CONTENT-END lockups -->
+
+  <footer class="foot">
+    <!-- LISA:CONTENT-START foot -->
+    <span>[BRAND NAME] · brand/design.md · v1 · [YYYY-MM-DD]</span>
+    <!-- LISA:CONTENT-END foot -->
+    <!-- credit: the maker's colophon. Ships by default; remove this one
+         span (only) when the intake answered `credit: false`. -->
+    <span>Made with <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer">Hi Ted, Meet Lisa</a></span>
+  </footer>
+
+</div>
+</body>
+</html>
