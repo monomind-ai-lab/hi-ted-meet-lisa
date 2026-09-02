@@ -39,6 +39,13 @@ jobs:
       - name: Install Chrome for the rendered checks
         id: setup-chrome
         uses: browser-actions/setup-chrome@v1
+        with:
+          # Pin the stable release. The action's default channel installs a
+          # raw chromium *snapshot* build (untested, straight off the CI
+          # bots) — one of those hung indefinitely on every page load here,
+          # which cost three rounds of CI archaeology. Stable is the same
+          # release train the checks are verified against locally.
+          chrome-version: stable
 
       - name: Check every template for rendered horizontal overflow
         # Renders each first-party template at 1280/2000/375 (walking hash
