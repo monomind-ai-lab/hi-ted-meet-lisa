@@ -23,6 +23,22 @@ Every snippet below is lifted verbatim from the reference deck, so the markup
 is known-good. Compose slides from these; do not invent new class names — the
 stylesheet in the template is the whole design system.
 
+## Two gotchas (all templates)
+
+- **Never show or hide a slide by toggling `display`.** Every template already
+  has a mechanism — the MonoMind deck scrolls a snap track, `evidence-deck` and
+  `paper-brief` scroll one and add `.visible`, the hash-routed documents set
+  `.page.active`, `mermaid-master` sets `.slide.active` — and
+  `window.__deckGo(i)` is how to move. A hand-rolled `.slide { display: none }`
+  / `.active { display: block }` breaks the moment the same element also
+  carries a layout rule: a `display: flex` or `display: grid` later in the
+  cascade wins at equal specificity, and every slide shows at once, stacked
+  down the page.
+- **Never write `-clamp()`, `-min()` or `-max()`.** A minus in front of a CSS
+  math function is not negation; the declaration is invalid and silently
+  discarded, and the property falls back to whatever it inherits — a margin of
+  0 where you wanted a pull. Write `calc(-1 * clamp(…))`.
+
 ## Slide anatomy
 
 ```
