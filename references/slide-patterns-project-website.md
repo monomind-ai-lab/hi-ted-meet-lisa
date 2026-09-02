@@ -4,6 +4,12 @@ Markup for `assets/tedandlisa-template-project-website.html`. Every snippet is
 lifted from the skeleton, so it is known-good. Compose from these; do not invent
 class names.
 
+**Density — a `site` template.** Skimmed before it is read: the hero makes one
+promise, a band holds three to six items (the card grid, the pillars, the
+six-step track), a page runs to a few bands, and prose is capped at
+`--maxw-prose` on the docs page. Four to eight items is fine at desk
+distance; a band that needs more is two bands or a table.
+
 This template is a **website**, not a deck and not a single page: several pages
 are hash-routed behind a sticky nav, each page scrolls, one footer is shared by
 all of them, and both languages are written into the file rather than translated
@@ -355,6 +361,16 @@ Two measured facts to carry forward:
 the Korean half a face. Nothing else loads from the network: no diagram runtime,
 no CDN, no analytics. With no network the type falls back to the system stack
 and everything else still works.
+
+## When unsure, default to
+
+- **A page:** `.section` > `.container` > `.sec-head`.
+- **A set of things:** `.item-card`s in `.cards-grid`, one `--h` each.
+- **A process:** `.lifecycle` when it is six steps; `.steps` otherwise.
+- **A comparison:** `.tblwrap` + `.tbl`, with a real `.pill-no`.
+- **A named thing and a line about it:** `.person-card`; an aside: `.callout`.
+- **A command:** `.cmd` with all three `data-copy-*` attributes.
+- **History:** `.releases`, one `is-current`.
 
 ## Known gaps
 

@@ -1,5 +1,13 @@
 # Hi Ted, Meet Lisa — component reference
 
+Markup for `assets/tedandlisa-template.html` — the MonoMind deck, `monomind-deck`
+in the registry.
+
+**Density — a `present` template.** One idea per slide, and one to three
+bullets where bullets are needed at all; a component says it better than a
+paragraph. Every size has to read from across a room, so body text never
+falls below the template's base size — a slide that needs more is two slides.
+
 ## Content fences (all templates)
 
 Every template's editable content is fenced by paired
@@ -183,6 +191,20 @@ Translate leaves it alone — "Made with" is meant to translate.
 <p class="deck-colophon">Made with
   <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer"><span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></a></p>
 ```
+
+## When unsure, default to
+
+- **A text slide:** the statement in `h2.h-md` and one `p.lead`; leave the
+  canvas empty.
+- **A set of named things:** `.qcard`s in `.grid-3` — four fit `.grid-4`, five
+  is two slides.
+- **Files or records:** `.dg-leader-row`s; a hierarchy: `.dg-treeview`; names
+  as objects: `.dg-chip-row`.
+- **A comparison:** `.tbl` with a `td.k` key column, inside `.dg-frame.is-accent`
+  when it needs an edge.
+- **A sequence:** `.dg-step` rows; phases that each hold steps: `.wf-row`.
+- **A command or prompt:** `p.code`.
+- **One line to remember:** `.dg-loop`, once per slide.
 
 ## Known gaps
 

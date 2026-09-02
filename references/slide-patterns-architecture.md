@@ -4,6 +4,11 @@ Markup for `assets/tedandlisa-template-architecture.html`. One page, one
 drawing, plus legend cards. Use it when the deliverable is a system diagram
 someone will read closely and paste into a review — not a talk.
 
+**Density — a `diagram` template.** One drawing per page, read closely and
+pasted into a review; the density lives in the drawing, so the prose is a
+title, a lead, and the legend cards. Label every node; two nested boundaries
+are readable, four are wallpaper.
+
 The visual system is derived from the Architecture Diagram Generator by Cocoon
 AI (MIT, see `NOTICE`): slate ground, a faint grid field, JetBrains Mono
 throughout, and **colour that means something**. The MonoMind chrome — the mark,
@@ -112,6 +117,15 @@ before it belongs to the logo answer, not to this one.
 ## Dependencies
 
 Google Fonts only. Everything else is inline.
+
+## When unsure, default to
+
+- **A node's class:** `backend` for what you run, `generic` for what you do
+  not — the class, never a fill.
+- **A link:** a solid orthogonal `L` path; `.dashed` for one meaning per
+  diagram, named in a legend card.
+- **A boundary:** one; two at most.
+- **A legend:** one card per family the drawing uses.
 
 ## Known gaps
 

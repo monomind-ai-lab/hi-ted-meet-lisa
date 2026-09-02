@@ -5,6 +5,11 @@ scroll-snap deck for an argument made out of measurements: tables that flag
 their own bad rows, stat rows, one number at display size, and a bar of orange
 that says what to do about it.
 
+**Density — a `present` template.** One idea per slide, and one to three
+bullets where bullets are needed at all; a component says it better than a
+paragraph. Every size has to read from across a room, so body text never
+falls below the template's base size — a slide that needs more is two slides.
+
 Use it when the deck's job is to make a case from data someone will push back
 on. Use `monomind-deck` when the job is a talk, and `web-document` when the
 reader will link to it rather than sit through it.
@@ -372,6 +377,17 @@ families; Noto Sans KR is the expensive one.
 
 There is no print stylesheet. A scroll-snap deck of `100dvh` sections prints as
 one slide per page only by accident.
+
+## When unsure, default to
+
+- **A text slide:** `.eyebrow` + the claim in `h2` + one `.body` paragraph.
+- **One number:** `.mega` with its `.mega-note`; several: `.statrow` of four;
+  two compared: `.split`.
+- **Evidence:** `table.data` with exactly one `tr.flag`.
+- **A new part of the argument:** `.section-card`, once per section.
+- **An ending:** `.verdict`, one per slide at most.
+- **Requirements:** `.specs`; questions: `.pts`.
+- **Emphasis:** `hl`; `sig` only for the alarming part.
 
 ## Known gaps
 

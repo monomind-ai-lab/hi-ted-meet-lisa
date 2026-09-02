@@ -5,6 +5,11 @@ Markup for `assets/tedandlisa-template-mermaid-master.html`. This template is
 footer below. If a slide has no diagram, it probably belongs in a different
 template.
 
+**Density — a `diagram` template.** One drawing per slide, read closely; the
+density lives in the drawing, so the prose beside it is a title and one
+subtitle. Label every node, and a drawing that wants a second title is two
+slides.
+
 Three things make it unlike the other two:
 
 - **Light paper**, not dark. `--paper: #f5f5f5`, `--ink: #2d3142`, one orange
@@ -108,6 +113,15 @@ ships by default; remove the `<a>` (only) when the intake answered
 
 Google Fonts only. Everything else is inline, so the file works offline and
 survives being emailed.
+
+## When unsure, default to
+
+- **A slide:** one diagram, a title, a subtitle — and no diagram means a
+  different template.
+- **The first thing to open:** `.card.focal` on the index, once.
+- **A connector:** solid and orthogonal with `url(#arrow)`; dashed for a return
+  path, and say so in a legend.
+- **A label:** a `<text>` element, never baked into a path.
 
 ## Known gaps
 

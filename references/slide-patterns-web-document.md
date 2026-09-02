@@ -4,6 +4,11 @@ Markup for `assets/tedandlisa-template-web-document.html`. Every snippet is
 lifted from a shipped document, so it is known-good. Compose from these; do not
 invent class names.
 
+**Density — a `read` template.** Read at desk distance, so four to eight
+items on a page or in a section is fine — a table of eight rows, a grid of
+six cards, a checklist of eight. One argument per page rather than one idea:
+the eye scans, returns, and links to it.
+
 This template is a **document**, not a slide deck: pages are hash-routed, each
 page scrolls, and both languages are written into the file rather than
 translated at read time.
@@ -165,6 +170,16 @@ like every other reader-visible string. It ships by default; remove the `<a>`
 Google Fonts, and **mermaid from a CDN**. Unlike the MonoMind deck, this
 template is not fully self-contained: with no network, diagrams do not render
 and the rest of the document still does. Say so when handing a file over.
+
+## When unsure, default to
+
+- **A page:** the shell — `.band` > `.wrap` with an eyebrow, `h2.sec` and a
+  `.lede`.
+- **A set of things:** `.fcard`s in `.grid3`; `.tcard` when they are small.
+- **A comparison:** `.tblwrap` + `.tbl`.
+- **A diagram:** a mermaid `.fig`, `flowchart LR`, colour only through named
+  `classDef`s.
+- **A decision:** `.decision` + `.chk`; a page with anchors: `.toc`.
 
 ## Known gaps
 

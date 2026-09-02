@@ -4,6 +4,11 @@ Markup for `assets/tedandlisa-template-sitemap-ia.html`. Every snippet is
 lifted from a shipped document, so it is known-good. Compose from these; do not
 invent class names.
 
+**Density — a `read` template.** Read at desk distance, so four to eight
+items on a page or in a section is fine — a table of eight rows, a grid of
+six cards, a checklist of eight. One argument per page rather than one idea:
+the eye scans, returns, and links to it.
+
 This template is a **document**, not a slide deck: pages are hash-routed, each
 page scrolls, and both languages are written into the file rather than
 translated at read time. What separates it from `web-document` is the last
@@ -197,6 +202,14 @@ Google Fonts and mermaid from a CDN for the document; Font Awesome and Tailwind
 from a CDN for the prototype. The `delivery: standalone` intake answer replaces
 all four with inlined copies — subset the webfonts to the glyphs the document
 actually uses, or Noto Sans TC alone runs to several megabytes.
+
+## When unsure, default to
+
+- **Credibility:** `.statrow` with real counts — or delete the row.
+- **The diagnosis:** `.tbl` with phasing pills.
+- **The structure:** a mermaid `.fig`, `flowchart TD`, every label quoted.
+- **The proof:** the `.mmfig` prototype, both cards.
+- **The contested calls:** a decision record plus `.chk` open questions.
 
 ## Known gaps
 
