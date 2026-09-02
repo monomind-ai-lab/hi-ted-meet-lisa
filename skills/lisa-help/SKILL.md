@@ -31,7 +31,13 @@ as they are.
   <https://html.monomind.one/intake>. The last step hands you a block of text
   to paste back into the conversation. Same payload either way.
 
-Nine to sixteen questions depending on the template, every one with a default.
+Fourteen to twenty-six questions depending on the template, every one with a default.
+
+The first asking screen after the template, **Grounds**, is the communication
+contract: who it is for, what it must accomplish, what they should walk away
+with, the one thing that must land, how it will be used, what happens to it
+afterwards, and how freely the source may be reshaped — every one defaulted,
+so it can be clicked straight through, and the build reads it before writing.
 
 ## The Preferences screen
 
