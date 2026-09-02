@@ -275,6 +275,33 @@ class ApplyDetails(unittest.TestCase):
                   for c in re.finditer(r"<!--.*?-->", out, re.S)]
         self.assertFalse(any(s <= m.start() < e for s, e in cspans))
 
+    def test_style_brand_is_reported_with_the_extraction_hint(self):
+        # `style: brand` is never mechanical: the file is left alone, the
+        # row is NOT-MECHANICAL, and the detail names the skill to run first.
+        dst = self._copy("web-document")
+        before = dst.read_bytes()
+        a = self._answers({"template": "web-document",
+                           "style": {"mode": "brand", "designFile": None,
+                                     "notes": None,
+                                     "url": "https://example.com", "file": None}})
+        proc = run_apply(a, dst)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(before, dst.read_bytes())
+        line = [l for l in proc.stdout.splitlines() if l.strip().startswith("style")]
+        self.assertEqual(len(line), 1, proc.stdout)
+        self.assertIn("NOT-MECHANICAL", line[0])
+        self.assertIn("/lisa-brand", line[0])
+        self.assertIn("designmd", line[0])
+        # the other modes keep the plain detail — no hint to follow
+        a2 = self._answers({"template": "web-document",
+                            "style": {"mode": "designmd", "designFile": None,
+                                      "notes": None, "url": None, "file": None}})
+        proc2 = run_apply(a2, dst)
+        self.assertEqual(proc2.returncode, 0, proc2.stderr)
+        line2 = [l for l in proc2.stdout.splitlines() if l.strip().startswith("style")]
+        self.assertIn("NOT-MECHANICAL", line2[0])
+        self.assertNotIn("/lisa-brand", line2[0])
+
     def test_dry_run_leaves_file_untouched(self):
         dst = self._copy("monomind-deck")
         before = dst.read_bytes()

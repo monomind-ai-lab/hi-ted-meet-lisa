@@ -136,8 +136,11 @@ The prompt carries the brief. Everything else comes from the intake panel.
    `NOT-MECHANICAL` rows and any `SKIPPED` row not already in the asked-for
    state, per `references/applying-answers.md` — the authority for what each
    answer means, and, on the no-shell route, the table to apply entirely by
-   hand. Every question asked always arrives answered; a missing key is a
-   malformed payload, not permission to guess.
+   hand. `style: brand` is the one `NOT-MECHANICAL` row with a prerequisite:
+   run `/lisa-brand` on the payload's `style.url` / `style.file` first
+   (`skills/lisa-brand/SKILL.md`), then apply its `brand/design.md` exactly
+   as `style: designmd`. Every question asked always arrives answered; a
+   missing key is a malformed payload, not permission to guess.
 
 8. **Verify** — checklist below. Count the language controls against the
    `languages` answer by hand: content nobody can reach is the same as not
@@ -233,5 +236,8 @@ branding — see `skills/lisa-design/SKILL.md`.
 | `skills/lisa-design/` | The wrapper for the vendored Slides AI pipeline. |
 | `skills/lisa-new-template/` | Turns a finished HTML file into a template. |
 | `skills/lisa-help/` | The utility explainer, `/lisa-help`. |
+| `skills/lisa-brand/` | Reads a brand into a `design.md` and an A4 brand book, `/lisa-brand`; also what `style: brand` runs. |
+| `references/brand-extraction.md` | The brand contract: `design.md` shape, extraction rules, and the per-template token mapping. |
+| `assets/lisa-brand-book-a4.html` | The A4 brand-book skeleton `/lisa-brand` copies. |
 | `vendor/slides-ai-plugin/` | Slides AI Plugin, MIT, vendored verbatim — see its `VENDORED.md`. |
 | `.agents/skills/impeccable/` | Bundled Impeccable, Apache 2.0, unmodified — see its `VENDORED.md`. |
