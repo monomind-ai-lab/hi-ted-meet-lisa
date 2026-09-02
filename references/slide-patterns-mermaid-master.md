@@ -18,7 +18,7 @@ Three things make it unlike the other two:
 - **Fully self-contained.** Diagrams are inline SVG, already rendered — there is
   no mermaid runtime and no CDN. Export from mermaid, then paste the SVG in.
 - **Bilingual by parallel slides.** Every slide exists twice, `s-en-NN` and
-  `s-zh-NN`, so even the text inside a diagram is translated.
+  `s-ko-NN`, so even the text inside a diagram is translated.
 
 ## The three registers that must agree
 
@@ -28,10 +28,10 @@ slide, check all three:
 | Register | Where | What it holds |
 | --- | --- | --- |
 | `ROUTES` | script at the foot | `["01", "02", …]` in order |
-| `TITLES` | script at the foot | `{en: [...], zh: [...]}` — **index title first**, then one per route |
-| Sections | markup | `s-en-NN` **and** `s-zh-NN` for every route |
+| `TITLES` | script at the foot | `{en: [...], ko: [...]}` — **index title first**, then one per route |
+| Sections | markup | `s-en-NN` **and** `s-ko-NN` for every route |
 
-A route with no `s-zh-NN` falls back to the index when a reader switches
+A route with no `s-ko-NN` falls back to the index when a reader switches
 language, which looks like the deck losing their place.
 
 ## Slide
@@ -83,11 +83,11 @@ Index cards link by hash (`#en/01`), so they keep working in the saved file.
 - **Draw arrows before nodes.** SVG has no z-index; paint order is document
   order, so connectors drawn last cut across the boxes.
 - **Every label is a `<text>` element**, never text baked into a path or image —
-  the Chinese copy of the slide has to be able to say something different.
+  the Korean copy of the slide has to be able to say something different.
 - **Palette**: nodes `#ffffff` on `rgba(45,49,66,0.12)` rule; the one focal node
   gets `rgba(235,108,54,0.08)` on `#eb6c36`. Body text `#2d3142`, secondary
   `#7a8399`.
-- Slides with `data-lang="zh"` re-font SVG text to Noto Sans TC automatically.
+- Slides with `data-lang="ko"` re-font SVG text to Noto Sans KR automatically.
 
 ## Chrome — do not rewrite
 
@@ -131,12 +131,15 @@ Evidenced, not imagined — each line names its record.
   enforces it** (`D-010`; `CLAUDE.md`). A route with no section in the other
   language falls back to the index, which looks like the deck losing the
   reader's place.
-- **Two stylesheet rules still name the old language.** The template ships
-  Korean since `D-010` (`s-ko-NN`, `TITLES.ko`, Noto Sans KR in the head),
-  but `#s-en-index h1, #s-zh-index h1` and the matching `.subtitle` rule
-  target `#s-zh-index`, so the index heading and subtitle sizes do not apply
-  to the Korean index. This reference's own examples (`s-zh-NN`, "the
-  Chinese copy", Noto Sans TC) lag the same rename.
+- **The Korean index has no counterpart to the English index's sizing.**
+  `#s-en-index h1` (2.5rem) and `#s-en-index .subtitle` (Instrument Serif
+  italic, 1.05rem) apply to English only; the Korean index renders at the
+  slide defaults — measured 30.4px against 40px, and Geist 14.4px upright
+  against the italic 16.8px. The dead `#s-zh-index` halves of those two
+  selectors, left over from the `D-010` rename, and this reference's stale
+  `s-zh` / Noto Sans TC examples were fixed in the same change that added
+  this section; whether the Korean index should share the English sizing is
+  a design call not taken here.
 - **Diagram labels sit at fixed `x`/`y`**, and a Korean label longer than its
   English twin overruns its node. The rendered gate skips SVG outright
   (`scripts/check_overflow.py`), so only reading both slide sets catches it.
