@@ -38,6 +38,7 @@ call the agent always does), with the exceptions noted inline.
 | `style: default` | [agent] | Change nothing. |
 | `style: designmd` | [agent] | Read the supplied `design.md` and apply it to the token block, not to individual rules. Report any rule you could not honour. |
 | `style: prompt` | [agent] | Apply `style.notes` the same way — through the tokens. |
+| `style` asks for fonts | [agent] | A font change is **two edits, both required**: repoint the template's font tokens (`--font-display`, `--font-body`, `--font-mono` in the MonoMind deck; other templates name theirs differently) *and* update the Google Fonts `<link>` in the head. The link is chrome outside the fences, and this is the one sanctioned reason to touch it. Changing only the tokens is the silent failure: the requested face never loads and the fallback renders with no error. Keep a real fallback stack after the new family — never a bare name. Interactions below the table. |
 | `accent` | [script] | `default` keeps the template's own accent. A hex value is repointed through the accent tokens only — never per element — with derived shades computed by channel math, so the design review re-checks contrast. On `architecture` the script deliberately does **not** apply it: that template's colour is semantic, and the report says so — the agent states in the handover that the accent was not honoured rather than silently repainting meaning. |
 | `elements` | [agent] | Every named component must actually appear. If the content gives one nothing to say, say so rather than inventing filler for it. |
 | `languages` | [script] on `monomind-deck`; [agent] everywhere else | Trim or extend the language switch to exactly this set. English always stays — and when English is *all* that is left, delete the switch, the `#google_translate_element` div and the translate script entirely, not just the surplus buttons; a one-language switch is a control that does nothing. The script does all of this on the MonoMind deck. On every other template each language is written inline, so trimming or adding one is content work — the script reports it `NOT-MECHANICAL`. Never infer a language from the subject: a deck *about* a Taiwanese client is not a request for Chinese. Only this answer decides. |
@@ -63,6 +64,19 @@ call the agent always does), with the exceptions noted inline.
 | `credit: true` or absent | [script] | Keep the colophon — the "Made with Hi Ted, Meet Lisa" line every template carries in its footer or closing slide, linking to html.monomind.one. Each pattern reference shows the exact markup. |
 | `credit: false` | [script] | Delete that one line only. The brand mark and any identity links stay — they belong to the `logo` answer, not this one. |
 | `review` | [agent] | No file transform at all — the script ignores it by design. It schedules when the design pass runs relative to handover; see `references/design-review.md`. |
+
+**Fonts a `design.md` or `style.notes` requests.** The scaffold rule — never
+a font the template does not load — forbids *inventing* fonts for new
+components; it does not forbid a face the user's `design.md` asked for,
+because after the swap above the template does load it. Two answers interact.
+`delivery: standalone` inlines the new family, so it must be subset per that
+row (Google Fonts' `text=` parameter; a CJK family is several megabytes
+unsubsetted) — and subsetting has an honest cost to state in the handover:
+glyphs typed into the file after the build are not in the subset and fall
+back. On `monomind-deck`, if the new family's name could read as a
+translatable word, add it to the `TERMS` protection list in the
+language-switch script — the same class of failure that turned "MIT" into the
+university.
 
 After applying them, re-run the verification checklist in
 `skills/lisa/SKILL.md`: these edits touch chrome, which is exactly what the

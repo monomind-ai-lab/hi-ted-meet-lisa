@@ -165,7 +165,9 @@ checks running. It is the difference between waiting and wondering.
 
 Extend a template freely — new components, new slide shapes — under two rules.
 **Build in the template's system**: its design tokens, never a raw hex value,
-a font it does not load, or a spacing value outside its scale. **Do not
+a font it does not load (a font a `design.md` requests is loaded first — font
+tokens *and* the Google Fonts `<link>`, per `references/applying-answers.md` —
+then used), or a spacing value outside its scale. **Do not
 rewrite the load-bearing machinery**: script block 1 in the MonoMind deck, the
 hash router and diagram viewer in the web document. Add a new script block
 instead, reuse `window.__deckGo(i)` rather than writing scroll code, and if
