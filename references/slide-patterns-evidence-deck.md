@@ -372,3 +372,29 @@ families; Noto Sans KR is the expensive one.
 
 There is no print stylesheet. A scroll-snap deck of `100dvh` sections prints as
 one slide per page only by accident.
+
+## Known gaps
+
+Evidenced, not imagined — each line names its record.
+
+- **There is no fail-visible path for `.reveal`.** Content becomes visible
+  only when the controller's `IntersectionObserver` adds `.visible`; the
+  sole unconditional reveal is the `prefers-reduced-motion` block, and there
+  is no `@media print` block at all. Anywhere the observer never fires — a
+  hidden tab, a print preview — the deck is structurally perfect and
+  visually empty (`L-022`, which `project-website` guards against and this
+  template does not).
+- **No print stylesheet.** A scroll-snap deck of `100dvh` sections prints as
+  one slide per page only by accident (Dependencies above).
+- **`theme: toggle` is not supported and `export` does not ship** — the
+  answers section above; the apply script reports both as the agent's work
+  (`references/applying-answers.md`).
+- **`.pagenum` is hand-written**, so it is the one thing that disagrees after
+  a slide is added or removed; the dots and progress bar are computed.
+- **Slides clip silently.** `.slide` and `.slide-content` both
+  `overflow:hidden`, and Korean and English do not wrap alike — check every
+  slide at 375px wide and 600px tall in both languages.
+- **Noto Sans KR is the expensive family under `delivery: standalone`**, and a
+  subset holds only the glyphs rendered at build time; glyphs typed later
+  fall back (`references/applying-answers.md`,
+  `references/cjk-typography.md`).

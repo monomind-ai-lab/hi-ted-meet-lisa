@@ -112,3 +112,19 @@ before it belongs to the logo answer, not to this one.
 ## Dependencies
 
 Google Fonts only. Everything else is inline.
+
+## Known gaps
+
+Evidenced, not imagined — each line names its record.
+
+- **`var()` never resolves inside an SVG presentation attribute** (`L-008`):
+  `stroke="var(--grid)"` silently draws nothing. The grid is styled from CSS
+  for that reason, and nothing checks that a new node or link was too.
+- **The `accent` answer is not applied.** Colour here is meaning, so
+  `scripts/tedandlisa_apply.py` refuses to repaint it and the handover has to
+  say the accent was not honoured (`references/applying-answers.md`).
+- **The rendered gate skips SVG** (`scripts/check_overflow.py`), so a Korean
+  label longer than its English twin can overrun its node with no finding —
+  read the drawing in both languages.
+- **There is no image export, by decision** (`D-011`): print and the HTML
+  self-download are the browser's own; a bitmap is a screenshot.

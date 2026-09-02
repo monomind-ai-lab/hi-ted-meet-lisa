@@ -183,3 +183,28 @@ Translate leaves it alone — "Made with" is meant to translate.
 <p class="deck-colophon">Made with
   <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer"><span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></a></p>
 ```
+
+## Known gaps
+
+Evidenced, not imagined — each line names its record.
+
+- **Google Translate rewrites identifiers not on the `TERMS` list** (`L-001`):
+  *MonoMind AI Lab* → 人工智慧實驗室, *MIT* → the university. The list is
+  extended per deck, by hand, and the colophon's own protection has not been
+  re-read against live Translate since the line was added (`NOW.md`, known
+  follow-up).
+- **Translated CJK runs land flush against protected spans** (`L-002`). The
+  `html.translated-ltr .nt-term { margin-inline: 0.15em }` fix reaches only
+  spans carrying `nt-term` — the ones the protection pass creates. A term
+  wrapped by hand without the class collides.
+- **The switch needs a served origin and time** (`L-004`): the language
+  cookie does not stick on `file://` (so the control hides itself there), and
+  translation runs only while the tab composites, 10–20 s in an automated
+  pane.
+- **No CJK family is loaded.** The head's `<link>` carries Plus Jakarta Sans
+  and JetBrains Mono only, so translated Korean or Chinese renders in the
+  reader's system face at Latin leading and tracking — see
+  `references/cjk-typography.md`.
+- **Fixed chrome misreports in an emulated narrow viewport** (`L-003`): the
+  counter, progress bar and switch report off-screen coordinates that are a
+  measurement artifact. Read `documentElement.clientWidth`, and check a phone.

@@ -108,3 +108,23 @@ ships by default; remove the `<a>` (only) when the intake answered
 
 Google Fonts only. Everything else is inline, so the file works offline and
 survives being emailed.
+
+## Known gaps
+
+Evidenced, not imagined — each line names its record.
+
+- **`ROUTES`, `TITLES` and the `s-<lang>-NN` sections must agree, and nothing
+  enforces it** (`D-010`; `CLAUDE.md`). A route with no section in the other
+  language falls back to the index, which looks like the deck losing the
+  reader's place.
+- **Two stylesheet rules still name the old language.** The template ships
+  Korean since `D-010` (`s-ko-NN`, `TITLES.ko`, Noto Sans KR in the head),
+  but `#s-en-index h1, #s-zh-index h1` and the matching `.subtitle` rule
+  target `#s-zh-index`, so the index heading and subtitle sizes do not apply
+  to the Korean index. This reference's own examples (`s-zh-NN`, "the
+  Chinese copy", Noto Sans TC) lag the same rename.
+- **Diagram labels sit at fixed `x`/`y`**, and a Korean label longer than its
+  English twin overruns its node. The rendered gate skips SVG outright
+  (`scripts/check_overflow.py`), so only reading both slide sets catches it.
+- **No export control ships.** `export: html` is the agent's work here, and
+  the apply script says so (`references/applying-answers.md`).

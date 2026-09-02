@@ -355,3 +355,30 @@ Two measured facts to carry forward:
 the Korean half a face. Nothing else loads from the network: no diagram runtime,
 no CDN, no analytics. With no network the type falls back to the system stack
 and everything else still works.
+
+## Known gaps
+
+Evidenced, not imagined — each line names its record.
+
+- **The dark theme's `--fg-faint` is 2.86:1** on `--bg` and carries four
+  selectors of 11–13px text; kept on purpose with the one-line fix beside it
+  in `:root` (`D-019`). Expect the review to raise it on every site built
+  from this template until someone acts on the comment.
+- **The nav row is capped at 1120px and fails by wrapping, not overflowing**
+  (`L-024`). `white-space:nowrap` on every label makes it fail visibly; the
+  width budget above is hand-measured and has to be re-measured after every
+  label or project-name change.
+- **`.reveal` is visible only through the observer** (`L-022`). The
+  fail-visible timer in `armReveal()` and the `@media print` reset are the
+  only guards; remove either and a hidden tab or a print preview renders a
+  structurally perfect, visually empty page.
+- **`.hero-title` paints a gradient through `background-clip:text` at
+  `line-height:1.02` with no paint-box padding** — the exact shape `L-015`
+  describes. Check the descenders with the snippet in
+  `references/design-review.md`, not by eye.
+- **The six-step track is positioned for six.** Any other count means
+  re-tuning the animated track's spacing (template comment; "Process track"
+  above).
+- **The language pair is coupled** the way `L-018` lists for `web-document`:
+  font URL and stack, visibility rules, button, routing regex,
+  `documentElement.lang`.

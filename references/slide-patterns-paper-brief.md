@@ -377,3 +377,31 @@ TC is the expensive half: subset it to the glyphs the deck actually uses or the
 file gains several megabytes.
 
 There is no print stylesheet.
+
+## Known gaps
+
+Evidenced, not imagined — each line names its record.
+
+- **There is no fail-visible path for `.reveal`.** Content becomes visible
+  only when the controller's `IntersectionObserver` adds `.visible`; the
+  sole unconditional reveal is the `prefers-reduced-motion` block, and there
+  is no `@media print` block. Anywhere the observer never fires — a hidden
+  tab, a print preview — the page is structurally perfect and visually
+  empty (`L-022`).
+- **No print stylesheet, on the template whose `best_for` says "a
+  recommendation someone prints"** (`templates/templates.json`; Dependencies
+  above). Printing is the browser's own, and a scroll-snap deck of `100dvh`
+  pages paginates only by accident.
+- **English is longer than Chinese, and the pages clip.** `.slide` and
+  `.slide-content` both `overflow:hidden`, so a page that fits in Chinese
+  can lose its bottom in English with no scrollbar to say so — check both
+  languages at 375px wide and 600px tall.
+- **`theme: dark` is the work and `theme: toggle` is not supported** (the
+  answers section above): the chapter pages are already the inverse and
+  must invert *back*.
+- **Noto Sans TC is the expensive half under `delivery: standalone`** —
+  several megabytes unsubsetted — and a subset holds only the glyphs rendered
+  at build time (`references/applying-answers.md`,
+  `references/cjk-typography.md`).
+- **`.pagenum` is hand-written**, and the title and closing pages carry none;
+  renumber the rest by hand after any edit.

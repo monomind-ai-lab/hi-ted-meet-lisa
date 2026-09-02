@@ -197,3 +197,27 @@ Google Fonts and mermaid from a CDN for the document; Font Awesome and Tailwind
 from a CDN for the prototype. The `delivery: standalone` intake answer replaces
 all four with inlined copies — subset the webfonts to the glyphs the document
 actually uses, or Noto Sans TC alone runs to several megabytes.
+
+## Known gaps
+
+Evidenced, not imagined — each line names its record.
+
+- **The seven section keys live in four places across two payload
+  scripts**, and nothing enforces agreement; a mismatch fails the way `L-019`
+  describes — silently, with the markup intact (`NOW.md`).
+- **The pair is English and Traditional Chinese**, against `D-010`'s default
+  of English and Korean, and it is coupled across the five places `L-018`
+  lists plus the prototype's `nl` table, a sixth (`NOW.md`).
+- **`footer .mono` is repaired for the light theme only.** This template
+  carries the same two rules as `web-document`
+  (`footer .mono{color:var(--muted-soft)}` on dark,
+  `html[data-theme="light"] footer .mono` for light), where the dark reading
+  measured 3.34:1 at 13px (`NOW.md`).
+- **Four CDN dependencies** — Google Fonts and mermaid for the document,
+  Font Awesome and Tailwind for the prototype. Only `delivery: standalone`
+  inlines them, and the CJK family must then be subset
+  (`references/applying-answers.md`, `references/cjk-typography.md`).
+- **Each prototype mount needs a fresh iframe** (`L-019`). `freshFrame()`
+  exists because `document.open()` keeps the frame's `Window`, and a
+  re-mounted `const` is a parse-time `SyntaxError` that leaves perfect
+  markup and no behaviour. Nothing tests that the guard is still there.
