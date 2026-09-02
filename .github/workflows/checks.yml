@@ -2,12 +2,16 @@
 # run on every change plus a weekly tick (templates and registry can drift
 # apart through merges that each looked fine alone).
 #
-# Everything here is Python stdlib against local files — no pip, no network,
-# no Chrome. build_skill_zips.py --check stages the bundles in a temp dir and
-# validates size/file-count/SKILL.md limits without writing or capturing
-# anything; the thumbnail script (which does need Chrome) is deliberately not
-# run here. The runner's system python3 is all any step needs, so there is no
-# actions/setup-python and nothing to cache.
+# Everything here is Python stdlib against local files — no pip, and only one
+# step needs more than the runner's system python3: the rendered-overflow gate
+# loads each template in headless Chrome (installed by browser-actions/
+# setup-chrome, since ubuntu-latest ships no browser), because a long
+# unbreakable token escaping its grid cell never widens the document and so
+# is invisible to any static check. build_skill_zips.py --check stages the
+# bundles in a temp dir and validates size/file-count/SKILL.md limits without
+# writing or capturing anything; the thumbnail script (which also needs
+# Chrome) is deliberately not run here. No actions/setup-python, nothing to
+# cache.
 
 name: Checks
 
@@ -31,6 +35,20 @@ jobs:
 
       - name: Run the apply-script test suite
         run: python3 scripts/test_tedandlisa_apply.py
+
+      - name: Install Chrome for the rendered checks
+        id: setup-chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Check every template for rendered horizontal overflow
+        # Renders each first-party template at 1280/2000/375 (walking hash
+        # routes where the template has a PAGES/ROUTES router) and fails when
+        # content escapes its box sideways — the class of bug a static check
+        # cannot see. The MonoMind deck's by-design horizontal snap track is
+        # detected from computed style and checked per slide instead.
+        env:
+          CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: python3 scripts/check_overflow.py
 
       - name: Check the intake panel's fallback list against the registry
         run: python3 scripts/tedandlisa_intake_fallback.py --check

@@ -143,7 +143,12 @@ which already carry `scroll-margin-top`.
 - **Fullscreen viewer** — drag to pan, wheel to zoom, Esc to close, plus native
   fullscreen. It reads from the same SVG cache the page rendered.
 - **Nav** — collapses to a burger under 1120px; the Documents dropdown flattens
-  into the mobile list.
+  into the mobile list. The link row can neither shrink nor scroll (the
+  dropdown lives inside it, so its overflow must stay `visible`): when the
+  filled-in document carries enough pages to outgrow the bar at laptop widths,
+  raise both burger breakpoints until the full row fits — thirteen links
+  measured 43px too wide for a 1280px bar and ran over the language toggle;
+  the shipped preview collapses at 1450px for that reason.
 
 ## Colophon — the maker's credit
 

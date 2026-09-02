@@ -207,7 +207,10 @@ write it.
 
 Two columns of rows on desktop, one on mobile, where `.cmd-row-principle` is
 dropped — put nothing there that the reader must see. Use a `div.cmd-row` for a
-row that does not navigate.
+row that does not navigate. The command column is a fixed track: a command
+longer than it (`tedandlisa_thumbs.py`) wraps inside the column via
+`overflow-wrap:anywhere` on `.cmd-row-cmd` rather than running into the
+description — do not remove that declaration to "fix" the wrap.
 
 ## Callout
 

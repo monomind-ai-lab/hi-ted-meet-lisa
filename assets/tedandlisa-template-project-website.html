@@ -312,7 +312,10 @@ html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
 .cmd-table{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
 .cmd-row{display:grid;grid-template-columns:130px 1fr auto;align-items:center;gap:16px;padding:14px 18px;background:var(--bg);transition:background .15s}
 .cmd-row:hover{background:var(--surface-2)}
-.cmd-row-cmd{font-family:var(--font-mono);font-size:.86rem;color:var(--accent)}
+/* min-width:0 + overflow-wrap:anywhere keep a long command inside its fixed
+   column: without them a token like tedandlisa_thumbs.py escapes the 130px
+   track and runs into the description. Short commands never hit the break. */
+.cmd-row-cmd{font-family:var(--font-mono);font-size:.86rem;color:var(--accent);min-width:0;overflow-wrap:anywhere}
 .cmd-row-doing{color:var(--fg);font-size:.9rem}
 .cmd-row-principle{color:var(--fg-faint);font-size:.8rem;text-align:end}
 .cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}

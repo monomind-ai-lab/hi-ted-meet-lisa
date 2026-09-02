@@ -101,6 +101,13 @@ code,.mono{font-family:var(--mono);font-size:13px}
 .nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;background:rgba(15,15,15,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--hairline-soft);display:flex;align-items:center;gap:16px;padding:0 20px}
 .nav .mark{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.2px;white-space:nowrap}
 .nav .mark svg{width:19px;height:19px;flex:none;color:var(--ink)}
+/* overflow:visible is deliberate: the Documents dropdown lives inside this
+   row, and any overflow-x value that scrolls or clips would swallow its
+   open menu. The row therefore cannot shrink or scroll — when the filled-in
+   document carries enough pages to outgrow the bar at laptop widths, raise
+   the burger breakpoint below until the row fits everywhere it shows
+   (measured: thirteen links overflow a 1280px bar by 43px and run over the
+   language toggle; the shipped preview collapses at 1450px for that reason). */
 .nav .links{display:flex;gap:4px;flex:1;justify-content:center;overflow:visible;scrollbar-width:none}
 .nav .links::-webkit-scrollbar{display:none}
 .nav .links a{font-size:14px;font-weight:500;color:var(--muted);padding:7px 12px;border-radius:var(--r-md);white-space:nowrap;line-height:1.4}
