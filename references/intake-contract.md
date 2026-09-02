@@ -90,6 +90,7 @@ An entry arrives in one of two shapes, and you must handle both:
 | `export` | array of `html` | Adds a self-download control to the deck chrome. |
 | `credit` | `true` \| `false` | Whether the file keeps its colophon — the "Made with Hi Ted, Meet Lisa" line linking to html.monomind.one. Every template ships it; `false` means delete that one line (never the logo or identity links, which belong to `logo`). Asked for **every** shape, the external handoff included, so it is present in both the runner's payload and the web panel's paste-ready prompt alike. |
 | `review` | `after` \| `inline` \| `none` | When the design review runs, relative to handover. `after` (the default): build, deliver the file, **then** offer and run the design pass as a follow-up (`/lisa-review`) — the file reaches the user's hands first. `inline`: run the full design pass (`references/design-review.md`) **before** handover, accepting the extra minutes it costs. `none`: run only the tooling-free floor checklist — the built-in structural checks that every build gets regardless. Whatever the value, the structural floor is never skipped. |
+| `contract` | object — see below | The communication contract: who it is for, what it must accomplish, what they should leave with, the one thing that must land, how it is used, what becomes of it, and how far the writing may move from the source. Asked for **every** template, the external handoff included, so it is in every payload — the second key, right after `template`. It shapes the writing, never the chrome: `scripts/tedandlisa_apply.py` reports it `NOT-MECHANICAL`, and `references/applying-answers.md` says what each field does to the writing. |
 
 ## The menu object
 
@@ -110,6 +111,40 @@ An entry arrives in one of two shapes, and you must handle both:
 
 `minimal` means no menu at all — just a back-to-the-start control beside the
 page counter. `none` means neither.
+
+## The contract object
+
+```json
+{ "audience": "engineering leads who have seen the roadmap once",
+  "purpose": ["inform", "decide"],
+  "outcome": null,
+  "coreMessage": "ship in October or lose the launch window",
+  "delivery": "presenter", "afterlife": "share", "divergence": "moderate" }
+```
+
+Seven questions on the panel's Purpose screen — its own chapter, the first
+one asked after the template — one object here: the split is presentation,
+like any chapter. Every field is always present.
+
+- `audience`, `outcome`, `coreMessage` — free text, or `null` when nothing
+  was typed. Null means **infer it from the brief and say so in the
+  handover**, never "there is none". Like every free-text answer, the text
+  arrives in whatever language the user typed; read it as written.
+- `purpose` — array of `inform` `explain` `persuade` `decide` `align` `teach`
+  `report` `mobilize` `record`, in the order picked. Defaults to `["inform"]`.
+  It can be empty, which reads the same as null above.
+- `delivery` — `presenter` \| `reader` \| `hybrid` \| `recorded`. The panel
+  defaults it from the chosen template's registry `type`: `present` — and the
+  `external` handoff, a deck by any route — gives `presenter`; `read`,
+  `diagram` and `site` give `reader`. It is re-derived on every template pick
+  until the user chooses, so a payload carrying the default still names it —
+  read this field, never the template, for how the file will be used.
+- `afterlife` — `share` (default) \| `approval` \| `review` \| `archive` \|
+  `handoff` \| `reuse`.
+- `divergence` — `close` \| `moderate` (default) \| `free`: how far the
+  writing may move from the brief and the references. `close` keeps the
+  source's own labels and order and says what was changed; `free` reshapes
+  freely.
 
 ## File objects
 

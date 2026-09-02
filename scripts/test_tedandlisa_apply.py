@@ -77,6 +77,9 @@ def fixture(template: str) -> dict:
         "style": {"mode": "default", "designFile": None, "notes": None},
         "logo": {"mode": "monomind", "file": None, "href": None},
         "elements": [],
+        "contract": {"audience": None, "purpose": ["inform"], "outcome": None,
+                     "coreMessage": None, "delivery": "presenter",
+                     "afterlife": "share", "divergence": "moderate"},
     }
     if template == "monomind-deck":
         answers["menu"] = {"mode": "minimal"}
@@ -295,6 +298,28 @@ class ApplyDetails(unittest.TestCase):
         self.assertNotEqual(run_apply(wrong_version, dst).returncode, 0)
         unknown = self._answers({"template": "no-such-template"})
         self.assertNotEqual(run_apply(unknown, dst).returncode, 0)
+
+    def test_contract_is_reported_not_mechanical_and_left_alone(self):
+        # the communication contract shapes the writing, never the chrome:
+        # one NOT-MECHANICAL line, no "unknown key", and the file untouched
+        dst = self._copy("web-document")
+        before = dst.read_bytes()
+        a = self._answers({"template": "web-document",
+                           "contract": {"audience": None,
+                                        "purpose": ["inform", "decide"],
+                                        "outcome": None,
+                                        "coreMessage": "ship in October",
+                                        "delivery": "reader",
+                                        "afterlife": "approval",
+                                        "divergence": "close"}})
+        proc = run_apply(a, dst)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(before, dst.read_bytes())
+        rows = [l for l in proc.stdout.splitlines()
+                if l.strip().startswith("contract")]
+        self.assertEqual(len(rows), 1, proc.stdout)
+        self.assertIn("NOT-MECHANICAL", rows[0])
+        self.assertNotIn("unknown answer key", proc.stdout)
 
     def test_handoff_payload_is_a_clean_no_op(self):
         dst = self._copy("monomind-deck")
