@@ -33,8 +33,8 @@ intake panel, and copy one paste-ready prompt for any coding agent — Claude
 Code, Codex, Pi, OpenCode, Hermes, or anything else that reads a public URL.
 Nothing to install.
 
-Prefer it as a standing command? Install the plugin once — it carries all six
-skills, and then they are six commands you have for good.
+Prefer it as a standing command? Install the plugin once — it carries all seven
+skills, and then they are seven commands you have for good.
 
 ```sh
 /plugin marketplace add monomind-ai-lab/hi-ted-meet-lisa
@@ -65,7 +65,9 @@ python3 scripts/build_skill_zips.py   # writes dist/lisa.zip and three more
 Upload `lisa`; `lisa-lang` and `lisa-help` are worth a slot too — the first
 layers languages onto a finished file with the same payload `lisa` carries,
 the second is a few kilobytes because it answers from its own text.
-`lisa-new-template` is built for completeness but is not worth a panel slot:
+`lisa-brand` is worth one as well: the extraction and both HTML files
+complete in a sandbox, and only the PDF render waits for a local Chrome,
+which the skill says so about. `lisa-new-template` is built for completeness but is not worth a panel slot:
 registering a template and capturing its thumbnail both write to a checkout,
 and the whole point of that skill is a template that stays in *your* gallery —
 which a sandbox cannot give you. `lisa-design` and `lisa-review` get no bundle
@@ -81,7 +83,7 @@ symlink the skills you want:
 git clone https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git \
   ~/.monomind/hi-ted-meet-lisa
 
-for s in lisa lisa-design lisa-review lisa-lang lisa-new-template lisa-help; do
+for s in lisa lisa-design lisa-review lisa-lang lisa-new-template lisa-brand lisa-help; do
   ln -s ~/.monomind/hi-ted-meet-lisa/skills/$s ~/.claude/skills/$s
 done
 ```
@@ -126,6 +128,16 @@ Turns a finished HTML file into a reusable template: extracts its stylesheet and
 machinery into a placeholder skeleton, strips the original's subject matter,
 registers it, and captures its gallery thumbnail. It is then one of your choices
 in the panel, permanently.
+
+```text
+/lisa-brand https://your-site.example
+```
+
+Reads your brand off a site, a screenshot, or the assets you hand over —
+colours, fonts, the mark, the tagline — confirms what it found, and writes a
+`design.md` plus a one-page A4 brand book. The intake's "Extract it from my
+brand" style option runs the same extraction inside a build, so the next deck
+comes out in your colours rather than MonoMind's.
 
 ```text
 /lisa-design a launch deck, glassmorphism, with animated slides
@@ -201,7 +213,7 @@ Hi Ted, Meet Lisa answers those directly:
 
 ## ✅ What this repository does
 
-This repository is an agent-facing package: six skills, eight templates, a
+This repository is an agent-facing package: seven skills, eight templates, a
 visual intake panel, a template registry, and the tooling that ties them
 together. An agent uses them to produce a deck without asking you to run
 anything yourself.
@@ -216,10 +228,10 @@ skill still cannot drift apart, they just ship on their own schedules now.
 
 ### How agents find the instructions
 
-1. Harnesses that support the Agent Skills convention discover all six
+1. Harnesses that support the Agent Skills convention discover all seven
    skills under `skills/` — `/lisa`, `/lisa-design`, `/lisa-review`,
-   `/lisa-lang`, `/lisa-new-template`, and `/lisa-help` — whether installed
-   as a plugin or symlinked.
+   `/lisa-lang`, `/lisa-new-template`, `/lisa-brand`, and `/lisa-help` —
+   whether installed as a plugin or symlinked.
 2. Any other agent can be pointed at <https://html.monomind.one/SKILL.md>
    directly; it is plain Markdown and carries the whole procedure. That URL is
    a deploy artifact the website build copies from `skills/lisa/SKILL.md`, so
@@ -400,6 +412,8 @@ carry the machinery, never the material.
 - **`lisa-new-template`** — turns an existing HTML page into a template.
 - **`lisa-help`** — explains the commands, routes, and URLs from inside the
   conversation, in your language.
+- **`lisa-brand`** — reads a brand off a site, a screenshot, or assets into a
+  `design.md` the intake takes, plus a one-page A4 brand book.
 - **Eight templates** with a pattern reference each, and a live preview.
 - **A visual intake panel** with a template gallery, plus its payload contract.
 - **A template registry** (`templates/templates.json`) and thumbnail tooling.
@@ -466,6 +480,7 @@ This distribution bundles some awesome projects:
 
 - [Impeccable](https://github.com/pbakaus/impeccable) under the Apache License 2.0
 - derives the architecture template's visual system from [Architecture Diagram Generator](https://github.com/Cocoon-AI/architecture-diagram-generator) (MIT)
+- derives the brand-extraction procedure and the A4 brand-book form from [Design System Toolkit](https://github.com/robonuggets/design-system) (MIT)
 - and carries [Slides AI Plugin](https://github.com/proyecto26/slides-ai-plugin) (MIT), copied in under `vendor/`.
 
 See [NOTICE](NOTICE) and [`.agents/skills/impeccable/VENDORED.md`](.agents/skills/impeccable/VENDORED.md).
