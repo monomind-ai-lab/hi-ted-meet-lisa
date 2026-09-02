@@ -177,8 +177,13 @@ main().catch(function (e) {
 
 def find_chrome() -> str | None:
     env = os.environ.get("CHROME_BIN")
-    if env and pathlib.Path(env).is_file():
-        return env
+    if env:
+        if pathlib.Path(env).is_file():
+            return env
+        # A set-but-wrong CHROME_BIN is a CI misconfiguration; falling back
+        # to some other browser would hide it.
+        print(f"error: CHROME_BIN is set but not a file: {env}", file=sys.stderr)
+        return None
     for c in CHROME_CANDIDATES:
         if pathlib.Path(c).is_file():
             return c
@@ -217,14 +222,22 @@ def serve(harness_dir: str, target_dir: str):
     return srv, srv.server_address[1]
 
 
-def run_chrome(chrome: str, url: str, timeout: float = 90.0) -> str:
+def run_chrome(chrome: str, url: str, timeout: float = 150.0) -> str:
     """Run headless Chrome with --dump-dom, polling stdout for the sentinel so
     a Chrome that writes its output and then fails to exit (a known headless
-    quirk, see tedandlisa_thumbs.py) does not stall the whole gate."""
+    quirk, see tedandlisa_thumbs.py) does not stall the whole gate. The
+    timeout is generous because a hosted CI runner's first Chrome start is
+    cold (font cache, profile creation); the sentinel poll means a healthy
+    run never waits it out."""
     with tempfile.TemporaryDirectory() as profile:
         out = pathlib.Path(profile) / "dom.txt"
         cmd = [chrome, "--headless=new", "--disable-gpu", "--hide-scrollbars",
                "--no-first-run", "--no-default-browser-check", "--disable-extensions",
+               # Hosted Linux runners need these two or Chrome dies before
+               # producing any output: the container has no usable sandbox,
+               # and /dev/shm is too small for a renderer. Both are inert on
+               # a desktop macOS Chrome, so they are passed unconditionally.
+               "--no-sandbox", "--disable-dev-shm-usage",
                f"--user-data-dir={profile}",
                f"--window-size={WINDOW[0]},{WINDOW[1]}",
                "--virtual-time-budget=45000", "--dump-dom", url]
@@ -267,12 +280,14 @@ def check_file(chrome: str, target: pathlib.Path) -> list[str]:
             srv.shutdown()
     m = re.search(re.escape(SENTINEL) + r"(\[.*?\])</pre>", dom, re.DOTALL)
     if not m:
-        return ["harness produced no result (Chrome failed or timed out)"]
+        return ["HARNESS ERROR: Chrome produced no result "
+                "(crashed on startup, was killed, or timed out) — "
+                "this is an infrastructure failure, not an overflow finding"]
     try:
         import html as _html
         return json.loads(_html.unescape(m.group(1)))
     except ValueError:
-        return ["harness result was not parseable JSON"]
+        return ["HARNESS ERROR: harness result was not parseable JSON"]
 
 
 def default_targets() -> list[pathlib.Path]:
@@ -303,23 +318,35 @@ def main() -> int:
         print("error: not a file: " + ", ".join(missing), file=sys.stderr)
         return 2
 
-    failures = 0
+    overflowing, broken = 0, 0
     for target in targets:
         problems = check_file(chrome, target)
         rel = os.path.relpath(target)
-        if problems:
-            failures += 1
+        # A harness/Chrome breakdown is an infrastructure failure and must
+        # not masquerade as a design finding; report and count it apart.
+        findings = [p for p in problems
+                    if "HARNESS ERROR" not in p and "MEASURE ERROR" not in p]
+        errors = [p for p in problems if p not in findings]
+        if findings:
+            overflowing += 1
             print(f"FAIL {rel}")
-            for p in problems:
-                print(f"     {p}")
+        elif errors:
+            broken += 1
+            print(f"ERROR {rel} — could not be checked")
         else:
             print(f"ok   {rel}")
-    if failures:
-        print(f"\n{failures} of {len(targets)} files have horizontal overflow")
-    else:
-        print(f"\nall {len(targets)} files clean at "
+        for p in findings + errors:
+            print(f"     {p}")
+    print()
+    if overflowing:
+        print(f"{overflowing} of {len(targets)} files have horizontal overflow")
+    if broken:
+        print(f"{broken} of {len(targets)} files could not be checked "
+              "(harness or Chrome failure, not an overflow finding)")
+    if not overflowing and not broken:
+        print(f"all {len(targets)} files clean at "
               + ", ".join(str(w) for w, _ in WIDTHS) + "px")
-    return 1 if failures else 0
+    return 1 if overflowing else (2 if broken else 0)
 
 
 if __name__ == "__main__":
