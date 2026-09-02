@@ -1779,23 +1779,23 @@ var MAX_INLINE_BYTES = 1500000; /* ~1.5 MB — past this the deck gets heavy */
    and fails if the two drift apart:
        python3 scripts/tedandlisa_intake_fallback.py */
 var TEMPLATES = CTX.templates || [
-  { id: "monomind-deck", name: "MonoMind deck", kind: "slides", type: "present",
+  { id: "monomind-deck", name: "MonoMind deck", kind: "slides", type: "present", layout: "reflow",
     tagline: "Horizontal presentation deck, dark ink and accent halos." },
-  { id: "web-document", name: "Web document", kind: "document", type: "read",
+  { id: "web-document", name: "Web document", kind: "document", type: "read", layout: "reflow",
     tagline: "Reads like a website page: top nav, sections, diagrams." },
-  { id: "mermaid-master", name: "Multi-page Diagrams", kind: "slides", type: "diagram",
+  { id: "mermaid-master", name: "Multi-page Diagrams", kind: "slides", type: "diagram", layout: "reflow",
     tagline: "Diagram-first deck on light paper, one drawing per slide." },
-  { id: "architecture", name: "Architecture diagram", kind: "document", type: "diagram",
+  { id: "architecture", name: "Architecture diagram", kind: "document", type: "diagram", layout: "reflow",
     tagline: "System diagrams on slate, where colour means something — one view or several." },
-  { id: "slide-design", name: "Slide design", kind: "external", type: "present", skill: "/lisa-design", badge: "HTML",
+  { id: "slide-design", name: "Slide design", kind: "external", type: "present", layout: "reflow", skill: "/lisa-design", badge: "HTML",
     tagline: "Not a MonoMind template — twelve style presets and animated HTML slides." },
-  { id: "sitemap-ia", name: "Sitemap & IA proposal", kind: "document", type: "read",
+  { id: "sitemap-ia", name: "Sitemap & IA proposal", kind: "document", type: "read", layout: "reflow",
     tagline: "Argue an information architecture, with the navigation wired up to click through." },
-  { id: "project-website", name: "Project website", kind: "document", type: "site",
+  { id: "project-website", name: "Project website", kind: "document", type: "site", layout: "reflow",
     tagline: "A project's public face: sticky nav, hash-routed pages, dark ink and a blue halo." },
-  { id: "evidence-deck", name: "Evidence deck", kind: "slides", type: "present",
+  { id: "evidence-deck", name: "Evidence deck", kind: "slides", type: "present", layout: "reflow",
     tagline: "Dark full-bleed slides that argue from numbers — tables, stat rows, verdict bars." },
-  { id: "paper-brief", name: "Paper brief", kind: "slides", type: "read",
+  { id: "paper-brief", name: "Paper brief", kind: "slides", type: "read", layout: "reflow",
     tagline: "Light paper slides paced in chapters — mega numbers, bar charts, decision boxes." }
 ];
 
