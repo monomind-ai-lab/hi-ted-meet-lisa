@@ -966,7 +966,10 @@ var UI = {
     lead: function (n) {
       var words = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
                    "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen",
-                   "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen"];
+                   "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen",
+                   "Nineteen", "Twenty", "Twenty-one", "Twenty-two", "Twenty-three",
+                   "Twenty-four", "Twenty-five", "Twenty-six", "Twenty-seven",
+                   "Twenty-eight", "Twenty-nine", "Thirty"];
       return (words[n] || n) + " questions, and none of them compulsory. Answer what " +
         "matters and leave the rest — anything untouched takes the value marked " +
         '<span class="default">default</span>.';
@@ -1247,7 +1250,7 @@ var L10N = {
   ko: {
     lead: {
       Template: "무엇을 만들 것인가. 이 선택이 뒤따르는 질문을 정합니다.",
-      Grounds:  "제안이 근거를 어디에서 얻는가.",
+      Grounds:  "누가 읽고, 무엇을 해내야 하며, 무엇을 근거로 삼는가.",
       Shape:    "분량은 얼마나 되고, 어디에서 열려야 하는가.",
       Look:     "지면에서 어떻게 읽히는가.",
       Handover: "읽는 사람이 무엇을 가지고 떠나는가.",
@@ -1302,6 +1305,61 @@ var L10N = {
       template: {
         q: "어떤 템플릿을 쓸까요?",
         hint: "먼저 만들 것의 형태를 고르세요 — 이 선택이 나머지 질문의 의미를 정합니다."
+      },
+      audience: {
+        q: "누구를 위한 것인가요?",
+        hint: "그 자리에 있을 사람들, 또는 링크를 열어 볼 사람들 — 역할과 이미 알고 있는 것. " +
+              "비워 두면 브리프에서 읽어냅니다.",
+        placeholder: "예: 로드맵을 한 번 본 적 있는 엔지니어링 리드"
+      },
+      purpose: {
+        q: "무엇을 해내야 하나요?",
+        hint: "해야 할 일을 모두 고르세요. 알리기는 바닥이고, 나머지가 무엇을 쓸지를 바꿉니다.",
+        o: { inform:   ["알리기", "사실을 앞에 놓습니다."],
+             explain:  ["설명하기", "구조나 변화를 이해하게 합니다."],
+             persuade: ["설득하기", "한 입장을 근거와 함께 논증합니다."],
+             decide:   ["결정 받기", "결정을 받아냅니다 — 요청이 분명히 드러납니다."],
+             align:    ["맞추기", "여러 사람을 같은 페이지에 올립니다."],
+             teach:    ["가르치기", "기술이나 방법을 남깁니다."],
+             report:   ["보고하기", "무슨 일이 있었고 지금 어디까지 왔는지 밝힙니다."],
+             mobilize: ["움직이기", "사람들이 행동하게 하고, 다음에 무엇을 할지 말합니다."],
+             record:   ["기록 남기기", "나중을 위해 오래 남는 기록을 남깁니다."] }
+      },
+      outcome: {
+        q: "무엇을 가지고 떠나야 하나요?",
+        hint: "보고 난 뒤 알거나, 믿거나, 결정하거나, 해야 할 것. 한 문장이면 충분합니다.",
+        placeholder: "예: 4분기 예산을 승인한다, 또는 내가 없어도 프로세스를 돌릴 수 있다"
+      },
+      coreMessage: {
+        q: "반드시 남아야 할 한 가지",
+        hint: "다른 것은 다 잊혀도 살아남아야 할 주장, 요청, 또는 행동.",
+        placeholder: "예: 10월에 출시하지 않으면 런치 시점을 놓친다"
+      },
+      contractDelivery: {
+        q: "어떻게 쓰이나요?",
+        hint: "기본값은 템플릿을 따릅니다: 발표용 형태는 발표자를, 읽기용 형태는 읽는 사람을 " +
+              "전제합니다. 주된 쓰임이 다르면 바꾸세요.",
+        o: { presenter: ["발표자가 이끄는", "누군가 말로 풀어 갑니다 — 한 장에 아이디어 하나, 더 큰 글자."],
+             reader:    ["혼자 읽는", "설명해 줄 사람이 없습니다 — 더 촘촘한 글, 요점을 담은 캡션."],
+             hybrid:    ["둘 다", "먼저 발표하고, 그 다음 읽으라고 공유합니다."],
+             recorded:  ["녹화 또는 자동 재생", "혼자 돌아갑니다 — 모든 장이 목소리 없이도 서야 합니다."] }
+      },
+      afterlife: {
+        q: "그 뒤에는 어떻게 되나요?",
+        hint: "회의가 끝난 뒤 이 파일이 맡는 일.",
+        o: { share:    ["전달됨", "그 자리에 없던 사람들에게 전달되고 나중에 열립니다."],
+             approval: ["승인", "서명을 받습니다 — 날짜가 있고, 그 자체로 완결되며, 암시로 남기는 것이 없습니다."],
+             review:   ["검토", "꼼꼼히 읽히고 의견이 달립니다."],
+             archive:  ["보관", "기록으로 남습니다 — 인쇄할 수 있고, 그 자체로 완전합니다."],
+             handoff:  ["인계", "다음 일을 맡을 사람이 이어받습니다."],
+             reuse:    ["재사용", "일부가 다른 덱으로 옮겨집니다."] }
+      },
+      divergence: {
+        q: "원본을 얼마나 자유롭게 고쳐 써도 되나요?",
+        hint: "브리프와 참고 자료에서 글이 얼마나 멀리 갈 수 있는가.",
+        o: { close:    ["가깝게", "원본의 이름과 순서를 지키고, 바꾼 것은 밝힙니다."],
+             moderate: ["균형 있게", "더 잘 읽히는 곳은 재구성하되, 알맹이는 지킵니다."],
+             free:     ["자유롭게", "재료에서 논지를 다시 세웁니다."] }
       },
       siteType: {
         q: "어떤 사이트 또는 앱인가요?",
@@ -1492,7 +1550,7 @@ var L10N = {
   "zh-TW": {
     lead: {
       Template: "你要做的是什麼。這個選擇決定了後面會問什麼。",
-      Grounds:  "這份提案的依據從哪裡來。",
+      Grounds:  "給誰看、要做到什麼，又以什麼為依據。",
       Shape:    "有多少份量，又得在哪裡跑起來。",
       Look:     "在頁面上讀起來是什麼樣子。",
       Handover: "讀的人最後帶走什麼。",
@@ -1544,6 +1602,61 @@ var L10N = {
       template: {
         q: "要用哪一個範本？",
         hint: "先決定它是什麼形態 — 這個選擇會決定後面每一個問題的意思。"
+      },
+      audience: {
+        q: "這是給誰看的？",
+        hint: "在場的人，或是打開連結的人 — 他們的角色，還有已經知道什麼。留白的話，就從 " +
+              "brief 裡讀出來。",
+        placeholder: "例如：看過一次路線圖的工程主管"
+      },
+      purpose: {
+        q: "它必須做到什麼？",
+        hint: "把它要做的事全部選起來。告知是底線，其餘的會改變寫出來的東西。",
+        o: { inform:   ["告知", "把事實擺在他們面前。"],
+             explain:  ["解釋", "讓一個機制或一項改變被理解。"],
+             persuade: ["說服", "帶著證據，論證一個立場。"],
+             decide:   ["取得決定", "拿到一個決定 — 訴求說得明白。"],
+             align:    ["對齊", "讓一群人站到同一頁上。"],
+             teach:    ["教會", "留下一項技能或一套方法。"],
+             report:   ["回報", "交代發生了什麼、現在到哪裡。"],
+             mobilize: ["動員", "讓人動起來，並說清楚下一步。"],
+             record:   ["留下記錄", "留一份日後可查的記錄。"] }
+      },
+      outcome: {
+        q: "他們該帶著什麼離開？",
+        hint: "看完之後，他們應該知道、相信、決定或去做的事。一句話就夠。",
+        placeholder: "例如：他們核准 Q4 預算，或是沒有我也能跑完流程"
+      },
+      coreMessage: {
+        q: "非留下不可的那一件事",
+        hint: "就算其他都忘了也要留住的主張、訴求，或行動。",
+        placeholder: "例如：十月出貨，否則錯過上市窗口"
+      },
+      contractDelivery: {
+        q: "它會怎麼被使用？",
+        hint: "預設跟著範本走：上台用的形態假設有人講，細讀用的形態假設有人讀。主要用途" +
+              "不同的話，就改掉。",
+        o: { presenter: ["有人上台講", "有人在旁邊講 — 一頁一個想法，字更大。"],
+             reader:    ["自己讀", "沒有人解說 — 文字更密，圖說要把重點講完。"],
+             hybrid:    ["兩者都要", "先講一遍，再分享出去讓人讀。"],
+             recorded:  ["錄影或自動播放", "自己跑 — 每一頁沒有聲音也要站得住。"] }
+      },
+      afterlife: {
+        q: "之後它會怎麼樣？",
+        hint: "會議結束之後，這個檔案還要做什麼。",
+        o: { share:    ["往外傳", "轉寄出去，由不在場的人日後打開。"],
+             approval: ["簽核", "要被簽核 — 有日期、自成一體，沒有留在暗示裡的東西。"],
+             review:   ["審閱", "被仔細讀過並加上意見。"],
+             archive:  ["歸檔", "留作記錄 — 可以列印，自己就完整。"],
+             handoff:  ["交接", "由接手下一段工作的人拿去。"],
+             reuse:    ["再利用", "有些部分會被搬到其他簡報裡。"] }
+      },
+      divergence: {
+        q: "原始素材可以改寫到什麼程度？",
+        hint: "文字可以離 brief 和參考資料多遠。",
+        o: { close:    ["貼近原文", "保留原文自己的標籤和順序；改了什麼就說出來。"],
+             moderate: ["平衡", "讀起來更順的地方就重組；實質內容留著。"],
+             free:     ["自由改寫", "從素材重新搭起論證。"] }
       },
       siteType: {
         q: "這是什麼樣的網站或應用？",
@@ -1816,6 +1929,73 @@ var QUESTIONS = [
       return { id: t.id, label: t.name, note: t.tagline, def: i === 0, tpl: t };
     }) },
 
+  /* ---- the communication contract ------------------------------------
+     What the brief leaves implicit: who it is for, what it has to do, and
+     how it will be used. Asked for every template, the external handoff
+     included, so no `kinds` and no `templates`. Seven questions on the panel,
+     one key in the payload: each carries `key: "contract"`, and payload()
+     folds them into the single `contract` object references/intake-contract.md
+     describes. Every one has a default, so the screen can be clicked through.
+     `contractDelivery` is named for the collision — `delivery` is already the
+     CDN-or-standalone answer under Preferences. */
+
+  { id: "audience", key: "contract", chapter: "Grounds", q: "Who is this for?",
+    hint: "The people in the room, or the ones opening the link — their role, and what they already know. Left blank, it is read off the brief.",
+    type: "textarea", rows: 2,
+    placeholder: "e.g. engineering leads who have seen the roadmap once" },
+
+  { id: "purpose", key: "contract", chapter: "Grounds", q: "What must it accomplish?",
+    hint: "Pick every job it has to do. Inform is the floor; the others change what gets written.",
+    type: "multi", options: [
+      { id: "inform",   label: "Inform",   note: "Put the facts in front of them.", def: true },
+      { id: "explain",  label: "Explain",  note: "Make a mechanism or a change understood." },
+      { id: "persuade", label: "Persuade", note: "Argue one position, with evidence." },
+      { id: "decide",   label: "Decide",   note: "Secure a decision — the ask is explicit." },
+      { id: "align",    label: "Align",    note: "Get a group onto the same page." },
+      { id: "teach",    label: "Teach",    note: "Leave a skill or a method behind." },
+      { id: "report",   label: "Report",   note: "Account for what happened and where it stands." },
+      { id: "mobilize", label: "Mobilize", note: "Move people to act, and say what to do next." },
+      { id: "record",   label: "Record",   note: "Leave a durable record for later." } ] },
+
+  { id: "outcome", key: "contract", chapter: "Grounds", q: "What should they walk away with?",
+    hint: "What the audience should know, believe, decide, or do afterwards. One sentence is enough.",
+    type: "textarea", rows: 2,
+    placeholder: "e.g. they approve the Q4 budget, or they can run the process without me" },
+
+  { id: "coreMessage", key: "contract", chapter: "Grounds", q: "The one thing that must land",
+    hint: "The claim, the ask, or the action that survives even if nothing else is remembered.",
+    type: "textarea", rows: 2,
+    placeholder: "e.g. ship in October or lose the launch window" },
+
+  /* The default follows the chosen template's registry `type` — a shape you
+     present assumes a presenter, one you read assumes a reader — and is
+     re-derived on every template pick until the reader picks for themselves.
+     See deliveryDefault() below. */
+  { id: "contractDelivery", key: "contract", chapter: "Grounds", q: "How will it be used?",
+    hint: "The default follows the template: a presenting shape assumes a presenter, a reading shape assumes a reader. Change it if the primary use is different.",
+    type: "single", defaultFor: function (tpl) { return deliveryDefault(tpl); }, options: [
+      { id: "presenter", label: "Presenter-led", note: "Someone talks over it — one idea per slide, larger type." },
+      { id: "reader",    label: "Read alone", note: "Nobody explains it — denser text, captions that carry the point." },
+      { id: "hybrid",    label: "Both", note: "Presented first, then shared to read." },
+      { id: "recorded",  label: "Recorded or self-running", note: "Plays on its own — every slide stands without a voice." } ] },
+
+  { id: "afterlife", key: "contract", chapter: "Grounds", q: "What happens to it afterwards?",
+    hint: "What the file is for once the meeting is over.",
+    type: "single", options: [
+      { id: "share",    label: "Shared onward", note: "Forwarded and opened later by people who were not there.", def: true },
+      { id: "approval", label: "Approval", note: "Signed off — dated, self-contained, nothing left implied." },
+      { id: "review",   label: "Review", note: "Read closely and commented on." },
+      { id: "archive",  label: "Archive", note: "Kept as the record — printable, complete on its own." },
+      { id: "handoff",  label: "Hand-off", note: "Picked up by whoever does the work next." },
+      { id: "reuse",    label: "Reuse", note: "Parts of it will be lifted into other decks." } ] },
+
+  { id: "divergence", key: "contract", chapter: "Grounds", q: "How freely may the source be reshaped?",
+    hint: "How far the writing may move from the brief and the references.",
+    type: "single", options: [
+      { id: "close",    label: "Stay close", note: "Keep the source's own labels and order; say what was changed." },
+      { id: "moderate", label: "Balanced", note: "Restructure where it reads better; keep the substance.", def: true },
+      { id: "free",     label: "Reshape freely", note: "Rebuild the argument from the material." } ] },
+
   /* ---- sitemap & IA proposal ----------------------------------------
      A structure proposal is only as good as what it was reasoned from, so
      these ask for the source material and the evidence before anything else.
@@ -2019,6 +2199,8 @@ var QUESTIONS = [
 ];
 
 var state = {};        /* id -> value */
+var touched = {};      /* id -> true once the reader picked, for questions whose
+                          default follows the template (see defOpt) */
 var other = {};        /* id -> free text for the `other` option */
 var files = {};        /* "questionId.slotId" -> { name, type, size, dataUri } */
 var subsel = {};       /* "questionId.slotId" -> [checked ids] for `checks` fields */
@@ -2040,7 +2222,7 @@ var CHAPTER_ORDER = ["Grounds", "Shape", "Look", "Handover", "Preferences"];
    so the content questions come first and the settings wait at the end. */
 var CHAPTER_LEAD = {
   Template: "What you are making. It decides which questions follow.",
-  Grounds:  "Where the proposal gets its evidence.",
+  Grounds:  "Who it is for, what it has to do, and what it is argued from.",
   Shape:    "How much there is, and where it has to run.",
   Look:     "How it reads on the page.",
   Handover: "What a reader leaves with.",
@@ -2063,6 +2245,28 @@ function typeOf(id) {
   return (t && t.type) || "";
 }
 function typeLabel(ty) { return (ui("types") || {})[ty] || ty; }
+
+/* The one place `type` reaches an answer, and only as a *default*: the
+   contract's delivery question starts from what the template is for. A shape
+   you present (`present`, and the external handoff, which is a deck by any
+   route) assumes a presenter; every other purpose — `read`, `diagram`,
+   `site` — assumes a reader. Re-derived on each template pick until the
+   reader chooses for themselves; documented in references/intake-contract.md. */
+function deliveryDefault(id) {
+  if (kindOf(id) === "external") { return "presenter"; }
+  return typeOf(id) === "present" ? "presenter" : "reader";
+}
+
+/* The default option id of a question — static (`def: true`) for almost
+   every one, computed from the chosen template where the question says so. */
+function defOpt(q) {
+  if (q.defaultFor) { return q.defaultFor(state.template); }
+  var d = (q.options || []).filter(function (o) { return o.def; })[0];
+  return d ? d.id : null;
+}
+function isDef(q, o) {
+  return q.defaultFor ? o.id === defOpt(q) : !!o.def;
+}
 function typesPresent() {
   var seen = [];
   TEMPLATES.forEach(function (t) {
@@ -2157,8 +2361,8 @@ function bytes(n) {
 /* ── defaults ─────────────────────────────────────────────────── */
 QUESTIONS.forEach(function (q) {
   if (q.type === "single" || q.type === "gallery") {
-    var d = q.options.filter(function (o) { return o.def; })[0];
-    state[q.id] = d ? d.id : null;
+    /* `template` is first, so a default computed from it sees the pick. */
+    state[q.id] = defOpt(q);
   } else if (q.type === "multi") {
     state[q.id] = q.options.filter(function (o) { return o.def; }).map(function (o) { return o.id; });
   } else if (q.type === "textarea") {
@@ -2335,7 +2539,7 @@ function optionsHtml(q) {
       ' aria-label="' + esc(label) + '">' +
       '<span class="key">' + (i < 9 ? i + 1 : "·") + '</span>' +
       '<span class="label">' + esc(label) +
-      (o.def ? ' <span class="default">' + esc(ui("defaultMark")) + '</span>' : "") +
+      (isDef(q, o) ? ' <span class="default">' + esc(ui("defaultMark")) + '</span>' : "") +
       (note ? '<span class="note">' + esc(note) + '</span>' : "") +
       '</span></button>' +
       (o.isOther
@@ -2354,7 +2558,7 @@ function questionHtml(q, at) {
   var body;
   var hint = thint(q);
   if (q.type === "textarea") {
-    body = '<textarea rows="3" data-seed="' + q.id + '" placeholder="' + esc(tqplace(q) || "") + '">' +
+    body = '<textarea rows="' + (q.rows || 3) + '" data-seed="' + q.id + '" placeholder="' + esc(tqplace(q) || "") + '">' +
            esc(state[q.id] || "") + '</textarea>';
   } else if (q.type === "gallery") {
     body = galleryHtml(q);
@@ -2623,6 +2827,11 @@ function choose(qid, oid, viaKey) {
        rail is. Re-derive both and stay put — the reader may want to compare
        another card, or open a preview, before moving on. */
     state.template = oid;
+    /* A default that follows the template follows it here too — but only
+       while it is still a default. A reader who picked keeps their pick. */
+    QUESTIONS.forEach(function (x) {
+      if (x.defaultFor && !touched[x.id]) { state[x.id] = defOpt(x); }
+    });
     rebuildOrder();
     paintOptions(q);
     renderRail();
@@ -2637,6 +2846,7 @@ function choose(qid, oid, viaKey) {
     if (at === -1) { arr.push(oid); } else { arr.splice(at, 1); }
   } else {
     state[qid] = oid;
+    touched[qid] = true;
   }
   paintOptions(q);
   renderRail();
@@ -2826,6 +3036,9 @@ document.addEventListener("keydown", function (e) {
 /* ── payload ──────────────────────────────────────────────────── */
 function slot(qid, id) { return files[qid + "." + id] || null; }
 
+/* Free text as the contract carries it: trimmed, and null when empty. */
+function typed(v) { var s = String(v || "").trim(); return s || null; }
+
 function expandOther(qid) {
   var picked = state[qid].filter(function (v) { return v !== "other"; });
   if (state[qid].indexOf("other") === -1) { return picked; }
@@ -2899,11 +3112,29 @@ function payload() {
     /* serialised as a boolean: the UI's option ids are a detail the
        contract never sees. */
     credit: state.credit !== "off",
-    review: state.review
+    review: state.review,
+    /* Seven questions on the panel, one object in the payload. Free text is
+       null when nothing was typed; every other value is an id, the same in
+       every language. */
+    contract: {
+      audience: typed(state.audience),
+      purpose: state.purpose,
+      outcome: typed(state.outcome),
+      coreMessage: typed(state.coreMessage),
+      delivery: state.contractDelivery,
+      afterlife: state.afterlife,
+      divergence: state.divergence
+    }
   };
 
+  /* A question serialises under its own id unless it names a `key` it shares
+     with others — then the shared key lands once, where the first of them
+     sits in ORDER, so key order still follows the questions asked. */
   var answers = {};
-  ORDER.forEach(function (q) { answers[q.id] = all[q.id]; });
+  ORDER.forEach(function (q) {
+    var k = q.key || q.id;
+    if (!Object.prototype.hasOwnProperty.call(answers, k)) { answers[k] = all[k]; }
+  });
 
   var chosen = TEMPLATES.filter(function (t) { return t.id === state.template; })[0] || {};
   return {
@@ -3040,8 +3271,8 @@ document.getElementById("backstep").addEventListener("click", prev);
 document.getElementById("skip").addEventListener("click", function () {
   QUESTIONS.forEach(function (q) {
     if (q.type === "single") {
-      var d = q.options.filter(function (o) { return o.def; })[0];
-      state[q.id] = d ? d.id : state[q.id];
+      state[q.id] = defOpt(q) || state[q.id];
+      delete touched[q.id];
     }
   });
   submit();
