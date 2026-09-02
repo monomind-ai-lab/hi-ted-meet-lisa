@@ -149,6 +149,17 @@ and registers it. Its cardinal rule: the *source* document is someone's real
 work and must never be committed — only the genericized skeleton, scrubbed of
 every identifying detail, is.
 
+**Brand extraction** is the sibling skill `skills/lisa-brand/` (`/lisa-brand`):
+it reads a brand off a site URL, a screenshot, or assets into
+`brand/design.md` — tokens on the schema the templates share, each value
+marked `fact` or `approx` with its source — plus a one-page A4 brand book
+built from `assets/lisa-brand-book-a4.html`. `references/brand-extraction.md`
+is the contract (the `design.md` shape, the extraction heuristics, SVG
+sanitisation, the contrast rule, and the per-template token mapping). The
+intake's `style: brand` answer runs the same extraction inside a `/lisa` build
+and then applies the result exactly like `style: designmd`. Both files go into
+the user's working directory, never into this checkout.
+
 **Design review** (`references/design-review.md`) is scheduled by the
 intake's `review` answer — default `after`: deliver the file first, then run
 `/lisa-review` when the user says yes; `inline` runs the pass before handover,
