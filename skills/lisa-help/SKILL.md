@@ -18,6 +18,7 @@ as they are.
 | `/lisa-lang [file] [language …]` | Add languages to a finished file, using its template's own mechanism. Build in one language now, layer more on later. |
 | `/lisa-design [brief]` | A deck the house style should not carry: twelve style presets and animated HTML, via the vendored Slides AI pipeline. |
 | `/lisa-new-template [file]` | Turn a finished HTML file you like into a reusable template — a permanent choice in your own intake gallery. |
+| `/lisa-motion [file] [what to animate]` | Animate a finished file without a library: reveals, a typewriter, count-ups, a marquee, from the motion pattern library — CSS and the Web Animations API only. |
 
 ## The two intake routes
 

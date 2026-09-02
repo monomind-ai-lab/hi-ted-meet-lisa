@@ -81,7 +81,7 @@ symlink the skills you want:
 git clone https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git \
   ~/.monomind/hi-ted-meet-lisa
 
-for s in lisa lisa-design lisa-review lisa-lang lisa-new-template lisa-help; do
+for s in lisa lisa-design lisa-review lisa-lang lisa-new-template lisa-motion lisa-help; do
   ln -s ~/.monomind/hi-ted-meet-lisa/skills/$s ~/.claude/skills/$s
 done
 ```
@@ -126,6 +126,17 @@ Turns a finished HTML file into a reusable template: extracts its stylesheet and
 machinery into a placeholder skeleton, strips the original's subject matter,
 registers it, and captures its gallery thumbnail. It is then one of your choices
 in the panel, permanently.
+
+```text
+/lisa-motion the-site-you-just-got.html make the hero count up
+```
+
+Animates a finished file without adding a library: reveals on scroll, a
+typewriter on the install command, count-up numbers, a marquee, a spotlight
+edge on the cards — thirty-nine patterns in CSS and the Web Animations API,
+each safe under reduced motion, in print, and in a hidden tab. When none
+fits, it composes one under the same rules and offers to add it to the
+library.
 
 ```text
 /lisa-design a launch deck, glassmorphism, with animated slides
@@ -247,6 +258,7 @@ repository builds it — see [when a template is the wrong shape](#-when-a-templ
 | **Architecture diagram** | System diagrams on slate, where colour means something — one view or several | Both languages inline, including the labels inside the drawing | [Live preview →](https://html.monomind.one/previews/architecture) |
 | **Sitemap & IA proposal** | Pages that argue a site structure, plus the navigation wired up to click through | Both languages written inline | [Live preview →](https://html.monomind.one/previews/sitemap-ia) |
 | **Project website** | Sticky nav and hash-routed pages — a project's public face, skimmed before it is read | English and Korean written inline, toggled instantly — works offline | [Live preview →](https://html.monomind.one/previews/project-website) |
+| **Motion website** | Project website with the motion layer — the hero rises in sequence, the command types itself, cards light up; CSS and WAAPI, no library | English and Korean written inline, toggled instantly — works offline | *preview pending* |
 | **Evidence deck** | Dark full-bleed slides that argue from numbers — tables, stat rows, verdict bars | English and Korean written inline, toggled instantly — works offline | [Live preview →](https://html.monomind.one/previews/evidence-deck) |
 | **Paper brief** | Light paper slides paced in chapters — mega numbers, bar charts, decision boxes | Traditional Chinese and English written inline; opens in Chinese | [Live preview →](https://html.monomind.one/previews/paper-brief) |
 | **Slide design** — *a handoff, not a template* | Twelve style presets and animated HTML | One language per deck — the presets carry no toggle | [Live preview →](https://html.monomind.one/previews/slide-design) |
@@ -398,6 +410,8 @@ carry the machinery, never the material.
 - **`lisa-lang`** — adds languages to a finished file, using its template's
   own language mechanism.
 - **`lisa-new-template`** — turns an existing HTML page into a template.
+- **`lisa-motion`** — animates a finished file from a dependency-free
+  pattern library (`references/motion-patterns.md`), and grows the library.
 - **`lisa-help`** — explains the commands, routes, and URLs from inside the
   conversation, in your language.
 - **Eight templates** with a pattern reference each, and a live preview.

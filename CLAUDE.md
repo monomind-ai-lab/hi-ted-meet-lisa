@@ -136,6 +136,16 @@ and registers it. Its cardinal rule: the *source* document is someone's real
 work and must never be committed — only the genericized skeleton, scrubbed of
 every identifying detail, is.
 
+**Motion is dependency-free** (`D-015`): `references/motion-patterns.md` is
+a library of animation patterns in CSS and the Web Animations API — no GSAP,
+nothing loaded — each with a runtime that arms reveals per page activation,
+carries a fail-visible timer (`L-022`), and cancels loops when a hash-routed
+page deactivates. `assets/tedandlisa-template-motion-website.html`
+(`motion-website`) is `project-website` with that layer applied, and
+`skills/lisa-motion/` (`/lisa-motion`) applies the library to any finished
+file. Pattern blocks are added beside a template's own scripts, never inside
+them.
+
 **Design review** (`references/design-review.md`) is scheduled by the
 intake's `review` answer — default `after`: deliver the file first, then run
 `/lisa-review` when the user says yes; `inline` runs the pass before handover,

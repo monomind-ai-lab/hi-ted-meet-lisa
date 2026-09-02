@@ -191,6 +191,7 @@ they differ in shape, navigation, and language handling.
 | `architecture` | System diagrams on slate; colour is semantic | Inline, labels included |
 | `sitemap-ia` | Hash-routed pages plus a clickable nav prototype; CDN unless `delivery: standalone` | Inline |
 | `project-website` | Hash-routed pages behind a sticky nav | Inline |
+| `motion-website` | `project-website` with the motion layer: hero, track, cards and rows animate, CSS and WAAPI only | Inline |
 | `evidence-deck` | Dark scroll-snap slides arguing from numbers | One language per deck |
 | `paper-brief` | Light paper slides paced by chapter pages | Traditional Chinese only |
 
@@ -222,6 +223,7 @@ branding — see `skills/lisa-design/SKILL.md`.
 | `references/intake-contract.md` | The intake payload shape. |
 | `references/applying-answers.md` | What every answer means, marked script vs agent; the manual fallback. |
 | `references/design-review.md` | The design pass: when it runs, which reviewer, the floor. |
+| `references/motion-patterns.md` | The dependency-free animation library `motion-website` and `/lisa-motion` build from. |
 | `references/reference-deck.html` | A full shipped deck, for a pattern in situ. |
 | `assets/tedandlisa-intake.html` | The questions panel. Standalone; opens from `file://` too. |
 | `assets/monomind-mark-white.svg` | The MonoMind mark, `currentColor`, with a `viewBox`. |
@@ -232,6 +234,7 @@ branding — see `skills/lisa-design/SKILL.md`.
 | `skills/lisa-lang/` | Layers more languages onto a delivered file, `/lisa-lang`. |
 | `skills/lisa-design/` | The wrapper for the vendored Slides AI pipeline. |
 | `skills/lisa-new-template/` | Turns a finished HTML file into a template. |
+| `skills/lisa-motion/` | Animates a finished file from the motion library, `/lisa-motion`. |
 | `skills/lisa-help/` | The utility explainer, `/lisa-help`. |
 | `vendor/slides-ai-plugin/` | Slides AI Plugin, MIT, vendored verbatim — see its `VENDORED.md`. |
 | `.agents/skills/impeccable/` | Bundled Impeccable, Apache 2.0, unmodified — see its `VENDORED.md`. |

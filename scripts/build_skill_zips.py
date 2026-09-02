@@ -119,6 +119,14 @@ NO_PAYLOAD = {
     "lisa-help": "self-contained: it answers from its own SKILL.md, so the "
                  "shared payload stays out and the bundle is a few kilobytes",
 }
+# Bundled with ONE reference file instead of the shared payload. /lisa-motion
+# reads references/motion-patterns.md and the file the user names; it never
+# opens a template or the registry, so 2.6 MB of payload would be dead
+# weight in a panel slot. The reference keeps its original path because the
+# skill names that path.
+PARTIAL_PAYLOAD = {
+    "lisa-motion": ("references/motion-patterns.md",),
+}
 PAYLOAD_FILES = ("LICENSE", "NOTICE")
 
 # Claude caps a custom skill upload at 30 MB uncompressed and states a 200-file
@@ -158,7 +166,7 @@ def stage(skill: pathlib.Path, into: pathlib.Path) -> pathlib.Path:
         else:
             shutil.copy2(extra, dest)
 
-    if skill.name not in NO_PAYLOAD:
+    if skill.name not in NO_PAYLOAD and skill.name not in PARTIAL_PAYLOAD:
         for name in PAYLOAD_DIRS:
             src = ROOT / name
             if not src.is_dir():
@@ -168,6 +176,14 @@ def stage(skill: pathlib.Path, into: pathlib.Path) -> pathlib.Path:
         src = ROOT / name
         if src.is_file():
             shutil.copy2(src, folder / name)
+
+    for rel in PARTIAL_PAYLOAD.get(skill.name, ()):
+        src = ROOT / rel
+        if not src.is_file():
+            sys.exit(f"partial payload missing for {skill.name}: {rel}")
+        dest = folder / rel               # original path preserved on purpose
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dest)
 
     for rel in EXTRA_PAYLOAD.get(skill.name, ()):
         src = ROOT / rel
@@ -239,6 +255,11 @@ def main() -> int:
     for name, why in NO_PAYLOAD.items():
         if any(s.name == name for s in skills):
             print(f"\nno payload: {name} — {why}")
+
+    for name, files in PARTIAL_PAYLOAD.items():
+        if any(s.name == name for s in skills):
+            print(f"\npartial payload: {name} — carries only {', '.join(files)}; "
+                  f"it reads nothing else from the checkout")
 
     if oversize:
         print(f"\nover the {MAX_UNCOMPRESSED//1024//1024} MB upload limit: "
