@@ -1030,7 +1030,10 @@ MECHANICAL = ("theme", "export", "menu", "languages", "noTranslate",
               "credit", "backgrounds", "accent")
 
 # answers that are judgment calls by design (see the SKILL.md table).
-JUDGMENT = ("slideCount", "elements", "style", "logo", "siteType",
+# `contract` — audience, purpose, outcome, core message, delivery, afterlife,
+# divergence — shapes the writing and never the chrome, so it is reported
+# here for the agent rather than silently ignored the way `review` is.
+JUDGMENT = ("contract", "slideCount", "elements", "style", "logo", "siteType",
             "projectStage", "sitemapSource", "benchmarks", "evidence",
             "prototype", "delivery", "format")
 
