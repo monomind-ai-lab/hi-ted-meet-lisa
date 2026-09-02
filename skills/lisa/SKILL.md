@@ -112,6 +112,9 @@ The prompt carries the brief. Everything else comes from the intake panel.
    starting Korean." For `monomind-deck` it is just the switch and the
    protection list, which the apply script handles next. A file already
    delivered gets its extra languages through `/lisa-lang`, not a rebuild.
+   Korean and Traditional Chinese runs follow `references/cjk-typography.md`
+   — looser leading, zero tracking, no uppercase, full-width punctuation —
+   on top of the pairing each template already carries.
 
 6. **Protect literals for translation** (`monomind-deck` only). Anything that
    is code, a path, a filename, a command, a product name, or an identity

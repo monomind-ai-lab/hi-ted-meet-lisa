@@ -134,6 +134,9 @@ Two further traps specific to this deck:
 - Body text never falls below the template's `--text-base`.
 - Contrast holds on the photographic slides, where artwork sits under text.
 - No more than one idea per slide.
+- CJK text follows `references/cjk-typography.md` — looser leading, zero
+  tracking, no uppercase, full-width punctuation, no synthesised italic —
+  and is checked by reading the page in that language, not the markup.
 
 ## Reporting
 
