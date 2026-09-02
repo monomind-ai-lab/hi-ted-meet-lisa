@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<!-- ===================================================================
+     MOTION WEBSITE — MonoMind template `motion-website`
+     ===================================================================
+     project-website with the lm motion layer applied: the same tokens,
+     chrome, router and language mechanism, plus seven dependency-free
+     animation patterns from references/motion-patterns.md (D-015: CSS and
+     the Web Animations API only — no GSAP, no Anime.js, nothing loaded).
+     One orchestrated moment on the first screen — the hero rises in
+     sequence and the command types itself — and restraint after it.
+     Shape:      a marketing/landing site. Sticky nav, hash-routed pages,
+                 each page scrolls. One shared footer for the whole site.
+     Language:   both languages written inline as sibling .en/.ko spans and
+                 toggled by body[data-lang]. No translation service, works
+                 offline. Never write a bare reader-visible string.
+     Deps:       Google Fonts only. Nothing else loads from the network,
+                 and no animation library ever will.
+     Motion:     every lm-* class in the pages is a hook from the library;
+                 remove the class to switch that effect off. Reduced motion
+                 and print get the finished page; a hidden tab or a dead
+                 IntersectionObserver still renders (L-022).
+
+     Three registers must agree or a page becomes unreachable:
+       1. <section class="page" id="page-ID">
+       2. the nav entries' data-page="ID"  (desktop AND mobile lists)
+       3. the PAGES array in the script at the foot of this file
+     =================================================================== -->
+<!-- LISA:CONTENT-MAP
+     Editable regions, fenced by LISA:CONTENT-START/END comments:
+       pages — the 8 hash-routed pages inside <main>
+       footer — brand line, link columns, copyright (keep the credit link per the intake)
+     Named edit points outside the fences:
+       <title> and <meta name="description"> in <head>
+       brand name, nav labels, CTA and external URLs in header.nav (desktop AND mobile lists)
+       the PAGES / DROP_PAGES arrays in the script (must match section ids and nav entries)
+     Motion, inside the fences:
+       lm-* classes are the animation hooks (see references/motion-patterns.md):
+       remove a class to switch that effect off; add one only from the library
+       the hero stat strip (.hero-stats): data-lm-to takes the integer, the
+       .lm-count-final span carries the formatted figure; a bracketed slot stays static
+       the hero command's .lm-type-text holds the command; data-copy-text still wraps it
+     Motion, outside the fences (load-bearing, verbatim from the library — never retype):
+       the MOTION style blocks before </head> and the MOTION script blocks before </body>
+     Everything else (head, CSS, chrome markup, scripts, artwork) is load-bearing:
+     copy this file with cp, never retype it, and edit only what is named here. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[PROJECT] · [ONE-LINE PROMISE]</title>
+<meta name="description" content="[One sentence describing the project, 140 characters or less.]">
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Geist / Geist Mono carry the look; Noto Sans KR is here only so the
+     Korean half of every bilingual pair has a face to render in. -->
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ========================== DESIGN TOKENS ==========================
+   The dark palette is the template's identity. Change values here and
+   every rule below follows; do not hardcode a colour anywhere else. */
+:root{
+  --black:#000000; --bg:#000000; --bg-subtle:#0a0a0a;
+  --surface:#0e0e0e; --surface-2:#141414; --surface-3:#1a1a1a;
+  --border:#1f1f1f; --border-strong:#2e2e2e; --border-hover:#3a3a3a;
+  --fg:#ededed; --fg-bright:#ffffff; --fg-muted:#a1a1a1; --fg-dim:#7d7d7d; --fg-faint:#565656;
+  /* KNOWN, MEASURED, AND INHERITED: --fg-faint is 2.86:1 on --bg, 2.70:1 on
+     --bg-subtle and 2.63:1 on --surface. It carries 11-13px text
+     (.ic-when, .cmd-row-principle, .cmd-label, .footer-bottom), so those
+     four fail WCAG AA. The value is the source design's, kept because a
+     template preserves its author's system -- but the fix is one line, and
+     #7a7a7a is the lightest grey that clears 4.5:1 on all three grounds:
+         --fg-faint:#7a7a7a;
+     Decide deliberately. The light theme below already clears AA. */
+  --accent:#52a8ff; --accent-strong:#0072f5; --accent-contrast:#ffffff;
+  --success:#46d160; --warn:#f5a623;
+  --title-grad:linear-gradient(180deg,#fff 30%,#b9b9b9);
+  --glow:rgba(82,168,255,.14);
+  --grid-line:rgba(255,255,255,.03);
+  --r-sm:6px; --r-md:10px; --r-lg:14px; --r-xl:20px;
+  --font-sans:"Geist","Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:"Geist Mono",ui-monospace,"SF Mono","Menlo","Consolas",monospace;
+  --maxw:1120px; --maxw-prose:760px; --nav-h:60px;
+  --ease:cubic-bezier(.22,1,.36,1);
+  color-scheme:dark;
+}
+/* ---------------------------- LIGHT THEME ---------------------------
+   Only the palette changes; every rule below consumes the variables.
+   theme: dark   -> delete this block and the #btnTheme button.
+   theme: light  -> put data-theme="light" on <html> and drop the button.
+   theme: toggle -> keep both; the choice persists to localStorage.
+   The token values are re-pointed, not re-invented, so the contrast
+   relationships of the dark palette survive the flip. */
+html[data-theme="light"]{
+  --bg:#ffffff; --bg-subtle:#f7f8fa;
+  --surface:#f6f7f9; --surface-2:#eef0f4; --surface-3:#e6e9ee;
+  --border:#e4e7ec; --border-strong:#d2d7df; --border-hover:#b9c0cb;
+  /* The dim tiers are re-tiered, not merely inverted: the dark ramp's
+     --fg-faint lands at 3.1:1 on paper, which fails at the 12-13px sizes
+     that token is used at (.ic-when, .cmd-row-principle, .footer-bottom,
+     .cmd-label). Measured on white: 7.5 / 6.1 / 5.3, so the hierarchy
+     survives and every step clears AA. */
+  --fg:#1b1f27; --fg-bright:#0b0d12; --fg-muted:#4e5563; --fg-dim:#5c6371; --fg-faint:#656c7a;
+  --accent:#0064d2; --accent-strong:#0050a8;
+  --success:#1a8f3c; --warn:#a86500;
+  --title-grad:linear-gradient(180deg,#0b0d12 30%,#454b57);
+  --glow:rgba(0,100,210,.10);
+  --grid-line:rgba(0,0,0,.04);
+  color-scheme:light;
+}
+/* Contrast repairs measured on white rather than eyeballed: --fg-faint and
+   the phase hues are tuned for a near-black ground and land under 4.5:1 on
+   paper. The hue stays; the lightness and the alpha do not. */
+html[data-theme="light"] .phase-chip{color:hsl(var(--h,210) 62% 30%);background:hsl(var(--h,210) 60% 55% / .12);border-color:hsl(var(--h,210) 45% 55% / .35)}
+html[data-theme="light"] .lc-phase{color:hsl(var(--h) 55% 32%)}
+html[data-theme="light"] .lc-node{border-color:hsl(var(--h) 40% 55% / .45)}
+html[data-theme="light"] .nav{background:rgba(255,255,255,.82)}
+html[data-theme="light"] .btn-primary{background:#0b0d12;border-color:#0b0d12;color:#fff}
+html[data-theme="light"] .btn-primary:hover{background:#2a2f3a;border-color:#2a2f3a}
+html[data-theme="light"] ::selection{background:rgba(0,100,210,.22);color:#0b0d12}
+
+*,*:before,*:after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h) + 24px);-webkit-text-size-adjust:100%}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-feature-settings:"cv11","ss01";text-rendering:optimizeLegibility;overflow-x:hidden}
+h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.02em;line-height:1.1;color:var(--fg-bright)}
+p{margin:0}
+a{color:inherit;text-decoration:none}
+img,svg{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer}
+::selection{background:rgba(82,168,255,.28);color:#fff}
+
+/* ---------- bilingual: body[data-lang] shows exactly one set ---------- */
+body[data-lang="en"] .ko,body[data-lang="ko"] .en{display:none}
+
+.container{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:24px}
+.section{padding-block:clamp(56px,9vw,112px)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-dim)}
+.eyebrow-num{color:var(--fg-faint)}
+.section-title{font-size:clamp(1.75rem,3.6vw,2.6rem);letter-spacing:-.03em}
+.section-lede{margin-top:16px;max-width:620px;color:var(--fg-muted);font-size:clamp(1rem,1.6vw,1.125rem);line-height:1.6}
+.prose{max-width:var(--maxw-prose);color:var(--fg-muted);font-size:1rem;line-height:1.7}
+.prose p+p{margin-top:16px}
+.prose strong{color:var(--fg-bright);font-weight:500}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding-inline:20px;border-radius:var(--r-md);font-size:.94rem;font-weight:500;letter-spacing:-.01em;border:1px solid transparent;transition:transform .15s var(--ease),background .2s var(--ease),border-color .2s var(--ease),color .2s var(--ease);white-space:nowrap}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--fg-bright);color:#000;border-color:var(--fg-bright)}
+.btn-primary:hover{background:#d9d9d9;border-color:#d9d9d9}
+.btn-secondary{background:transparent;color:var(--fg);border-color:var(--border-strong)}
+.btn-secondary:hover{background:var(--surface-2);border-color:var(--border-hover);color:var(--fg-bright)}
+.btn-ghost{background:transparent;color:var(--fg-muted);height:38px;padding-inline:12px}
+.btn-ghost:hover{color:var(--fg-bright)}
+.btn svg{width:16px;height:16px}
+
+.card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);transition:border-color .2s var(--ease),background .2s var(--ease),transform .2s var(--ease)}
+.card:hover{border-color:var(--border-hover);background:var(--surface-2)}
+.chip{display:inline-flex;align-items:center;gap:6px;height:24px;padding-inline:9px;border-radius:999px;font-family:var(--font-mono);font-size:11.5px;letter-spacing:.01em;color:var(--fg-muted);background:var(--surface-2);border:1px solid var(--border)}
+/* --h is the phase hue, set inline per card. One number tints the dot, the
+   chip, the card's hover edge, and its arrow — do not paint them separately. */
+.phase-dot{width:7px;height:7px;border-radius:999px;background:hsl(var(--h,210) 75% 62%);box-shadow:0 0 8px hsl(var(--h,210) 80% 60% / .6);flex:none}
+.phase-chip{color:hsl(var(--h,210) 60% 78%);background:hsl(var(--h,210) 60% 55% / .1);border-color:hsl(var(--h,210) 55% 55% / .24)}
+code,kbd{font-family:var(--font-mono);font-size:.9em}
+.mono{font-family:var(--font-mono)}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(to right,var(--grid-line) 1px,transparent 1px),linear-gradient(to bottom,var(--grid-line) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 40%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 40%,transparent 100%);pointer-events:none}
+.hairline{border:0;height:1px;background:linear-gradient(to right,transparent,var(--border) 20%,var(--border) 80%,transparent);margin:0}
+.text-muted{color:var(--fg-muted)}
+.text-dim{color:var(--fg-dim)}
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.skip-link{position:absolute;left:-999px;top:8px;z-index:100;background:var(--fg-bright);color:var(--bg);padding:8px 14px;border-radius:var(--r-sm);font-size:.85rem}
+.skip-link:focus{left:12px}
+
+/* Reveal-on-scroll. Elements start hidden and are armed by the observer in
+   the script. A page that has never been routed to has never been observed,
+   so armReveal() runs again on every page activation — without it, page two
+   is a blank screen. */
+@media(prefers-reduced-motion:no-preference){
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+  .reveal.in{opacity:1;transform:none}
+}
+
+/* ============================== NAV ============================== */
+.nav{position:sticky;top:0;z-index:50;background:rgba(0,0,0,.70);backdrop-filter:saturate(160%) blur(14px);-webkit-backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid var(--border)}
+/* THE NAV WIDTH BUDGET. The row is capped by --maxw (1120px) at every
+   viewport above 1168px, so a row that does not fit has no wider screen to
+   grow into: it wraps mid-label or shoves the language toggle off the edge.
+   The default configuration spends roughly:
+       brand 183 + five links 356 + More 68 + gaps 68
+       + link icon 32 + utilbar 104 + language 82 + CTA 99 + padding 48
+       = ~1040, leaving ~80px of headroom.
+   Longer labels and a longer project name eat that headroom. A sixth inline
+   link does not fit -- move one into the More dropdown instead. Measure, do
+   not eyeball: at 1120 the row fails silently by wrapping. */
+.nav-inner{display:flex;align-items:center;gap:18px;height:var(--nav-h)}
+/* min-width:0 lets the brand shrink instead of pushing the utility cluster
+   off the screen: [PROJECT] is a placeholder, and a real project name is
+   usually longer than the one it replaces. */
+.brand{display:inline-flex;align-items:center;gap:9px;min-width:0;font-weight:600;letter-spacing:-.02em;font-size:.98rem;color:var(--fg-bright)}
+.brand-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brand-mark{color:var(--accent);display:inline-flex}
+.brand-dim{color:var(--fg-dim)}
+.nav-links{display:flex;gap:4px;margin-inline-start:8px}
+.nav-link{padding:7px 12px;font-size:.9rem;color:var(--fg-muted);border-radius:var(--r-sm);white-space:nowrap;transition:color .15s,background .15s;cursor:pointer}
+.nav-link:hover{color:var(--fg-bright);background:var(--surface-2)}
+.nav-link.active{color:var(--fg-bright)}
+.nav-actions{display:flex;align-items:center;gap:10px;margin-inline-start:auto}
+.nav-icon{display:inline-flex;padding:8px;color:var(--fg-muted);border-radius:var(--r-sm);transition:color .15s,background .15s}
+.nav-icon:hover{color:var(--fg-bright);background:var(--surface-2)}
+.nav-cta{height:36px;padding-inline:15px;font-size:.88rem}
+.nav-toggle{display:none;flex-direction:column;gap:5px;background:none;border:0;padding:8px}
+.nav-toggle span{width:20px;height:1.5px;background:var(--fg);transition:transform .2s,opacity .2s}
+.nav-mobile{display:none;flex-direction:column;padding:8px 24px 16px;border-bottom:1px solid var(--border);background:var(--bg)}
+.nav-mobile.open{display:flex}
+.nav-mobile-link{padding:12px 4px;color:var(--fg-muted);border-bottom:1px solid var(--border);font-size:.98rem;cursor:pointer}
+.nav-mobile-link:hover,.nav-mobile-link.active{color:var(--fg-bright)}
+
+/* Nav dropdown. Seven or eight pages will not fit inline next to the utility
+   cluster -- the row stops shrinking and pushes the language toggle off the
+   right edge. Secondary pages live in here instead. On mobile the button is
+   hidden and the menu flattens into the list, so nothing becomes unreachable. */
+.navdrop{position:relative;flex:none}
+.navdrop>button{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;font-size:.9rem;color:var(--fg-muted);background:transparent;border:0;border-radius:var(--r-sm);white-space:nowrap;transition:color .15s,background .15s}
+.navdrop>button:hover,.navdrop.open>button{color:var(--fg-bright);background:var(--surface-2)}
+.navdrop.oncur>button{color:var(--fg-bright)}
+.navdrop>button:after{content:"";width:5px;height:5px;border-right:1.2px solid currentColor;border-bottom:1.2px solid currentColor;transform:translateY(-1px) rotate(45deg)}
+.dropmenu{display:none;position:absolute;top:calc(100% + 12px);left:50%;transform:translateX(-50%);min-width:210px;flex-direction:column;gap:2px;padding:8px;background:var(--surface-2);border:1px solid var(--border-strong);border-radius:var(--r-lg);box-shadow:0 12px 32px rgba(0,0,0,.45);z-index:120}
+html[data-theme="light"] .dropmenu{box-shadow:0 12px 32px rgba(11,13,18,.12)}
+.navdrop.open .dropmenu{display:flex}
+.dropmenu a{padding:8px 12px;font-size:.9rem;color:var(--fg-muted);border-radius:var(--r-sm);white-space:nowrap;cursor:pointer;transition:color .15s,background .15s}
+.dropmenu a:hover{color:var(--fg-bright);background:var(--surface-3)}
+.dropmenu a.active{color:var(--fg-bright);background:var(--surface-3)}
+
+/* Utility cluster: theme, self-download. Each control is guarded in the
+   script, so deleting a button here is the supported way to switch it off. */
+.utilbar{display:inline-flex;align-items:center;border:1px solid var(--border-strong);border-radius:var(--r-md);overflow:hidden}
+.utilbar button{display:inline-flex;align-items:center;gap:6px;height:34px;padding-inline:10px;background:transparent;border:0;border-inline-start:1px solid var(--border);color:var(--fg-dim);font-size:.78rem;letter-spacing:.02em;white-space:nowrap;transition:color .15s,background .15s}
+/* Icon-only: the HTML word costs width the row has none to spare for, and
+   the button carries a title and an aria-label. Delete this rule to show it,
+   and re-measure the budget above before you do. */
+.utilbar button span{display:none}
+.utilbar button:first-child{border-inline-start:0}
+.utilbar button:hover{color:var(--fg-bright);background:var(--surface-2)}
+.utilbar svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.lang-toggle{display:inline-flex;border:1px solid var(--border-strong);border-radius:var(--r-md);overflow:hidden}
+.lang-toggle button{height:34px;padding-inline:11px;background:transparent;border:0;color:var(--fg-dim);font-family:var(--font-mono);font-size:.76rem;white-space:nowrap;transition:color .15s,background .15s}
+.lang-toggle button.active{background:var(--fg-bright);color:var(--bg)}
+.lang-toggle button:not(.active):hover{color:var(--fg-bright);background:var(--surface-2)}
+@media(max-width:960px){.nav-links,.nav-cta{display:none}.nav-toggle{display:flex}}
+@media(max-width:520px){.utilbar{display:none}}
+/* Below 420px the nav has no slack left. The external-link icon goes first
+   because the mobile menu already carries the same link; then the gaps and
+   the language labels tighten. Checked against a 320px viewport. */
+@media(max-width:420px){
+  .nav-inner{gap:12px}
+  .nav-actions{gap:6px}
+  .nav-icon{display:none}
+  .lang-toggle button{padding-inline:8px;font-size:.72rem}
+}
+
+/* ============================== PAGES ============================== */
+/* Only the routed page is in the document flow. */
+.page{display:none}
+.page.active{display:block}
+
+/* ============================== HERO ============================== */
+.hero{position:relative;padding-top:clamp(64px,11vw,128px);padding-bottom:clamp(56px,8vw,96px);overflow:hidden}
+.hero-glow{position:absolute;top:-180px;left:50%;width:900px;height:560px;transform:translate(-50%);background:radial-gradient(50% 50% at 50% 50%,var(--glow),transparent 70%);filter:blur(20px);pointer-events:none}
+.hero-inner{position:relative;text-align:center;display:flex;flex-direction:column;align-items:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;height:32px;padding-inline:14px;border-radius:999px;border:1px solid var(--border-strong);background:rgba(255,255,255,.02);font-size:.82rem;color:var(--fg-muted);transition:border-color .2s,background .2s}
+.hero-badge:hover{border-color:var(--border-hover);background:var(--surface-2)}
+.hero-badge .dot{width:7px;height:7px;border-radius:999px;background:var(--success);box-shadow:0 0 8px var(--success)}
+.hero-badge-sep{color:var(--fg-faint)}
+.hero-badge svg{color:var(--fg-faint)}
+/* Gradient text: the fill is the gradient, so `color` is transparent. Any
+   colour set on a child span here will not show — style the token instead. */
+.hero-title{margin-top:26px;font-size:clamp(2.4rem,6.4vw,4.4rem);letter-spacing:-.04em;line-height:1.02;background:var(--title-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-sub{margin-top:22px;max-width:620px;font-size:clamp(1.02rem,1.9vw,1.22rem);line-height:1.55;color:var(--fg-muted)}
+.hero-cmd{margin-top:34px;width:100%;max-width:460px}
+.hero-cta{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.hero-compat{margin-top:52px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.hero-compat-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-faint)}
+.hero-compat-list{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 22px;max-width:720px}
+.hero-compat-item{color:var(--fg-dim);font-size:.92rem;font-weight:500;transition:color .2s}
+.hero-compat-item:hover{color:var(--fg)}
+
+/* =========================== COPY COMMAND =========================== */
+/* min-width:0 on both is what lets .cmd-text's own overflow-x:auto work. A
+   flex or grid item defaults to min-width:auto, so a long nowrap command
+   refuses to shrink and widens its whole column instead of scrolling inside
+   itself -- which at 320px pushes the page sideways. */
+.cmd{display:inline-flex;flex-direction:column;gap:8px;width:100%;max-width:100%;min-width:0}
+.cmd-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-faint)}
+.cmd-body{display:flex;align-items:center;gap:12px;min-width:0;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r-md);padding:0 8px 0 16px;font-family:var(--font-mono);transition:border-color .2s var(--ease);overflow:hidden}
+.cmd-body:hover{border-color:var(--border-hover)}
+.cmd-prompt{color:var(--accent);user-select:none;flex:none}
+.cmd-text{color:var(--fg);white-space:nowrap;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0;padding-block:14px;text-align:start}
+.cmd-text::-webkit-scrollbar{display:none}
+.cmd-btn{flex:none;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--r-sm);background:transparent;border:1px solid transparent;color:var(--fg-dim);transition:color .15s,background .15s,border-color .15s}
+.cmd-btn:hover{color:var(--fg-bright);background:var(--surface-3);border-color:var(--border)}
+.i-check{display:none;color:var(--success)}
+.cmd-btn.copied .i-copy{display:none}
+.cmd-btn.copied .i-check{display:block}
+.cmd-sm .cmd-body{padding-left:12px;font-size:.82rem}
+.cmd-sm .cmd-text{padding-block:10px}
+.cmd-lg .cmd-body{font-size:1rem;padding-left:18px}
+.cmd-lg .cmd-text{padding-block:17px}
+
+/* ============================ LIFECYCLE ============================ */
+.lifecycle{position:relative;width:100%}
+.lc-track{position:absolute;top:62px;left:6%;right:6%;height:1px;background:linear-gradient(90deg,transparent,var(--border-strong) 8%,var(--border-strong) 92%,transparent)}
+.lc-track:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,hsl(205 80% 60% / .9),hsl(175 70% 55% / .9),hsl(40 90% 60% / .9),hsl(340 75% 62% / .9),hsl(145 65% 55% / .9),transparent);background-size:220% 100%;-webkit-mask:linear-gradient(90deg,transparent,#000 20%,#000 80%,transparent);mask:linear-gradient(90deg,transparent,#000 20%,#000 80%,transparent);opacity:.55;animation:flow 6s linear infinite}
+@keyframes flow{to{background-position:-220% 0}}
+.lc-steps{position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:8px;list-style:none;margin:0;padding:0}
+.lc-step{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.lc-phase{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:hsl(var(--h) 45% 68%)}
+.lc-node{position:relative;display:flex;flex-direction:column;gap:2px;width:100%;max-width:108px;padding:12px 8px;background:var(--surface);border:1px solid hsl(var(--h) 40% 45% / .35);border-radius:var(--r-md);box-shadow:0 0 0 4px hsl(var(--h) 60% 50% / .04);transition:border-color .2s var(--ease),transform .2s var(--ease)}
+.lc-step:hover .lc-node{border-color:hsl(var(--h) 60% 55% / .7);transform:translateY(-2px)}
+.lc-verb{font-weight:600;font-size:.95rem;color:var(--fg-bright);letter-spacing:-.01em}
+.lc-sub{font-size:.72rem;color:var(--fg-dim)}
+.lc-cmd{font-family:var(--font-mono);font-size:11px;color:var(--fg-dim);padding:3px 7px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border)}
+.lifecycle-wrap{margin-bottom:48px;padding:40px 24px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--r-xl)}
+@media(max-width:720px){.lc-track{display:none}.lc-steps{grid-template-columns:repeat(3,1fr);gap:16px 8px}}
+@media(max-width:420px){.lc-steps{grid-template-columns:repeat(2,1fr)}.lc-sub{display:none}}
+
+/* ============================ SECTIONS ============================ */
+.sec-head{max-width:760px;margin-bottom:48px}
+.sec-head .section-title{margin-top:18px}
+.sec-head-row{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;max-width:none}
+.sec-head-cta{flex:none}
+.cmd-table{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.cmd-row{display:grid;grid-template-columns:130px 1fr auto;align-items:center;gap:16px;padding:14px 18px;background:var(--bg);transition:background .15s}
+.cmd-row:hover{background:var(--surface-2)}
+/* min-width:0 + overflow-wrap:anywhere keep a long command inside its fixed
+   column: without them a token like tedandlisa_thumbs.py escapes the 130px
+   track and runs into the description. Short commands never hit the break. */
+.cmd-row-cmd{font-family:var(--font-mono);font-size:.86rem;color:var(--accent);min-width:0;overflow-wrap:anywhere}
+.cmd-row-doing{color:var(--fg);font-size:.9rem}
+.cmd-row-principle{color:var(--fg-faint);font-size:.8rem;text-align:end}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.item-card{display:flex;flex-direction:column;padding:18px 18px 16px;height:100%;overflow:hidden}
+.item-card:before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(180deg,hsl(var(--h) 70% 60% / .22),transparent 45%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .25s var(--ease);pointer-events:none}
+.item-card:hover:before{opacity:1}
+.ic-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
+.ic-cmd{font-size:12px;color:var(--fg-dim)}
+.ic-name{font-size:.98rem;font-weight:500;letter-spacing:-.01em;color:var(--fg-bright);word-break:break-word}
+.ic-summary{margin-top:8px;color:var(--fg-muted);font-size:.88rem;line-height:1.5;flex:1}
+.ic-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+.ic-when{color:var(--fg-faint);font-size:.78rem;line-height:1.4}
+.ic-arrow{flex:none;color:var(--fg-dim);transition:transform .2s var(--ease),color .2s}
+.item-card:hover .ic-arrow{color:hsl(var(--h) 70% 72%);transform:translate(3px)}
+.pillars{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.pillar{padding:28px}
+.pillar-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:var(--r-md);background:var(--surface-3);border:1px solid var(--border);color:var(--fg);margin-bottom:20px}
+.pillar-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.pillar-tag{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.pillar-title{margin-top:10px;font-size:1.24rem;letter-spacing:-.02em}
+.pillar-body{margin-top:12px;color:var(--fg-muted);font-size:.94rem;line-height:1.6}
+.split-layout{display:grid;grid-template-columns:.85fr 1.15fr;gap:48px;align-items:center}
+.split-layout>*{min-width:0}
+.inline-cmd{font-family:var(--font-mono);color:var(--accent);background:var(--surface-2);padding:1px 7px;border-radius:5px;border:1px solid var(--border);font-size:.9em}
+.split-cta{margin-top:28px}
+.people-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.person-card{padding:20px}
+.person-head{display:flex;align-items:center;gap:12px}
+.person-avatar{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;flex:none;border-radius:10px;background:linear-gradient(145deg,var(--surface-3),var(--surface));border:1px solid var(--border-strong);font-family:var(--font-mono);font-size:.82rem;color:var(--fg-bright)}
+.person-name{font-size:.88rem;font-weight:500;color:var(--fg-bright)}
+.person-role{font-size:.78rem;color:var(--fg-dim)}
+.person-note{margin-top:14px;color:var(--fg-muted);font-size:.86rem;line-height:1.55}
+.final-cta{position:relative;text-align:center;overflow:hidden}
+.final-glow{top:auto;bottom:-260px;opacity:.8}
+.final-inner{position:relative;display:flex;flex-direction:column;align-items:center}
+.final-title{font-size:clamp(1.9rem,4.4vw,3rem);letter-spacing:-.03em;max-width:640px}
+.final-sub{margin-top:16px;color:var(--fg-muted);font-size:1.08rem}
+.final-cmd{margin-top:30px;width:100%;max-width:460px}
+.final-links{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+/* Callout: the one component the source did not have, added because a project
+   site always ends up needing to say "note this". Built from existing tokens. */
+.callout{margin-top:28px;padding:18px 20px;border:1px solid var(--border);border-inline-start:2px solid var(--accent);border-radius:var(--r-md);background:var(--surface);color:var(--fg-muted);font-size:.94rem;line-height:1.6}
+.callout b{color:var(--fg-bright);font-weight:500}
+@media(max-width:900px){.split-layout{grid-template-columns:1fr;gap:32px}.pillars{grid-template-columns:1fr}}
+@media(max-width:860px){.cards-grid{grid-template-columns:repeat(2,1fr)}.cmd-table{grid-template-columns:1fr}.sec-head-row{flex-direction:column;align-items:flex-start}}
+@media(max-width:560px){.cards-grid{grid-template-columns:1fr}.cmd-row{grid-template-columns:96px 1fr}.cmd-row-principle{display:none}.people-grid{grid-template-columns:1fr}}
+
+/* ============================ STEP LIST ============================
+   Numbered walkthrough. The number is generated from the list, so steps
+   renumber themselves when one is inserted or deleted. */
+.steps{list-style:none;counter-reset:step;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;max-width:var(--maxw-prose)}
+.step{counter-increment:step;position:relative;padding:18px 20px 18px 62px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);transition:border-color .2s var(--ease)}
+.step:hover{border-color:var(--border-hover)}
+.step:before{content:counter(step,decimal-leading-zero);position:absolute;left:20px;top:18px;font-family:var(--font-mono);font-size:.8rem;color:var(--accent)}
+.step h4{font-size:1rem;letter-spacing:-.01em}
+.step p{margin-top:6px;color:var(--fg-muted);font-size:.92rem;line-height:1.6}
+.step .cmd{margin-top:12px}
+
+/* ============================== TABLE ==============================
+   .tblwrap is what stops a wide table scrolling the whole page. Never
+   drop it, however few columns the table starts with. */
+.tblwrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface)}
+.tbl{width:100%;border-collapse:collapse;font-size:.9rem}
+.tbl th{text-align:start;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-dim);padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg-subtle);white-space:nowrap}
+.tbl td{padding:13px 16px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--fg-muted)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td:first-child{color:var(--fg-bright);font-weight:500}
+.tbl code{background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;color:var(--accent)}
+.pill{font-family:var(--font-mono);font-size:12px;white-space:nowrap}
+.pill-ok{color:var(--success)}
+.pill-warn{color:var(--warn)}
+.pill-no{color:var(--fg-faint)}
+
+/* ============================= CHECKLIST ============================= */
+.chk{list-style:none;margin:0;padding:0;max-width:var(--maxw-prose);font-size:.94rem;color:var(--fg-muted)}
+.chk li{position:relative;padding-inline-start:30px;margin-bottom:10px;line-height:1.6}
+.chk li:before{content:"\2610";position:absolute;inset-inline-start:0;top:-1px;font-family:var(--font-mono);color:var(--fg-dim)}
+.chk li.done:before{content:"\2611";color:var(--success)}
+.chk .cid{font-family:var(--font-mono);font-size:12px;color:var(--accent);margin-inline-end:10px}
+
+/* ============================== RELEASES ==============================
+   A dated entry list. The rule is drawn on the list, not on each row, so
+   the last entry has no trailing hairline to remove. */
+.releases{max-width:var(--maxw-prose);border-inline-start:1px solid var(--border);padding-inline-start:28px;display:flex;flex-direction:column;gap:32px}
+.release{position:relative}
+.release:before{content:"";position:absolute;inset-inline-start:-33px;top:7px;width:9px;height:9px;border-radius:999px;background:var(--surface-3);border:1px solid var(--border-hover)}
+.release.is-current:before{background:var(--accent);border-color:var(--accent);box-shadow:0 0 10px var(--accent)}
+.rel-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.rel-ver{font-family:var(--font-mono);font-size:1rem;color:var(--fg-bright)}
+.rel-date{font-family:var(--font-mono);font-size:12px;color:var(--fg-dim)}
+.rel-note{margin-top:8px;color:var(--fg-muted);font-size:.94rem;line-height:1.6}
+.rel-list{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.rel-list li{position:relative;padding-inline-start:18px;color:var(--fg-muted);font-size:.92rem;line-height:1.6}
+.rel-list li:before{content:"";position:absolute;inset-inline-start:0;top:.62em;width:5px;height:5px;border-radius:999px;background:var(--border-hover)}
+
+/* ============================== FOOTER ============================== */
+.footer{border-top:1px solid var(--border);background:var(--bg-subtle);padding-block:56px 32px}
+.footer-grid{display:grid;grid-template-columns:1.6fr repeat(3,1fr);gap:40px;margin-bottom:40px}
+.footer-tag{margin-top:16px;max-width:320px;color:var(--fg-dim);font-size:.9rem;line-height:1.55}
+.footer-cmd{margin-top:16px;display:inline-block;padding:8px 12px;font-size:.78rem;color:var(--fg-muted);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm)}
+.footer-col h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--fg-dim);font-weight:500;margin-bottom:14px}
+.footer-col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.footer-col a{color:var(--fg-muted);font-size:.9rem;transition:color .15s;cursor:pointer}
+.footer-col a:hover{color:var(--fg-bright)}
+.footer-bottom{display:flex;justify-content:space-between;gap:16px;margin-top:28px;color:var(--fg-faint);font-size:.82rem;align-items:center;flex-wrap:wrap}
+.footer-bottom a{color:var(--fg-dim)}
+.footer-bottom a:hover{color:var(--fg-bright)}
+/* House rule: the maker's credit stays on the page and links to the tool at
+   html.monomind.one — remove it only when the intake answered `credit: false`. */
+.mm-by{display:inline-flex;align-items:center;gap:7px;color:var(--fg-faint)}
+.mm-by svg{width:15px;height:15px;color:var(--fg-dim)}
+@media(max-width:780px){.footer-grid{grid-template-columns:1fr 1fr;gap:32px 24px}.footer-brand{grid-column:1 / -1}.footer-bottom{flex-direction:column;gap:6px;align-items:flex-start}}
+
+/* ============================== PRINT ============================== */
+/* Every page is printed, not just the routed one, and the chrome is
+   dropped. */
+@media print{
+  .nav,.nav-mobile,.skip-link{display:none!important}
+  .page{display:block!important;break-after:page}
+  .reveal{opacity:1!important;transform:none!important}
+  body{background:#fff;color:#111}
+  .hero-title,.final-title{background:none;-webkit-text-fill-color:#111;color:#111}
+  .hero-glow,.grid-bg{display:none}
+}
+</style>
+<!-- ==================================================================
+     MOTION. The lm token bridge, the lm base, the CSS of the seven
+     patterns this template uses (each verbatim from
+     references/motion-patterns.md), and this file's own glue. Load-bearing:
+     copy, never retype. To switch an effect off, remove its lm-* class from
+     the markup; do not edit these rules.
+     ================================================================== -->
+<style>
+/* lm bridge — the motion library reads only --lm-* names; this block maps
+   them onto this file's own tokens. Values stay the host's. */
+:root{
+  --lm-accent:var(--accent);
+  --lm-accent-2:var(--accent-strong);
+  --lm-fg:var(--fg);
+  --lm-fg-bright:var(--fg-bright);
+  --lm-fg-dim:var(--fg-dim);
+  --lm-surface:var(--surface);
+  --lm-surface-2:var(--surface-2);
+  --lm-border:var(--border);
+  --lm-glow:var(--glow);
+  --lm-radius:var(--r-lg);
+  --lm-ease:var(--ease);
+  --lm-font-mono:var(--font-mono);
+  --lm-nav-h:var(--nav-h);
+  --lm-dur:.6s;
+  --lm-dur-fast:.25s;
+  --lm-stagger:80ms;
+  --lm-marquee-duration:28s;
+}
+</style>
+<style>
+/* lm base. Base styles are the finished state; motion lives inside the
+   screen + no-preference media block, so reduced motion and print both get
+   the finished page without a rule each. */
+[class*="lm-"]:focus-visible{outline:2px solid var(--lm-accent,currentColor);outline-offset:2px}
+.lm-vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media screen and (prefers-reduced-motion: no-preference){
+  .lm-reveal{opacity:0;transform:translateY(14px);transition:opacity var(--lm-dur,.6s) var(--lm-ease,ease),transform var(--lm-dur,.6s) var(--lm-ease,ease)}
+  .lm-reveal.is-in{opacity:1;transform:none}
+}
+</style>
+<style>
+/* ---- pattern css, verbatim from references/motion-patterns.md ---- */
+/* -- 02 Staggered list -- */
+@media screen and (prefers-reduced-motion: no-preference){
+  .lm-stagger>*{opacity:0;transform:translateY(10px);transition:opacity var(--lm-dur,.6s) var(--lm-ease,ease),transform var(--lm-dur,.6s) var(--lm-ease,ease);transition-delay:min(calc(var(--i,0)*var(--lm-stagger,80ms)),720ms)}
+  .lm-stagger.is-in>*{opacity:1;transform:none}
+  .lm-stagger.lm-reveal{transition:none}
+  .lm-stagger>tr{transform:none}
+}
+
+/* -- 04 Wipe -- */
+.lm-wipe{-webkit-mask:linear-gradient(#000 0 0) 0 0/100% 100% no-repeat;mask:linear-gradient(#000 0 0) 0 0/100% 100% no-repeat}
+@media screen and (prefers-reduced-motion: no-preference){
+  .lm-wipe{transition:-webkit-mask-size 1.2s var(--lm-ease,ease),mask-size 1.2s var(--lm-ease,ease)}
+  .lm-wipe:not(.is-in){-webkit-mask-size:0% 100%;mask-size:0% 100%}
+}
+
+/* -- 13 Text mask -- */
+.lm-textmask{background-image:linear-gradient(90deg,var(--lm-fg-bright,currentColor) 0 50%,var(--lm-fg-dim,currentColor) 50% 100%);background-size:200% 100%;background-position:0 0;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+@media screen and (prefers-reduced-motion: no-preference){
+  .lm-textmask:not(.is-in){background-position:100% 0}
+  .lm-textmask{transition:background-position 1.1s var(--lm-ease,ease)}
+  @supports (animation-timeline: view()){
+    .lm-textmask.lm-view{transition:none;animation:lm-textmask linear both;animation-timeline:view();animation-range:entry 10% cover 45%}
+    .lm-textmask.lm-view:not(.is-in){background-position:0 0}
+  }
+  @keyframes lm-textmask{from{background-position:100% 0}to{background-position:0 0}}
+}
+@media print{.lm-textmask{background:none;color:inherit;-webkit-text-fill-color:currentColor}}
+
+/* -- 14 Typewriter -- */
+.lm-type{position:relative;display:inline-block;font-family:var(--lm-font-mono,monospace);white-space:nowrap}
+.lm-type-text{display:inline-block}
+@media screen and (prefers-reduced-motion: no-preference){
+  .lm-type:not(.is-in) .lm-type-text{clip-path:inset(0 100% 0 0)}
+  .lm-type.is-in .lm-type-text{animation:lm-type calc(var(--lm-chars,20)*55ms) steps(var(--lm-chars,20),end) both;animation-delay:var(--lm-type-delay,0s)}
+  .lm-type.is-in::after{content:"";position:absolute;left:0;top:.1em;width:.08em;height:1.1em;background:var(--lm-accent,currentColor);animation:lm-type-caret calc(var(--lm-chars,20)*55ms) steps(var(--lm-chars,20),end) both,lm-type-blink 1s steps(2) infinite;animation-delay:var(--lm-type-delay,0s),0s}
+  .lm-type.is-done .lm-type-text{animation:none}
+  .lm-type.is-done::after{content:none}
+  @keyframes lm-type{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+  @keyframes lm-type-caret{from{transform:translateX(0)}to{transform:translateX(calc(var(--lm-chars,20)*1ch))}}
+  @keyframes lm-type-blink{50%{opacity:0}}
+}
+
+/* -- 19 Marquee -- */
+.lm-marquee{--lm-marquee-gap:48px;display:flex;flex-wrap:wrap;gap:var(--lm-marquee-gap);width:100%;overflow:hidden}
+.lm-marquee-track{display:flex;flex-wrap:wrap;gap:var(--lm-marquee-gap);list-style:none;margin:0;padding:0;color:var(--lm-fg-dim,currentColor)}
+.lm-marquee-track+.lm-marquee-track{display:none}
+@media screen and (prefers-reduced-motion: no-preference){
+  .lm-marquee{flex-wrap:nowrap;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+  .lm-marquee-track{flex:none;flex-wrap:nowrap;min-width:100%;justify-content:space-around;will-change:transform;animation:lm-marquee var(--lm-marquee-duration,28s) linear infinite}
+  .lm-marquee-track+.lm-marquee-track{display:flex}
+  .lm-marquee:hover .lm-marquee-track,.lm-marquee:focus-within .lm-marquee-track{animation-play-state:paused}
+  @keyframes lm-marquee{to{transform:translateX(calc(-100% - var(--lm-marquee-gap)))}}
+}
+
+/* -- 20 Count-up -- */
+@property --lm-n{syntax:"<integer>";inherits:false;initial-value:0}
+.lm-count{font-variant-numeric:tabular-nums}
+.lm-count-n{display:none}
+.lm-count-n::after{counter-reset:lm-n var(--lm-n);content:counter(lm-n)}
+.lm-count.is-live .lm-count-n{display:inline}
+.lm-count.is-live .lm-count-final{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+
+/* -- 22 Spotlight border -- */
+@property --lm-mx{syntax:"<length-percentage>";inherits:true;initial-value:50%}
+@property --lm-my{syntax:"<length-percentage>";inherits:true;initial-value:50%}
+.lm-spotlight{position:relative}
+.lm-spotlight::after{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:radial-gradient(180px circle at var(--lm-mx) var(--lm-my),var(--lm-accent,currentColor),transparent 70%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;pointer-events:none}
+.lm-spotlight:focus-visible::after{opacity:1}
+@media (hover: hover) and (pointer: fine){.lm-spotlight:hover::after{opacity:1}}
+@media screen and (prefers-reduced-motion: no-preference){
+  .lm-spotlight::after{transition:opacity var(--lm-dur-fast,.25s) ease,--lm-mx .08s linear,--lm-my .08s linear}
+}
+</style>
+<style>
+/* ---- template glue: this file's own use of the patterns ---- */
+/* The spotlight ring replaces the item card's static hover edge. */
+.item-card.lm-spotlight:before{display:none}
+/* The compat strip is a marquee: two identical tracks, the second aria-hidden.
+   flex-start, not centre — a centred flex row splits its overflow to both
+   sides and the seam lands off-screen. The strip stretches to the hero's
+   width so the band's width:100% has something definite to resolve against;
+   content-sized, it would grow to its nowrap tracks and escape at 375px. */
+.hero-compat{align-self:stretch}
+.hero-compat-list.lm-marquee{justify-content:flex-start}
+/* Hero stat strip: three figures with a label. Integers count up. */
+.hero-stats{margin-top:44px;display:flex;flex-wrap:wrap;justify-content:center;gap:16px 44px}
+.stat{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:112px}
+.stat-n{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:600;letter-spacing:-.03em;line-height:1.1;color:var(--fg-bright);font-variant-numeric:tabular-nums}
+.stat-l{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-dim)}
+/* --fg-bright is the dark palette's white; on paper the figure inherits the
+   print colour like the titles do. */
+@media print{.stat-n{color:inherit}}
+</style>
+</head>
+<body data-lang="en">
+<a href="#main" class="skip-link"><span class="en">Skip to content</span><span class="ko">본문으로 건너뛰기</span></a>
+
+<!-- ==================================================================
+     NAV. One entry per page. `data-page` must match a section.page id
+     AND the PAGES array at the foot of the file. The desktop list and
+     the mobile list are separate DOM — add a page to both.
+     ================================================================== -->
+<header class="nav">
+  <div class="nav-inner container">
+    <a class="brand" id="brandLink" aria-label="[PROJECT] home">
+      <span class="brand-mark" aria-hidden="true">
+        <!-- Project mark. Swap this SVG for the project's own; keep it at
+             22px and on currentColor so it follows the accent token. -->
+        <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
+          <path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+          <path d="M12 3v18M4 7.5l8 4.5 8-4.5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" opacity="0.55"/>
+        </svg>
+      </span>
+      <!-- A product name is an identifier, not prose: written once, outside
+           any .en/.ko span, so it reads the same in both languages. -->
+      <span class="brand-name">[PROJECT]<span class="brand-dim">[-SUFFIX]</span></span>
+    </a>
+
+    <nav class="nav-links" id="navLinks" aria-label="Primary">
+      <a class="nav-link" data-page="home"><span class="en">Home</span><span class="ko">홈</span></a>
+      <a class="nav-link" data-page="catalog"><span class="en">[PAGE 2]</span><span class="ko">[페이지 2]</span></a>
+      <a class="nav-link" data-page="how"><span class="en">[PAGE 3]</span><span class="ko">[페이지 3]</span></a>
+      <a class="nav-link" data-page="guides"><span class="en">Guides</span><span class="ko">가이드</span></a>
+      <a class="nav-link" data-page="docs"><span class="en">Docs</span><span class="ko">문서</span></a>
+      <!-- Secondary pages. Anything beyond about five inline links stops the
+           row shrinking and pushes the language toggle off the right edge, so
+           the overflow goes here rather than into the row. `oncur` is set by
+           apply() when the routed page is one of DROP_PAGES. -->
+      <div class="navdrop" id="navDrop">
+        <button onclick="toggleDrop(event)"><span class="en">More</span><span class="ko">더 보기</span></button>
+        <div class="dropmenu">
+          <a data-page="compare"><span class="en">Compare</span><span class="ko">비교</span></a>
+          <a data-page="changelog"><span class="en">Changelog</span><span class="ko">변경 이력</span></a>
+          <a data-page="contribute"><span class="en">Contribute</span><span class="ko">참여하기</span></a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="nav-actions">
+      <!-- Optional external link. Delete the anchor if the project has none. -->
+      <a href="[REPO OR EXTERNAL URL]" class="nav-icon" target="_blank" rel="noopener" aria-label="[EXTERNAL LINK LABEL]">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+
+      <!-- Utility cluster. Every button is guarded in the script: deleting
+           one here turns that feature off cleanly. -->
+      <div class="utilbar">
+        <button id="btnTheme" title="Theme" aria-label="Theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg>
+        </button>
+        <button id="btnHtml" title="Download the HTML">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 3.6-3.6M12 15l-3.6-3.6M5 19h14"/></svg><span>HTML</span>
+        </button>
+      </div>
+
+      <div class="lang-toggle">
+        <button id="btnEn" onclick="setLang('en')">EN</button>
+        <button id="btnKo" onclick="setLang('ko')">한국어</button>
+      </div>
+
+      <a class="btn btn-primary nav-cta" onclick="go('docs')"><span class="en">[NAV CTA]</span><span class="ko">[내비 CTA]</span></a>
+
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false" data-nav-toggle>
+        <span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <nav class="nav-mobile" aria-label="Mobile" data-nav-mobile>
+    <a class="nav-mobile-link" data-page="home"><span class="en">Home</span><span class="ko">홈</span></a>
+    <a class="nav-mobile-link" data-page="catalog"><span class="en">[PAGE 2]</span><span class="ko">[페이지 2]</span></a>
+    <a class="nav-mobile-link" data-page="how"><span class="en">[PAGE 3]</span><span class="ko">[페이지 3]</span></a>
+    <a class="nav-mobile-link" data-page="guides"><span class="en">Guides</span><span class="ko">가이드</span></a>
+    <a class="nav-mobile-link" data-page="docs"><span class="en">Docs</span><span class="ko">문서</span></a>
+    <a class="nav-mobile-link" data-page="compare"><span class="en">Compare</span><span class="ko">비교</span></a>
+    <a class="nav-mobile-link" data-page="changelog"><span class="en">Changelog</span><span class="ko">변경 이력</span></a>
+    <a class="nav-mobile-link" data-page="contribute"><span class="en">Contribute</span><span class="ko">참여하기</span></a>
+    <a href="[REPO OR EXTERNAL URL]" class="nav-mobile-link" target="_blank" rel="noopener">[EXTERNAL LINK] ↗</a>
+  </nav>
+</header>
+
+<!-- LISA:CONTENT-START pages -->
+<!-- Edit between these markers. Everything outside is load-bearing chrome: copy the file with cp, never retype it. -->
+<main id="main">
+
+<!-- ======================== PAGE 1: HOME ======================== -->
+<section class="page" id="page-home">
+
+  <section class="hero">
+    <div class="grid-bg"></div>
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="container hero-inner lm-stagger lm-on">
+
+      <a href="[BADGE LINK]" target="_blank" rel="noopener" class="hero-badge">
+        <span class="dot"></span>
+        <span class="en">[BADGE CLAIM]</span><span class="ko">[배지 문구]</span>
+        <span class="hero-badge-sep">·</span>
+        <span class="text-muted"><span class="en">[BADGE DETAIL]</span><span class="ko">[배지 상세]</span></span>
+        <svg viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M5 3.5h7.5V11M12.5 3.5 3.5 12.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+
+      <h1 class="hero-title">
+        <span class="en">[THE PROMISE, IN ONE SENTENCE.]<br>[SECOND LINE IF IT NEEDS ONE.]</span><span class="ko">[한 문장으로 표현한 약속.]<br>[필요하면 둘째 줄.]</span>
+      </h1>
+
+      <p class="hero-sub"><span class="en">[Two or three sentences of support. What this is, who it is for, and what changes for them once they have it.]</span><span class="ko">[두세 문장의 보충 설명. 무엇이고, 누구를 위한 것이며, 무엇이 달라지는지.]</span></p>
+
+      <!-- Copy-to-clipboard. The three data attributes are a set: -root is the
+           container queried at load, -text is the string that gets copied, and
+           -btn is what flips to the tick. Change the command in ONE place —
+           data-copy-text is the source of truth; the aria-label repeats it.
+           MOTION: the command types itself (.lm-type). The text lives in
+           .lm-type-text INSIDE data-copy-text, so the copied string stays whole;
+           --lm-type-delay holds the caret until the hero stagger has landed. -->
+      <div class="hero-cmd">
+        <div class="cmd cmd-lg" data-copy-root>
+          <div class="cmd-body">
+            <span class="cmd-prompt" aria-hidden="true">$</span>
+            <code class="cmd-text" data-copy-text><span class="lm-type lm-on" style="--lm-type-delay:.9s"><span class="lm-type-text">[install or run command]</span></span></code>
+            <button class="cmd-btn" data-copy-btn aria-label="Copy: [install or run command]">
+              <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+              <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-cta">
+        <a class="btn btn-primary" onclick="go('docs')">
+          <span class="en">[PRIMARY ACTION]</span><span class="ko">[주요 동작]</span>
+          <svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="btn btn-secondary" onclick="go('catalog')"><span class="en">[SECONDARY ACTION]</span><span class="ko">[보조 동작]</span></a>
+      </div>
+
+      <!-- Compatibility strip. Names of things are identifiers, so they are
+           written once, outside .en/.ko. Delete the block if there is no
+           ecosystem to claim; do not fill it with decoration.
+           MOTION: an endless marquee (.lm-marquee). The second track is an
+           exact copy and aria-hidden — it is the seam. Reduced motion shows
+           one wrapping row. Six or more names, or the band has holes. -->
+      <div class="hero-compat">
+        <span class="hero-compat-label"><span class="en">[WHAT IT WORKS WITH]</span><span class="ko">[호환 대상]</span></span>
+        <div class="hero-compat-list lm-marquee">
+          <ul class="lm-marquee-track">
+            <li class="hero-compat-item">[NAME 1]</li>
+            <li class="hero-compat-item">[NAME 2]</li>
+            <li class="hero-compat-item">[NAME 3]</li>
+            <li class="hero-compat-item">[NAME 4]</li>
+            <li class="hero-compat-item">[NAME 5]</li>
+            <li class="hero-compat-item">[NAME 6]</li>
+          </ul>
+          <ul class="lm-marquee-track" aria-hidden="true">
+            <li class="hero-compat-item">[NAME 1]</li>
+            <li class="hero-compat-item">[NAME 2]</li>
+            <li class="hero-compat-item">[NAME 3]</li>
+            <li class="hero-compat-item">[NAME 4]</li>
+            <li class="hero-compat-item">[NAME 5]</li>
+            <li class="hero-compat-item">[NAME 6]</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Stat strip. Three figures that argue something, each counting up
+           (.lm-count): data-lm-to is the integer, .lm-count-final the
+           formatted figure with its separators and unit. A figure you do not
+           have stays a bracketed slot, which renders static. Delete the whole
+           strip rather than invent a number. -->
+      <div class="hero-stats" role="list">
+        <div class="stat" role="listitem">
+          <span class="stat-n"><span class="lm-count lm-on" data-lm-to="[1200]"><span class="lm-count-n" aria-hidden="true"></span><span class="lm-count-final">[1,200]</span></span></span>
+          <span class="stat-l"><span class="en">[WHAT IT COUNTS]</span><span class="ko">[무엇의 수]</span></span>
+        </div>
+        <div class="stat" role="listitem">
+          <span class="stat-n"><span class="lm-count lm-on" data-lm-to="[98]"><span class="lm-count-n" aria-hidden="true"></span><span class="lm-count-final">[98%]</span></span></span>
+          <span class="stat-l"><span class="en">[WHAT IT COUNTS]</span><span class="ko">[무엇의 수]</span></span>
+        </div>
+        <div class="stat" role="listitem">
+          <span class="stat-n"><span class="lm-count lm-on" data-lm-to="[14]"><span class="lm-count-n" aria-hidden="true"></span><span class="lm-count-final">[14]</span></span></span>
+          <span class="stat-l"><span class="en">[WHAT IT COUNTS]</span><span class="ko">[무엇의 수]</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---- Band 01: the process diagram ---- -->
+  <section class="section">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="eyebrow-num">01</span> <span class="en">[EYEBROW]</span><span class="ko">[라벨]</span></span>
+        <h2 class="section-title"><span class="en">[SECTION HEADLINE AS A SENTENCE.]</span><span class="ko">[문장형 섹션 제목.]</span></h2>
+        <p class="section-lede"><span class="en">[Two sentences explaining the shape of the thing the diagram below shows.]</span><span class="ko">[아래 다이어그램이 무엇을 보여주는지 두 문장으로.]</span></p>
+      </div>
+
+      <!-- Six-step track. --h is the hue for that step and tints the label,
+           the node border, and its glow. Keep six steps or the animated
+           track's spacing has to be re-tuned; three fit on a phone.
+           MOTION: the track wipes in left to right (.lm-wipe) and the six
+           steps rise in sequence (.lm-stagger) — one moment, not a wrap
+           fade on top of it, which is why .reveal is gone from the wrap. -->
+      <div class="lifecycle-wrap">
+        <div class="lifecycle" role="img" aria-label="[DIAGRAM DESCRIPTION FOR SCREEN READERS]">
+          <div class="lc-track lm-wipe lm-on" aria-hidden="true"></div>
+          <ol class="lc-steps lm-stagger lm-on">
+            <li class="lc-step" style="--h:205">
+              <span class="lc-phase"><span class="en">[PHASE 1]</span><span class="ko">[단계 1]</span></span>
+              <div class="lc-node"><span class="lc-verb"><span class="en">[VERB]</span><span class="ko">[동사]</span></span><span class="lc-sub"><span class="en">[sub]</span><span class="ko">[보조]</span></span></div>
+              <code class="lc-cmd">[/cmd]</code>
+            </li>
+            <li class="lc-step" style="--h:255">
+              <span class="lc-phase"><span class="en">[PHASE 2]</span><span class="ko">[단계 2]</span></span>
+              <div class="lc-node"><span class="lc-verb"><span class="en">[VERB]</span><span class="ko">[동사]</span></span><span class="lc-sub"><span class="en">[sub]</span><span class="ko">[보조]</span></span></div>
+              <code class="lc-cmd">[/cmd]</code>
+            </li>
+            <li class="lc-step" style="--h:175">
+              <span class="lc-phase"><span class="en">[PHASE 3]</span><span class="ko">[단계 3]</span></span>
+              <div class="lc-node"><span class="lc-verb"><span class="en">[VERB]</span><span class="ko">[동사]</span></span><span class="lc-sub"><span class="en">[sub]</span><span class="ko">[보조]</span></span></div>
+              <code class="lc-cmd">[/cmd]</code>
+            </li>
+            <li class="lc-step" style="--h:40">
+              <span class="lc-phase"><span class="en">[PHASE 4]</span><span class="ko">[단계 4]</span></span>
+              <div class="lc-node"><span class="lc-verb"><span class="en">[VERB]</span><span class="ko">[동사]</span></span><span class="lc-sub"><span class="en">[sub]</span><span class="ko">[보조]</span></span></div>
+              <code class="lc-cmd">[/cmd]</code>
+            </li>
+            <li class="lc-step" style="--h:340">
+              <span class="lc-phase"><span class="en">[PHASE 5]</span><span class="ko">[단계 5]</span></span>
+              <div class="lc-node"><span class="lc-verb"><span class="en">[VERB]</span><span class="ko">[동사]</span></span><span class="lc-sub"><span class="en">[sub]</span><span class="ko">[보조]</span></span></div>
+              <code class="lc-cmd">[/cmd]</code>
+            </li>
+            <li class="lc-step" style="--h:145">
+              <span class="lc-phase"><span class="en">[PHASE 6]</span><span class="ko">[단계 6]</span></span>
+              <div class="lc-node"><span class="lc-verb"><span class="en">[VERB]</span><span class="ko">[동사]</span></span><span class="lc-sub"><span class="en">[sub]</span><span class="ko">[보조]</span></span></div>
+              <code class="lc-cmd">[/cmd]</code>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Two-column register. Rows are anchors so a row can route to a page;
+           drop the onclick and use a <div class="cmd-row"> for a static row. -->
+      <div class="cmd-table reveal">
+        <a class="cmd-row" onclick="go('docs')"><code class="cmd-row-cmd">[/cmd-1]</code><span class="cmd-row-doing"><span class="en">[What it does]</span><span class="ko">[하는 일]</span></span><span class="cmd-row-principle"><span class="en">[Principle]</span><span class="ko">[원칙]</span></span></a>
+        <a class="cmd-row" onclick="go('docs')"><code class="cmd-row-cmd">[/cmd-2]</code><span class="cmd-row-doing"><span class="en">[What it does]</span><span class="ko">[하는 일]</span></span><span class="cmd-row-principle"><span class="en">[Principle]</span><span class="ko">[원칙]</span></span></a>
+        <a class="cmd-row" onclick="go('docs')"><code class="cmd-row-cmd">[/cmd-3]</code><span class="cmd-row-doing"><span class="en">[What it does]</span><span class="ko">[하는 일]</span></span><span class="cmd-row-principle"><span class="en">[Principle]</span><span class="ko">[원칙]</span></span></a>
+        <a class="cmd-row" onclick="go('docs')"><code class="cmd-row-cmd">[/cmd-4]</code><span class="cmd-row-doing"><span class="en">[What it does]</span><span class="ko">[하는 일]</span></span><span class="cmd-row-principle"><span class="en">[Principle]</span><span class="ko">[원칙]</span></span></a>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hairline">
+
+  <!-- ---- Band 02: the final ask ---- -->
+  <section class="section final-cta">
+    <div class="hero-glow final-glow" aria-hidden="true"></div>
+    <!-- MOTION: the closing title's fill sweeps in (.lm-textmask) while the
+         block rises in sequence (.lm-stagger). -->
+    <div class="container final-inner lm-stagger lm-on">
+      <h2 class="final-title lm-textmask lm-on"><span class="en">[THE ONE THING YOU WANT THEM TO DO.]</span><span class="ko">[방문자가 해주길 바라는 한 가지.]</span></h2>
+      <p class="final-sub"><span class="en">[One sentence that removes the last objection.]</span><span class="ko">[마지막 망설임을 없애는 한 문장.]</span></p>
+      <div class="final-cmd">
+        <div class="cmd cmd-lg" data-copy-root>
+          <div class="cmd-body">
+            <span class="cmd-prompt" aria-hidden="true">$</span>
+            <code class="cmd-text" data-copy-text>[install or run command]</code>
+            <button class="cmd-btn" data-copy-btn aria-label="Copy: [install or run command]">
+              <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+              <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="final-links">
+        <a class="btn btn-primary" onclick="go('docs')"><span class="en">[PRIMARY ACTION]</span><span class="ko">[주요 동작]</span></a>
+        <a href="[REPO OR EXTERNAL URL]" target="_blank" rel="noopener" class="btn btn-secondary"><span class="en">[SECONDARY ACTION]</span><span class="ko">[보조 동작]</span></a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ======================== PAGE 2: CATALOG ========================
+     The card grid. --h on each card is its category hue and tints the
+     chip, the dot, the hover edge, and the arrow from one number.
+     MOTION: the grid rises card by card (.lm-stagger) and each card's edge
+     lights up under the pointer (.lm-spotlight), replacing the static hover
+     edge. Touch readers keep the plain card. -->
+<section class="page" id="page-catalog">
+  <section class="section">
+    <div class="container">
+      <div class="sec-head sec-head-row reveal">
+        <div>
+          <span class="eyebrow"><span class="eyebrow-num">02</span> <span class="en">[EYEBROW]</span><span class="ko">[라벨]</span></span>
+          <h2 class="section-title"><span class="en">[WHAT THIS PAGE LISTS.]</span><span class="ko">[이 페이지가 나열하는 것.]</span></h2>
+          <p class="section-lede"><span class="en">[Two sentences on what the items are and how to pick one.]</span><span class="ko">[항목이 무엇이고 어떻게 고르는지 두 문장으로.]</span></p>
+        </div>
+        <a class="btn btn-secondary sec-head-cta" onclick="go('docs')">
+          <span class="en">[SECTION CTA]</span><span class="ko">[섹션 CTA]</span>
+          <svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+
+      <div class="cards-grid lm-stagger lm-on">
+        <a class="card item-card lm-spotlight" style="--h:205" onclick="go('docs')">
+          <div class="ic-top">
+            <span class="chip phase-chip"><span class="phase-dot"></span><span class="en">[CATEGORY]</span><span class="ko">[분류]</span></span>
+            <span class="ic-cmd mono">[/cmd]</span>
+          </div>
+          <h3 class="ic-name mono">[item-name]</h3>
+          <p class="ic-summary"><span class="en">[What it is, in one sentence.]</span><span class="ko">[한 문장 설명.]</span></p>
+          <div class="ic-foot">
+            <span class="ic-when"><span class="en">[When to reach for it.]</span><span class="ko">[언제 쓰는지.]</span></span>
+            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </a>
+
+        <a class="card item-card lm-spotlight" style="--h:255" onclick="go('docs')">
+          <div class="ic-top">
+            <span class="chip phase-chip"><span class="phase-dot"></span><span class="en">[CATEGORY]</span><span class="ko">[분류]</span></span>
+            <span class="ic-cmd mono">[/cmd]</span>
+          </div>
+          <h3 class="ic-name mono">[item-name]</h3>
+          <p class="ic-summary"><span class="en">[What it is, in one sentence.]</span><span class="ko">[한 문장 설명.]</span></p>
+          <div class="ic-foot">
+            <span class="ic-when"><span class="en">[When to reach for it.]</span><span class="ko">[언제 쓰는지.]</span></span>
+            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </a>
+
+        <!-- A card with no command chip: the .ic-cmd span is simply absent. -->
+        <a class="card item-card lm-spotlight" style="--h:175" onclick="go('docs')">
+          <div class="ic-top">
+            <span class="chip phase-chip"><span class="phase-dot"></span><span class="en">[CATEGORY]</span><span class="ko">[분류]</span></span>
+          </div>
+          <h3 class="ic-name mono">[item-name]</h3>
+          <p class="ic-summary"><span class="en">[What it is, in one sentence.]</span><span class="ko">[한 문장 설명.]</span></p>
+          <div class="ic-foot">
+            <span class="ic-when"><span class="en">[When to reach for it.]</span><span class="ko">[언제 쓰는지.]</span></span>
+            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </a>
+
+        <a class="card item-card lm-spotlight" style="--h:40" onclick="go('docs')">
+          <div class="ic-top">
+            <span class="chip phase-chip"><span class="phase-dot"></span><span class="en">[CATEGORY]</span><span class="ko">[분류]</span></span>
+            <span class="ic-cmd mono">[/cmd]</span>
+          </div>
+          <h3 class="ic-name mono">[item-name]</h3>
+          <p class="ic-summary"><span class="en">[What it is, in one sentence.]</span><span class="ko">[한 문장 설명.]</span></p>
+          <div class="ic-foot">
+            <span class="ic-when"><span class="en">[When to reach for it.]</span><span class="ko">[언제 쓰는지.]</span></span>
+            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </a>
+
+        <a class="card item-card lm-spotlight" style="--h:340" onclick="go('docs')">
+          <div class="ic-top">
+            <span class="chip phase-chip"><span class="phase-dot"></span><span class="en">[CATEGORY]</span><span class="ko">[분류]</span></span>
+            <span class="ic-cmd mono">[/cmd]</span>
+          </div>
+          <h3 class="ic-name mono">[item-name]</h3>
+          <p class="ic-summary"><span class="en">[What it is, in one sentence.]</span><span class="ko">[한 문장 설명.]</span></p>
+          <div class="ic-foot">
+            <span class="ic-when"><span class="en">[When to reach for it.]</span><span class="ko">[언제 쓰는지.]</span></span>
+            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </a>
+
+        <a class="card item-card lm-spotlight" style="--h:145" onclick="go('docs')">
+          <div class="ic-top">
+            <span class="chip phase-chip"><span class="phase-dot"></span><span class="en">[CATEGORY]</span><span class="ko">[분류]</span></span>
+            <span class="ic-cmd mono">[/cmd]</span>
+          </div>
+          <h3 class="ic-name mono">[item-name]</h3>
+          <p class="ic-summary"><span class="en">[What it is, in one sentence.]</span><span class="ko">[한 문장 설명.]</span></p>
+          <div class="ic-foot">
+            <span class="ic-when"><span class="en">[When to reach for it.]</span><span class="ko">[언제 쓰는지.]</span></span>
+            <span class="ic-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M4 8h8M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ======================== PAGE 3: HOW IT WORKS ======================== -->
+<section class="page" id="page-how">
+  <section class="section">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="eyebrow-num">03</span> <span class="en">[EYEBROW]</span><span class="ko">[라벨]</span></span>
+        <h2 class="section-title"><span class="en">[THE ARGUMENT, AS A SENTENCE.]<br>[THE TURN, IF IT NEEDS ONE.]</span><span class="ko">[문장으로 쓴 주장.]<br>[필요하면 반전 문장.]</span></h2>
+        <p class="section-lede"><span class="en">[Two sentences setting up the four pillars below.]</span><span class="ko">[아래 네 기둥을 소개하는 두 문장.]</span></p>
+      </div>
+
+      <div class="pillars lm-stagger lm-on">
+        <article class="card pillar">
+          <div class="pillar-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 4.6 6.4v5.1c0 4.4 3.1 8.1 7.4 9.3 4.3-1.2 7.4-4.9 7.4-9.3V6.4Z"/></svg></div>
+          <span class="pillar-tag mono"><span class="en">[TAG]</span><span class="ko">[태그]</span></span>
+          <h3 class="pillar-title"><span class="en">[What this mechanism guarantees]</span><span class="ko">[이 장치가 보장하는 것]</span></h3>
+          <p class="pillar-body"><span class="en">[Two or three sentences. Say the mechanism, not the benefit.]</span><span class="ko">[두세 문장. 효과가 아니라 장치를 설명할 것.]</span></p>
+        </article>
+        <article class="card pillar">
+          <div class="pillar-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5 9.5 17.5 19.5 7"/></svg></div>
+          <span class="pillar-tag mono"><span class="en">[TAG]</span><span class="ko">[태그]</span></span>
+          <h3 class="pillar-title"><span class="en">[What this mechanism guarantees]</span><span class="ko">[이 장치가 보장하는 것]</span></h3>
+          <p class="pillar-body"><span class="en">[Two or three sentences.]</span><span class="ko">[두세 문장.]</span></p>
+        </article>
+        <article class="card pillar">
+          <div class="pillar-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="6.5" r="2.6"/><circle cx="5.5" cy="17.5" r="2.6"/><circle cx="18.5" cy="17.5" r="2.6"/><path d="M12 9.1v3.3M12 12.4 6.9 15.6M12 12.4l5.1 3.2"/></svg></div>
+          <span class="pillar-tag mono"><span class="en">[TAG]</span><span class="ko">[태그]</span></span>
+          <h3 class="pillar-title"><span class="en">[What this mechanism guarantees]</span><span class="ko">[이 장치가 보장하는 것]</span></h3>
+          <p class="pillar-body"><span class="en">[Two or three sentences.]</span><span class="ko">[두세 문장.]</span></p>
+        </article>
+        <article class="card pillar">
+          <div class="pillar-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5V9.8M9.8 19.5V4.5M15.2 19.5v-7.4M20.5 19.5v-11"/></svg></div>
+          <span class="pillar-tag mono"><span class="en">[TAG]</span><span class="ko">[태그]</span></span>
+          <h3 class="pillar-title"><span class="en">[What this mechanism guarantees]</span><span class="ko">[이 장치가 보장하는 것]</span></h3>
+          <p class="pillar-body"><span class="en">[Two or three sentences.]</span><span class="ko">[두세 문장.]</span></p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hairline">
+
+  <!-- Asymmetric split: argument on the left, evidence on the right. -->
+  <section class="section">
+    <div class="container">
+      <div class="split-layout">
+        <div class="reveal">
+          <span class="eyebrow"><span class="eyebrow-num">04</span> <span class="en">[EYEBROW]</span><span class="ko">[라벨]</span></span>
+          <h2 class="section-title"><span class="en">[THE CLAIM THE CARDS PROVE]</span><span class="ko">[카드가 뒷받침하는 주장]</span></h2>
+          <!-- An inline <code> or <strong> goes INSIDE each language span, never
+               between them: an element sitting between .en and .ko belongs to
+               neither, so it renders in both languages and the reader sees it
+               twice. The identifier is therefore written once per language. -->
+          <p class="section-lede"><span class="en">[Explain the claim. Use <code class="inline-cmd">[/cmd]</code> inline when naming a command — an identifier inside a sentence lives inside that sentence's span.]</span><span class="ko">[주장을 설명합니다. 문장 안에서 <code class="inline-cmd">[/cmd]</code> 처럼 명령을 언급할 때는, 식별자를 해당 언어 span 안에 넣습니다.]</span></p>
+          <a class="btn btn-secondary split-cta" onclick="go('docs')"><span class="en">[SECTION CTA]</span><span class="ko">[섹션 CTA]</span></a>
+        </div>
+
+        <div class="people-grid lm-stagger lm-on">
+          <div class="card person-card">
+            <div class="person-head">
+              <span class="person-avatar" aria-hidden="true">[AB]</span>
+              <div><h3 class="person-name mono">[name-or-role]</h3><span class="person-role"><span class="en">[Title]</span><span class="ko">[직함]</span></span></div>
+            </div>
+            <p class="person-note"><span class="en">[What this one contributes, in one sentence.]</span><span class="ko">[이 항목이 기여하는 바, 한 문장.]</span></p>
+          </div>
+          <div class="card person-card">
+            <div class="person-head">
+              <span class="person-avatar" aria-hidden="true">[CD]</span>
+              <div><h3 class="person-name mono">[name-or-role]</h3><span class="person-role"><span class="en">[Title]</span><span class="ko">[직함]</span></span></div>
+            </div>
+            <p class="person-note"><span class="en">[What this one contributes.]</span><span class="ko">[기여하는 바.]</span></p>
+          </div>
+          <div class="card person-card">
+            <div class="person-head">
+              <span class="person-avatar" aria-hidden="true">[EF]</span>
+              <div><h3 class="person-name mono">[name-or-role]</h3><span class="person-role"><span class="en">[Title]</span><span class="ko">[직함]</span></span></div>
+            </div>
+            <p class="person-note"><span class="en">[What this one contributes.]</span><span class="ko">[기여하는 바.]</span></p>
+          </div>
+          <div class="card person-card">
+            <div class="person-head">
+              <span class="person-avatar" aria-hidden="true">[GH]</span>
+              <div><h3 class="person-name mono">[name-or-role]</h3><span class="person-role"><span class="en">[Title]</span><span class="ko">[직함]</span></span></div>
+            </div>
+            <p class="person-note"><span class="en">[What this one contributes.]</span><span class="ko">[기여하는 바.]</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ======================== PAGE 4: DOCS ========================
+     The text-forward page. Prose is capped at --maxw-prose so a line
+     stays readable; the small copy blocks carry the commands. -->
+<section class="page" id="page-docs">
+  <section class="section">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="eyebrow-num">05</span> <span class="en">Getting started</span><span class="ko">시작하기</span></span>
+        <h2 class="section-title"><span class="en">[HOW TO BEGIN, IN A SENTENCE.]</span><span class="ko">[시작 방법, 한 문장.]</span></h2>
+        <p class="section-lede"><span class="en">[What a reader will have working by the end of this page.]</span><span class="ko">[이 페이지를 끝내면 무엇이 동작하는지.]</span></p>
+      </div>
+
+      <div class="prose reveal">
+        <p><span class="en">[Opening paragraph. Prose carries both languages exactly like every other string; there is no translation service to fall back on.]</span><span class="ko">[도입 문단. 산문도 다른 문자열과 똑같이 두 언어를 함께 씁니다.]</span></p>
+        <p><span class="en">[Second paragraph. Mark the words that matter with <strong>strong</strong>, not with colour.]</span><span class="ko">[둘째 문단. 중요한 단어는 색이 아니라 <strong>굵게</strong>로 표시합니다.]</span></p>
+      </div>
+
+      <div class="callout reveal">
+        <b><span class="en">[Note.]</span><span class="ko">[참고.]</span></b> <span class="en">[The thing a reader will otherwise get wrong.]</span><span class="ko">[그냥 두면 틀리기 쉬운 지점.]</span>
+      </div>
+
+      <!-- Small copy blocks. Same three data attributes as the large one. -->
+      <div class="reveal" style="margin-top:28px;display:flex;flex-direction:column;gap:14px;max-width:var(--maxw-prose)">
+        <div class="cmd cmd-sm" data-copy-root>
+          <span class="cmd-label"><span class="en">[STEP 1 LABEL]</span><span class="ko">[1단계 라벨]</span></span>
+          <div class="cmd-body">
+            <span class="cmd-prompt" aria-hidden="true">$</span>
+            <code class="cmd-text" data-copy-text>[command one]</code>
+            <button class="cmd-btn" data-copy-btn aria-label="Copy: [command one]">
+              <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+              <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="cmd cmd-sm" data-copy-root>
+          <span class="cmd-label"><span class="en">[STEP 2 LABEL]</span><span class="ko">[2단계 라벨]</span></span>
+          <div class="cmd-body">
+            <span class="cmd-prompt" aria-hidden="true">$</span>
+            <code class="cmd-text" data-copy-text>[command two]</code>
+            <button class="cmd-btn" data-copy-btn aria-label="Copy: [command two]">
+              <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+              <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ======================== PAGE 5: GUIDES ========================
+     The walkthrough page. .steps numbers itself from the list, so
+     inserting or deleting a step renumbers the rest. -->
+<section class="page" id="page-guides">
+  <section class="section">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="eyebrow-num">06</span> <span class="en">Guides</span><span class="ko">가이드</span></span>
+        <h2 class="section-title"><span class="en">[WHAT A READER WILL BE ABLE TO DO.]</span><span class="ko">[독자가 무엇을 할 수 있게 되는지.]</span></h2>
+        <p class="section-lede"><span class="en">[Who this walkthrough is for and roughly how long it takes.]</span><span class="ko">[누구를 위한 안내이며 대략 얼마나 걸리는지.]</span></p>
+      </div>
+
+      <ol class="steps lm-stagger lm-on">
+        <li class="step">
+          <h4><span class="en">[Do this first]</span><span class="ko">[가장 먼저 할 일]</span></h4>
+          <p><span class="en">[One or two sentences. Say what the reader should see when it worked.]</span><span class="ko">[한두 문장. 성공했을 때 무엇이 보이는지 쓸 것.]</span></p>
+          <div class="cmd cmd-sm" data-copy-root>
+            <div class="cmd-body">
+              <span class="cmd-prompt" aria-hidden="true">$</span>
+              <code class="cmd-text" data-copy-text>[step one command]</code>
+              <button class="cmd-btn" data-copy-btn aria-label="Copy: [step one command]">
+                <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+                <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </li>
+        <li class="step">
+          <h4><span class="en">[Then this]</span><span class="ko">[그다음 할 일]</span></h4>
+          <p><span class="en">[What changes, and what to check before moving on.]</span><span class="ko">[무엇이 달라지고, 다음으로 넘어가기 전에 확인할 것.]</span></p>
+        </li>
+        <li class="step">
+          <h4><span class="en">[Then this]</span><span class="ko">[그다음 할 일]</span></h4>
+          <p><span class="en">[A step with no command needs no .cmd block — leave it out rather than inventing one.]</span><span class="ko">[명령이 없는 단계에는 .cmd 블록을 넣지 않습니다.]</span></p>
+        </li>
+        <li class="step">
+          <h4><span class="en">[Finally]</span><span class="ko">[마지막으로]</span></h4>
+          <p><span class="en">[The finished state. Say how the reader knows they are done.]</span><span class="ko">[완료된 상태. 끝났음을 어떻게 아는지 쓸 것.]</span></p>
+        </li>
+      </ol>
+
+      <div class="callout reveal">
+        <b><span class="en">[If it did not work.]</span><span class="ko">[잘 되지 않았다면.]</span></b> <span class="en">[The one failure most readers hit, and what to do about it.]</span><span class="ko">[대부분이 겪는 문제와 그 해결 방법.]</span>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ======================== PAGE 6: COMPARE ========================
+     Keep .tblwrap around every table: it is what stops a wide table
+     scrolling the whole page instead of itself.
+     MOTION: rows fade in one after another (.lm-stagger on tbody). Rows
+     fade without rising — table rows do not transform everywhere. -->
+<section class="page" id="page-compare">
+  <section class="section">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="eyebrow-num">07</span> <span class="en">Compare</span><span class="ko">비교</span></span>
+        <h2 class="section-title"><span class="en">[WHAT THIS IS, AND WHAT IT IS NOT.]</span><span class="ko">[이것은 무엇이고, 무엇이 아닌지.]</span></h2>
+        <p class="section-lede"><span class="en">[Be fair about where the alternative wins. A comparison that loses nowhere is not read as a comparison.]</span><span class="ko">[상대가 더 나은 지점도 솔직하게 밝힐 것. 모든 항목에서 이기는 비교표는 신뢰받지 못합니다.]</span></p>
+      </div>
+
+      <div class="tblwrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th><span class="en">Capability</span><span class="ko">항목</span></th>
+              <th>[THIS]</th>
+              <th>[ALTERNATIVE A]</th>
+              <th>[ALTERNATIVE B]</th>
+              <th><span class="en">Notes</span><span class="ko">비고</span></th>
+            </tr>
+          </thead>
+          <tbody class="lm-stagger lm-on">
+            <tr>
+              <td><span class="en">[Capability]</span><span class="ko">[항목]</span></td>
+              <td><span class="pill pill-ok">yes</span></td>
+              <td><span class="pill pill-warn">partial</span></td>
+              <td><span class="pill pill-no">no</span></td>
+              <td><span class="en">[What the difference costs in practice.]</span><span class="ko">[실제로 어떤 차이를 만드는지.]</span></td>
+            </tr>
+            <tr>
+              <td><span class="en">[Capability]</span><span class="ko">[항목]</span></td>
+              <td><span class="pill pill-ok">yes</span></td>
+              <td><span class="pill pill-ok">yes</span></td>
+              <td><span class="pill pill-warn">partial</span></td>
+              <td><span class="en">[Note.]</span><span class="ko">[비고.]</span></td>
+            </tr>
+            <tr>
+              <td><span class="en">[Capability]</span><span class="ko">[항목]</span></td>
+              <td><span class="pill pill-no">no</span></td>
+              <td><span class="pill pill-ok">yes</span></td>
+              <td><span class="pill pill-ok">yes</span></td>
+              <td><span class="en">[Say plainly where this one loses.]</span><span class="ko">[이 항목에서 밀린다는 점을 분명히 밝힐 것.]</span></td>
+            </tr>
+            <tr>
+              <td><code>[config or flag]</code></td>
+              <td><span class="pill pill-ok">yes</span></td>
+              <td><span class="pill pill-no">no</span></td>
+              <td><span class="pill pill-no">no</span></td>
+              <td><span class="en">[Note.]</span><span class="ko">[비고.]</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout reveal">
+        <b><span class="en">[When to pick something else.]</span><span class="ko">[다른 선택이 나은 경우.]</span></b> <span class="en">[The case this project genuinely does not serve.]</span><span class="ko">[이 프로젝트가 적합하지 않은 상황.]</span>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ======================== PAGE 7: CHANGELOG ======================== -->
+<section class="page" id="page-changelog">
+  <section class="section">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="eyebrow-num">08</span> <span class="en">Changelog</span><span class="ko">변경 이력</span></span>
+        <h2 class="section-title"><span class="en">[WHAT CHANGED, NEWEST FIRST.]</span><span class="ko">[무엇이 바뀌었는지, 최신순.]</span></h2>
+        <p class="section-lede"><span class="en">[How often this ships, and what a version number means here.]</span><span class="ko">[배포 주기와 버전 번호의 의미.]</span></p>
+      </div>
+
+      <!-- `is-current` lights the marker for the newest entry. Exactly one. -->
+      <div class="releases reveal">
+        <div class="release is-current">
+          <div class="rel-head"><span class="rel-ver">[0.0.0]</span><span class="rel-date">[YYYY-MM-DD]</span></div>
+          <p class="rel-note"><span class="en">[One sentence on what this release is about.]</span><span class="ko">[이번 릴리스의 요지 한 문장.]</span></p>
+          <ul class="rel-list">
+            <li><span class="en">[A change a reader would notice.]</span><span class="ko">[사용자가 체감하는 변경.]</span></li>
+            <li><span class="en">[Another change.]</span><span class="ko">[또 다른 변경.]</span></li>
+            <li><span class="en">[A fix, said as what now works rather than what was broken.]</span><span class="ko">[수정 사항. 무엇이 고장났었는지보다 이제 무엇이 되는지로 쓸 것.]</span></li>
+          </ul>
+        </div>
+        <div class="release">
+          <div class="rel-head"><span class="rel-ver">[0.0.0]</span><span class="rel-date">[YYYY-MM-DD]</span></div>
+          <p class="rel-note"><span class="en">[One sentence.]</span><span class="ko">[한 문장.]</span></p>
+          <ul class="rel-list">
+            <li><span class="en">[A change.]</span><span class="ko">[변경 사항.]</span></li>
+            <li><span class="en">[A change.]</span><span class="ko">[변경 사항.]</span></li>
+          </ul>
+        </div>
+        <div class="release">
+          <div class="rel-head"><span class="rel-ver">[0.0.0]</span><span class="rel-date">[YYYY-MM-DD]</span></div>
+          <p class="rel-note"><span class="en">[The first release.]</span><span class="ko">[첫 릴리스.]</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ======================== PAGE 8: CONTRIBUTE ======================== -->
+<section class="page" id="page-contribute">
+  <section class="section">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="eyebrow-num">09</span> <span class="en">Contribute</span><span class="ko">참여하기</span></span>
+        <h2 class="section-title"><span class="en">[WHAT HELP IS ACTUALLY WANTED.]</span><span class="ko">[실제로 어떤 도움이 필요한지.]</span></h2>
+        <p class="section-lede"><span class="en">[Name the contribution that would help most right now. A generic invitation gets generic contributions.]</span><span class="ko">[지금 가장 도움이 되는 기여를 구체적으로 밝힐 것. 막연한 초대는 막연한 기여를 부릅니다.]</span></p>
+      </div>
+
+      <div class="split-layout">
+        <div>
+          <h3 class="pillar-title"><span class="en">[Before you open one]</span><span class="ko">[제출하기 전에]</span></h3>
+          <!-- .chk renders ☐ / ☑ from li.done. The .cid is a stable id worth
+               quoting in a review; drop it if nothing refers to these.
+               MOTION: items appear one by one (.lm-stagger). -->
+          <ul class="chk lm-stagger lm-on" style="margin-top:16px">
+            <li class="done"><span class="cid">C-01</span><span class="en">[Something already true, so the list reads as real.]</span><span class="ko">[이미 충족된 항목. 목록이 실제처럼 읽히도록.]</span></li>
+            <li><span class="cid">C-02</span><span class="en">[Something the contributor must do.]</span><span class="ko">[기여자가 해야 할 일.]</span></li>
+            <li><span class="cid">C-03</span><span class="en">[Something else they must do.]</span><span class="ko">[또 하나의 준비 사항.]</span></li>
+            <li><span class="cid">C-04</span><span class="en">[The check people forget.]</span><span class="ko">[사람들이 자주 빠뜨리는 확인.]</span></li>
+          </ul>
+        </div>
+
+        <div class="reveal">
+          <h3 class="pillar-title"><span class="en">[Get set up]</span><span class="ko">[개발 환경 준비]</span></h3>
+          <div style="margin-top:16px;display:flex;flex-direction:column;gap:14px">
+            <div class="cmd cmd-sm" data-copy-root>
+              <span class="cmd-label"><span class="en">[Clone]</span><span class="ko">[클론]</span></span>
+              <div class="cmd-body">
+                <span class="cmd-prompt" aria-hidden="true">$</span>
+                <code class="cmd-text" data-copy-text>[clone command]</code>
+                <button class="cmd-btn" data-copy-btn aria-label="Copy: [clone command]">
+                  <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+                  <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="cmd cmd-sm" data-copy-root>
+              <span class="cmd-label"><span class="en">[Check your work]</span><span class="ko">[검증]</span></span>
+              <div class="cmd-body">
+                <span class="cmd-prompt" aria-hidden="true">$</span>
+                <code class="cmd-text" data-copy-text>[verify command]</code>
+                <button class="cmd-btn" data-copy-btn aria-label="Copy: [verify command]">
+                  <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+                  <svg class="i-check" viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <a href="[REPO OR EXTERNAL URL]" target="_blank" rel="noopener" class="btn btn-secondary split-cta"><span class="en">[Open the tracker]</span><span class="ko">[이슈 트래커 열기]</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+</main>
+<!-- LISA:CONTENT-END pages -->
+
+<!-- LISA:CONTENT-START footer -->
+<!-- Edit between these markers. Everything outside is load-bearing chrome: copy the file with cp, never retype it. -->
+<!-- ==================================================================
+     FOOTER. Site chrome, so it sits outside the pages and shows on all
+     of them. Column links route with data-page; external links use href.
+     ================================================================== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" onclick="go('home')">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
+              <path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+              <path d="M12 3v18M4 7.5l8 4.5 8-4.5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" opacity="0.55"/>
+            </svg>
+          </span>
+          <span>[PROJECT]<span class="brand-dim">[-SUFFIX]</span></span>
+        </a>
+        <p class="footer-tag"><span class="en">[One or two sentences. The same promise as the hero, said plainly.]</span><span class="ko">[한두 문장. 히어로와 같은 약속을 담백하게.]</span></p>
+        <p class="footer-cmd mono">[install or run command]</p>
+      </div>
+
+      <nav class="footer-col" aria-label="[COLUMN 1]">
+        <h3><span class="en">[COLUMN 1]</span><span class="ko">[열 1]</span></h3>
+        <ul>
+          <li><a onclick="go('catalog')"><span class="en">[Link]</span><span class="ko">[링크]</span></a></li>
+          <li><a onclick="go('how')"><span class="en">[Link]</span><span class="ko">[링크]</span></a></li>
+          <li><a onclick="go('docs')"><span class="en">[Link]</span><span class="ko">[링크]</span></a></li>
+        </ul>
+      </nav>
+      <nav class="footer-col" aria-label="[COLUMN 2]">
+        <h3><span class="en">[COLUMN 2]</span><span class="ko">[열 2]</span></h3>
+        <ul>
+          <li><a onclick="go('docs')"><span class="en">[Link]</span><span class="ko">[링크]</span></a></li>
+          <li><a onclick="go('docs')"><span class="en">[Link]</span><span class="ko">[링크]</span></a></li>
+          <li><a onclick="go('docs')"><span class="en">[Link]</span><span class="ko">[링크]</span></a></li>
+        </ul>
+      </nav>
+      <nav class="footer-col" aria-label="[COLUMN 3]">
+        <h3><span class="en">[COLUMN 3]</span><span class="ko">[열 3]</span></h3>
+        <ul>
+          <li><a href="[REPO OR EXTERNAL URL]" target="_blank" rel="noopener">[EXTERNAL LINK] ↗</a></li>
+          <li><a href="[REPO OR EXTERNAL URL]" target="_blank" rel="noopener">[EXTERNAL LINK] ↗</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <hr class="hairline">
+
+    <div class="footer-bottom">
+      <p>© [YYYY] [PROJECT] · <span class="en">[licence or rights line]</span><span class="ko">[라이선스 또는 권리 표기]</span></p>
+      <!-- credit: the maker's colophon. Ships by default; remove the .mm-by
+           link (only) when the intake answered `credit: false`. -->
+      <a class="mm-by" href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener">
+        <svg viewBox="0 0 512 512" aria-hidden="true" fill="currentColor"><path d="M0 0 C21.12 0 42.24 0 64 0 C64.33 9.24 64.66 18.48 65 28 C67.31 28.825 69.62 29.65 72 30.5 C80.67855394 33.70320466 88.83987436 37.66197192 97 42 C98.13824219 42.59296875 99.27648437 43.1859375 100.44921875 43.796875 C114.11283709 51.2237895 126.32645153 60.78564509 138 71 C138.33 53.51 138.66 36.02 139 18 C147.41726708 18 155.23771035 18.11320702 163.5 19.1875 C165.04349121 19.38714355 165.04349121 19.38714355 166.61816406 19.59082031 C209.08178959 25.42223064 247.55036699 43.98420048 278.48925781 73.55664062 C279.51252583 74.53426838 280.54069027 75.50679224 281.57324219 76.47460938 C316.21868127 109.03500379 337.95056536 156.61339058 341 204 C341 209.28 341 214.56 341 220 C319.88 220 298.76 220 277 220 C276.34 213.07 275.68 206.14 275 199 C274.38439297 195.37078182 273.77803562 191.97121696 272.875 188.4375 C272.66327148 187.58655762 272.45154297 186.73561523 272.23339844 185.85888672 C266.69864116 164.72016184 256.75707174 146.80424072 243 130 C242.33226562 129.17757812 241.66453125 128.35515625 240.9765625 127.5078125 C235.93066496 121.55571295 230.17510386 116.74552502 224 112 C223.10023438 111.30777344 222.20046875 110.61554688 221.2734375 109.90234375 C203.20851766 96.39269908 177.88565782 83.53645418 154.625 83.9375 C153.42875 83.958125 152.2325 83.97875 151 84 C151.58265625 84.66902344 152.1653125 85.33804688 152.765625 86.02734375 C185.07129092 123.86967253 203 170.1014647 203 220 C181.88 220 160.76 220 139 220 C138.01 211.75 137.02 203.5 136 195 C129.68082068 166.91475858 117.85438519 144.07221923 98 123 C97.45085937 122.39800781 96.90171875 121.79601562 96.3359375 121.17578125 C86.97145584 111.2807994 75.80572295 104.7461274 64 98 C64 138.26 64 178.52 64 220 C42.88 220 21.76 220 0 220 C0 147.4 0 74.8 0 0 Z" transform="translate(74,141)"/><path d="M0 0 C6.93122125 2.33191353 11.59348712 6.73609933 15 13.15234375 C17.3325015 19.79450622 17.26381755 27.06296996 14.3125 33.5 C10.66303794 39.55276634 5.78715496 43.90906429 -1 46 C-7.43466397 46.85737784 -13.48798557 46.74360867 -19.18359375 43.40234375 C-24.96806721 38.93648145 -29.37878226 33.62316781 -30.37109375 26.23828125 C-30.53935564 18.82486011 -29.62715748 12.97497629 -25 7 C-17.06174054 0.27985277 -10.33089416 -1.10531813 0 0 Z" transform="translate(450,315)"/></svg>
+        <span><span class="en">Made with Hi Ted, Meet Lisa</span><span class="ko">Hi Ted, Meet Lisa로 제작</span></span>
+      </a>
+    </div>
+  </div>
+</footer>
+<!-- LISA:CONTENT-END footer -->
+
+<script>
+/* ===================================================================
+   Routing, language, reveal, copy, and the utility cluster.
+   Order matters only in one place: apply() is called once at the end,
+   after every function it needs is defined.
+   =================================================================== */
+
+/* ---------- the page register ----------
+   Add a page here AND as a section.page id AND as a data-page nav entry
+   in both the desktop and the mobile list. Miss one and the page is
+   unreachable; miss the array and its deep link silently falls home. */
+var PAGES = ['home','catalog','how','guides','docs','compare','changelog','contribute'];
+/* The subset that lives behind the More dropdown. Listed separately only so
+   the button can show as current when one of them is the routed page. */
+var DROP_PAGES = ['compare','changelog','contribute'];
+var LANGS = ['en','ko'];
+var HOME  = 'home';
+
+/* ---------- reveal-on-scroll ----------
+   A page that has never been routed to has never been laid out, so its
+   .reveal elements never intersected anything. armReveal() is therefore
+   called on every activation, not once at load. Elements already `.in`
+   are skipped, so re-visiting a page does not replay the animation. */
+var revealObserver = ('IntersectionObserver' in window)
+  ? new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('in'); revealObserver.unobserve(e.target); }
+      });
+    }, { rootMargin:'0px 0px -8% 0px', threshold:.05 })
+  : null;
+
+function armReveal(scope){
+  if(!scope) return;
+  var els = scope.querySelectorAll('.reveal:not(.in)');
+  if(!els.length) return;
+  if(!revealObserver){ els.forEach(function(el){ el.classList.add('in'); }); return; }
+  els.forEach(function(el){ revealObserver.observe(el); });
+
+  /* Fail visible. Some contexts never deliver IntersectionObserver
+     callbacks at all -- an offscreen or hidden embed, a print preview, a
+     headless screenshot -- and .reveal starts at opacity 0, so the page
+     renders blank in exactly the places nobody thinks to check. If not one
+     element in this page has been reported after a beat, the observer is
+     not working here: show everything rather than show nothing. A browser
+     that does deliver will already have flagged the top element, so the
+     animation is untouched. */
+  setTimeout(function(){
+    if(scope.querySelector('.reveal.in')) return;
+    els.forEach(function(el){ el.classList.add('in'); revealObserver.unobserve(el); });
+  }, 1200);
+}
+
+/* ---------- routing: #/{lang}/{page} ---------- */
+function parseHash(){
+  var m = location.hash.match(/^#\/([a-z-]+)\/([a-z0-9-]+)/);
+  var lang = (m && LANGS.indexOf(m[1]) >= 0) ? m[1] : 'en';
+  var page = (m && PAGES.indexOf(m[2]) >= 0) ? m[2] : HOME;
+  return { lang: lang, page: page };
+}
+
+function apply(){
+  var s = parseHash();
+
+  document.body.setAttribute('data-lang', s.lang);
+  document.documentElement.lang = s.lang;
+  var be = document.getElementById('btnEn'), bk = document.getElementById('btnKo');
+  if(be) be.classList.toggle('active', s.lang === 'en');
+  if(bk) bk.classList.toggle('active', s.lang === 'ko');
+
+  PAGES.forEach(function(p){
+    var el = document.getElementById('page-' + p);
+    if(!el) return;
+    var on = (p === s.page);
+    el.classList.toggle('active', on);
+    if(on) armReveal(el);
+  });
+
+  /* Both nav lists are driven from the same loop, so they cannot drift. */
+  document.querySelectorAll('[data-page]').forEach(function(a){
+    var p = a.getAttribute('data-page');
+    a.classList.toggle('active', p === s.page);
+    a.setAttribute('href', '#/' + s.lang + '/' + p);
+  });
+  var brand = document.getElementById('brandLink');
+  if(brand) brand.setAttribute('href', '#/' + s.lang + '/' + HOME);
+
+  var drop = document.getElementById('navDrop');
+  if(drop){
+    drop.classList.remove('open');
+    drop.classList.toggle('oncur', DROP_PAGES.indexOf(s.page) >= 0);
+  }
+
+  var mob = document.querySelector('[data-nav-mobile]');
+  if(mob) mob.classList.remove('open');
+  var tog = document.querySelector('[data-nav-toggle]');
+  if(tog) tog.setAttribute('aria-expanded', 'false');
+
+  window.scrollTo(0, 0);
+}
+
+/* setLang and go each change one half of the hash and preserve the other,
+   so a language choice survives navigation and a deep link keeps both. */
+function setLang(l){ var s = parseHash(); location.hash = '#/' + l + '/' + s.page; }
+function go(p){ var s = parseHash(); location.hash = '#/' + s.lang + '/' + p; }
+function jump(id){
+  var el = document.getElementById(id);
+  if(!el) return;
+  window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 88, behavior:'smooth' });
+}
+
+window.addEventListener('hashchange', apply);
+if(!location.hash) location.hash = '#/en/' + HOME;
+apply();
+/* The footer lives outside the pages, so it is armed once, on its own. */
+armReveal(document.querySelector('.footer'));
+
+/* ---------- nav dropdown ----------
+   Guarded like everything else: delete .navdrop from the nav and this is a
+   no-op rather than an error. */
+function toggleDrop(e){
+  e.stopPropagation();
+  var d = document.getElementById('navDrop');
+  if(d) d.classList.toggle('open');
+}
+document.addEventListener('click', function(e){
+  var d = document.getElementById('navDrop');
+  if(d && !d.contains(e.target)) d.classList.remove('open');
+});
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Escape') return;
+  var d = document.getElementById('navDrop');
+  if(d) d.classList.remove('open');
+  var m = document.querySelector('[data-nav-mobile]');
+  var t = document.querySelector('[data-nav-toggle]');
+  if(m) m.classList.remove('open');
+  if(t) t.setAttribute('aria-expanded', 'false');
+});
+
+/* ---------- mobile nav ---------- */
+(function(){
+  var toggle = document.querySelector('[data-nav-toggle]');
+  var panel  = document.querySelector('[data-nav-mobile]');
+  if(!toggle || !panel) return;
+  toggle.addEventListener('click', function(){
+    var open = panel.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+})();
+
+/* ---------- copy to clipboard ----------
+   data-copy-text is the single source of truth for what gets copied.
+   The clipboard API needs a secure context, so the textarea fallback is
+   what makes this work from file:// — do not remove it. */
+document.querySelectorAll('[data-copy-root]').forEach(function(root){
+  var btn = root.querySelector('[data-copy-btn]');
+  var text = (root.querySelector('[data-copy-text]') || {}).textContent || '';
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var done = function(){
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.classList.remove('copied'); }, 1600);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, function(){ fallback(); });
+    } else { fallback(); }
+    function fallback(){
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      ta.remove(); done();
+    }
+  });
+});
+
+/* ---------- theme, self-download ----------
+   Kept apart from the routing above so it cannot disturb it. Every
+   control is guarded: delete its button in the nav to switch it off. */
+(function(){
+  var root = document.documentElement;
+  var KEY = 'monomind-doc-theme';
+  var tBtn = document.getElementById('btnTheme');
+
+  function applyTheme(t){
+    if(t === 'light') root.setAttribute('data-theme', 'light');
+    else root.removeAttribute('data-theme');
+    /* The control is an icon, so the affordance lives in its label:
+       announce the theme it switches TO. */
+    if(tBtn){
+      var next = (t === 'light') ? 'dark' : 'light';
+      tBtn.setAttribute('title', next === 'dark' ? 'Switch to dark' : 'Switch to light');
+      tBtn.setAttribute('aria-label', next === 'dark' ? 'Switch to dark theme' : 'Switch to light theme');
+    }
+  }
+  if(tBtn){
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch(e) {}
+    applyTheme(saved || (root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'));
+    tBtn.addEventListener('click', function(){
+      var next = (root.getAttribute('data-theme') === 'light') ? 'dark' : 'light';
+      applyTheme(next);
+      try { localStorage.setItem(KEY, next); } catch(e) {}
+    });
+  }
+
+  var hBtn = document.getElementById('btnHtml');
+  /* A self-download offers to save a copy of a file the reader already has, so
+     it earns its place only when this page is being served. On file:// it hands
+     you what is already on your disk — hide it. Same rule as the language
+     switch. Nulled rather than returned: wiring after this block must still run. */
+  if (hBtn && location.protocol === 'file:') { hBtn.hidden = true; hBtn = null; }
+  if(hBtn){
+    hBtn.addEventListener('click', function(){
+      /* The saved copy should open the way the original does, so the
+         transient UI state is stripped: the open burger and the .in
+         classes the observer added. */
+      var clone = document.documentElement.cloneNode(true);
+      clone.querySelectorAll('.reveal.in').forEach(function(el){ el.classList.remove('in'); });
+      var m = clone.querySelector('[data-nav-mobile]'); if(m) m.classList.remove('open');
+      var name = (document.title || 'project-website').trim().replace(/[^\w.-]+/g, '-').toLowerCase();
+      var blob = new Blob(['<!doctype html>\n', clone.outerHTML], { type:'text/html' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = name + '.html';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+    });
+  }
+})();
+</script>
+<!-- ==================================================================
+     MOTION. The lm runtime, the JS of the patterns that need any, and the
+     self-download strip — each verbatim from references/motion-patterns.md.
+     Placed AFTER the router on purpose: the runtime listens to hashchange
+     one registration later and reads .page.active, so it never touches
+     apply(). Load-bearing: copy, never retype.
+     ================================================================== -->
+<script>
+/* lm — the motion runtime. Place AFTER the file's router so its hashchange
+   listener runs after the router has toggled .page.active. Never edit the
+   router; hook here.
+     lm.onActivate(fn)  fn(scope) runs on every page activation and may
+                        return stop(), called when that page deactivates
+     lm.whenIn(el, fn)  fn once el has scrolled into view (or been shown)
+     lm.reduced()       prefers-reduced-motion: reduce
+     lm.fine()          a hovering, fine pointer (desktop) is present   */
+window.lm = (function(){
+  var RM   = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : { matches:false };
+  var FINE = window.matchMedia ? matchMedia('(hover: hover) and (pointer: fine)') : { matches:false };
+  var SEL  = '.lm-reveal:not(.is-in), .lm-on:not(.is-in)';
+  var hooks = [], stops = [], current = null, looseArmed = false;
+
+  function reduced(){ return !!RM.matches; }
+  function fine(){ return !!FINE.matches; }
+
+  function mark(el){
+    if(el.classList.contains('is-in')) return;
+    el.classList.add('is-in');
+    if(io) io.unobserve(el);
+    el.dispatchEvent(new CustomEvent('lm:in'));
+  }
+  var io = ('IntersectionObserver' in window)
+    ? new IntersectionObserver(function(entries){
+        entries.forEach(function(e){ if(e.isIntersecting) mark(e.target); });
+      }, { rootMargin:'0px 0px -8% 0px', threshold:0.05 })
+    : null;
+
+  /* L-022: the observer is never the only path to visible. No observer, a
+     reduced-motion reader, or a hidden tab (throttled timers, no callbacks)
+     all show everything now; a live tab gets a fail-visible timer that shows
+     the lot if not one element in the scope has been reported. */
+  function arm(els, probe){
+    if(!els.length) return;
+    if(!io || reduced() || document.hidden){ els.forEach(mark); return; }
+    els.forEach(function(el){ io.observe(el); });
+    setTimeout(function(){ if(!probe()) els.forEach(mark); }, 1200);
+  }
+  function reveal(scope){
+    scope = scope || document;
+    var els = Array.prototype.slice.call(scope.querySelectorAll(SEL));
+    arm(els, function(){ return !!scope.querySelector('.lm-reveal.is-in, .lm-on.is-in'); });
+  }
+  /* Elements outside every routed page (a shared footer) are armed once. */
+  function revealLoose(){
+    if(looseArmed) return; looseArmed = true;
+    var els = Array.prototype.filter.call(document.querySelectorAll(SEL), function(el){ return !el.closest('.page'); });
+    arm(els, function(){ return els.some(function(el){ return el.classList.contains('is-in'); }); });
+  }
+  function showAll(scope){ (scope || document).querySelectorAll(SEL).forEach(mark); }
+  function whenIn(el, fn){
+    if(el.classList.contains('is-in')) fn();
+    else el.addEventListener('lm:in', function h(){ el.removeEventListener('lm:in', h); fn(); });
+  }
+
+  function run(fn, scope){
+    var stop = null;
+    try { stop = fn(scope); } catch(e){ if(window.console) console.error(e); }
+    if(typeof stop === 'function') stops.push(stop);
+  }
+  function activate(scope){
+    scope = scope || document.querySelector('.page.active') || document.body;
+    if(scope === current) return;
+    deactivate();
+    current = scope;
+    hooks.forEach(function(fn){ run(fn, scope); });   /* listeners first, */
+    reveal(scope);                                     /* then the reveals */
+    if(scope !== document.body) revealLoose();
+  }
+  function deactivate(){
+    stops.splice(0).forEach(function(s){ try { s(); } catch(e){} });
+    current = null;
+  }
+  function onActivate(fn){ hooks.push(fn); if(current) run(fn, current); }
+
+  window.addEventListener('hashchange', function(){ activate(); });
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden && current) reveal(current); });
+  window.addEventListener('beforeprint', function(){ showAll(document); });
+  if(RM.addEventListener) RM.addEventListener('change', function(){
+    if(reduced()) showAll(document);
+    var s = current; deactivate(); activate(s);
+  });
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ activate(); });
+  else activate();
+
+  return { reduced:reduced, fine:fine, reveal:reveal, showAll:showAll, whenIn:whenIn,
+           activate:activate, deactivate:deactivate, onActivate:onActivate,
+           scope:function(){ return current; } };
+})();
+</script>
+<script>
+/* ---- pattern js, verbatim from references/motion-patterns.md ---- */
+/* -- 02 Staggered list -- */
+/* Numbers the children when the markup did not. */
+lm.onActivate(function(scope){
+  scope.querySelectorAll('.lm-stagger').forEach(function(list){
+    Array.prototype.forEach.call(list.children, function(c, i){
+      if(!c.style.getPropertyValue('--i')) c.style.setProperty('--i', i);
+    });
+  });
+});
+
+/* -- 14 Typewriter -- */
+lm.onActivate(function(scope){
+  scope.querySelectorAll('.lm-type').forEach(function(el){
+    var t = el.querySelector('.lm-type-text');
+    if(!t) return;
+    el.style.setProperty('--lm-chars', t.textContent.length);
+    if(el.getAttribute('data-lm-ready')) return;
+    el.setAttribute('data-lm-ready', '1');
+    t.addEventListener('animationend', function(){ el.classList.add('is-done'); });
+  });
+});
+
+/* -- 20 Count-up -- */
+lm.onActivate(function(scope){
+  var anims = [];
+  var can = !!(window.CSS && CSS.registerProperty && Element.prototype.animate);
+  scope.querySelectorAll('.lm-count').forEach(function(el){
+    var n = el.querySelector('.lm-count-n'), to = parseInt(el.getAttribute('data-lm-to'), 10);
+    if(!n || isNaN(to) || !can || lm.reduced() || el.getAttribute('data-lm-done')) return;
+    lm.whenIn(el, function(){
+      el.setAttribute('data-lm-done', '1');
+      el.classList.add('is-live');
+      var a = n.animate([{ '--lm-n': 0 }, { '--lm-n': to }], { duration: Math.min(800 + to.toString().length * 300, 2200), easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' });
+      a.onfinish = a.oncancel = function(){ el.classList.remove('is-live'); };
+      anims.push(a);
+    });
+  });
+  return function(){ anims.forEach(function(a){ a.cancel(); }); };
+});
+
+/* -- 22 Spotlight border -- */
+lm.onActivate(function(scope){
+  if(!lm.fine()) return;
+  scope.querySelectorAll('.lm-spotlight').forEach(function(el){
+    if(el.getAttribute('data-lm-ready')) return;
+    el.setAttribute('data-lm-ready', '1');
+    el.addEventListener('pointermove', function(e){
+      var r = el.getBoundingClientRect();
+      el.style.setProperty('--lm-mx', (e.clientX - r.left) + 'px');
+      el.style.setProperty('--lm-my', (e.clientY - r.top) + 'px');
+    });
+  });
+});
+</script>
+<script>
+/* lm — the saved copy must open the way the original does. The router's
+   download handler clones the DOM on click; this capture-phase listener
+   runs first, strips the motion state, and puts it back in the same task. */
+document.addEventListener('click', function(e){
+  if(!e.target.closest('#btnHtml')) return;
+  var undo = [];
+  document.querySelectorAll('.is-in, .is-done').forEach(function(el){
+    ['is-in', 'is-done'].forEach(function(k){
+      if(el.classList.contains(k)){ el.classList.remove(k); undo.push(function(){ el.classList.add(k); }); }
+    });
+  });
+  document.querySelectorAll('[data-lm-ready],[data-lm-done]').forEach(function(el){
+    ['data-lm-ready','data-lm-done'].forEach(function(a){
+      var v = el.getAttribute(a);
+      if(v !== null){ el.removeAttribute(a); undo.push(function(){ el.setAttribute(a, v); }); }
+    });
+  });
+  setTimeout(function(){ undo.forEach(function(f){ f(); }); }, 0);
+}, true);
+</script>
+</body>
+</html>

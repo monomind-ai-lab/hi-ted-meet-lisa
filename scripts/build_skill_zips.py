@@ -132,6 +132,7 @@ NO_PAYLOAD = {
 SLICED_PAYLOAD = {
     "lisa-brand": ("references/brand-extraction.md",
                    "assets/lisa-brand-book-a4.html"),
+    "lisa-motion": ("references/motion-patterns.md",),
 }
 PAYLOAD_FILES = ("LICENSE", "NOTICE")
 
@@ -190,6 +191,7 @@ def stage(skill: pathlib.Path, into: pathlib.Path) -> pathlib.Path:
         src = ROOT / name
         if src.is_file():
             shutil.copy2(src, folder / name)
+
 
     for rel in EXTRA_PAYLOAD.get(skill.name, ()):
         src = ROOT / rel

@@ -39,6 +39,26 @@ the Architecture Diagram Generator skill.
 
 
 --------------------------------------------------------------------------
+Cinematic Site Components — references/motion-patterns.md
+--------------------------------------------------------------------------
+The motion pattern library re-implements the thirty demo pages of Cinematic
+Site Components: the sixteen that need no library, and the fourteen built on
+GSAP and ScrollTrigger, which are rewritten here in CSS (scroll-driven
+animations, scroll-snap, sticky positioning, clip-path and masks) and the
+Web Animations API so that nothing is loaded.
+
+  Upstream:  https://github.com/robonuggets/cinematic-site-components
+  Author:    Jay from RoboLabs
+  License:   MIT
+  Changes:   Derived, not copied. Every pattern rewritten under an lm-*
+             namespace, reading the host template's design tokens instead
+             of a hard-coded palette; the global reset, the generic class
+             names and the fixed attribution bar dropped; ARIA, keyboard
+             paths, reduced-motion handling, print handling and a
+             fail-visible fallback for IntersectionObserver added; every
+             GSAP dependency replaced, since GSAP could not be bundled.
+
+--------------------------------------------------------------------------
 Slides AI Plugin onboarding deck — https://html.monomind.one/previews/slide-design.html
 --------------------------------------------------------------------------
 The preview behind option five is proyecto26's own onboarding deck, rebranded.
