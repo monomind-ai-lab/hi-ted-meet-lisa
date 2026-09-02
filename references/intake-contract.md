@@ -122,8 +122,9 @@ page counter. `none` means neither.
   "delivery": "presenter", "afterlife": "share", "divergence": "moderate" }
 ```
 
-Seven questions on the panel's Grounds screen, one object here — the split
-is presentation, like a chapter. Every field is always present.
+Seven questions on the panel's Purpose screen — its own chapter, the first
+one asked after the template — one object here: the split is presentation,
+like any chapter. Every field is always present.
 
 - `audience`, `outcome`, `coreMessage` — free text, or `null` when nothing
   was typed. Null means **infer it from the brief and say so in the

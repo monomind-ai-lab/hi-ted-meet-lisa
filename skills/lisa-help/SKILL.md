@@ -33,7 +33,7 @@ as they are.
 
 Fourteen to twenty-six questions depending on the template, every one with a default.
 
-The first asking screen after the template, **Grounds**, is the communication
+The first asking screen after the template, **Purpose**, is the communication
 contract: who it is for, what it must accomplish, what they should walk away
 with, the one thing that must land, how it will be used, what happens to it
 afterwards, and how freely the source may be reshaped — every one defaulted,

@@ -1036,7 +1036,7 @@ var UI = {
     pvwClose: "× Close",
     pvwCloseLabel: "Close preview",
     pvwFrame: "Template preview",
-    chap: { Prompt: "Prompt", Template: "Template", Grounds: "Grounds", Shape: "Shape",
+    chap: { Prompt: "Prompt", Template: "Template", Purpose: "Purpose", Grounds: "Grounds", Shape: "Shape",
             Look: "Look", Handover: "Handover", Preferences: "Preferences", Ready: "Ready" },
     ready: {
       runner: ["Lisa has your answers.",
@@ -1122,7 +1122,7 @@ var UI = {
     pvwClose: "× 닫기",
     pvwCloseLabel: "미리보기 닫기",
     pvwFrame: "템플릿 미리보기",
-    chap: { Prompt: "프롬프트", Template: "템플릿", Grounds: "근거", Shape: "형태",
+    chap: { Prompt: "프롬프트", Template: "템플릿", Purpose: "목적", Grounds: "근거", Shape: "형태",
             Look: "모양새", Handover: "인계", Preferences: "환경 설정", Ready: "준비 완료" },
     ready: {
       runner: ["Lisa가 답변을 받았습니다.",
@@ -1207,7 +1207,7 @@ var UI = {
     pvwClose: "× 關閉",
     pvwCloseLabel: "關閉預覽",
     pvwFrame: "範本預覽",
-    chap: { Prompt: "Prompt", Template: "範本", Grounds: "依據", Shape: "形態",
+    chap: { Prompt: "Prompt", Template: "範本", Purpose: "目的", Grounds: "依據", Shape: "形態",
             Look: "外觀", Handover: "交付", Preferences: "偏好設定", Ready: "準備好了" },
     ready: {
       runner: ["Lisa 收到你的答案了。",
@@ -1250,7 +1250,8 @@ var L10N = {
   ko: {
     lead: {
       Template: "무엇을 만들 것인가. 이 선택이 뒤따르는 질문을 정합니다.",
-      Grounds:  "누가 읽고, 무엇을 해내야 하며, 무엇을 근거로 삼는가.",
+      Purpose:  "누가 읽고, 무엇을 해내야 하며, 어떻게 쓰이는가.",
+      Grounds:  "제안이 근거를 어디에서 얻는가.",
       Shape:    "분량은 얼마나 되고, 어디에서 열려야 하는가.",
       Look:     "지면에서 어떻게 읽히는가.",
       Handover: "읽는 사람이 무엇을 가지고 떠나는가.",
@@ -1550,7 +1551,8 @@ var L10N = {
   "zh-TW": {
     lead: {
       Template: "你要做的是什麼。這個選擇決定了後面會問什麼。",
-      Grounds:  "給誰看、要做到什麼，又以什麼為依據。",
+      Purpose:  "給誰看、要做到什麼，又會怎麼被使用。",
+      Grounds:  "這份提案的依據從哪裡來。",
       Shape:    "有多少份量，又得在哪裡跑起來。",
       Look:     "在頁面上讀起來是什麼樣子。",
       Handover: "讀的人最後帶走什麼。",
@@ -1931,20 +1933,21 @@ var QUESTIONS = [
 
   /* ---- the communication contract ------------------------------------
      What the brief leaves implicit: who it is for, what it has to do, and
-     how it will be used. Asked for every template, the external handoff
-     included, so no `kinds` and no `templates`. Seven questions on the panel,
+     how it will be used. Its own chapter, Purpose, ahead of everything else,
+     and asked for every template, the external handoff included, so no
+     `kinds` and no `templates`. Seven questions on the panel,
      one key in the payload: each carries `key: "contract"`, and payload()
      folds them into the single `contract` object references/intake-contract.md
      describes. Every one has a default, so the screen can be clicked through.
      `contractDelivery` is named for the collision — `delivery` is already the
      CDN-or-standalone answer under Preferences. */
 
-  { id: "audience", key: "contract", chapter: "Grounds", q: "Who is this for?",
+  { id: "audience", key: "contract", chapter: "Purpose", q: "Who is this for?",
     hint: "The people in the room, or the ones opening the link — their role, and what they already know. Left blank, it is read off the brief.",
     type: "textarea", rows: 2,
     placeholder: "e.g. engineering leads who have seen the roadmap once" },
 
-  { id: "purpose", key: "contract", chapter: "Grounds", q: "What must it accomplish?",
+  { id: "purpose", key: "contract", chapter: "Purpose", q: "What must it accomplish?",
     hint: "Pick every job it has to do. Inform is the floor; the others change what gets written.",
     type: "multi", options: [
       { id: "inform",   label: "Inform",   note: "Put the facts in front of them.", def: true },
@@ -1957,12 +1960,12 @@ var QUESTIONS = [
       { id: "mobilize", label: "Mobilize", note: "Move people to act, and say what to do next." },
       { id: "record",   label: "Record",   note: "Leave a durable record for later." } ] },
 
-  { id: "outcome", key: "contract", chapter: "Grounds", q: "What should they walk away with?",
+  { id: "outcome", key: "contract", chapter: "Purpose", q: "What should they walk away with?",
     hint: "What the audience should know, believe, decide, or do afterwards. One sentence is enough.",
     type: "textarea", rows: 2,
     placeholder: "e.g. they approve the Q4 budget, or they can run the process without me" },
 
-  { id: "coreMessage", key: "contract", chapter: "Grounds", q: "The one thing that must land",
+  { id: "coreMessage", key: "contract", chapter: "Purpose", q: "The one thing that must land",
     hint: "The claim, the ask, or the action that survives even if nothing else is remembered.",
     type: "textarea", rows: 2,
     placeholder: "e.g. ship in October or lose the launch window" },
@@ -1971,7 +1974,7 @@ var QUESTIONS = [
      present assumes a presenter, one you read assumes a reader — and is
      re-derived on every template pick until the reader picks for themselves.
      See deliveryDefault() below. */
-  { id: "contractDelivery", key: "contract", chapter: "Grounds", q: "How will it be used?",
+  { id: "contractDelivery", key: "contract", chapter: "Purpose", q: "How will it be used?",
     hint: "The default follows the template: a presenting shape assumes a presenter, a reading shape assumes a reader. Change it if the primary use is different.",
     type: "single", defaultFor: function (tpl) { return deliveryDefault(tpl); }, options: [
       { id: "presenter", label: "Presenter-led", note: "Someone talks over it — one idea per slide, larger type." },
@@ -1979,7 +1982,7 @@ var QUESTIONS = [
       { id: "hybrid",    label: "Both", note: "Presented first, then shared to read." },
       { id: "recorded",  label: "Recorded or self-running", note: "Plays on its own — every slide stands without a voice." } ] },
 
-  { id: "afterlife", key: "contract", chapter: "Grounds", q: "What happens to it afterwards?",
+  { id: "afterlife", key: "contract", chapter: "Purpose", q: "What happens to it afterwards?",
     hint: "What the file is for once the meeting is over.",
     type: "single", options: [
       { id: "share",    label: "Shared onward", note: "Forwarded and opened later by people who were not there.", def: true },
@@ -1989,7 +1992,7 @@ var QUESTIONS = [
       { id: "handoff",  label: "Hand-off", note: "Picked up by whoever does the work next." },
       { id: "reuse",    label: "Reuse", note: "Parts of it will be lifted into other decks." } ] },
 
-  { id: "divergence", key: "contract", chapter: "Grounds", q: "How freely may the source be reshaped?",
+  { id: "divergence", key: "contract", chapter: "Purpose", q: "How freely may the source be reshaped?",
     hint: "How far the writing may move from the brief and the references.",
     type: "single", options: [
       { id: "close",    label: "Stay close", note: "Keep the source's own labels and order; say what was changed." },
@@ -2214,7 +2217,7 @@ var SCREENS = [];      /* prompt, template, one per surviving chapter, ready */
    decides. A chapter is a heading over a group of questions — never a payload
    key. The leads describe the territory rather than the individual questions,
    because which questions survive depends on the template. */
-var CHAPTER_ORDER = ["Grounds", "Shape", "Look", "Handover", "Preferences"];
+var CHAPTER_ORDER = ["Purpose", "Grounds", "Shape", "Look", "Handover", "Preferences"];
 /* Template is not a chapter — it is one question on its own screen — but it
    wears the same heading so every asking screen opens the same way.
    Preferences is the last asking screen by construction: it holds the
@@ -2222,7 +2225,8 @@ var CHAPTER_ORDER = ["Grounds", "Shape", "Look", "Handover", "Preferences"];
    so the content questions come first and the settings wait at the end. */
 var CHAPTER_LEAD = {
   Template: "What you are making. It decides which questions follow.",
-  Grounds:  "Who it is for, what it has to do, and what it is argued from.",
+  Purpose:  "Who it is for, what it has to do, and how it will be used.",
+  Grounds:  "Where the proposal gets its evidence.",
   Shape:    "How much there is, and where it has to run.",
   Look:     "How it reads on the page.",
   Handover: "What a reader leaves with.",
@@ -2303,8 +2307,9 @@ function rebuildOrder() {
 /* Chapters are derived from the *filtered* ORDER, never from QUESTIONS: a
    chapter whose questions were all filtered away by `kinds` / `templates`
    (D-017) has nothing to ask, so it never reaches the rail or the flow. That
-   is why a deck shows Shape, Look, Handover and Preferences; `sitemap-ia`
-   also shows Grounds; and the external handoff shows only what survives.
+   is why a deck shows Purpose, Shape, Look, Handover and Preferences;
+   `sitemap-ia` also shows Grounds; and the external handoff shows only what
+   survives.
    Preferences sits last in CHAPTER_ORDER, so its screen lands just before
    Ready whatever the template filtered away. Question
    order inside a chapter stays ORDER's own — the payload's key order is built
