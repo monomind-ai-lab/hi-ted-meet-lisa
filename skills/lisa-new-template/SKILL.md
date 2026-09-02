@@ -99,7 +99,7 @@ confirm before doing it.
    ```sh
    python3 scripts/tedandlisa_new_template.py register --id ID --name "NAME" \
      --file assets/tedandlisa-template-ID.html --kind slides|document \
-     --type present|read|diagram|site \
+     --type present|read|diagram|site --layout reflow|stage \
      --tagline "..." --patterns references/slide-patterns-ID.md \
      --best-for "..." --dependencies "..."
    ```
@@ -111,6 +111,19 @@ confirm before doing it.
    `paper-brief` is `slides` you `read`, `architecture` is a `document` you
    `diagram` in. Pick the type from the reader's purpose, not the file's
    shape.
+
+   `--layout` is how the file **meets the viewport**, and a template keeps
+   the model it arrived with (the same logic as `D-037` for language).
+   `reflow` — the default, and every first-party template — re-lays its
+   content out for any width and is readable at a phone width. `stage` is a
+   file authored on a fixed 1920×1080 canvas that scales uniformly to the
+   viewport and letterboxes or pillarboxes on other aspect ratios, never
+   re-laying out (the deck-stage model). `analyze` reports a best guess with
+   its evidence — `stage` when it finds a fixed canvas scaled by
+   `transform: scale(...)` from `Math.min(innerWidth / W, innerHeight / H)`
+   or a `<deck-stage>` element — but confirm it in the stylesheet: a stage
+   has no `@media` rules that move content, only one scale. Like `type`, it
+   is marked on the gallery card and never reaches the payload.
 7. **Capture its thumbnail** so it appears in the intake gallery, and
    regenerate the panel's `file://` fallback list so the template is
    offerable with nothing injected:
@@ -128,7 +141,13 @@ confirm before doing it.
    - Every page or slide reachable; navigation, routing, and deep links work.
    - The language mechanism switches both ways and restores the original.
    - Diagrams, menus, modals, and viewers still function.
-   - No console errors; nothing overflows horizontally at 375px.
+   - No console errors. A `reflow` template: nothing overflows horizontally
+     at 375px. A `stage` template is **not** expected to reflow at 375px:
+     instead it letterboxes cleanly at a phone size and at 1280×900 — the
+     canvas scaled uniformly and centred, nothing escaping it, the page never
+     scrolling sideways — and stays navigable.
+     `python3 scripts/check_overflow.py --layout stage FILE` measures exactly
+     that (the registry's `layout` selects the mode once it is registered).
    - No `[PLACEHOLDER]` renders as literal machinery — bracket characters inside
      mermaid or template syntax must be quoted.
    - Grep for the source's subject matter one last time.

@@ -17,8 +17,8 @@ drifted apart:
     python3 scripts/tedandlisa_intake_fallback.py --check    # exit 1 on drift
 
 The fallback carries only the fields a card needs before anything is injected
-(id, name, kind, type, tagline, plus skill and badge where the registry sets
-them) — the same projection scripts/tedandlisa_intake.py and the website
+(id, name, kind, type, layout, tagline, plus skill and badge where the registry
+sets them) — the same projection scripts/tedandlisa_intake.py and the website
 repository's sync.sh make, minus the keys that are meaningless without a
 served site: thumb, preview,
 best_for and dependencies. Dropping `skill` is not cosmetic — payload()'s
@@ -49,7 +49,7 @@ BLOCK = re.compile(
 
 # Written onto the first line of an entry, in this order; `tagline` gets the
 # second line to itself because it is the long one.
-HEAD_KEYS = ("id", "name", "kind", "type", "skill", "badge")
+HEAD_KEYS = ("id", "name", "kind", "type", "layout", "skill", "badge")
 
 
 def js(value: str) -> str:

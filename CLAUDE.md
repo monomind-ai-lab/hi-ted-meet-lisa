@@ -28,8 +28,11 @@ python3 scripts/tedandlisa_intake.py --prompt "the deck brief" --out intake.json
 python3 scripts/tedandlisa_new_template.py analyze SOURCE.html
 
 # Register a new template skeleton (create-only; refuses to overwrite an id).
+# --layout is reflow (default) or stage — a fixed 1920×1080 canvas that scales
+# uniformly and letterboxes instead of reflowing.
 python3 scripts/tedandlisa_new_template.py register --id ID --name "NAME" \
-  --file assets/tedandlisa-template-ID.html --kind slides|document
+  --file assets/tedandlisa-template-ID.html --kind slides|document \
+  --type present|read|diagram|site [--layout reflow|stage]
 
 # Re-capture gallery thumbnails after adding/changing a template's opening
 # screen. Needs a local Chrome/Chromium; degrades to a text card if absent.
@@ -80,7 +83,17 @@ bearing on the others. Three of them show how far apart the systems sit:
 `tedandlisa_new_template.py register` read/write; each entry points at its file,
 its pattern-reference doc (`references/slide-patterns*.md` — verbatim,
 known-good markup for every component), and its thumbnail in
-`templates/thumbs/`.
+`templates/thumbs/`. Three classifying fields sit beside those: `kind`
+(`slides` / `document` / `external`) is the shape and is machinery — it
+decides which intake questions are asked; `type` (`present` / `read` /
+`diagram` / `site`) is what the template is for — the gallery's flag and
+filter; and `layout` is how it meets the viewport — `reflow` (re-lays its
+content out for any width; every first-party template today) or `stage` (a
+fixed 1920×1080 canvas scaled uniformly and letterboxed on other aspect
+ratios, never re-laid out). `type` and `layout` are presentation only:
+marked on the gallery card, never in the payload. `scripts/check_overflow.py`
+reads `layout` to decide whether a template is reflowed at 375px or rendered
+at its stage and letterboxed.
 
 **The public website is a separate repository.** The landing page, the live
 preview decks and the Cloudflare Pages deploy live in
