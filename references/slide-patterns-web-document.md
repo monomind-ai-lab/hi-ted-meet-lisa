@@ -4,6 +4,11 @@ Markup for `assets/tedandlisa-template-web-document.html`. Every snippet is
 lifted from a shipped document, so it is known-good. Compose from these; do not
 invent class names.
 
+**Density — a `read` template.** Read at desk distance, so four to eight
+items on a page or in a section is fine — a table of eight rows, a grid of
+six cards, a checklist of eight. One argument per page rather than one idea:
+the eye scans, returns, and links to it.
+
 This template is a **document**, not a slide deck: pages are hash-routed, each
 page scrolls, and both languages are written into the file rather than
 translated at read time.
@@ -165,3 +170,42 @@ like every other reader-visible string. It ships by default; remove the `<a>`
 Google Fonts, and **mermaid from a CDN**. Unlike the MonoMind deck, this
 template is not fully self-contained: with no network, diagrams do not render
 and the rest of the document still does. Say so when handing a file over.
+
+## When unsure, default to
+
+- **A page:** the shell — `.band` > `.wrap` with an eyebrow, `h2.sec` and a
+  `.lede`.
+- **A set of things:** `.fcard`s in `.grid3`; `.tcard` when they are small.
+- **A comparison:** `.tblwrap` + `.tbl`.
+- **A diagram:** a mermaid `.fig`, `flowchart LR`, colour only through named
+  `classDef`s.
+- **A decision:** `.decision` + `.chk`; a page with anchors: `.toc`.
+
+## Known gaps
+
+Evidenced, not imagined — each line names its record.
+
+- **The language pair is coupled across five places, none of them the
+  content** (`L-018`): the Google Fonts URL and `--sans`, the two visibility
+  rules plus the `body[data-lang]` font rule, the button id and label, the
+  routing regex `#/(en|ko)/` — which falls back to English on every deep link
+  in the new language rather than erroring — and `documentElement.lang`.
+  Nothing in the template or this reference lists them together (`NOW.md`).
+- **`footer .mono` measures 3.34:1 on the dark ground**, below AA at its 13px
+  (`NOW.md`). `html[data-theme="light"] footer .mono` repairs the same
+  selector for the light theme and nothing repairs it for dark, which reads
+  as an omission rather than a `D-019`-style decision.
+- **The nav's link row can neither shrink nor scroll**, so the burger
+  breakpoint is a per-document number — 1120px in the template, 1450px in the
+  preview (`L-016`; `NOW.md`, 2026-09-02). `scripts/check_overflow.py` fails
+  when the escape returns; nothing tells you the row needed the breakpoint
+  raised until you look.
+- **mermaid loads from a CDN.** With no network the diagrams do not render
+  and the rest of the document does — say so at handover, or answer
+  `delivery: standalone`.
+- **Mermaid's palette is fixed at `initialize()`** (`L-007`): the toggle
+  re-initialises and re-renders, but a `classDef` colour hardcoded in a
+  diagram's source still defeats it — black boxes on white paper.
+- **The shipped preview is English and Chinese; the template is English and
+  Korean** (`D-010`, `NOW.md`). Converting the preview is a translation
+  project, so the two will keep disagreeing.

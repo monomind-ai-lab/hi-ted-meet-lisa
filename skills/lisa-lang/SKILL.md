@@ -57,7 +57,9 @@ Ask; never guess which one was meant.
    - per-language labels and titles (`evidence-deck`, `paper-brief`:
      `data-label-en/ko`, `body data-title-*`) alongside the paired text.
    The pattern reference (`references/slide-patterns-<id>.md`) shows the
-   markup; the file itself is the authority.
+   markup; the file itself is the authority. A Korean or Traditional Chinese
+   pass also follows `references/cjk-typography.md`, whichever mechanism
+   carries it.
 
 5. **Give every language a reachable control.** Extend the language switch —
    toggle buttons, the `langToggle` chip cycle, whatever this file uses — so

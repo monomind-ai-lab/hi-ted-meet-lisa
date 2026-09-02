@@ -5,6 +5,12 @@ deck that reads like a printed briefing paper: white ground under a faint
 twelve-column grid, Archivo over Noto Sans TC, red and blue doing the arguing,
 and chapter pages that invert to near-black so a long report has visible seams.
 
+**Density — a `read` template, in slide shape.** Read at desk distance and
+forwarded, so four to eight items on a page is fine — an eight-row table, a
+bar chart of six, a spec list of eight — and one conclusion per page rather
+than one idea. It is still a page that clips, so the count is bounded by
+375px wide and 600px tall in both languages, not by a projector.
+
 Use it when the deck will be read at desk distance and forwarded — a planning
 input, a review, a recommendation someone prints. Use `evidence-deck` when the
 same argument has to survive a projector, and `web-document` when it wants a
@@ -377,3 +383,42 @@ TC is the expensive half: subset it to the glyphs the deck actually uses or the
 file gains several megabytes.
 
 There is no print stylesheet.
+
+## When unsure, default to
+
+- **A text page:** `.eyebrow` + the conclusion in `h2` + one `.body` paragraph.
+- **Proportions:** `.bars`, scaled to the largest value; one figure: `.mega`;
+  two compared: `.split`.
+- **Evidence:** `table.data` with one `tr.flag`.
+- **A seam in a long report:** a chapter page.
+- **An ending:** `.decision`, with a verb in `.da`.
+- **Requirements:** `.specs`; questions: `.pts`.
+- **Emphasis:** `hl`; `red` only for the problem.
+
+## Known gaps
+
+Evidenced, not imagined — each line names its record.
+
+- **There is no fail-visible path for `.reveal`.** Content becomes visible
+  only when the controller's `IntersectionObserver` adds `.visible`; the
+  sole unconditional reveal is the `prefers-reduced-motion` block, and there
+  is no `@media print` block. Anywhere the observer never fires — a hidden
+  tab, a print preview — the page is structurally perfect and visually
+  empty (`L-022`).
+- **No print stylesheet, on the template whose `best_for` says "a
+  recommendation someone prints"** (`templates/templates.json`; Dependencies
+  above). Printing is the browser's own, and a scroll-snap deck of `100dvh`
+  pages paginates only by accident.
+- **English is longer than Chinese, and the pages clip.** `.slide` and
+  `.slide-content` both `overflow:hidden`, so a page that fits in Chinese
+  can lose its bottom in English with no scrollbar to say so — check both
+  languages at 375px wide and 600px tall.
+- **`theme: dark` is the work and `theme: toggle` is not supported** (the
+  answers section above): the chapter pages are already the inverse and
+  must invert *back*.
+- **Noto Sans TC is the expensive half under `delivery: standalone`** —
+  several megabytes unsubsetted — and a subset holds only the glyphs rendered
+  at build time (`references/applying-answers.md`,
+  `references/cjk-typography.md`).
+- **`.pagenum` is hand-written**, and the title and closing pages carry none;
+  renumber the rest by hand after any edit.

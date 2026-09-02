@@ -1,22 +1,24 @@
-# Project website — component reference
+# Motion website — component reference
 
-Markup for `assets/tedandlisa-template-project-website.html`. Every snippet is
+Markup for `assets/tedandlisa-template-motion-website.html`. Every snippet is
 lifted from the skeleton, so it is known-good. Compose from these; do not invent
 class names.
 
-**Density — a `site` template.** Skimmed before it is read: the hero makes one
-promise, a band holds three to six items (the card grid, the pillars, the
-six-step track), a page runs to a few bands, and prose is capped at
-`--maxw-prose` on the docs page. Four to eight items is fine at desk
-distance; a band that needs more is two bands or a table.
+This template is `project-website` with the **motion layer** applied: the same
+tokens, chrome, router, footer and language mechanism, plus seven
+dependency-free animation patterns from `references/motion-patterns.md` —
+CSS and the Web Animations API only, nothing loaded (`D-015`). Every
+component below is the project-website one; the "Motion" section at the end
+says what moves, where, and how to switch any of it off.
 
-This template is a **website**, not a deck and not a single page: several pages
-are hash-routed behind a sticky nav, each page scrolls, one footer is shared by
+It is a **website**, not a deck and not a single page: several pages are
+hash-routed behind a sticky nav, each page scrolls, one footer is shared by
 all of them, and both languages are written into the file rather than translated
 at read time.
 
-Reach for it when the deliverable is a project's public face — a launch page, a
-tool's home, a programme's site — rather than something read start to finish.
+Reach for it when the deliverable is a project's public face that should feel
+alive on the first screen — a launch page, a tool's home, a programme's site —
+and reach for `project-website` when it should not move at all.
 
 ## The three registers that must agree
 
@@ -86,8 +88,11 @@ Every reader-visible string carries **both** languages as sibling spans:
 
 ## Reveal on scroll
 
-Any block can carry `.reveal` and it fades up when scrolled to. Two things to
-know:
+Any block can carry `.reveal` and it fades up when scrolled to — this is the
+project-website mechanism, kept as it is. The motion layer adds a second one,
+`.lm-reveal` / `.lm-on`, driven by the `lm` runtime; the two coexist and an
+element carries **one** of them, never both (see Motion). Two things to know
+about `.reveal`:
 
 - A page that has never been routed to has never been laid out, so its `.reveal`
   elements never intersected anything. `armReveal()` therefore runs on **every**
@@ -355,46 +360,152 @@ Two measured facts to carry forward:
   deliberately; `--fg-faint:#7a7a7a` is the lightest grey that clears 4.5:1 on
   all three dark grounds. The comment in `:root` says so. Decide, do not drift.
 
+## Motion — what moves, where, and how to switch it off
+
+The motion layer is three verbatim blocks from `references/motion-patterns.md`
+outside the fences — the `--lm-*` **bridge** (mapped onto this file's tokens),
+the **base**, and the **runtime** script placed after the router — plus the CSS
+and JS of the seven patterns used, and a self-download strip block. All of it
+is load-bearing: copy, never retype. Inside the fences, an `lm-*` class on an
+element is the whole hook: **remove the class and that effect is gone**; add
+one only from the library. The router, the language switch, the theme and
+the self-download are untouched.
+
+One orchestrated moment, then restraint: the hero rises in sequence and the
+command types itself; after that a section wipes in, a grid lights up under
+the pointer, rows arrive one by one, and the closing title sweeps. Every
+other block keeps project-website's own `.reveal` fade or does not move.
+
+### The hero — stagger, typewriter, marquee, stat strip
+
+`.hero-inner` carries `lm-stagger lm-on`, so its direct children rise one
+after another (the script numbers them with `--i`). The command inside the
+copy block types itself: the text sits in `.lm-type-text` **inside**
+`data-copy-text`, so the copied string is whole, and `--lm-type-delay` holds
+the caret until the hero has landed.
+
+```html
+<div class="container hero-inner lm-stagger lm-on">
+  …
+  <code class="cmd-text" data-copy-text><span class="lm-type lm-on" style="--lm-type-delay:.9s"><span class="lm-type-text">[install or run command]</span></span></code>
+```
+
+The compatibility strip is an endless marquee. Two identical tracks, the
+second `aria-hidden` — it is the seam. Six or more names, or the band has
+holes; under reduced motion it becomes one wrapping row.
+
+```html
+<div class="hero-compat-list lm-marquee">
+  <ul class="lm-marquee-track">
+    <li class="hero-compat-item">[NAME 1]</li>
+    …
+  </ul>
+  <ul class="lm-marquee-track" aria-hidden="true">
+    <li class="hero-compat-item">[NAME 1]</li>
+    …
+  </ul>
+</div>
+```
+
+The stat strip is the one component the source template did not have. Three
+figures with a label; integers count up when scrolled to. `data-lm-to` takes
+the integer, `.lm-count-final` carries the formatted figure with its
+separators and unit and is what screen readers and reduced-motion readers
+get. A bracketed slot fails `parseInt` and stays static, which is right for a
+figure you do not have — delete the strip rather than invent one.
+
+```html
+<div class="hero-stats" role="list">
+  <div class="stat" role="listitem">
+    <span class="stat-n"><span class="lm-count lm-on" data-lm-to="[1200]"><span class="lm-count-n" aria-hidden="true"></span><span class="lm-count-final">[1,200]</span></span></span>
+    <span class="stat-l"><span class="en">[WHAT IT COUNTS]</span><span class="ko">[무엇의 수]</span></span>
+  </div>
+</div>
+```
+
+### The process track — wipe and stagger
+
+`.lifecycle-wrap` no longer carries `.reveal`; instead the track wipes in
+left to right and the six steps rise in sequence — one moment, not a wrap
+fade on top of it.
+
+```html
+<div class="lifecycle-wrap">
+  <div class="lifecycle" role="img" aria-label="…">
+    <div class="lc-track lm-wipe lm-on" aria-hidden="true"></div>
+    <ol class="lc-steps lm-stagger lm-on">
+      <li class="lc-step" style="--h:205">…</li>
+```
+
+### The card grid — stagger and spotlight
+
+`.cards-grid` carries `lm-stagger lm-on` in place of `.reveal`, and every
+`.item-card` carries `lm-spotlight`: its edge lights up where the pointer is
+and sits in the centre on focus. The template's glue switches the card's
+original static hover edge off (`.item-card.lm-spotlight:before{display:none}`)
+so there is one ring, not two. Touch readers keep the plain card.
+
+```html
+<div class="cards-grid lm-stagger lm-on">
+  <a class="card item-card lm-spotlight" style="--h:205" onclick="go('docs')">…</a>
+```
+
+### Rows, lists, and pillars — stagger
+
+`lm-stagger lm-on` replaces `.reveal` on `.pillars`, `.people-grid`,
+`.steps`, the compare table's `<tbody>` and the contribute page's `.chk`.
+Table rows fade without rising — the library strips the transform for `tr`
+because table rows do not transform everywhere — and the wrapper that used
+to carry `.reveal` (`.tblwrap`, the checklist's column) no longer does, so
+nothing double-fades.
+
+```html
+<tbody class="lm-stagger lm-on">
+  <tr>…</tr>
+```
+
+### The closing title — text mask
+
+`.final-inner` carries `lm-stagger lm-on` and `.final-title` carries
+`lm-textmask lm-on` — its own trigger, because the sweep is keyed on the
+title's `.is-in`, not the parent's: the fill sweeps from dim to bright as the
+block rises. In print
+the title is solid — both the template's print rule and the pattern's own
+restore a solid colour.
+
+```html
+<div class="container final-inner lm-stagger lm-on">
+  <h2 class="final-title lm-textmask lm-on">…</h2>
+```
+
+### Rules the motion layer adds
+
+- **One mechanism per element.** `.reveal` and `.lm-reveal`/`.lm-on` never
+  share an element or nest a fade inside a fade; where a pattern went on,
+  `.reveal` came off the wrapper.
+- **Reduced motion and print get the finished page.** Every moving rule
+  lives inside `@media screen and (prefers-reduced-motion: no-preference)`;
+  the base style is the final state. Do not add a `.lm-*` rule outside that
+  block.
+- **A hidden tab or a dead observer still renders** (`L-022`). The runtime
+  shows everything when the tab is hidden, when `IntersectionObserver` is
+  absent, on `beforeprint`, and after a 1.2s fail-visible timer — the same
+  guarantee `armReveal()` gives `.reveal`.
+- **The hero command is the only typewriter.** Monospace Latin only: the
+  caret travels in `ch` units, so a Korean command would need the plain
+  copy block instead.
+- **The self-download keeps working.** Its strip block removes `.is-in`,
+  `.is-done`, `data-lm-ready` and `data-lm-done` before the router clones the document
+  and restores them in the same task, so the saved copy opens exactly like
+  the original. Keep the block if the download button stays.
+- **Adding a pattern** means the library: `/lisa-motion` applies one from
+  `references/motion-patterns.md` under the same rules, and composes a new one
+  only when none fits.
+
 ## Dependencies
 
 **Google Fonts only** — Geist and Geist Mono carry the look, Noto Sans KR gives
 the Korean half a face. Nothing else loads from the network: no diagram runtime,
-no CDN, no analytics. With no network the type falls back to the system stack
-and everything else still works.
-
-## When unsure, default to
-
-- **A page:** `.section` > `.container` > `.sec-head`.
-- **A set of things:** `.item-card`s in `.cards-grid`, one `--h` each.
-- **A process:** `.lifecycle` when it is six steps; `.steps` otherwise.
-- **A comparison:** `.tblwrap` + `.tbl`, with a real `.pill-no`.
-- **A named thing and a line about it:** `.person-card`; an aside: `.callout`.
-- **A command:** `.cmd` with all three `data-copy-*` attributes.
-- **History:** `.releases`, one `is-current`.
-
-## Known gaps
-
-Evidenced, not imagined — each line names its record.
-
-- **The dark theme's `--fg-faint` is 2.86:1** on `--bg` and carries four
-  selectors of 11–13px text; kept on purpose with the one-line fix beside it
-  in `:root` (`D-019`). Expect the review to raise it on every site built
-  from this template until someone acts on the comment.
-- **The nav row is capped at 1120px and fails by wrapping, not overflowing**
-  (`L-024`). `white-space:nowrap` on every label makes it fail visibly; the
-  width budget above is hand-measured and has to be re-measured after every
-  label or project-name change.
-- **`.reveal` is visible only through the observer** (`L-022`). The
-  fail-visible timer in `armReveal()` and the `@media print` reset are the
-  only guards; remove either and a hidden tab or a print preview renders a
-  structurally perfect, visually empty page.
-- **`.hero-title` paints a gradient through `background-clip:text` at
-  `line-height:1.02` with no paint-box padding** — the exact shape `L-015`
-  describes. Check the descenders with the snippet in
-  `references/design-review.md`, not by eye.
-- **The six-step track is positioned for six.** Any other count means
-  re-tuning the animated track's spacing (template comment; "Process track"
-  above).
-- **The language pair is coupled** the way `L-018` lists for `web-document`:
-  font URL and stack, visibility rules, button, routing regex,
-  `documentElement.lang`.
+no CDN, no analytics, and **no animation library** — the motion layer is CSS
+and the Web Animations API. With no network the type falls back to the system
+stack and everything else still works.

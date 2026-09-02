@@ -77,6 +77,9 @@ def fixture(template: str) -> dict:
         "style": {"mode": "default", "designFile": None, "notes": None},
         "logo": {"mode": "monomind", "file": None, "href": None},
         "elements": [],
+        "contract": {"audience": None, "purpose": ["inform"], "outcome": None,
+                     "coreMessage": None, "delivery": "presenter",
+                     "afterlife": "share", "divergence": "moderate"},
     }
     if template == "monomind-deck":
         answers["menu"] = {"mode": "minimal"}
@@ -275,6 +278,33 @@ class ApplyDetails(unittest.TestCase):
                   for c in re.finditer(r"<!--.*?-->", out, re.S)]
         self.assertFalse(any(s <= m.start() < e for s, e in cspans))
 
+    def test_style_brand_is_reported_with_the_extraction_hint(self):
+        # `style: brand` is never mechanical: the file is left alone, the
+        # row is NOT-MECHANICAL, and the detail names the skill to run first.
+        dst = self._copy("web-document")
+        before = dst.read_bytes()
+        a = self._answers({"template": "web-document",
+                           "style": {"mode": "brand", "designFile": None,
+                                     "notes": None,
+                                     "url": "https://example.com", "file": None}})
+        proc = run_apply(a, dst)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(before, dst.read_bytes())
+        line = [l for l in proc.stdout.splitlines() if l.strip().startswith("style")]
+        self.assertEqual(len(line), 1, proc.stdout)
+        self.assertIn("NOT-MECHANICAL", line[0])
+        self.assertIn("/lisa-brand", line[0])
+        self.assertIn("designmd", line[0])
+        # the other modes keep the plain detail — no hint to follow
+        a2 = self._answers({"template": "web-document",
+                            "style": {"mode": "designmd", "designFile": None,
+                                      "notes": None, "url": None, "file": None}})
+        proc2 = run_apply(a2, dst)
+        self.assertEqual(proc2.returncode, 0, proc2.stderr)
+        line2 = [l for l in proc2.stdout.splitlines() if l.strip().startswith("style")]
+        self.assertIn("NOT-MECHANICAL", line2[0])
+        self.assertNotIn("/lisa-brand", line2[0])
+
     def test_dry_run_leaves_file_untouched(self):
         dst = self._copy("monomind-deck")
         before = dst.read_bytes()
@@ -295,6 +325,28 @@ class ApplyDetails(unittest.TestCase):
         self.assertNotEqual(run_apply(wrong_version, dst).returncode, 0)
         unknown = self._answers({"template": "no-such-template"})
         self.assertNotEqual(run_apply(unknown, dst).returncode, 0)
+
+    def test_contract_is_reported_not_mechanical_and_left_alone(self):
+        # the communication contract shapes the writing, never the chrome:
+        # one NOT-MECHANICAL line, no "unknown key", and the file untouched
+        dst = self._copy("web-document")
+        before = dst.read_bytes()
+        a = self._answers({"template": "web-document",
+                           "contract": {"audience": None,
+                                        "purpose": ["inform", "decide"],
+                                        "outcome": None,
+                                        "coreMessage": "ship in October",
+                                        "delivery": "reader",
+                                        "afterlife": "approval",
+                                        "divergence": "close"}})
+        proc = run_apply(a, dst)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(before, dst.read_bytes())
+        rows = [l for l in proc.stdout.splitlines()
+                if l.strip().startswith("contract")]
+        self.assertEqual(len(rows), 1, proc.stdout)
+        self.assertIn("NOT-MECHANICAL", rows[0])
+        self.assertNotIn("unknown answer key", proc.stdout)
 
     def test_handoff_payload_is_a_clean_no_op(self):
         dst = self._copy("monomind-deck")

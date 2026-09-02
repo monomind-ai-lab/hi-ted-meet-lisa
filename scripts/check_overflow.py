@@ -4,6 +4,7 @@ content escape sideways at any tested viewport width.
 
     python3 scripts/check_overflow.py                 # every first-party template
     python3 scripts/check_overflow.py previews/*.html # specific files
+    python3 scripts/check_overflow.py --layout stage scripts/fixtures/stage-1920x1080.html
     CHROME_BIN=/path/to/chrome python3 scripts/check_overflow.py
 
 Why this exists: a fixed grid track plus one long unbreakable mono token
@@ -26,9 +27,45 @@ too so one Chrome run covers every width), and measured per width:
      horizontally scrolling ancestor (a <pre> in a scrolling code frame is
      contained, not colliding). SVG content is skipped outright — scrollWidth
      has no useful meaning there and diagram label metrics vary by font.
+  3. no_overlapping_text: two text-bearing elements whose painted text boxes
+     intersect while neither is an ancestor of the other — the grid panel
+     that covers its neighbour, the nowrap label that runs into the next
+     cell — which passes both measurements above because nothing's
+     scrollWidth grows. Boxes are the text nodes' own line fragments —
+     never the element's box, so text that spills out of its element is
+     still measured — trimmed to the element's line-height (a display face
+     under tight leading overshoots its line box by metric slack, not ink)
+     and clipped by every overflow-hidden ancestor, so only painted text
+     counts. Hidden, aria-hidden and fixed/sticky chrome is skipped (a nav
+     or a menu sits over content by design), and a pair is reported only
+     when the intersection is more than a few pixels each way and at least
+     a third of the smaller box: edge-touching inline runs are not
+     collisions, a panel covering its neighbour or a token running into the
+     next column is.
+
+Before anything is measured the harness settles the page: it forces a layout
+so every lazily requested @font-face is actually queued, waits for
+document.fonts.ready and keeps waiting while the status is still `loading`
+(a bare `fonts.ready` resolves before layout has asked for a single face —
+observed with zero faces loaded and the swap arriving afterwards), and pins
+the entrance animations (`.reveal`, `[data-reveal]`) to their settled state,
+so no width is measured mid-flight or in a fallback font.
 
 Files with a PAGES/ROUTES hash router keep only the routed page in layout, so
 the harness walks every route (in the file's boot language) and measures each.
+
+Which check runs depends on the template's `layout` in the registry. A
+`reflow` template (every first-party template today) gets the three widths
+above. A `stage` template is authored on a fixed 1920×1080 canvas that scales
+uniformly and letterboxes, so a 375px reflow pass would fail it for doing what
+it is meant to do; it is rendered at 1920×1080 and at one letterboxed size
+(1280×900) instead, and fails when the page scrolls sideways, when the stage
+canvas (the largest transformed element of at least 960×540) is not scaled
+uniformly, does not fit the viewport or fills neither axis of it, or when any
+visible element's box escapes the canvas. Because headless Chrome never fires
+a frame's resize event, stage mode dispatches one after each resize so a
+JS-driven fit actually re-runs. Files not in the registry are `reflow` unless
+`--layout stage` says otherwise.
 
 How the result reaches Python — an in-page completion signal, NOT
 --dump-dom: the harness fetch()-POSTs its JSON verdict back to this script's
@@ -77,12 +114,24 @@ CHROME_CANDIDATES = [
 # (width, height): the two desktop widths the bug class shows at, plus a true
 # 375 phone viewport. All rendered inside the iframe of one 2010px window.
 WIDTHS = [(1280, 800), (2000, 1100), (375, 667)]
+# `layout: stage`: the canvas at 1:1, then one size whose aspect ratio forces
+# letterboxing (1280×900 is 0.667 scale with 90px bars top and bottom). No
+# phone width: a stage does not reflow, it scales.
+STAGE_SIZES = [(1920, 1080), (1280, 900)]
 WINDOW = (2010, 1200)
 TOLERANCE = 2  # px of sub-pixel rounding forgiven at document/slide level
 # Per-element escapes under this are letter-spacing trails, focus-ring slack
 # and rounding noise (3-5px was observed on healthy pages); the collision
 # class this gate exists for starts well above it (35px+ observed).
 ESCAPE_TOLERANCE = 8
+# no_overlapping_text: an intersection must exceed this many px in both
+# directions AND cover at least this fraction of the smaller text box. Inline
+# runs touch at their edges (0-1px) and a heading's descender-fix padding can
+# leave a few px of metric slack against the next line; a panel covering
+# another, or a token running into the next column, overlaps by tens of px
+# and most of a line (measured 44% and 100% on the fixture that shaped this).
+OVERLAP_TOLERANCE = 3
+OVERLAP_FRACTION = 0.3
 
 # The harness page iframes the target (same origin, served together), walks
 # its hash routes at each width, and POSTs the JSON verdict to /r/result on
@@ -98,7 +147,7 @@ HARNESS = """<!doctype html><html><head><meta charset="utf-8"><title>gate</title
 <body style="margin:0">
 <iframe id="f" src="%(src)s" style="display:block;border:0;width:1280px;height:800px"></iframe>
 <script>
-var WIDTHS = %(widths)s, TOL = %(tol)d, ETOL = %(etol)d;
+var WIDTHS = %(widths)s, TOL = %(tol)d, ETOL = %(etol)d, OTOL = %(otol)d, OFRAC = %(ofrac)s, MODE = %(mode)s;
 var frame = document.getElementById('f');
 function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
@@ -148,33 +197,258 @@ function measure(win, label) {
   return out;
 }
 
+// ---- settling before measurement --------------------------------------
+// Entrance animations. The templates that animate content in (`.reveal` on
+// the two snap decks and the project website) start it at opacity:0 plus a
+// translateY, and only an IntersectionObserver callback ends that — so a
+// measurement taken mid-flight, or where the observer never fires, reads
+// translated boxes and invisible text. Pin those classes to their settled
+// state. Only those: a generic opacity:0 sweep would also drag intentional
+// overlays (scrims, closed mega menus) into view and manufacture overlaps.
+var ENTRANCE = '.reveal, [data-reveal]';
+function settle(win) {
+  Array.prototype.forEach.call(win.document.querySelectorAll(ENTRANCE), function (el) {
+    el.style.setProperty('transition', 'none', 'important');
+    el.style.setProperty('animation', 'none', 'important');
+    el.style.setProperty('opacity', '1', 'important');
+    el.style.setProperty('transform', 'none', 'important');
+    el.style.setProperty('visibility', 'visible', 'important');
+  });
+}
+
+// Webfonts. document.fonts.ready resolves whenever nothing is loading, and
+// that includes the moment before layout has asked for a single @font-face.
+// Force a layout so the faces are requested, wait, and keep waiting while
+// the status is still 'loading'; `budget` caps it in wall-clock ms.
+async function fontsSettled(win, budget) {
+  var doc = win.document, t0 = Date.now();
+  if (!doc.body) return;
+  void doc.body.offsetHeight;
+  do {
+    try { await Promise.race([doc.fonts.ready, sleep(budget)]); } catch (e) { return; }
+    await sleep(50);
+  } while (doc.fonts.status === 'loading' && Date.now() - t0 < budget);
+}
+
+// ---- no_overlapping_text ----------------------------------------------
+function rectOf(r) { return { l: r.left, t: r.top, r: r.right, b: r.bottom }; }
+function clipRect(a, b) {
+  if (!a) return b;
+  var l = Math.max(a.l, b.l), t = Math.max(a.t, b.t),
+      r = Math.min(a.r, b.r), bt = Math.min(a.b, b.b);
+  return (r > l && bt > t) ? { l: l, t: t, r: r, b: bt } : null;
+}
+function nameOf(el) {
+  var s = '<' + el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') +
+          (el.className && String(el.className).trim() ?
+            '.' + String(el.className).trim().split(/\\s+/).slice(0, 3).join('.') : '') + '>';
+  var txt = (el.textContent || '').replace(/\\s+/g, ' ').trim();
+  if (txt) s += ' "' + (txt.length > 28 ? txt.slice(0, 27) + '...' : txt) + '"';
+  return s;
+}
+function whereIs(el) {
+  var s = el.closest('section, .slide, .page');
+  if (!s) return '';
+  var lab = s.getAttribute('data-screen-label') || s.getAttribute('data-label-en') ||
+            s.getAttribute('data-label-zh') || s.getAttribute('data-route') || s.id;
+  return lab ? ' in ' + (lab === s.id ? '#' + lab : '"' + lab + '"') : '';
+}
+function textOverlaps(win, label) {
+  var doc = win.document, de = doc.documentElement, out = [];
+  var skipMemo = new Map(), clipMemo = new Map();
+  // Hidden, aria-hidden, or fixed/sticky chrome — on the element or any
+  // ancestor. Chrome (nav, menus, progress bars, viewers) sits over content
+  // by design and is measured by the responsive checks, not here.
+  function skip(el) {
+    if (!el || el === doc.body || el === de) return false;
+    if (skipMemo.has(el)) return skipMemo.get(el);
+    var cs = win.getComputedStyle(el);
+    var v = cs.display === 'none' || cs.visibility === 'hidden' ||
+            parseFloat(cs.opacity) === 0 || cs.position === 'fixed' ||
+            cs.position === 'sticky' || el.getAttribute('aria-hidden') === 'true' ||
+            skip(el.parentElement);
+    skipMemo.set(el, v);
+    return v;
+  }
+  // The box every overflow-clipping ancestor (and the element itself) leaves
+  // painted. Scroll containers (auto/scroll) do not clip: their content is
+  // reachable. Nor do html/body, which are the document's own scrollers.
+  function clipOf(el) {
+    if (!el || el === doc.body || el === de) return null;
+    if (clipMemo.has(el)) return clipMemo.get(el);
+    var c = clipOf(el.parentElement), cs = win.getComputedStyle(el);
+    if (/hidden|clip/.test(cs.overflowX + ' ' + cs.overflowY))
+      c = clipRect(c, rectOf(el.getBoundingClientRect())) || { l: 0, t: 0, r: 0, b: 0 };
+    clipMemo.set(el, c);
+    return c;
+  }
+  var frags = [], walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT), n;
+  while ((n = walker.nextNode())) {
+    if (!/\\S/.test(n.nodeValue)) continue;
+    var el = n.parentElement;
+    if (!el || el.namespaceURI !== 'http://www.w3.org/1999/xhtml') continue;   // SVG etc.
+    if (/^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|TITLE)$/.test(el.tagName)) continue;
+    if (skip(el)) continue;
+    var clip = clipOf(el), lh = parseFloat(win.getComputedStyle(el).lineHeight);
+    var range = doc.createRange();
+    range.selectNodeContents(n);
+    var rects = range.getClientRects();
+    for (var i = 0; i < rects.length; i++) {
+      var r = rectOf(rects[i]);
+      // A line fragment is the font's content area, which under tight
+      // leading is taller than the line box it paints in; trim the slack
+      // so a display heading is not "overlapping" the line below it.
+      if (lh > 0 && r.b - r.t > lh + 1) { var d = (r.b - r.t - lh) / 2; r.t += d; r.b -= d; }
+      var f = clip ? clipRect(clip, r) : r;
+      if (f && f.r - f.l > 1 && f.b - f.t > 1) { f.el = el; frags.push(f); }
+    }
+  }
+  // Sweep by top edge: only fragments that overlap vertically are compared.
+  frags.sort(function (a, b) { return a.t - b.t; });
+  var ids = new Map(), seen = {}, pairs = 0, LIMIT = 20;
+  function idOf(el) { if (!ids.has(el)) ids.set(el, ids.size + 1); return ids.get(el); }
+  for (var i = 0; i < frags.length; i++) {
+    var f = frags[i];
+    for (var j = i + 1; j < frags.length && frags[j].t < f.b - OTOL; j++) {
+      var g = frags[j];
+      if (f.el === g.el || f.el.contains(g.el) || g.el.contains(f.el)) continue;
+      var ix = Math.min(f.r, g.r) - Math.max(f.l, g.l);
+      var iy = Math.min(f.b, g.b) - Math.max(f.t, g.t);
+      if (ix <= OTOL || iy <= OTOL) continue;
+      var smaller = Math.min((f.r - f.l) * (f.b - f.t), (g.r - g.l) * (g.b - g.t));
+      if (ix * iy < OFRAC * smaller) continue;
+      var a = idOf(f.el), b = idOf(g.el), key = Math.min(a, b) + ':' + Math.max(a, b);
+      if (seen[key]) continue;
+      seen[key] = true;
+      if (pairs++ < LIMIT)
+        out.push(label + ' text overlaps ' + nameOf(f.el) + ' x ' + nameOf(g.el) +
+                 ' by ' + Math.round(ix) + 'x' + Math.round(iy) + 'px' + whereIs(f.el));
+    }
+  }
+  if (pairs > LIMIT) out.push(label + ' ... ' + (pairs - LIMIT) + ' more overlapping pairs not listed');
+  return out;
+}
+
+function elName(el) {
+  return '<' + el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') +
+         (el.className && String(el.className).trim() ?
+           '.' + String(el.className).trim().split(/\\s+/).join('.') : '') + '>';
+}
+
+/* The stage canvas: the largest element carrying a transform whose
+   untransformed box is at least 960×540 — a scaled stage, whatever the
+   template calls it. */
+function stageOf(win, doc) {
+  var best = null, area = 0;
+  Array.prototype.forEach.call(doc.querySelectorAll('body *'), function (el) {
+    if (el.namespaceURI !== 'http://www.w3.org/1999/xhtml') return;
+    if (el.offsetWidth < 960 || el.offsetHeight < 540) return;
+    if (win.getComputedStyle(el).transform === 'none') return;
+    var a = el.offsetWidth * el.offsetHeight;
+    if (a > area) { area = a; best = el; }
+  });
+  return best;
+}
+
+function measureStage(win, label) {
+  var doc = win.document, de = doc.documentElement, out = [];
+  var vw = de.clientWidth, vh = de.clientHeight;
+  if (de.scrollWidth > vw + TOL)
+    out.push(label + ' document scrolls sideways: scrollWidth ' +
+             de.scrollWidth + ' > viewport ' + vw);
+  var stage = stageOf(win, doc);
+  if (!stage) {
+    out.push(label + ' no stage canvas found (no transformed element of at least 960\u00d7540)');
+    return out;
+  }
+  var r = stage.getBoundingClientRect(), name = elName(stage);
+  var sw = Math.round(r.width), sh = Math.round(r.height);
+  if (r.left < -TOL || r.top < -TOL || r.right > vw + TOL || r.bottom > vh + TOL)
+    out.push(label + ' stage ' + name + ' escapes the viewport: ' + sw + '\u00d7' + sh +
+             ' at ' + Math.round(r.left) + ',' + Math.round(r.top) + ' in ' + vw + '\u00d7' + vh);
+  // A stage scales *to* the viewport: letterboxed means one axis is filled
+  // and the other carries the bars. A canvas filling under 90%% of both is a
+  // fit that never ran (the boot scale carried over) or a stage that is not
+  // scaled at all — and either way not the model this mode checks.
+  if (r.width < vw * 0.9 && r.height < vh * 0.9)
+    out.push(label + ' stage ' + name + ' is not scaled to the viewport: ' + sw + '\u00d7' + sh +
+             ' fills neither axis of ' + vw + '\u00d7' + vh);
+  // Letterboxing keeps the canvas's aspect ratio; a stretched stage is a
+  // stage scaled per axis, which is reflow by another name.
+  if (Math.abs(r.width / r.height - stage.offsetWidth / stage.offsetHeight) > 0.01)
+    out.push(label + ' stage ' + name + ' is not scaled uniformly: ' + sw + '\u00d7' + sh +
+             ' for a ' + stage.offsetWidth + '\u00d7' + stage.offsetHeight + ' canvas');
+  Array.prototype.forEach.call(stage.querySelectorAll('*'), function (el) {
+    if (el.namespaceURI !== 'http://www.w3.org/1999/xhtml') return;
+    var cs = win.getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0) return;
+    var b = el.getBoundingClientRect();
+    if (!b.width || !b.height) return;
+    for (var a = el.parentElement; a && a !== stage; a = a.parentElement) {
+      var acs = win.getComputedStyle(a);
+      if (parseFloat(acs.opacity) === 0) return;              // hidden with its slide
+      if (acs.overflowX !== 'visible' || acs.overflowY !== 'visible') return;  // clipped or scrolled inside the stage on purpose
+    }
+    var escape = Math.max(r.left - b.left, b.right - r.right, r.top - b.top, b.bottom - r.bottom);
+    if (escape > ETOL)
+      out.push(label + ' ' + elName(el) + ' escapes the stage by ' + Math.round(escape) + 'px');
+  });
+  return out;
+}
+
 async function routesOf(win) {
   var list = win.PAGES || win.ROUTES;
   if (!Array.isArray(list) || !list.length || !win.location.hash) return [null];
   return list.slice();
 }
 
+// The iframe starts life on about:blank, whose readyState is already
+// 'complete', so a load listener can resolve on the wrong document and the
+// harness then reads a body that does not exist yet while the real file is
+// still parsing behind a blocking CDN script. Poll for the target document.
+async function loaded() {
+  for (var t0 = Date.now(); Date.now() - t0 < 60000; await sleep(100)) {
+    var d = frame.contentDocument;
+    if (d && d.readyState === 'complete' && d.body && d.location.pathname.indexOf('/t/') === 0)
+      return;
+  }
+  throw new Error('target document never finished loading');
+}
+
 async function main() {
-  await new Promise(function (r) {
-    if (frame.contentDocument && frame.contentDocument.readyState === 'complete') r();
-    else frame.addEventListener('load', r, { once: true });
-  });
+  await loaded();
   await sleep(600);                       // boot scripts, router, reveal arming
   var win = frame.contentWindow, problems = [];
-  try { await Promise.race([win.document.fonts.ready, sleep(4000)]); } catch (e) {}
+  await fontsSettled(win, 4000);
+  settle(win);
   var routes = await routesOf(win);
   for (var w = 0; w < WIDTHS.length; w++) {
     frame.style.width = WIDTHS[w][0] + 'px';
     frame.style.height = WIDTHS[w][1] + 'px';
+    if (MODE === 'stage') {
+      // Headless Chrome updates the frame's innerWidth/innerHeight but never
+      // fires its window's resize event (measured: innerWidth 1920, listener
+      // never run), so a JS-driven stage fit would keep its boot scale and
+      // the letterbox pass would test nothing. Deliver the event the browser
+      // withholds. Reflow templates are left alone: their re-layout is CSS,
+      // and the CI run must stay identical for them.
+      try { win.dispatchEvent(new win.Event('resize')); } catch (e) {}
+    }
     await sleep(300);
+    await fontsSettled(win, 2000);        // a width can pull in a face it had not used
     for (var i = 0; i < routes.length; i++) {
       var label = '@' + WIDTHS[w][0];
       if (routes[i] !== null) {
         win.location.hash = win.location.hash.replace(/[^\\/#]+$/, routes[i]);
         await sleep(400);                 // router swap + per-page layout
+        await fontsSettled(win, 2000);    // a page can too
+        settle(win);                      // the router re-arms reveals per page
+        await sleep(50);
         label += ' page:' + routes[i];
       }
-      try { problems = problems.concat(measure(win, label)); }
+      try { problems = problems.concat(MODE === 'stage' ? measureStage(win, label)
+                                                        : measure(win, label),
+                                       textOverlaps(win, label)); }
       catch (e) { problems.push(label + ' MEASURE ERROR ' + e); }
     }
   }
@@ -360,12 +634,15 @@ def parse_result(raw: str | None) -> list[str] | None:
         return ["HARNESS ERROR: harness result was not parseable JSON"]
 
 
-def check_file(chrome: str, target: pathlib.Path) -> list[str]:
-    widths_js = json.dumps([[w, h] for w, h in WIDTHS])
+def check_file(chrome: str, target: pathlib.Path, layout: str = "reflow") -> list[str]:
+    sizes = STAGE_SIZES if layout == "stage" else WIDTHS
+    widths_js = json.dumps([[w, h] for w, h in sizes])
     attempts: list[tuple[str, ChromeRun]] = []
     with tempfile.TemporaryDirectory() as hd:
         harness = HARNESS % {"src": f"/t/{target.name}", "widths": widths_js,
-                             "tol": TOLERANCE, "etol": ESCAPE_TOLERANCE}
+                             "tol": TOLERANCE, "etol": ESCAPE_TOLERANCE,
+                             "otol": OVERLAP_TOLERANCE, "ofrac": OVERLAP_FRACTION,
+                             "mode": json.dumps(layout)}
         (pathlib.Path(hd) / "harness.html").write_text(harness, encoding="utf-8")
         srv = serve(hd, str(target.parent))
         try:
@@ -422,21 +699,32 @@ def probe_chrome(chrome: str) -> tuple[bool, list[str]]:
     return False, msgs
 
 
-def default_targets() -> list[pathlib.Path]:
+def registry_layouts() -> dict[pathlib.Path, str]:
+    """Each first-party template file -> its registry `layout` (reflow when
+    an entry has none), in registry order."""
     reg = ROOT / "templates" / "templates.json"
-    if reg.is_file():
-        entries = json.loads(reg.read_text())["templates"]
-        files = [ROOT / t["file"] for t in entries
-                 if t.get("file") and t.get("kind") != "external"]
-        if files:
-            return files
+    if not reg.is_file():
+        return {}
+    entries = json.loads(reg.read_text())["templates"]
+    return {(ROOT / t["file"]).resolve(): t.get("layout") or "reflow"
+            for t in entries if t.get("file") and t.get("kind") != "external"}
+
+
+def default_targets() -> list[pathlib.Path]:
+    files = list(registry_layouts())
+    if files:
+        return files
     return sorted(ROOT.glob("assets/tedandlisa-template*.html"))
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Rendered horizontal-overflow gate")
+    ap = argparse.ArgumentParser(
+        description="Rendered horizontal-overflow and overlapping-text gate")
     ap.add_argument("files", nargs="*", type=pathlib.Path,
                     help="HTML files to check (default: every first-party template)")
+    ap.add_argument("--layout", choices=["reflow", "stage"],
+                    help="layout model for the given files, overriding the "
+                         "registry (default: the file's registry entry, else reflow)")
     args = ap.parse_args()
 
     chrome = find_chrome()
@@ -450,10 +738,15 @@ def main() -> int:
         print("error: not a file: " + ", ".join(missing), file=sys.stderr)
         return 2
 
+    known = registry_layouts()
+    layouts = {t: args.layout or known.get(t, "reflow") for t in targets}
     overflowing, broken = 0, 0
     for i, target in enumerate(targets):
-        problems = check_file(chrome, target)
+        layout = layouts[target]
+        problems = check_file(chrome, target, layout)
         rel = os.path.relpath(target)
+        if layout == "stage":
+            rel += " (stage: " + ", ".join(f"{w}\u00d7{h}" for w, h in STAGE_SIZES) + ")"
         # A harness/Chrome breakdown is an infrastructure failure and must
         # not masquerade as a design finding; report and count it apart.
         findings = [p for p in problems
@@ -490,13 +783,20 @@ def main() -> int:
             sys.stdout.flush()
     print()
     if overflowing:
-        print(f"{overflowing} of {len(targets)} files have horizontal overflow")
+        print(f"{overflowing} of {len(targets)} files have horizontal overflow "
+              "or overlapping text")
     if broken:
         print(f"{broken} of {len(targets)} files could not be checked "
               "(harness or Chrome failure, not an overflow finding)")
     if not overflowing and not broken:
-        print(f"all {len(targets)} files clean at "
-              + ", ".join(str(w) for w, _ in WIDTHS) + "px")
+        reflow_at = ", ".join(str(w) for w, _ in WIDTHS) + "px"
+        if "stage" in layouts.values():
+            stage_at = ", ".join(f"{w}\u00d7{h}" for w, h in STAGE_SIZES)
+            modes = ("reflow at " + reflow_at if "reflow" in layouts.values() else "") + \
+                    ("; " if len(set(layouts.values())) > 1 else "") + "stage at " + stage_at
+            print(f"all {len(targets)} files clean ({modes})")
+        else:
+            print(f"all {len(targets)} files clean at " + reflow_at)
     return 1 if overflowing else (2 if broken else 0)
 
 

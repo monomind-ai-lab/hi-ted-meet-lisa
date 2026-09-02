@@ -1030,9 +1030,27 @@ MECHANICAL = ("theme", "export", "menu", "languages", "noTranslate",
               "credit", "backgrounds", "accent")
 
 # answers that are judgment calls by design (see the SKILL.md table).
-JUDGMENT = ("slideCount", "elements", "style", "logo", "siteType",
+# `contract` — audience, purpose, outcome, core message, delivery, afterlife,
+# divergence — shapes the writing and never the chrome, so it is reported
+# here for the agent rather than silently ignored the way `review` is.
+JUDGMENT = ("contract", "slideCount", "elements", "style", "logo", "siteType",
             "projectStage", "sitemapSource", "benchmarks", "evidence",
             "prototype", "delivery", "format")
+
+
+def judgment_hint(key, value):
+    """The NOT-MECHANICAL detail for a judgment row.
+
+    Plain "left to the agent" for all of them except the one whose next
+    step is a different skill: `style` in `brand` mode means the brand has
+    to be extracted (skills/lisa-brand/) before there is a design.md to
+    apply, and a one-line pointer here is cheaper than a missed step.
+    """
+    if key == "style" and isinstance(value, dict) and value.get("mode") == "brand":
+        return ("left to the agent — mode brand: run /lisa-brand on style.url / "
+                "style.file first, then apply its brand/design.md as style: "
+                "designmd, through the tokens")
+    return "left to the agent"
 
 
 def main() -> int:
@@ -1117,7 +1135,7 @@ def main() -> int:
 
     for key in JUDGMENT:
         if key in answers:
-            rep.manual("%s" % key)
+            rep.manual("%s" % key, judgment_hint(key, answers[key]))
     handled = set(MECHANICAL) | set(JUDGMENT) | {"template", "review"}
     for key in answers:
         if key not in handled:

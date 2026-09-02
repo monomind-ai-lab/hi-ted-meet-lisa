@@ -119,6 +119,21 @@ NO_PAYLOAD = {
     "lisa-help": "self-contained: it answers from its own SKILL.md, so the "
                  "shared payload stays out and the bundle is a few kilobytes",
 }
+
+# Bundled with a SLICE of the payload: only the files the skill actually
+# reads, at their original paths, so every `references/...` and `assets/...`
+# path in its SKILL.md resolves unchanged. /lisa-brand reads its contract and
+# its A4 skeleton and nothing else — it writes into the user's working
+# directory, never into a template — so the 2.6 MB of templates it never
+# opens would only push the bundle toward the limits for nothing. It is
+# worth a panel slot: the extraction and both HTML files complete in a
+# sandbox, and only the PDF render waits for a local Chrome, which the skill
+# says so about.
+SLICED_PAYLOAD = {
+    "lisa-brand": ("references/brand-extraction.md",
+                   "assets/lisa-brand-book-a4.html"),
+    "lisa-motion": ("references/motion-patterns.md",),
+}
 PAYLOAD_FILES = ("LICENSE", "NOTICE")
 
 # Claude caps a custom skill upload at 30 MB uncompressed and states a 200-file
@@ -158,7 +173,15 @@ def stage(skill: pathlib.Path, into: pathlib.Path) -> pathlib.Path:
         else:
             shutil.copy2(extra, dest)
 
-    if skill.name not in NO_PAYLOAD:
+    if skill.name in SLICED_PAYLOAD:
+        for rel in SLICED_PAYLOAD[skill.name]:
+            src = ROOT / rel
+            if not src.is_file():
+                sys.exit(f"sliced payload missing for {skill.name}: {rel}")
+            dest = folder / rel              # original path preserved on purpose
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dest)
+    elif skill.name not in NO_PAYLOAD:
         for name in PAYLOAD_DIRS:
             src = ROOT / name
             if not src.is_dir():
@@ -168,6 +191,7 @@ def stage(skill: pathlib.Path, into: pathlib.Path) -> pathlib.Path:
         src = ROOT / name
         if src.is_file():
             shutil.copy2(src, folder / name)
+
 
     for rel in EXTRA_PAYLOAD.get(skill.name, ()):
         src = ROOT / rel
@@ -239,6 +263,11 @@ def main() -> int:
     for name, why in NO_PAYLOAD.items():
         if any(s.name == name for s in skills):
             print(f"\nno payload: {name} — {why}")
+
+    for name, rels in SLICED_PAYLOAD.items():
+        if any(s.name == name for s in skills):
+            print(f"\nsliced payload: {name} — only {', '.join(rels)}, "
+                  f"at their original paths")
 
     if oversize:
         print(f"\nover the {MAX_UNCOMPRESSED//1024//1024} MB upload limit: "

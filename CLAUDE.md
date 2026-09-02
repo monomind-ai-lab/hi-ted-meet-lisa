@@ -28,8 +28,11 @@ python3 scripts/tedandlisa_intake.py --prompt "the deck brief" --out intake.json
 python3 scripts/tedandlisa_new_template.py analyze SOURCE.html
 
 # Register a new template skeleton (create-only; refuses to overwrite an id).
+# --layout is reflow (default) or stage — a fixed 1920×1080 canvas that scales
+# uniformly and letterboxes instead of reflowing.
 python3 scripts/tedandlisa_new_template.py register --id ID --name "NAME" \
-  --file assets/tedandlisa-template-ID.html --kind slides|document
+  --file assets/tedandlisa-template-ID.html --kind slides|document \
+  --type present|read|diagram|site [--layout reflow|stage]
 
 # Re-capture gallery thumbnails after adding/changing a template's opening
 # screen. Needs a local Chrome/Chromium; degrades to a text card if absent.
@@ -55,7 +58,7 @@ switch, check for console errors and horizontal overflow at 375px).
 ## Architecture
 
 **Independent template systems, not variations of one look.** The registry
-carries eight first-party templates (plus the external `slide-design` entry
+carries the first-party templates (plus the external `slide-design` entry
 that hands off to `/lisa-design`). Each is a single self-contained HTML file
 with its own design tokens, chrome, scripts, and language mechanism — they
 differ in shape, navigation, and how they translate, so a change to one has no
@@ -80,7 +83,17 @@ bearing on the others. Three of them show how far apart the systems sit:
 `tedandlisa_new_template.py register` read/write; each entry points at its file,
 its pattern-reference doc (`references/slide-patterns*.md` — verbatim,
 known-good markup for every component), and its thumbnail in
-`templates/thumbs/`.
+`templates/thumbs/`. Three classifying fields sit beside those: `kind`
+(`slides` / `document` / `external`) is the shape and is machinery — it
+decides which intake questions are asked; `type` (`present` / `read` /
+`diagram` / `site`) is what the template is for — the gallery's flag and
+filter; and `layout` is how it meets the viewport — `reflow` (re-lays its
+content out for any width; every first-party template today) or `stage` (a
+fixed 1920×1080 canvas scaled uniformly and letterboxed on other aspect
+ratios, never re-laid out). `type` and `layout` are presentation only:
+marked on the gallery card, never in the payload. `scripts/check_overflow.py`
+reads `layout` to decide whether a template is reflowed at 375px or rendered
+at its stage and letterboxed.
 
 **The public website is a separate repository.** The landing page, the live
 preview decks and the Cloudflare Pages deploy live in
@@ -135,6 +148,27 @@ turns a finished HTML file into a placeholder skeleton + pattern-reference doc
 and registers it. Its cardinal rule: the *source* document is someone's real
 work and must never be committed — only the genericized skeleton, scrubbed of
 every identifying detail, is.
+
+**Brand extraction** is the sibling skill `skills/lisa-brand/` (`/lisa-brand`):
+it reads a brand off a site URL, a screenshot, or assets into
+`brand/design.md` — tokens on the schema the templates share, each value
+marked `fact` or `approx` with its source — plus a one-page A4 brand book
+built from `assets/lisa-brand-book-a4.html`. `references/brand-extraction.md`
+is the contract (the `design.md` shape, the extraction heuristics, SVG
+sanitisation, the contrast rule, and the per-template token mapping). The
+intake's `style: brand` answer runs the same extraction inside a `/lisa` build
+and then applies the result exactly like `style: designmd`. Both files go into
+the user's working directory, never into this checkout.
+
+**Motion is dependency-free** (`D-015`): `references/motion-patterns.md` is
+a library of animation patterns in CSS and the Web Animations API — no GSAP,
+nothing loaded — each with a runtime that arms reveals per page activation,
+carries a fail-visible timer (`L-022`), and cancels loops when a hash-routed
+page deactivates. `assets/tedandlisa-template-motion-website.html`
+(`motion-website`) is `project-website` with that layer applied, and
+`skills/lisa-motion/` (`/lisa-motion`) applies the library to any finished
+file. Pattern blocks are added beside a template's own scripts, never inside
+them.
 
 **Design review** (`references/design-review.md`) is scheduled by the
 intake's `review` answer — default `after`: deliver the file first, then run

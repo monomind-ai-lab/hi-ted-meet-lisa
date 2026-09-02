@@ -39,6 +39,26 @@ the Architecture Diagram Generator skill.
 
 
 --------------------------------------------------------------------------
+Cinematic Site Components — references/motion-patterns.md
+--------------------------------------------------------------------------
+The motion pattern library re-implements the thirty demo pages of Cinematic
+Site Components: the sixteen that need no library, and the fourteen built on
+GSAP and ScrollTrigger, which are rewritten here in CSS (scroll-driven
+animations, scroll-snap, sticky positioning, clip-path and masks) and the
+Web Animations API so that nothing is loaded.
+
+  Upstream:  https://github.com/robonuggets/cinematic-site-components
+  Author:    Jay from RoboLabs
+  License:   MIT
+  Changes:   Derived, not copied. Every pattern rewritten under an lm-*
+             namespace, reading the host template's design tokens instead
+             of a hard-coded palette; the global reset, the generic class
+             names and the fixed attribution bar dropped; ARIA, keyboard
+             paths, reduced-motion handling, print handling and a
+             fail-visible fallback for IntersectionObserver added; every
+             GSAP dependency replaced, since GSAP could not be bundled.
+
+--------------------------------------------------------------------------
 Slides AI Plugin onboarding deck — https://html.monomind.one/previews/slide-design.html
 --------------------------------------------------------------------------
 The preview behind option five is proyecto26's own onboarding deck, rebranded.
@@ -72,4 +92,30 @@ became clear that submodules do not travel with a plugin install.
              .gitignore are deliberately not copied; see
              vendor/slides-ai-plugin/VENDORED.md. MonoMind branding is applied
              by the wrapper skill in skills/lisa-design/.
+
+--------------------------------------------------------------------------
+Design System Toolkit — skills/lisa-brand/, references/brand-extraction.md,
+                        assets/lisa-brand-book-a4.html
+--------------------------------------------------------------------------
+The brand-extraction procedure — extract from the reference before asking,
+never invent a brand detail, never redraw a logo, finish the job by rendering
+the PDF — and the single-A4 brand-book form with its print trio (`@page` A4
+at zero margin, exact print colours, a fixed-millimetre page) are derived
+from RoboNuggets' Design System Toolkit skill.
+
+  Upstream:  https://github.com/robonuggets/design-system
+  Author:    RoboNuggets
+  License:   MIT
+  Changes:   Derived, not copied. Rewritten as a Hi Ted, Meet Lisa skill:
+             the output is a design.md on the templates' shared token schema
+             with per-token provenance (fact / approx), consumed by /lisa
+             through the intake's style answer; the A4 skeleton is rebuilt
+             brand-neutral with LISA:CONTENT fences, bracketed slots and the
+             house colophon; the scrollable design-system.html page is not
+             carried. Added: a contrast check on the extracted colour pairs
+             (reported, never repainted), a fonts-ready wait and an
+             embedded-font assertion before the PDF counts as rendered,
+             overflow: visible on the page plus a page-count assertion, and
+             sanitisation of any SVG lifted from a web page (scripts,
+             handlers, foreignObject and external hrefs stripped).
 

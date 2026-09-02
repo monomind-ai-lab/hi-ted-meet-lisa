@@ -38,6 +38,7 @@ call the agent always does), with the exceptions noted inline.
 | `style: default` | [agent] | Change nothing. |
 | `style: designmd` | [agent] | Read the supplied `design.md` and apply it to the token block, not to individual rules. Report any rule you could not honour. |
 | `style: prompt` | [agent] | Apply `style.notes` the same way — through the tokens. |
+| `style: brand` | [agent] | Run the `/lisa-brand` extraction first — the whole procedure in `skills/lisa-brand/SKILL.md`, confirmation included — on `style.url` / `style.file`, then apply the `brand/design.md` it wrote exactly like `style: designmd`: through the tokens, on the mapping in `references/brand-extraction.md`, never per element. Fonts follow the two-edit rule below. Precedence: an explicit hex in `accent` wins over the brand's `--accent`; `accent: default` lets the brand's `--accent` apply. Append the `design.md`'s never-translate terms to `noTranslate`. Report what was extracted, approximated, and dropped, and name the `design.md` so the next deck starts from it. |
 | `style` asks for fonts | [agent] | A font change is **two edits, both required**: repoint the template's font tokens (`--font-display`, `--font-body`, `--font-mono` in the MonoMind deck; other templates name theirs differently) *and* update the Google Fonts `<link>` in the head. The link is chrome outside the fences, and this is the one sanctioned reason to touch it. Changing only the tokens is the silent failure: the requested face never loads and the fallback renders with no error. Keep a real fallback stack after the new family — never a bare name. Interactions below the table. |
 | `accent` | [script] | `default` keeps the template's own accent. A hex value is repointed through the accent tokens only — never per element — with derived shades computed by channel math, so the design review re-checks contrast. On `architecture` the script deliberately does **not** apply it: that template's colour is semantic, and the report says so — the agent states in the handover that the accent was not honoured rather than silently repainting meaning. |
 | `elements` | [agent] | Every named component must actually appear. If the content gives one nothing to say, say so rather than inventing filler for it. |
@@ -64,6 +65,7 @@ call the agent always does), with the exceptions noted inline.
 | `credit: true` or absent | [script] | Keep the colophon — the "Made with Hi Ted, Meet Lisa" line every template carries in its footer or closing slide, linking to html.monomind.one. Each pattern reference shows the exact markup. |
 | `credit: false` | [script] | Delete that one line only. The brand mark and any identity links stay — they belong to the `logo` answer, not this one. |
 | `review` | [agent] | No file transform at all — the script ignores it by design. It schedules when the design pass runs relative to handover; see `references/design-review.md`. |
+| `contract` | [agent] | No file transform — the script reports it `NOT-MECHANICAL`. It shapes the writing, not the chrome, so it is read **before** the content is written, not after; what each field does is below. |
 
 **Fonts a `design.md` or `style.notes` requests.** The scaffold rule — never
 a font the template does not load — forbids *inventing* fonts for new
@@ -77,6 +79,41 @@ back. On `monomind-deck`, if the new family's name could read as a
 translatable word, add it to the `TERMS` protection list in the
 language-switch script — the same class of failure that turned "MIT" into the
 university.
+
+**The contract shapes the writing.** `answers.contract` is read before the
+first line is written, and each field decides something concrete:
+
+- `audience` — pitch the vocabulary and the assumed knowledge at these
+  people. `null` means infer them from the brief and name the assumption in
+  the handover.
+- `purpose` — `persuade`: every section closes on a verdict and shows its
+  evidence. `decide`: an explicit ask slide or section — the decision, the
+  options, the recommendation, and by when. `align`: the shared position
+  stated, and the open disagreements named. `teach`: steps and worked
+  examples over claims. `report`: what happened, where it stands, what
+  changed since last time. `mobilize`: end on what to do next, and who does
+  it. `record`: dates, sources and definitions written out — nothing that
+  only makes sense in the room. `inform` and `explain` are the floor every
+  build has.
+- `outcome` and `coreMessage` — the arc is built so the outcome is what a
+  reader is left holding, and the closing slide or section says the core
+  message in its own words. `null` means derive them from the brief and say
+  so in the handover.
+- `delivery` — `presenter`: one idea per slide, larger type; the speaker
+  carries the connective tissue. `reader`: denser text, captions that carry
+  the point, headings that read as a summary on their own. `hybrid`: build
+  for the presenter, then make every slide stand unread — a caption or a
+  takeaway line each. `recorded`: no slide may depend on a voice.
+- `afterlife` — `approval` and `archive`: dated, self-contained, printable —
+  the decision or the record written out in full, nothing left to memory.
+  `review`: numbered sections a comment can point at. `handoff`: the next
+  owner's questions answered — status, contacts, open items. `reuse`:
+  sections that stand alone when lifted. `share`, the default: readable by
+  someone who was not there.
+- `divergence` — `close`: keep the source's own labels, order and figures,
+  and list in the handover what was changed and why. `moderate`: restructure
+  where it reads better, keep the substance. `free`: rebuild the argument
+  from the material.
 
 After applying them, re-run the verification checklist in
 `skills/lisa/SKILL.md`: these edits touch chrome, which is exactly what the

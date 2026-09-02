@@ -4,6 +4,11 @@ Markup for `assets/tedandlisa-template-sitemap-ia.html`. Every snippet is
 lifted from a shipped document, so it is known-good. Compose from these; do not
 invent class names.
 
+**Density — a `read` template.** Read at desk distance, so four to eight
+items on a page or in a section is fine — a table of eight rows, a grid of
+six cards, a checklist of eight. One argument per page rather than one idea:
+the eye scans, returns, and links to it.
+
 This template is a **document**, not a slide deck: pages are hash-routed, each
 page scrolls, and both languages are written into the file rather than
 translated at read time. What separates it from `web-document` is the last
@@ -197,3 +202,35 @@ Google Fonts and mermaid from a CDN for the document; Font Awesome and Tailwind
 from a CDN for the prototype. The `delivery: standalone` intake answer replaces
 all four with inlined copies — subset the webfonts to the glyphs the document
 actually uses, or Noto Sans TC alone runs to several megabytes.
+
+## When unsure, default to
+
+- **Credibility:** `.statrow` with real counts — or delete the row.
+- **The diagnosis:** `.tbl` with phasing pills.
+- **The structure:** a mermaid `.fig`, `flowchart TD`, every label quoted.
+- **The proof:** the `.mmfig` prototype, both cards.
+- **The contested calls:** a decision record plus `.chk` open questions.
+
+## Known gaps
+
+Evidenced, not imagined — each line names its record.
+
+- **The seven section keys live in four places across two payload
+  scripts**, and nothing enforces agreement; a mismatch fails the way `L-019`
+  describes — silently, with the markup intact (`NOW.md`).
+- **The pair is English and Traditional Chinese**, against `D-010`'s default
+  of English and Korean, and it is coupled across the five places `L-018`
+  lists plus the prototype's `nl` table, a sixth (`NOW.md`).
+- **`footer .mono` is repaired for the light theme only.** This template
+  carries the same two rules as `web-document`
+  (`footer .mono{color:var(--muted-soft)}` on dark,
+  `html[data-theme="light"] footer .mono` for light), where the dark reading
+  measured 3.34:1 at 13px (`NOW.md`).
+- **Four CDN dependencies** — Google Fonts and mermaid for the document,
+  Font Awesome and Tailwind for the prototype. Only `delivery: standalone`
+  inlines them, and the CJK family must then be subset
+  (`references/applying-answers.md`, `references/cjk-typography.md`).
+- **Each prototype mount needs a fresh iframe** (`L-019`). `freshFrame()`
+  exists because `document.open()` keeps the frame's `Window`, and a
+  re-mounted `const` is a parse-time `SyntaxError` that leaves perfect
+  markup and no behaviour. Nothing tests that the guard is still there.

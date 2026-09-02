@@ -33,8 +33,8 @@ intake panel, and copy one paste-ready prompt for any coding agent — Claude
 Code, Codex, Pi, OpenCode, Hermes, or anything else that reads a public URL.
 Nothing to install.
 
-Prefer it as a standing command? Install the plugin once — it carries all six
-skills, and then they are six commands you have for good.
+Prefer it as a standing command? Install the plugin once — it carries every
+skill, and then they are commands you have for good.
 
 ```sh
 /plugin marketplace add monomind-ai-lab/hi-ted-meet-lisa
@@ -65,7 +65,9 @@ python3 scripts/build_skill_zips.py   # writes dist/lisa.zip and three more
 Upload `lisa`; `lisa-lang` and `lisa-help` are worth a slot too — the first
 layers languages onto a finished file with the same payload `lisa` carries,
 the second is a few kilobytes because it answers from its own text.
-`lisa-new-template` is built for completeness but is not worth a panel slot:
+`lisa-brand` is worth one as well: the extraction and both HTML files
+complete in a sandbox, and only the PDF render waits for a local Chrome,
+which the skill says so about. `lisa-new-template` is built for completeness but is not worth a panel slot:
 registering a template and capturing its thumbnail both write to a checkout,
 and the whole point of that skill is a template that stays in *your* gallery —
 which a sandbox cannot give you. `lisa-design` and `lisa-review` get no bundle
@@ -81,7 +83,7 @@ symlink the skills you want:
 git clone https://github.com/monomind-ai-lab/hi-ted-meet-lisa.git \
   ~/.monomind/hi-ted-meet-lisa
 
-for s in lisa lisa-design lisa-review lisa-lang lisa-new-template lisa-help; do
+for s in lisa lisa-design lisa-review lisa-lang lisa-new-template lisa-brand lisa-motion lisa-help; do
   ln -s ~/.monomind/hi-ted-meet-lisa/skills/$s ~/.claude/skills/$s
 done
 ```
@@ -97,7 +99,7 @@ with a `SKILL.md` at its top. Every skill here lives under `skills/`.
 /lisa a 12-slide deck on our Q3 roadmap, for the exec team
 ```
 
-Opens the intake panel, asks its questions — nine to sixteen depending on the
+Opens the intake panel, asks its questions — how many depends on the
 template, every one with a default — builds from the template you picked, and
 hands back one file.
 
@@ -128,6 +130,27 @@ registers it, and captures its gallery thumbnail. It is then one of your choices
 in the panel, permanently.
 
 ```text
+/lisa-brand https://your-site.example
+```
+
+Reads your brand off a site, a screenshot, or the assets you hand over —
+colours, fonts, the mark, the tagline — confirms what it found, and writes a
+`design.md` plus a one-page A4 brand book. The intake's "Extract it from my
+brand" style option runs the same extraction inside a build, so the next deck
+comes out in your colours rather than MonoMind's.
+
+```text
+/lisa-motion the-site-you-just-got.html make the hero count up
+```
+
+Animates a finished file without adding a library: reveals on scroll, a
+typewriter on the install command, count-up numbers, a marquee, a spotlight
+edge on the cards — thirty-nine patterns in CSS and the Web Animations API,
+each safe under reduced motion, in print, and in a hidden tab. When none
+fits, it composes one under the same rules and offers to add it to the
+library.
+
+```text
 /lisa-design a launch deck, glassmorphism, with animated slides
 ```
 
@@ -155,7 +178,7 @@ panel. The deck is about [YOUR SUBJECT], for [AUDIENCE].
 
 - **One standalone `.html` file** — open it, present it, print it, email it. No
   build step and no dependencies to install.
-- **A choice of eight shapes** — a presentation deck, a web document, a
+- **A choice of shapes** — a presentation deck, a web document, a
   diagram-first deck, a single architecture diagram, a sitemap and IA proposal
   with a clickable navigation prototype, a project website, an evidence deck
   that argues from numbers, or a paper brief paced in chapters. Preview each in
@@ -201,7 +224,7 @@ Hi Ted, Meet Lisa answers those directly:
 
 ## ✅ What this repository does
 
-This repository is an agent-facing package: six skills, eight templates, a
+This repository is an agent-facing package: the skills, the templates, a
 visual intake panel, a template registry, and the tooling that ties them
 together. An agent uses them to produce a deck without asking you to run
 anything yourself.
@@ -216,10 +239,10 @@ skill still cannot drift apart, they just ship on their own schedules now.
 
 ### How agents find the instructions
 
-1. Harnesses that support the Agent Skills convention discover all six
-   skills under `skills/` — `/lisa`, `/lisa-design`, `/lisa-review`,
-   `/lisa-lang`, `/lisa-new-template`, and `/lisa-help` — whether installed
-   as a plugin or symlinked.
+1. Harnesses that support the Agent Skills convention discover every
+   skill under `skills/` — `/lisa`, `/lisa-design`, `/lisa-review`,
+   `/lisa-lang`, `/lisa-new-template`, `/lisa-brand`, `/lisa-motion`, and `/lisa-help` —
+   whether installed as a plugin or symlinked.
 2. Any other agent can be pointed at <https://html.monomind.one/SKILL.md>
    directly; it is plain Markdown and carries the whole procedure. That URL is
    a deploy artifact the website build copies from `skills/lisa/SKILL.md`, so
@@ -231,7 +254,7 @@ skill still cannot drift apart, they just ship on their own schedules now.
 
 ## ✅ Templates
 
-Eight templates, chosen at the start of the intake. They are not variations of
+The templates, chosen at the start of the intake. They are not variations of
 one look — they differ in shape, navigation, and how they handle language.
 
 The intake gallery offers a ninth card beside them, listed here for the same
@@ -247,6 +270,7 @@ repository builds it — see [when a template is the wrong shape](#-when-a-templ
 | **Architecture diagram** | System diagrams on slate, where colour means something — one view or several | Both languages inline, including the labels inside the drawing | [Live preview →](https://html.monomind.one/previews/architecture) |
 | **Sitemap & IA proposal** | Pages that argue a site structure, plus the navigation wired up to click through | Both languages written inline | [Live preview →](https://html.monomind.one/previews/sitemap-ia) |
 | **Project website** | Sticky nav and hash-routed pages — a project's public face, skimmed before it is read | English and Korean written inline, toggled instantly — works offline | [Live preview →](https://html.monomind.one/previews/project-website) |
+| **Motion website** | Project website with the motion layer — the hero rises in sequence, the command types itself, cards light up; CSS and WAAPI, no library | English and Korean written inline, toggled instantly — works offline | *preview pending* |
 | **Evidence deck** | Dark full-bleed slides that argue from numbers — tables, stat rows, verdict bars | English and Korean written inline, toggled instantly — works offline | [Live preview →](https://html.monomind.one/previews/evidence-deck) |
 | **Paper brief** | Light paper slides paced in chapters — mega numbers, bar charts, decision boxes | Traditional Chinese and English written inline; opens in Chinese | [Live preview →](https://html.monomind.one/previews/paper-brief) |
 | **Slide design** — *a handoff, not a template* | Twelve style presets and animated HTML | One language per deck — the presets carry no toggle | [Live preview →](https://html.monomind.one/previews/slide-design) |
@@ -254,11 +278,20 @@ repository builds it — see [when a template is the wrong shape](#-when-a-templ
 All nine have a live preview linked from the intake gallery, so you can look
 before you choose.
 
+Every card also carries a **layout mark**, from the registry's `layout`
+property. All nine entries today are `reflow` — the file re-lays its content
+out for whatever screen opens it, readable at a phone width. A template can
+instead be registered as `stage`: authored on a fixed 1920×1080 canvas that
+scales uniformly to the viewport and letterboxes on other aspect ratios, never
+re-laying its content out — the model of a deck stage. The panel marks which
+model a card is, and the checks treat the two differently: a stage template is
+rendered at its canvas and letterboxed rather than reflowed at 375px.
+
 <p align="left">
   <img src="assets/tedandlisa-intake-templates.jpg" alt="The intake panel's template screen: filter chips for All, to present, to read, to diagram and to publish, above a gallery of template cards — each a screenshot of a real generated file, with its shape, dependencies and a Preview link." style="width: 100%; max-width: 100%;">
 </p>
 
-Each of the eight templates has a pattern reference in `references/` giving
+Each template has a pattern reference in `references/` giving
 verbatim markup for every component, plus the rules that are easy to get wrong.
 The handoff has none — it is not built from markup here.
 
@@ -398,9 +431,13 @@ carry the machinery, never the material.
 - **`lisa-lang`** — adds languages to a finished file, using its template's
   own language mechanism.
 - **`lisa-new-template`** — turns an existing HTML page into a template.
+- **`lisa-motion`** — animates a finished file from a dependency-free
+  pattern library (`references/motion-patterns.md`), and grows the library.
 - **`lisa-help`** — explains the commands, routes, and URLs from inside the
   conversation, in your language.
-- **Eight templates** with a pattern reference each, and a live preview.
+- **`lisa-brand`** — reads a brand off a site, a screenshot, or assets into a
+  `design.md` the intake takes, plus a one-page A4 brand book.
+- **The templates** with a pattern reference each, and a live preview.
 - **A visual intake panel** with a template gallery, plus its payload contract.
 - **A template registry** (`templates/templates.json`) and thumbnail tooling.
 - **A bundled design reviewer**, so the review works without a separate install.
@@ -424,7 +461,8 @@ python3 scripts/tedandlisa_new_template.py analyze SOURCE.html
 
 # register a new template, then capture its gallery thumbnail
 python3 scripts/tedandlisa_new_template.py register --id ID --name "NAME" \
-  --file assets/tedandlisa-template-ID.html --kind slides
+  --file assets/tedandlisa-template-ID.html --kind slides --type present \
+  --layout reflow   # or stage: a fixed 1920×1080 canvas that letterboxes
 python3 scripts/tedandlisa_thumbs.py --only ID
 
 # regenerate the intake panel's file:// fallback list from the registry
@@ -466,6 +504,7 @@ This distribution bundles some awesome projects:
 
 - [Impeccable](https://github.com/pbakaus/impeccable) under the Apache License 2.0
 - derives the architecture template's visual system from [Architecture Diagram Generator](https://github.com/Cocoon-AI/architecture-diagram-generator) (MIT)
+- derives the brand-extraction procedure and the A4 brand-book form from [Design System Toolkit](https://github.com/robonuggets/design-system) (MIT)
 - and carries [Slides AI Plugin](https://github.com/proyecto26/slides-ai-plugin) (MIT), copied in under `vendor/`.
 
 See [NOTICE](NOTICE) and [`.agents/skills/impeccable/VENDORED.md`](.agents/skills/impeccable/VENDORED.md).

@@ -5,6 +5,11 @@ scroll-snap deck for an argument made out of measurements: tables that flag
 their own bad rows, stat rows, one number at display size, and a bar of orange
 that says what to do about it.
 
+**Density — a `present` template.** One idea per slide, and one to three
+bullets where bullets are needed at all; a component says it better than a
+paragraph. Every size has to read from across a room, so body text never
+falls below the template's base size — a slide that needs more is two slides.
+
 Use it when the deck's job is to make a case from data someone will push back
 on. Use `monomind-deck` when the job is a talk, and `web-document` when the
 reader will link to it rather than sit through it.
@@ -372,3 +377,40 @@ families; Noto Sans KR is the expensive one.
 
 There is no print stylesheet. A scroll-snap deck of `100dvh` sections prints as
 one slide per page only by accident.
+
+## When unsure, default to
+
+- **A text slide:** `.eyebrow` + the claim in `h2` + one `.body` paragraph.
+- **One number:** `.mega` with its `.mega-note`; several: `.statrow` of four;
+  two compared: `.split`.
+- **Evidence:** `table.data` with exactly one `tr.flag`.
+- **A new part of the argument:** `.section-card`, once per section.
+- **An ending:** `.verdict`, one per slide at most.
+- **Requirements:** `.specs`; questions: `.pts`.
+- **Emphasis:** `hl`; `sig` only for the alarming part.
+
+## Known gaps
+
+Evidenced, not imagined — each line names its record.
+
+- **There is no fail-visible path for `.reveal`.** Content becomes visible
+  only when the controller's `IntersectionObserver` adds `.visible`; the
+  sole unconditional reveal is the `prefers-reduced-motion` block, and there
+  is no `@media print` block at all. Anywhere the observer never fires — a
+  hidden tab, a print preview — the deck is structurally perfect and
+  visually empty (`L-022`, which `project-website` guards against and this
+  template does not).
+- **No print stylesheet.** A scroll-snap deck of `100dvh` sections prints as
+  one slide per page only by accident (Dependencies above).
+- **`theme: toggle` is not supported and `export` does not ship** — the
+  answers section above; the apply script reports both as the agent's work
+  (`references/applying-answers.md`).
+- **`.pagenum` is hand-written**, so it is the one thing that disagrees after
+  a slide is added or removed; the dots and progress bar are computed.
+- **Slides clip silently.** `.slide` and `.slide-content` both
+  `overflow:hidden`, and Korean and English do not wrap alike — check every
+  slide at 375px wide and 600px tall in both languages.
+- **Noto Sans KR is the expensive family under `delivery: standalone`**, and a
+  subset holds only the glyphs rendered at build time; glyphs typed later
+  fall back (`references/applying-answers.md`,
+  `references/cjk-typography.md`).

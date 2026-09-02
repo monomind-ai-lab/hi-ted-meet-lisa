@@ -18,6 +18,8 @@ as they are.
 | `/lisa-lang [file] [language …]` | Add languages to a finished file, using its template's own mechanism. Build in one language now, layer more on later. |
 | `/lisa-design [brief]` | A deck the house style should not carry: twelve style presets and animated HTML, via the vendored Slides AI pipeline. |
 | `/lisa-new-template [file]` | Turn a finished HTML file you like into a reusable template — a permanent choice in your own intake gallery. |
+| `/lisa-brand [url \| screenshot \| assets]` | Read a brand into a `design.md` and a one-page A4 brand book — colours, fonts, mark, tagline, taken from a site or a screenshot, confirmed with you, never invented. The `design.md` is what the intake's "Extract it from my brand" style option feeds a build with. |
+| `/lisa-motion [file] [what to animate]` | Animate a finished file without a library: reveals, a typewriter, count-ups, a marquee, from the motion pattern library — CSS and the Web Animations API only. |
 
 ## The two intake routes
 
@@ -31,7 +33,13 @@ as they are.
   <https://html.monomind.one/intake>. The last step hands you a block of text
   to paste back into the conversation. Same payload either way.
 
-Nine to sixteen questions depending on the template, every one with a default.
+A short set of questions, how many depending on the template, every one with a default.
+
+The first asking screen after the template, **Purpose**, is the communication
+contract: who it is for, what it must accomplish, what they should walk away
+with, the one thing that must land, how it will be used, what happens to it
+afterwards, and how freely the source may be reshaped — every one defaulted,
+so it can be clicked straight through, and the build reads it before writing.
 
 ## The Preferences screen
 

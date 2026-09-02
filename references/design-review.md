@@ -69,9 +69,19 @@ generated one at a time:
 - Colour is used for the same meaning everywhere — accent means emphasis, not
   decoration on one slide and structure on another.
 - Slide count matches the counter, and `data-screen-label` values are sequential.
+- No workflow text survives on a slide: no template or preset name, file
+  name, path, "option A/B" or requirement note ("safe option", "for internal
+  sharing") — chrome is the deck title, section, date, author, page number,
+  or nothing.
 
-**Responsive behaviour.** The deck is horizontal on desktop and vertical on
-phones; check both:
+**Responsive behaviour.** Which check applies is the template's `layout` in
+`templates/templates.json`. A `stage` template is authored on a fixed
+1920×1080 canvas and must **not** reflow: at a phone size and at 1280×900 it
+letterboxes cleanly — the canvas scaled uniformly and centred, nothing
+escaping it — the page never scrolls sideways, and the navigation stays
+reachable. Fault it for clipping, drifting off-centre, or scrolling, never
+for being small on a phone. Every first-party template is `reflow`, where
+the deck is horizontal on desktop and vertical on phones; check both:
 
 - At phone width nothing overflows horizontally. Verify with
   `document.documentElement.scrollWidth === clientWidth`, not by eye.
@@ -130,6 +140,9 @@ Two further traps specific to this deck:
 - Body text never falls below the template's `--text-base`.
 - Contrast holds on the photographic slides, where artwork sits under text.
 - No more than one idea per slide.
+- CJK text follows `references/cjk-typography.md` — looser leading, zero
+  tracking, no uppercase, full-width punctuation, no synthesised italic —
+  and is checked by reading the page in that language, not the markup.
 
 ## Reporting
 

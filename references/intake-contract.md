@@ -72,9 +72,11 @@ An entry arrives in one of two shapes, and you must handle both:
 | `backgrounds.cover` / `.closing` | file object or `null` | Only populated when mode is `upload`. |
 | `logo.mode` | `monomind` \| `custom` | `custom` replaces the mark on every slide. |
 | `logo.file` / `logo.href` | file object / URL string / `null` | `href` is where the mark links; defaults to monomind.one. |
-| `style.mode` | `default` \| `designmd` \| `prompt` | |
+| `style.mode` | `default` \| `designmd` \| `prompt` \| `brand` | `brand` means: extract the brand first — `skills/lisa-brand/SKILL.md`, per `references/brand-extraction.md` — from `style.url` / `style.file`, confirm it with the user, then apply the `design.md` it wrote exactly as `designmd`. |
 | `style.designFile` | file object or `null` | A `design.md` whose rules override template defaults. |
 | `style.notes` | string or `null` | Free-text style direction. |
+| `style.url` | URL string or `null` | **`brand` only**, `null` otherwise. The site to read the brand off. `null` with `brand` means a file was attached instead; both `null` is a question back to the user, not a licence to guess. |
+| `style.file` | file object or `null` | **`brand` only**, `null` otherwise. A screenshot, a logo (SVG preferred), a PDF style guide, or an existing `design.md`, each read per the extraction rules for its kind. It shares the upload slot with `style.designFile`: one upload per question, and only the chosen mode's key is populated. |
 | `accent` | `"default"` or a hex string like `"#e8590c"` | The primary colour. `default` keeps the template's own accent. A hex value is applied **through the template's design tokens only** — repoint the accent token(s) and let everything that wears them move together; never recolour per element. Templates whose colour is semantic (`architecture`, where colour encodes meaning) may honour it partially or not at all — say so in the handover rather than silently repainting meaning. |
 | `elements` | array of `chart` `graph` `diagram` `table` `workflow` `quote` `agenda` `twocol` `image` `code` | Must-include components. Not a whitelist — other patterns stay available. |
 | `languages` | array of tags, always includes `en` | Drives the language switch **in the generated file**. Nothing to do with the language the panel itself was read in — see below. Never contains the literal `other`. The panel defaults this to English plus the language the **brief** is written in (detected from its script), nothing more — every template except `monomind-deck` writes each language inline, so each one adds roughly a full build's worth of writing. Languages are also **stageable**: a finished file can have more layered onto it later with `/lisa-lang`, so build the ones asked for and never pad the list. |
@@ -90,6 +92,7 @@ An entry arrives in one of two shapes, and you must handle both:
 | `export` | array of `html` | Adds a self-download control to the deck chrome. |
 | `credit` | `true` \| `false` | Whether the file keeps its colophon — the "Made with Hi Ted, Meet Lisa" line linking to html.monomind.one. Every template ships it; `false` means delete that one line (never the logo or identity links, which belong to `logo`). Asked for **every** shape, the external handoff included, so it is present in both the runner's payload and the web panel's paste-ready prompt alike. |
 | `review` | `after` \| `inline` \| `none` | When the design review runs, relative to handover. `after` (the default): build, deliver the file, **then** offer and run the design pass as a follow-up (`/lisa-review`) — the file reaches the user's hands first. `inline`: run the full design pass (`references/design-review.md`) **before** handover, accepting the extra minutes it costs. `none`: run only the tooling-free floor checklist — the built-in structural checks that every build gets regardless. Whatever the value, the structural floor is never skipped. |
+| `contract` | object — see below | The communication contract: who it is for, what it must accomplish, what they should leave with, the one thing that must land, how it is used, what becomes of it, and how far the writing may move from the source. Asked for **every** template, the external handoff included, so it is in every payload — the second key, right after `template`. It shapes the writing, never the chrome: `scripts/tedandlisa_apply.py` reports it `NOT-MECHANICAL`, and `references/applying-answers.md` says what each field does to the writing. |
 
 ## The menu object
 
@@ -110,6 +113,40 @@ An entry arrives in one of two shapes, and you must handle both:
 
 `minimal` means no menu at all — just a back-to-the-start control beside the
 page counter. `none` means neither.
+
+## The contract object
+
+```json
+{ "audience": "engineering leads who have seen the roadmap once",
+  "purpose": ["inform", "decide"],
+  "outcome": null,
+  "coreMessage": "ship in October or lose the launch window",
+  "delivery": "presenter", "afterlife": "share", "divergence": "moderate" }
+```
+
+Seven questions on the panel's Purpose screen — its own chapter, the first
+one asked after the template — one object here: the split is presentation,
+like any chapter. Every field is always present.
+
+- `audience`, `outcome`, `coreMessage` — free text, or `null` when nothing
+  was typed. Null means **infer it from the brief and say so in the
+  handover**, never "there is none". Like every free-text answer, the text
+  arrives in whatever language the user typed; read it as written.
+- `purpose` — array of `inform` `explain` `persuade` `decide` `align` `teach`
+  `report` `mobilize` `record`, in the order picked. Defaults to `["inform"]`.
+  It can be empty, which reads the same as null above.
+- `delivery` — `presenter` \| `reader` \| `hybrid` \| `recorded`. The panel
+  defaults it from the chosen template's registry `type`: `present` — and the
+  `external` handoff, a deck by any route — gives `presenter`; `read`,
+  `diagram` and `site` give `reader`. It is re-derived on every template pick
+  until the user chooses, so a payload carrying the default still names it —
+  read this field, never the template, for how the file will be used.
+- `afterlife` — `share` (default) \| `approval` \| `review` \| `archive` \|
+  `handoff` \| `reuse`.
+- `divergence` — `close` \| `moderate` (default) \| `free`: how far the
+  writing may move from the brief and the references. `close` keeps the
+  source's own labels and order and says what was changed; `free` reshapes
+  freely.
 
 ## File objects
 
@@ -163,6 +200,9 @@ chapter: a screen grouping, absent from the payload, changing nothing about
 which keys arrive or in what order. The panel's UI language is presentation
 too: absent from the payload, and carried on the
 panel's URL as `?lang=en|ko|zh-TW` when the public site opens it in a frame.
+So are the registry's `type` (what a template is for — the card's flag and
+the filter) and `layout` (`reflow` or `stage` — the card's layout mark):
+both are read at draw time and never reach the payload.
 Do not look for any of these, and do not infer anything from the order the
 answers arrive in beyond what this file says.
 The `sitemap-ia` keys above are the first of the second sort: they are asked

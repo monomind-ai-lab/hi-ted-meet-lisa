@@ -4,6 +4,11 @@ Markup for `assets/tedandlisa-template-architecture.html`. One page, one
 drawing, plus legend cards. Use it when the deliverable is a system diagram
 someone will read closely and paste into a review — not a talk.
 
+**Density — a `diagram` template.** One drawing per page, read closely and
+pasted into a review; the density lives in the drawing, so the prose is a
+title, a lead, and the legend cards. Label every node; two nested boundaries
+are readable, four are wallpaper.
+
 The visual system is derived from the Architecture Diagram Generator by Cocoon
 AI (MIT, see `NOTICE`): slate ground, a faint grid field, JetBrains Mono
 throughout, and **colour that means something**. The MonoMind chrome — the mark,
@@ -112,3 +117,28 @@ before it belongs to the logo answer, not to this one.
 ## Dependencies
 
 Google Fonts only. Everything else is inline.
+
+## When unsure, default to
+
+- **A node's class:** `backend` for what you run, `generic` for what you do
+  not — the class, never a fill.
+- **A link:** a solid orthogonal `L` path; `.dashed` for one meaning per
+  diagram, named in a legend card.
+- **A boundary:** one; two at most.
+- **A legend:** one card per family the drawing uses.
+
+## Known gaps
+
+Evidenced, not imagined — each line names its record.
+
+- **`var()` never resolves inside an SVG presentation attribute** (`L-008`):
+  `stroke="var(--grid)"` silently draws nothing. The grid is styled from CSS
+  for that reason, and nothing checks that a new node or link was too.
+- **The `accent` answer is not applied.** Colour here is meaning, so
+  `scripts/tedandlisa_apply.py` refuses to repaint it and the handover has to
+  say the accent was not honoured (`references/applying-answers.md`).
+- **The rendered gate skips SVG** (`scripts/check_overflow.py`), so a Korean
+  label longer than its English twin can overrun its node with no finding —
+  read the drawing in both languages.
+- **There is no image export, by decision** (`D-011`): print and the HTML
+  self-download are the browser's own; a bitmap is a screenshot.

@@ -5,6 +5,11 @@ Markup for `assets/tedandlisa-template-mermaid-master.html`. This template is
 footer below. If a slide has no diagram, it probably belongs in a different
 template.
 
+**Density — a `diagram` template.** One drawing per slide, read closely; the
+density lives in the drawing, so the prose beside it is a title and one
+subtitle. Label every node, and a drawing that wants a second title is two
+slides.
+
 Three things make it unlike the other two:
 
 - **Light paper**, not dark. `--paper: #f5f5f5`, `--ink: #2d3142`, one orange
@@ -13,7 +18,7 @@ Three things make it unlike the other two:
 - **Fully self-contained.** Diagrams are inline SVG, already rendered — there is
   no mermaid runtime and no CDN. Export from mermaid, then paste the SVG in.
 - **Bilingual by parallel slides.** Every slide exists twice, `s-en-NN` and
-  `s-zh-NN`, so even the text inside a diagram is translated.
+  `s-ko-NN`, so even the text inside a diagram is translated.
 
 ## The three registers that must agree
 
@@ -23,10 +28,10 @@ slide, check all three:
 | Register | Where | What it holds |
 | --- | --- | --- |
 | `ROUTES` | script at the foot | `["01", "02", …]` in order |
-| `TITLES` | script at the foot | `{en: [...], zh: [...]}` — **index title first**, then one per route |
-| Sections | markup | `s-en-NN` **and** `s-zh-NN` for every route |
+| `TITLES` | script at the foot | `{en: [...], ko: [...]}` — **index title first**, then one per route |
+| Sections | markup | `s-en-NN` **and** `s-ko-NN` for every route |
 
-A route with no `s-zh-NN` falls back to the index when a reader switches
+A route with no `s-ko-NN` falls back to the index when a reader switches
 language, which looks like the deck losing their place.
 
 ## Slide
@@ -78,11 +83,11 @@ Index cards link by hash (`#en/01`), so they keep working in the saved file.
 - **Draw arrows before nodes.** SVG has no z-index; paint order is document
   order, so connectors drawn last cut across the boxes.
 - **Every label is a `<text>` element**, never text baked into a path or image —
-  the Chinese copy of the slide has to be able to say something different.
+  the Korean copy of the slide has to be able to say something different.
 - **Palette**: nodes `#ffffff` on `rgba(45,49,66,0.12)` rule; the one focal node
   gets `rgba(235,108,54,0.08)` on `#eb6c36`. Body text `#2d3142`, secondary
   `#7a8399`.
-- Slides with `data-lang="zh"` re-font SVG text to Noto Sans TC automatically.
+- Slides with `data-lang="ko"` re-font SVG text to Noto Sans KR automatically.
 
 ## Chrome — do not rewrite
 
@@ -108,3 +113,35 @@ ships by default; remove the `<a>` (only) when the intake answered
 
 Google Fonts only. Everything else is inline, so the file works offline and
 survives being emailed.
+
+## When unsure, default to
+
+- **A slide:** one diagram, a title, a subtitle — and no diagram means a
+  different template.
+- **The first thing to open:** `.card.focal` on the index, once.
+- **A connector:** solid and orthogonal with `url(#arrow)`; dashed for a return
+  path, and say so in a legend.
+- **A label:** a `<text>` element, never baked into a path.
+
+## Known gaps
+
+Evidenced, not imagined — each line names its record.
+
+- **`ROUTES`, `TITLES` and the `s-<lang>-NN` sections must agree, and nothing
+  enforces it** (`D-010`; `CLAUDE.md`). A route with no section in the other
+  language falls back to the index, which looks like the deck losing the
+  reader's place.
+- **The Korean index has no counterpart to the English index's sizing.**
+  `#s-en-index h1` (2.5rem) and `#s-en-index .subtitle` (Instrument Serif
+  italic, 1.05rem) apply to English only; the Korean index renders at the
+  slide defaults — measured 30.4px against 40px, and Geist 14.4px upright
+  against the italic 16.8px. The dead `#s-zh-index` halves of those two
+  selectors, left over from the `D-010` rename, and this reference's stale
+  `s-zh` / Noto Sans TC examples were fixed in the same change that added
+  this section; whether the Korean index should share the English sizing is
+  a design call not taken here.
+- **Diagram labels sit at fixed `x`/`y`**, and a Korean label longer than its
+  English twin overruns its node. The rendered gate skips SVG outright
+  (`scripts/check_overflow.py`), so only reading both slide sets catches it.
+- **No export control ships.** `export: html` is the agent's work here, and
+  the apply script says so (`references/applying-answers.md`).

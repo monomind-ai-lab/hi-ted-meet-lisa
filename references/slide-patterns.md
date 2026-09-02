@@ -1,5 +1,13 @@
 # Hi Ted, Meet Lisa — component reference
 
+Markup for `assets/tedandlisa-template.html` — the MonoMind deck, `monomind-deck`
+in the registry.
+
+**Density — a `present` template.** One idea per slide, and one to three
+bullets where bullets are needed at all; a component says it better than a
+paragraph. Every size has to read from across a room, so body text never
+falls below the template's base size — a slide that needs more is two slides.
+
 ## Content fences (all templates)
 
 Every template's editable content is fenced by paired
@@ -14,6 +22,22 @@ it — then edit inside the fences.
 Every snippet below is lifted verbatim from the reference deck, so the markup
 is known-good. Compose slides from these; do not invent new class names — the
 stylesheet in the template is the whole design system.
+
+## Two gotchas (all templates)
+
+- **Never show or hide a slide by toggling `display`.** Every template already
+  has a mechanism — the MonoMind deck scrolls a snap track, `evidence-deck` and
+  `paper-brief` scroll one and add `.visible`, the hash-routed documents set
+  `.page.active`, `mermaid-master` sets `.slide.active` — and
+  `window.__deckGo(i)` is how to move. A hand-rolled `.slide { display: none }`
+  / `.active { display: block }` breaks the moment the same element also
+  carries a layout rule: a `display: flex` or `display: grid` later in the
+  cascade wins at equal specificity, and every slide shows at once, stacked
+  down the page.
+- **Never write `-clamp()`, `-min()` or `-max()`.** A minus in front of a CSS
+  math function is not negation; the declaration is invalid and silently
+  discarded, and the property falls back to whatever it inherits — a margin of
+  0 where you wanted a pull. Write `calc(-1 * clamp(…))`.
 
 ## Slide anatomy
 
@@ -183,3 +207,42 @@ Translate leaves it alone — "Made with" is meant to translate.
 <p class="deck-colophon">Made with
   <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer"><span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></a></p>
 ```
+
+## When unsure, default to
+
+- **A text slide:** the statement in `h2.h-md` and one `p.lead`; leave the
+  canvas empty.
+- **A set of named things:** `.qcard`s in `.grid-3` — four fit `.grid-4`, five
+  is two slides.
+- **Files or records:** `.dg-leader-row`s; a hierarchy: `.dg-treeview`; names
+  as objects: `.dg-chip-row`.
+- **A comparison:** `.tbl` with a `td.k` key column, inside `.dg-frame.is-accent`
+  when it needs an edge.
+- **A sequence:** `.dg-step` rows; phases that each hold steps: `.wf-row`.
+- **A command or prompt:** `p.code`.
+- **One line to remember:** `.dg-loop`, once per slide.
+
+## Known gaps
+
+Evidenced, not imagined — each line names its record.
+
+- **Google Translate rewrites identifiers not on the `TERMS` list** (`L-001`):
+  *MonoMind AI Lab* → 人工智慧實驗室, *MIT* → the university. The list is
+  extended per deck, by hand, and the colophon's own protection has not been
+  re-read against live Translate since the line was added (`NOW.md`, known
+  follow-up).
+- **Translated CJK runs land flush against protected spans** (`L-002`). The
+  `html.translated-ltr .nt-term { margin-inline: 0.15em }` fix reaches only
+  spans carrying `nt-term` — the ones the protection pass creates. A term
+  wrapped by hand without the class collides.
+- **The switch needs a served origin and time** (`L-004`): the language
+  cookie does not stick on `file://` (so the control hides itself there), and
+  translation runs only while the tab composites, 10–20 s in an automated
+  pane.
+- **No CJK family is loaded.** The head's `<link>` carries Plus Jakarta Sans
+  and JetBrains Mono only, so translated Korean or Chinese renders in the
+  reader's system face at Latin leading and tracking — see
+  `references/cjk-typography.md`.
+- **Fixed chrome misreports in an emulated narrow viewport** (`L-003`): the
+  counter, progress bar and switch report off-screen coordinates that are a
+  measurement artifact. Read `documentElement.clientWidth`, and check a phone.
