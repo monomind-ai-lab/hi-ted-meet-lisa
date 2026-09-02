@@ -222,32 +222,75 @@ def serve(harness_dir: str, target_dir: str):
     return srv, srv.server_address[1]
 
 
-def run_chrome(chrome: str, url: str, timeout: float = 150.0) -> str:
+class ChromeRun:
+    """Everything one Chrome invocation produced, kept for diagnostics."""
+
+    def __init__(self, cmd, dom, stderr, exit_code, timed_out, seconds):
+        self.cmd, self.dom, self.stderr = cmd, dom, stderr
+        self.exit_code, self.timed_out, self.seconds = exit_code, timed_out, seconds
+
+    def diagnose(self) -> list[str]:
+        import shlex
+        status = ("still running after %.0fs, killed" % self.seconds
+                  if self.timed_out else
+                  f"exited {self.exit_code} after {self.seconds:.1f}s")
+        lines = [f"chrome {status}",
+                 "cmd: " + " ".join(shlex.quote(c) for c in self.cmd)]
+        err = self.stderr.strip()
+        lines.append("stderr: " + (err[-3000:] if err else "(empty)"))
+        dom = self.dom.strip()
+        lines.append("stdout/dom head: " + (dom[:300] if dom else "(empty)"))
+        return lines
+
+
+def chrome_flags(headless_flag: str, profile: str) -> list[str]:
+    """One flag set for every invocation, probe included. Hosted Linux
+    runners need --no-sandbox and --disable-dev-shm-usage or Chrome dies
+    (or hangs) before producing output — the container has no usable
+    sandbox and /dev/shm is too small for a renderer — and a per-run
+    --user-data-dir under a temp dir avoids profile-lock and crashpad
+    collisions. All of it is inert on a desktop macOS Chrome, so the set
+    is unconditional. Crash reporting is switched off for the same
+    reason: crashpad has nothing useful to do in CI and its handler
+    startup is a known way for toolcache builds to wedge."""
+    return [headless_flag, "--disable-gpu", "--hide-scrollbars",
+            "--no-first-run", "--no-default-browser-check", "--disable-extensions",
+            "--no-sandbox", "--disable-dev-shm-usage",
+            "--disable-crash-reporter", "--disable-breakpad",
+            f"--user-data-dir={profile}"]
+
+
+def run_chrome(chrome: str, url: str, headless_flag: str = "--headless=new",
+               timeout: float = 150.0) -> ChromeRun:
     """Run headless Chrome with --dump-dom, polling stdout for the sentinel so
     a Chrome that writes its output and then fails to exit (a known headless
     quirk, see tedandlisa_thumbs.py) does not stall the whole gate. The
     timeout is generous because a hosted CI runner's first Chrome start is
     cold (font cache, profile creation); the sentinel poll means a healthy
-    run never waits it out."""
-    with tempfile.TemporaryDirectory() as profile:
+    run never waits it out. Nothing here is platform-specific: argv list (no
+    shell quoting), temp files under tempfile, killpg on a fresh session —
+    all identical on Linux and macOS."""
+    # ignore_cleanup_errors: a SIGKILLed Chrome's helpers can briefly hold
+    # profile files while the temp dir is being removed; that race is not
+    # a check failure.
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as profile:
         out = pathlib.Path(profile) / "dom.txt"
-        cmd = [chrome, "--headless=new", "--disable-gpu", "--hide-scrollbars",
-               "--no-first-run", "--no-default-browser-check", "--disable-extensions",
-               # Hosted Linux runners need these two or Chrome dies before
-               # producing any output: the container has no usable sandbox,
-               # and /dev/shm is too small for a renderer. Both are inert on
-               # a desktop macOS Chrome, so they are passed unconditionally.
-               "--no-sandbox", "--disable-dev-shm-usage",
-               f"--user-data-dir={profile}",
-               f"--window-size={WINDOW[0]},{WINDOW[1]}",
-               "--virtual-time-budget=45000", "--dump-dom", url]
-        with open(out, "w") as fo:
-            proc = subprocess.Popen(cmd, stdout=fo, stderr=subprocess.DEVNULL,
+        err = pathlib.Path(profile) / "stderr.txt"
+        cmd = ([chrome] + chrome_flags(headless_flag, profile) +
+               [f"--window-size={WINDOW[0]},{WINDOW[1]}",
+                "--virtual-time-budget=45000", "--dump-dom", url])
+        start = time.monotonic()
+        timed_out = False
+        with open(out, "w") as fo, open(err, "w") as fe:
+            proc = subprocess.Popen(cmd, stdout=fo, stderr=fe,
                                     start_new_session=True)
-            deadline = time.monotonic() + timeout
+            deadline = start + timeout
             try:
-                while time.monotonic() < deadline:
+                while True:
                     if proc.poll() is not None:
+                        break
+                    if time.monotonic() >= deadline:
+                        timed_out = True
                         break
                     if SENTINEL in out.read_text(encoding="utf-8", errors="replace"):
                         time.sleep(0.5)  # let the dump finish writing
@@ -263,11 +306,26 @@ def run_chrome(chrome: str, url: str, timeout: float = 150.0) -> str:
                         proc.wait(timeout=5)
                     except subprocess.TimeoutExpired:
                         pass
-        return out.read_text(encoding="utf-8", errors="replace")
+        return ChromeRun(cmd, out.read_text(encoding="utf-8", errors="replace"),
+                         err.read_text(encoding="utf-8", errors="replace"),
+                         proc.returncode, timed_out, time.monotonic() - start)
+
+
+def parse_result(dom: str) -> list[str] | None:
+    """The problems list out of a dumped DOM, or None when no sentinel."""
+    m = re.search(re.escape(SENTINEL) + r"(\[.*?\])</pre>", dom, re.DOTALL)
+    if not m:
+        return None
+    try:
+        import html as _html
+        return json.loads(_html.unescape(m.group(1)))
+    except ValueError:
+        return ["HARNESS ERROR: harness result was not parseable JSON"]
 
 
 def check_file(chrome: str, target: pathlib.Path) -> list[str]:
     widths_js = json.dumps([[w, h] for w, h in WIDTHS])
+    attempts: list[tuple[str, ChromeRun]] = []
     with tempfile.TemporaryDirectory() as hd:
         harness = HARNESS % {"src": f"/t/{target.name}", "widths": widths_js,
                              "tol": TOLERANCE, "etol": ESCAPE_TOLERANCE,
@@ -275,19 +333,50 @@ def check_file(chrome: str, target: pathlib.Path) -> list[str]:
         (pathlib.Path(hd) / "harness.html").write_text(harness, encoding="utf-8")
         srv, port = serve(hd, str(target.parent))
         try:
-            dom = run_chrome(chrome, f"http://127.0.0.1:{port}/h/harness.html")
+            url = f"http://127.0.0.1:{port}/h/harness.html"
+            # Some chromium builds on CI toolcaches behave differently under
+            # --headless=new; when it yields nothing, retry once with the
+            # plain --headless mode before declaring the harness broken.
+            for flag, tmo in (("--headless=new", 150.0), ("--headless", 90.0)):
+                run = run_chrome(chrome, url, flag, tmo)
+                problems = parse_result(run.dom)
+                if problems is not None:
+                    return problems
+                attempts.append((flag, run))
         finally:
             srv.shutdown()
-    m = re.search(re.escape(SENTINEL) + r"(\[.*?\])</pre>", dom, re.DOTALL)
-    if not m:
-        return ["HARNESS ERROR: Chrome produced no result "
-                "(crashed on startup, was killed, or timed out) — "
-                "this is an infrastructure failure, not an overflow finding"]
+    report = ["HARNESS ERROR: Chrome produced no result under any headless "
+              "mode — an infrastructure failure, not an overflow finding. "
+              "Per-attempt diagnostics follow:"]
+    for flag, run in attempts:
+        report.append(f"-- attempt with {flag}:")
+        report.extend("   " + line for line in run.diagnose())
+    return report
+
+
+def probe_chrome(chrome: str) -> tuple[bool, list[str]]:
+    """Cheap environment sanity check, run only after a harness error on the
+    first file: --version, then a trivial data: URL dump in each headless
+    mode. If none of it works the browser is dead and the whole run should
+    abort instead of spending the full timeout on every remaining file."""
+    msgs = []
     try:
-        import html as _html
-        return json.loads(_html.unescape(m.group(1)))
-    except ValueError:
-        return ["HARNESS ERROR: harness result was not parseable JSON"]
+        v = subprocess.run([chrome, "--version"], capture_output=True,
+                           timeout=30, text=True)
+        msgs.append(f"probe `--version`: exit {v.returncode}, "
+                    f"stdout: {v.stdout.strip() or '(empty)'}, "
+                    f"stderr: {v.stderr.strip()[-500:] or '(empty)'}")
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        msgs.append(f"probe `--version` failed to run: {exc}")
+    for flag in ("--headless=new", "--headless"):
+        run = run_chrome(chrome, "data:text/html,<title>probe</title>PROBE-OK",
+                         flag, timeout=45.0)
+        if "PROBE-OK" in run.dom:
+            msgs.append(f"probe dump with {flag}: OK")
+            return True, msgs
+        msgs.append(f"probe dump with {flag} produced no DOM:")
+        msgs.extend("   " + line for line in run.diagnose())
+    return False, msgs
 
 
 def default_targets() -> list[pathlib.Path]:
@@ -319,13 +408,14 @@ def main() -> int:
         return 2
 
     overflowing, broken = 0, 0
-    for target in targets:
+    for i, target in enumerate(targets):
         problems = check_file(chrome, target)
         rel = os.path.relpath(target)
         # A harness/Chrome breakdown is an infrastructure failure and must
         # not masquerade as a design finding; report and count it apart.
         findings = [p for p in problems
-                    if "HARNESS ERROR" not in p and "MEASURE ERROR" not in p]
+                    if "HARNESS ERROR" not in p and "MEASURE ERROR" not in p
+                    and not p.startswith(("-- attempt", "   "))]
         errors = [p for p in problems if p not in findings]
         if findings:
             overflowing += 1
@@ -337,6 +427,22 @@ def main() -> int:
             print(f"ok   {rel}")
         for p in findings + errors:
             print(f"     {p}")
+        sys.stdout.flush()
+        # Fail fast on a dead environment: when the very first file cannot
+        # be checked, probe the browser itself; if even a data: URL dump
+        # fails, every remaining file would fail the same slow way.
+        if i == 0 and errors and not findings and len(targets) > 1:
+            ok, msgs = probe_chrome(chrome)
+            for msg in msgs:
+                print(msg)
+            if not ok:
+                print("\nABORT: the browser cannot render anything in this "
+                      "environment — skipping the remaining "
+                      f"{len(targets) - 1} files (infrastructure failure, "
+                      "not an overflow finding)")
+                return 2
+            print("probe passed — the browser works; continuing with the "
+                  "remaining files")
     print()
     if overflowing:
         print(f"{overflowing} of {len(targets)} files have horizontal overflow")
