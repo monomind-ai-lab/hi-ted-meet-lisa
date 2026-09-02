@@ -266,8 +266,15 @@ one fetch turns most of these into `fact`.
 
 An SVG is the mark, sanitised. Colours are read from the SVG's own fills
 (`fact` — they are the brand's own values) and assigned to roles by
-prominence. A PDF or image style guide is read like a screenshot, except
-that a value it states in text (a hex, a family name) is `fact`.
+prominence. An image style guide is read like a screenshot.
+
+### From a PDF
+
+Read it as an image, one page at a time; everything sampled from its pixels
+— colours, faces, the mark — is `approx`, exactly as from a screenshot, and
+a mark is a placeholder unless an SVG comes with it. The one exception is a
+value the document states in text (a hex, a family name), which is `fact`
+with the page cited.
 
 ### From an existing `design.md`
 

@@ -70,6 +70,12 @@ body { background: var(--bg); color: var(--fg); font-family: var(--font-body); }
   display: flex; flex-direction: column; gap: 6mm;
   position: relative; overflow: visible;
 }
+/* A sparse brand — two swatches, one family, no principles — would otherwise
+   leave the lower third of the sheet empty: the colour and typography
+   regions grow to compose the page. Growth is layout only. Never add a
+   value or a section to fill space; a missing row is a fact about the brand. */
+.page > .grow { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
+.grow .swatches, .grow .twocol { flex: 1 1 auto; }
 /* on screen the sheet sits on a grey desk; print sees none of this */
 @media screen {
   body { background: #e6e6e6; padding: 10mm 0; }
@@ -105,8 +111,8 @@ a { color: inherit; }
 
 /* ---- colours --------------------------------------------------------- */
 .swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; }
-.swatch { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
-.swatch .fill { height: 22mm; }
+.swatch { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface); display: flex; flex-direction: column; }
+.swatch .fill { flex: 1 1 auto; min-height: 22mm; }
 .swatch .info { padding: 2.5mm 3mm 3mm; }
 .swatch .role { display: block; font-size: 10.5px; font-weight: 700; }
 .swatch .hex { display: block; font-family: var(--font-mono); font-size: 9px; color: var(--muted); margin-top: 0.8mm; }
@@ -176,7 +182,7 @@ a { color: inherit; }
   <!-- LISA:CONTENT-END head -->
 
   <!-- LISA:CONTENT-START colours -->
-  <section>
+  <section class="grow">
     <p class="label">Colour</p>
     <div class="swatches">
       <div class="swatch"><div class="fill" style="background: var(--accent)"></div>
@@ -198,7 +204,7 @@ a { color: inherit; }
   <!-- LISA:CONTENT-END colours -->
 
   <!-- LISA:CONTENT-START typography -->
-  <section>
+  <section class="grow">
     <p class="label">Typography</p>
     <div class="twocol">
       <div class="card">
