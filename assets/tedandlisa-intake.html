@@ -412,12 +412,18 @@ h1 { font-family: var(--font-display); font-size: clamp(28px, 4.4vw, 40px); line
    card: mono, small, muted, no fill. It is a flag you read after the name,
    not a headline that competes with it. `kind` (slides / document /
    external) is not shown at all — it is machinery that decides which
-   questions get asked, and a reader choosing a template has no use for it. */
-.tpl .ttype { display: inline-block; margin-top: var(--space-2);
+   questions get asked, and a reader choosing a template has no use for it.
+   `.tlayout` is the second pill, the `layout` axis — whether the template
+   reflows to the viewport or is a fixed 16:9 stage that letterboxes. A
+   reader choosing a template must see which model it is, so it is a mark
+   on every card, in the same voice as the type flag beside it. */
+.tpl .ttype, .tpl .tlayout { display: inline-block; margin-top: var(--space-2);
   font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.4;
   color: var(--muted-inv); border: 1px solid var(--glass-hair);
   border-radius: var(--radius-pill); padding: 1px 8px; }
-.tpl[aria-checked="true"] .ttype { color: var(--accent); border-color: var(--accent-hair); }
+.tpl .tlayout { margin-left: 4px; }
+.tpl[aria-checked="true"] .ttype, .tpl[aria-checked="true"] .tlayout {
+  color: var(--accent); border-color: var(--accent-hair); }
 
 /* ── type filters ─────────────────────────────────────────────── */
 /* A row of real buttons above the gallery. flex-wrap + gap and nothing
@@ -1000,6 +1006,12 @@ var UI = {
        never drift apart. Missing entry falls back to the raw id. */
     types: { present: "to present", read: "to read",
              diagram: "to diagram", site: "to publish" },
+    /* The `layout` axis — how a template meets the viewport. `reflow` re-lays
+       its content out for any width; `stage` is authored on a fixed 1920×1080
+       canvas that scales uniformly and letterboxes on other aspect ratios.
+       Keyed by the registry's own layout ids; presentation only. */
+    layouts: { reflow: "\u2194 Reflows to any screen",
+               stage: "\u25AD Fixed 16:9 stage \u2014 letterboxed on phones" },
     filterLabel: "Filter templates by type",
     filterAll: "All",
     /* `kept` is true when the reader's current pick does not match the filter
@@ -1089,6 +1101,8 @@ var UI = {
     noshot: "미리보기 없음",
     types: { present: "발표용", read: "읽기용",
              diagram: "다이어그램용", site: "사이트용" },
+    layouts: { reflow: "\u2194 어떤 화면에도 맞춰 흐름",
+               stage: "\u25AD 고정 16:9 스테이지 \u2014 휴대폰에서는 레터박스" },
     filterLabel: "템플릿을 유형으로 좁히기",
     filterAll: "전체",
     filterStat: function (shown, total, kept) {
@@ -1174,6 +1188,8 @@ var UI = {
     noshot: "沒有預覽",
     types: { present: "上台用", read: "細讀用",
              diagram: "圖解用", site: "上線用" },
+    layouts: { reflow: "\u2194 隨螢幕自動重排",
+               stage: "\u25AD 固定 16:9 舞台 \u2014 手機上留黑邊" },
     filterLabel: "依用途篩選範本",
     filterAll: "全部",
     filterStat: function (shown, total, kept) {
@@ -2063,6 +2079,15 @@ function typeOf(id) {
   return (t && t.type) || "";
 }
 function typeLabel(ty) { return (ui("types") || {})[ty] || ty; }
+/* `layout` is the same sort of thing as `type`: a registry property read at
+   draw time, marked on the card and in the preview bar, and never in the
+   payload. An entry without one (an injected list from an older projection)
+   simply shows no mark. */
+function layoutOf(id) {
+  var t = TEMPLATES.filter(function (x) { return x.id === id; })[0];
+  return (t && t.layout) || "";
+}
+function layoutLabel(lo) { return (ui("layouts") || {})[lo] || lo; }
 function typesPresent() {
   var seen = [];
   TEMPLATES.forEach(function (t) {
@@ -2293,6 +2318,7 @@ function cardsHtml(q) {
       var best = tplText(o.id, 2, t.best_for);
       var deps = tplText(o.id, 3, t.dependencies);
       var ty   = typeOf(o.id);
+      var lo   = layoutOf(o.id);
       var preview = t.preview
         ? '<a class="tplpreview" href="' + esc(t.preview) + '" target="_blank" rel="noopener noreferrer">' +
           esc(ui("previewLink")) + '</a>'
@@ -2300,7 +2326,8 @@ function cardsHtml(q) {
       /* The type joins the accessible name rather than sitting in the card as
          a stray word: a screen reader hears "Evidence deck, to present" the
          way a sighted reader sees the name with its flag under it. */
-      var aria = ty ? name + ", " + typeLabel(ty) : name;
+      var aria = (ty ? name + ", " + typeLabel(ty) : name) +
+                 (lo ? ", " + layoutLabel(lo) : "");
       return '<div class="tplcell">' +
         '<button type="button" class="tpl" role="radio" aria-checked="' + on + '"' +
         ' aria-label="' + esc(aria) + '" data-q="' + q.id + '" data-o="' + o.id + '">' +
@@ -2315,6 +2342,7 @@ function cardsHtml(q) {
         '<span class="note">' + esc(tag) + '</span>' +
         (best ? '<span class="note">' + esc(best) + '</span>' : "") +
         (ty ? '<span class="ttype">' + esc(typeLabel(ty)) + '</span>' : "") +
+        (lo ? '<span class="tlayout">' + esc(layoutLabel(lo)) + '</span>' : "") +
         (deps ? '<span class="dep">' + esc(deps) + '</span>' : "") +
         '</span></span></button>' + preview + '</div>';
     }).join("") + '</div>';
@@ -2681,7 +2709,9 @@ qlist.addEventListener("click", function (e) {
        and would show an empty panel, so let those take the anchor's own path. */
     if (/^https?:/i.test(href)) { return; }
     e.preventDefault();
-    openPreview(href, prev.closest(".tplcell").querySelector("b").textContent.trim());
+    var cell = prev.closest(".tplcell");
+    openPreview(href, cell.querySelector("b").textContent.trim(),
+                layoutLabel(layoutOf(cell.querySelector(".tpl").dataset.o)));
     return;
   }
   /* Gallery cards are .tpl, not .opt — without this they look selectable and
@@ -3111,11 +3141,13 @@ document.getElementById("reflist").addEventListener("click", function (e) {
   if (b) { refs.splice(Number(b.dataset.ref), 1); renderRefs(); }
 });
 
-function openPreview(href, title) {
+function openPreview(href, title, mark) {
   var pv = document.getElementById("pvw");
   document.getElementById("pvwframe").src = href;
   document.getElementById("pvwopen").href = href;
-  document.getElementById("pvwtitle").textContent = title;
+  /* The layout mark travels with the name so a reader sizing up the preview
+     knows whether what they see reflows or is a fixed stage. */
+  document.getElementById("pvwtitle").textContent = title + (mark ? " \u00B7 " + mark : "");
   pv.hidden = false;
   document.getElementById("pvwclose").focus();
 }
