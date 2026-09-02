@@ -163,6 +163,9 @@ chapter: a screen grouping, absent from the payload, changing nothing about
 which keys arrive or in what order. The panel's UI language is presentation
 too: absent from the payload, and carried on the
 panel's URL as `?lang=en|ko|zh-TW` when the public site opens it in a frame.
+So are the registry's `type` (what a template is for — the card's flag and
+the filter) and `layout` (`reflow` or `stage` — the card's layout mark):
+both are read at draw time and never reach the payload.
 Do not look for any of these, and do not infer anything from the order the
 answers arrive in beyond what this file says.
 The `sitemap-ia` keys above are the first of the second sort: they are asked

@@ -209,14 +209,17 @@ branding — see `skills/lisa-design/SKILL.md`.
       path, command, and product name in English**
 - [ ] Switching back to EN fully restores the original text
 - [ ] No `[PLACEHOLDER]` survives anywhere
-- [ ] Readable at a phone width
+- [ ] Readable at a phone width — a `layout: reflow` template re-lays out
+      with nothing overflowing sideways; a `layout: stage` template is not
+      expected to reflow: it letterboxes cleanly, the canvas scaled uniformly
+      with nothing escaping it, and stays navigable
 - [ ] Brand mark present on every slide, `data-screen-label`s sequential
 
 ## Files
 
 | Path | Purpose |
 | --- | --- |
-| `templates/templates.json` | The template registry. |
+| `templates/templates.json` | The template registry; each entry's `layout` (`reflow` or `stage`) says how it meets the viewport. |
 | `assets/tedandlisa-template*.html` | The eight templates. Copy with `cp`, never author from scratch. |
 | `references/slide-patterns*.md` | Known-good markup per template; `slide-patterns.md` also documents the content fences. |
 | `references/intake-contract.md` | The intake payload shape. |

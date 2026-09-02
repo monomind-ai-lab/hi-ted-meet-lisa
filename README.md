@@ -254,6 +254,15 @@ repository builds it — see [when a template is the wrong shape](#-when-a-templ
 All nine have a live preview linked from the intake gallery, so you can look
 before you choose.
 
+Every card also carries a **layout mark**, from the registry's `layout`
+property. All nine entries today are `reflow` — the file re-lays its content
+out for whatever screen opens it, readable at a phone width. A template can
+instead be registered as `stage`: authored on a fixed 1920×1080 canvas that
+scales uniformly to the viewport and letterboxes on other aspect ratios, never
+re-laying its content out — the model of a deck stage. The panel marks which
+model a card is, and the checks treat the two differently: a stage template is
+rendered at its canvas and letterboxed rather than reflowed at 375px.
+
 <p align="left">
   <img src="assets/tedandlisa-intake-templates.jpg" alt="The intake panel's template screen: filter chips for All, to present, to read, to diagram and to publish, above a gallery of template cards — each a screenshot of a real generated file, with its shape, dependencies and a Preview link." style="width: 100%; max-width: 100%;">
 </p>
@@ -424,7 +433,8 @@ python3 scripts/tedandlisa_new_template.py analyze SOURCE.html
 
 # register a new template, then capture its gallery thumbnail
 python3 scripts/tedandlisa_new_template.py register --id ID --name "NAME" \
-  --file assets/tedandlisa-template-ID.html --kind slides
+  --file assets/tedandlisa-template-ID.html --kind slides --type present \
+  --layout reflow   # or stage: a fixed 1920×1080 canvas that letterboxes
 python3 scripts/tedandlisa_thumbs.py --only ID
 
 # regenerate the intake panel's file:// fallback list from the registry
