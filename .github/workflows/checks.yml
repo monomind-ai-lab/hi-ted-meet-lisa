@@ -57,6 +57,16 @@ jobs:
           CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
         run: python3 scripts/check_overflow.py
 
+      - name: Check the overflow gate's stage mode on its fixture
+        # A `layout: stage` template (none registered yet) is not reflowed at
+        # 375px — it is rendered at its 1920×1080 canvas and letterboxed at
+        # 1280×900, failing if the page scrolls sideways or anything escapes
+        # the stage. The synthetic fixture keeps that mode exercised until a
+        # real stage template arrives; it is not in the registry.
+        env:
+          CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: python3 scripts/check_overflow.py --layout stage scripts/fixtures/stage-1920x1080.html
+
       - name: Check the intake panel's fallback list against the registry
         run: python3 scripts/tedandlisa_intake_fallback.py --check
 
@@ -64,10 +74,12 @@ jobs:
         run: python3 scripts/build_skill_zips.py --check
 
       - name: Check template registry integrity
-        # Every first-party entry in templates/templates.json must have its
+        # Every entry in templates/templates.json must declare its layout
+        # (reflow or stage — the gallery marks it on the card and the overflow
+        # gate reads it). Every first-party entry must also have its
         # template file and pattern reference on disk, properly paired
         # LISA:CONTENT-START/END fences in order, and a trailing </html>.
-        # External hand-off entries (kind: external, no file) are skipped.
+        # External hand-off entries (kind: external, no file) skip that part.
         run: |
           python3 - <<'PY'
           import json, pathlib, re, sys
@@ -79,6 +91,9 @@ jobs:
           bad = []
           n = 0
           for t in reg["templates"]:
+              if t.get("layout") not in ("reflow", "stage"):
+                  bad.append(f"{t.get('id')}: layout must be reflow or stage, "
+                             f"got {t.get('layout')!r}")
               if t.get("kind") == "external" or not t.get("file"):
                   continue  # hand-off entries carry no file of their own
               n += 1

@@ -4,6 +4,7 @@ content escape sideways at any tested viewport width.
 
     python3 scripts/check_overflow.py                 # every first-party template
     python3 scripts/check_overflow.py previews/*.html # specific files
+    python3 scripts/check_overflow.py --layout stage scripts/fixtures/stage-1920x1080.html
     CHROME_BIN=/path/to/chrome python3 scripts/check_overflow.py
 
 Why this exists: a fixed grid track plus one long unbreakable mono token
@@ -29,6 +30,19 @@ too so one Chrome run covers every width), and measured per width:
 
 Files with a PAGES/ROUTES hash router keep only the routed page in layout, so
 the harness walks every route (in the file's boot language) and measures each.
+
+Which check runs depends on the template's `layout` in the registry. A
+`reflow` template (every first-party template today) gets the three widths
+above. A `stage` template is authored on a fixed 1920×1080 canvas that scales
+uniformly and letterboxes, so a 375px reflow pass would fail it for doing what
+it is meant to do; it is rendered at 1920×1080 and at one letterboxed size
+(1280×900) instead, and fails when the page scrolls sideways, when the stage
+canvas (the largest transformed element of at least 960×540) is not scaled
+uniformly, does not fit the viewport or fills neither axis of it, or when any
+visible element's box escapes the canvas. Because headless Chrome never fires
+a frame's resize event, stage mode dispatches one after each resize so a
+JS-driven fit actually re-runs. Files not in the registry are `reflow` unless
+`--layout stage` says otherwise.
 
 How the result reaches Python — an in-page completion signal, NOT
 --dump-dom: the harness fetch()-POSTs its JSON verdict back to this script's
@@ -77,6 +91,10 @@ CHROME_CANDIDATES = [
 # (width, height): the two desktop widths the bug class shows at, plus a true
 # 375 phone viewport. All rendered inside the iframe of one 2010px window.
 WIDTHS = [(1280, 800), (2000, 1100), (375, 667)]
+# `layout: stage`: the canvas at 1:1, then one size whose aspect ratio forces
+# letterboxing (1280×900 is 0.667 scale with 90px bars top and bottom). No
+# phone width: a stage does not reflow, it scales.
+STAGE_SIZES = [(1920, 1080), (1280, 900)]
 WINDOW = (2010, 1200)
 TOLERANCE = 2  # px of sub-pixel rounding forgiven at document/slide level
 # Per-element escapes under this are letter-spacing trails, focus-ring slack
@@ -98,7 +116,7 @@ HARNESS = """<!doctype html><html><head><meta charset="utf-8"><title>gate</title
 <body style="margin:0">
 <iframe id="f" src="%(src)s" style="display:block;border:0;width:1280px;height:800px"></iframe>
 <script>
-var WIDTHS = %(widths)s, TOL = %(tol)d, ETOL = %(etol)d;
+var WIDTHS = %(widths)s, TOL = %(tol)d, ETOL = %(etol)d, MODE = %(mode)s;
 var frame = document.getElementById('f');
 function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
@@ -148,6 +166,73 @@ function measure(win, label) {
   return out;
 }
 
+function elName(el) {
+  return '<' + el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') +
+         (el.className && String(el.className).trim() ?
+           '.' + String(el.className).trim().split(/\\s+/).join('.') : '') + '>';
+}
+
+/* The stage canvas: the largest element carrying a transform whose
+   untransformed box is at least 960×540 — a scaled stage, whatever the
+   template calls it. */
+function stageOf(win, doc) {
+  var best = null, area = 0;
+  Array.prototype.forEach.call(doc.querySelectorAll('body *'), function (el) {
+    if (el.namespaceURI !== 'http://www.w3.org/1999/xhtml') return;
+    if (el.offsetWidth < 960 || el.offsetHeight < 540) return;
+    if (win.getComputedStyle(el).transform === 'none') return;
+    var a = el.offsetWidth * el.offsetHeight;
+    if (a > area) { area = a; best = el; }
+  });
+  return best;
+}
+
+function measureStage(win, label) {
+  var doc = win.document, de = doc.documentElement, out = [];
+  var vw = de.clientWidth, vh = de.clientHeight;
+  if (de.scrollWidth > vw + TOL)
+    out.push(label + ' document scrolls sideways: scrollWidth ' +
+             de.scrollWidth + ' > viewport ' + vw);
+  var stage = stageOf(win, doc);
+  if (!stage) {
+    out.push(label + ' no stage canvas found (no transformed element of at least 960\u00d7540)');
+    return out;
+  }
+  var r = stage.getBoundingClientRect(), name = elName(stage);
+  var sw = Math.round(r.width), sh = Math.round(r.height);
+  if (r.left < -TOL || r.top < -TOL || r.right > vw + TOL || r.bottom > vh + TOL)
+    out.push(label + ' stage ' + name + ' escapes the viewport: ' + sw + '\u00d7' + sh +
+             ' at ' + Math.round(r.left) + ',' + Math.round(r.top) + ' in ' + vw + '\u00d7' + vh);
+  // A stage scales *to* the viewport: letterboxed means one axis is filled
+  // and the other carries the bars. A canvas filling under 90%% of both is a
+  // fit that never ran (the boot scale carried over) or a stage that is not
+  // scaled at all — and either way not the model this mode checks.
+  if (r.width < vw * 0.9 && r.height < vh * 0.9)
+    out.push(label + ' stage ' + name + ' is not scaled to the viewport: ' + sw + '\u00d7' + sh +
+             ' fills neither axis of ' + vw + '\u00d7' + vh);
+  // Letterboxing keeps the canvas's aspect ratio; a stretched stage is a
+  // stage scaled per axis, which is reflow by another name.
+  if (Math.abs(r.width / r.height - stage.offsetWidth / stage.offsetHeight) > 0.01)
+    out.push(label + ' stage ' + name + ' is not scaled uniformly: ' + sw + '\u00d7' + sh +
+             ' for a ' + stage.offsetWidth + '\u00d7' + stage.offsetHeight + ' canvas');
+  Array.prototype.forEach.call(stage.querySelectorAll('*'), function (el) {
+    if (el.namespaceURI !== 'http://www.w3.org/1999/xhtml') return;
+    var cs = win.getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0) return;
+    var b = el.getBoundingClientRect();
+    if (!b.width || !b.height) return;
+    for (var a = el.parentElement; a && a !== stage; a = a.parentElement) {
+      var acs = win.getComputedStyle(a);
+      if (parseFloat(acs.opacity) === 0) return;              // hidden with its slide
+      if (acs.overflowX !== 'visible' || acs.overflowY !== 'visible') return;  // clipped or scrolled inside the stage on purpose
+    }
+    var escape = Math.max(r.left - b.left, b.right - r.right, r.top - b.top, b.bottom - r.bottom);
+    if (escape > ETOL)
+      out.push(label + ' ' + elName(el) + ' escapes the stage by ' + Math.round(escape) + 'px');
+  });
+  return out;
+}
+
 async function routesOf(win) {
   var list = win.PAGES || win.ROUTES;
   if (!Array.isArray(list) || !list.length || !win.location.hash) return [null];
@@ -166,6 +251,15 @@ async function main() {
   for (var w = 0; w < WIDTHS.length; w++) {
     frame.style.width = WIDTHS[w][0] + 'px';
     frame.style.height = WIDTHS[w][1] + 'px';
+    if (MODE === 'stage') {
+      // Headless Chrome updates the frame's innerWidth/innerHeight but never
+      // fires its window's resize event (measured: innerWidth 1920, listener
+      // never run), so a JS-driven stage fit would keep its boot scale and
+      // the letterbox pass would test nothing. Deliver the event the browser
+      // withholds. Reflow templates are left alone: their re-layout is CSS,
+      // and the CI run must stay identical for them.
+      try { win.dispatchEvent(new win.Event('resize')); } catch (e) {}
+    }
     await sleep(300);
     for (var i = 0; i < routes.length; i++) {
       var label = '@' + WIDTHS[w][0];
@@ -174,7 +268,8 @@ async function main() {
         await sleep(400);                 // router swap + per-page layout
         label += ' page:' + routes[i];
       }
-      try { problems = problems.concat(measure(win, label)); }
+      try { problems = problems.concat(MODE === 'stage' ? measureStage(win, label)
+                                                        : measure(win, label)); }
       catch (e) { problems.push(label + ' MEASURE ERROR ' + e); }
     }
   }
@@ -360,12 +455,14 @@ def parse_result(raw: str | None) -> list[str] | None:
         return ["HARNESS ERROR: harness result was not parseable JSON"]
 
 
-def check_file(chrome: str, target: pathlib.Path) -> list[str]:
-    widths_js = json.dumps([[w, h] for w, h in WIDTHS])
+def check_file(chrome: str, target: pathlib.Path, layout: str = "reflow") -> list[str]:
+    sizes = STAGE_SIZES if layout == "stage" else WIDTHS
+    widths_js = json.dumps([[w, h] for w, h in sizes])
     attempts: list[tuple[str, ChromeRun]] = []
     with tempfile.TemporaryDirectory() as hd:
         harness = HARNESS % {"src": f"/t/{target.name}", "widths": widths_js,
-                             "tol": TOLERANCE, "etol": ESCAPE_TOLERANCE}
+                             "tol": TOLERANCE, "etol": ESCAPE_TOLERANCE,
+                             "mode": json.dumps(layout)}
         (pathlib.Path(hd) / "harness.html").write_text(harness, encoding="utf-8")
         srv = serve(hd, str(target.parent))
         try:
@@ -422,14 +519,21 @@ def probe_chrome(chrome: str) -> tuple[bool, list[str]]:
     return False, msgs
 
 
-def default_targets() -> list[pathlib.Path]:
+def registry_layouts() -> dict[pathlib.Path, str]:
+    """Each first-party template file -> its registry `layout` (reflow when
+    an entry has none), in registry order."""
     reg = ROOT / "templates" / "templates.json"
-    if reg.is_file():
-        entries = json.loads(reg.read_text())["templates"]
-        files = [ROOT / t["file"] for t in entries
-                 if t.get("file") and t.get("kind") != "external"]
-        if files:
-            return files
+    if not reg.is_file():
+        return {}
+    entries = json.loads(reg.read_text())["templates"]
+    return {(ROOT / t["file"]).resolve(): t.get("layout") or "reflow"
+            for t in entries if t.get("file") and t.get("kind") != "external"}
+
+
+def default_targets() -> list[pathlib.Path]:
+    files = list(registry_layouts())
+    if files:
+        return files
     return sorted(ROOT.glob("assets/tedandlisa-template*.html"))
 
 
@@ -437,6 +541,9 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Rendered horizontal-overflow gate")
     ap.add_argument("files", nargs="*", type=pathlib.Path,
                     help="HTML files to check (default: every first-party template)")
+    ap.add_argument("--layout", choices=["reflow", "stage"],
+                    help="layout model for the given files, overriding the "
+                         "registry (default: the file's registry entry, else reflow)")
     args = ap.parse_args()
 
     chrome = find_chrome()
@@ -450,10 +557,15 @@ def main() -> int:
         print("error: not a file: " + ", ".join(missing), file=sys.stderr)
         return 2
 
+    known = registry_layouts()
+    layouts = {t: args.layout or known.get(t, "reflow") for t in targets}
     overflowing, broken = 0, 0
     for i, target in enumerate(targets):
-        problems = check_file(chrome, target)
+        layout = layouts[target]
+        problems = check_file(chrome, target, layout)
         rel = os.path.relpath(target)
+        if layout == "stage":
+            rel += " (stage: " + ", ".join(f"{w}\u00d7{h}" for w, h in STAGE_SIZES) + ")"
         # A harness/Chrome breakdown is an infrastructure failure and must
         # not masquerade as a design finding; report and count it apart.
         findings = [p for p in problems
@@ -495,8 +607,14 @@ def main() -> int:
         print(f"{broken} of {len(targets)} files could not be checked "
               "(harness or Chrome failure, not an overflow finding)")
     if not overflowing and not broken:
-        print(f"all {len(targets)} files clean at "
-              + ", ".join(str(w) for w, _ in WIDTHS) + "px")
+        reflow_at = ", ".join(str(w) for w, _ in WIDTHS) + "px"
+        if "stage" in layouts.values():
+            stage_at = ", ".join(f"{w}\u00d7{h}" for w, h in STAGE_SIZES)
+            modes = ("reflow at " + reflow_at if "reflow" in layouts.values() else "") + \
+                    ("; " if len(set(layouts.values())) > 1 else "") + "stage at " + stage_at
+            print(f"all {len(targets)} files clean ({modes})")
+        else:
+            print(f"all {len(targets)} files clean at " + reflow_at)
     return 1 if overflowing else (2 if broken else 0)
 
 
