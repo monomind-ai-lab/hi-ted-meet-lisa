@@ -69,6 +69,10 @@ generated one at a time:
 - Colour is used for the same meaning everywhere — accent means emphasis, not
   decoration on one slide and structure on another.
 - Slide count matches the counter, and `data-screen-label` values are sequential.
+- No workflow text survives on a slide: no template or preset name, file
+  name, path, "option A/B" or requirement note ("safe option", "for internal
+  sharing") — chrome is the deck title, section, date, author, page number,
+  or nothing.
 
 **Responsive behaviour.** The deck is horizontal on desktop and vertical on
 phones; check both:

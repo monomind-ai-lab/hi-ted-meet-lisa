@@ -65,6 +65,17 @@ confirm before doing it.
      dual-language spans must keep both spans in every placeholder.
    - Annotate the traps in HTML comments: which ids must agree, what renders
      lazily, what must not be rewritten.
+   - **Nothing on a placeholder slide may read as workflow.** The skeleton's
+     slides are what the gallery thumbnail and the first preview show, and a
+     reader takes them for the deck. Never render internal workflow text on
+     a slide: not "template", "preset", "skeleton" or "option A/B", not a
+     file name, a path or a source-document label, and not the user's own
+     requirement notes ("safe option", "for internal sharing",
+     "audience: …"). Where a slide needs chrome, use real deck chrome — the
+     deck title, a section title, date, author, page number — or a
+     `[BRACKETED]` slot. The template's name belongs in the registry and in
+     the message to the user, never on the slide; HTML comments are the
+     place for everything else.
 5. **Write the pattern reference** at `references/slide-patterns-ID.md` —
    verbatim markup for every component, plus the rules that are easy to get
    wrong. Model it on `references/slide-patterns-web-document.md`.
@@ -108,6 +119,11 @@ confirm before doing it.
    python3 scripts/tedandlisa_thumbs.py --only ID
    python3 scripts/tedandlisa_intake_fallback.py
    ```
+
+   The thumbnail is the skeleton's opening screen, so it is where the step-4
+   ban list shows first: before capturing, read that screen's rendered text
+   and make sure nothing on it names the template, a file, a preset or a
+   requirement — the gallery card has to look like a deck, not a diagnostic.
 8. **Verify in a browser**, served over http, not `file://`:
    - Every page or slide reachable; navigation, routing, and deep links work.
    - The language mechanism switches both ways and restores the original.
