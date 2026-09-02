@@ -58,7 +58,7 @@ switch, check for console errors and horizontal overflow at 375px).
 ## Architecture
 
 **Independent template systems, not variations of one look.** The registry
-carries eight first-party templates (plus the external `slide-design` entry
+carries the first-party templates (plus the external `slide-design` entry
 that hands off to `/lisa-design`). Each is a single self-contained HTML file
 with its own design tokens, chrome, scripts, and language mechanism — they
 differ in shape, navigation, and how they translate, so a change to one has no

@@ -33,7 +33,7 @@ as they are.
   <https://html.monomind.one/intake>. The last step hands you a block of text
   to paste back into the conversation. Same payload either way.
 
-Fourteen to twenty-six questions depending on the template, every one with a default.
+A short set of questions, how many depending on the template, every one with a default.
 
 The first asking screen after the template, **Purpose**, is the communication
 contract: who it is for, what it must accomplish, what they should walk away

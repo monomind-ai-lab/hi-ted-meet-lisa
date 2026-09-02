@@ -57,8 +57,8 @@ The prompt carries the brief. Everything else comes from the intake panel.
 
    Then stop. **Do not ask for a brief first** — the panel's first screen is
    the brief field, and the payload's prompt wins over anything typed after
-   `/lisa`. **Do not interview** — the panel asks fourteen to twenty-six defaulted
-   questions; a conversation has neither property. **Do not read other files
+   `/lisa`. **Do not interview** — the panel asks a short set of defaulted
+   questions, its length set by the template; a conversation has neither property. **Do not read other files
    yet** — nothing read before the payload arrives can be acted on.
 
    Skip the panel only when the user explicitly asks to, or has already
@@ -231,7 +231,7 @@ branding — see `skills/lisa-design/SKILL.md`.
 | Path | Purpose |
 | --- | --- |
 | `templates/templates.json` | The template registry; each entry's `layout` (`reflow` or `stage`) says how it meets the viewport. |
-| `assets/tedandlisa-template*.html` | The eight templates. Copy with `cp`, never author from scratch. |
+| `assets/tedandlisa-template*.html` | The templates, one file each. Copy with `cp`, never author from scratch. |
 | `references/slide-patterns*.md` | Known-good markup per template; `slide-patterns.md` also documents the content fences. |
 | `references/intake-contract.md` | The intake payload shape. |
 | `references/applying-answers.md` | What every answer means, marked script vs agent; the manual fallback. |

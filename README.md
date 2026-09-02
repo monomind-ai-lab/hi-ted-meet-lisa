@@ -33,8 +33,8 @@ intake panel, and copy one paste-ready prompt for any coding agent — Claude
 Code, Codex, Pi, OpenCode, Hermes, or anything else that reads a public URL.
 Nothing to install.
 
-Prefer it as a standing command? Install the plugin once — it carries all seven
-skills, and then they are seven commands you have for good.
+Prefer it as a standing command? Install the plugin once — it carries every
+skill, and then they are commands you have for good.
 
 ```sh
 /plugin marketplace add monomind-ai-lab/hi-ted-meet-lisa
@@ -99,7 +99,7 @@ with a `SKILL.md` at its top. Every skill here lives under `skills/`.
 /lisa a 12-slide deck on our Q3 roadmap, for the exec team
 ```
 
-Opens the intake panel, asks its questions — nine to sixteen depending on the
+Opens the intake panel, asks its questions — how many depends on the
 template, every one with a default — builds from the template you picked, and
 hands back one file.
 
@@ -178,7 +178,7 @@ panel. The deck is about [YOUR SUBJECT], for [AUDIENCE].
 
 - **One standalone `.html` file** — open it, present it, print it, email it. No
   build step and no dependencies to install.
-- **A choice of eight shapes** — a presentation deck, a web document, a
+- **A choice of shapes** — a presentation deck, a web document, a
   diagram-first deck, a single architecture diagram, a sitemap and IA proposal
   with a clickable navigation prototype, a project website, an evidence deck
   that argues from numbers, or a paper brief paced in chapters. Preview each in
@@ -224,7 +224,7 @@ Hi Ted, Meet Lisa answers those directly:
 
 ## ✅ What this repository does
 
-This repository is an agent-facing package: seven skills, eight templates, a
+This repository is an agent-facing package: the skills, the templates, a
 visual intake panel, a template registry, and the tooling that ties them
 together. An agent uses them to produce a deck without asking you to run
 anything yourself.
@@ -239,9 +239,9 @@ skill still cannot drift apart, they just ship on their own schedules now.
 
 ### How agents find the instructions
 
-1. Harnesses that support the Agent Skills convention discover all seven
-   skills under `skills/` — `/lisa`, `/lisa-design`, `/lisa-review`,
-   `/lisa-lang`, `/lisa-new-template`, `/lisa-brand`, and `/lisa-help` —
+1. Harnesses that support the Agent Skills convention discover every
+   skill under `skills/` — `/lisa`, `/lisa-design`, `/lisa-review`,
+   `/lisa-lang`, `/lisa-new-template`, `/lisa-brand`, `/lisa-motion`, and `/lisa-help` —
    whether installed as a plugin or symlinked.
 2. Any other agent can be pointed at <https://html.monomind.one/SKILL.md>
    directly; it is plain Markdown and carries the whole procedure. That URL is
@@ -254,7 +254,7 @@ skill still cannot drift apart, they just ship on their own schedules now.
 
 ## ✅ Templates
 
-Eight templates, chosen at the start of the intake. They are not variations of
+The templates, chosen at the start of the intake. They are not variations of
 one look — they differ in shape, navigation, and how they handle language.
 
 The intake gallery offers a ninth card beside them, listed here for the same
@@ -291,7 +291,7 @@ rendered at its canvas and letterboxed rather than reflowed at 375px.
   <img src="assets/tedandlisa-intake-templates.jpg" alt="The intake panel's template screen: filter chips for All, to present, to read, to diagram and to publish, above a gallery of template cards — each a screenshot of a real generated file, with its shape, dependencies and a Preview link." style="width: 100%; max-width: 100%;">
 </p>
 
-Each of the eight templates has a pattern reference in `references/` giving
+Each template has a pattern reference in `references/` giving
 verbatim markup for every component, plus the rules that are easy to get wrong.
 The handoff has none — it is not built from markup here.
 
@@ -437,7 +437,7 @@ carry the machinery, never the material.
   conversation, in your language.
 - **`lisa-brand`** — reads a brand off a site, a screenshot, or assets into a
   `design.md` the intake takes, plus a one-page A4 brand book.
-- **Eight templates** with a pattern reference each, and a live preview.
+- **The templates** with a pattern reference each, and a live preview.
 - **A visual intake panel** with a template gallery, plus its payload contract.
 - **A template registry** (`templates/templates.json`) and thumbnail tooling.
 - **A bundled design reviewer**, so the review works without a separate install.
