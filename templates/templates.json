@@ -207,6 +207,32 @@
       ],
       "preview": "previews/paper-brief.html",
       "thumb_source": "previews/paper-brief.html"
+    },
+    {
+      "id": "motion-website",
+      "name": "Motion website",
+      "tagline": "Project website with the motion layer: the hero rises in sequence, the command types itself, cards light up under the pointer — CSS and WAAPI only, no library.",
+      "file": "assets/tedandlisa-template-motion-website.html",
+      "patterns": "references/slide-patterns-motion-website.md",
+      "thumb": "templates/thumbs/motion-website.png",
+      "kind": "document",
+      "type": "site",
+      "layout": "reflow",
+      "best_for": "A project's own site that should feel alive on the first screen: a launch page, a tool's home, a programme's front door. The same shape as Project website, read at desk distance and skimmed before it is read — with one orchestrated moment and restraint after it.",
+      "navigation": "Sticky top nav with hash routing (#/lang/page); five inline links plus a More dropdown for the rest, one footer for the whole site, burger under 960px.",
+      "languages": "English and Korean written inline and toggled instantly — no translation service, works offline.",
+      "dependencies": "Google Fonts only — no animation library.",
+      "features": [
+        "hero that rises in sequence, then types its command",
+        "marquee of the things it works with",
+        "stat strip that counts up",
+        "six-step process track that wipes in",
+        "spotlight-edged card grid",
+        "rows and checklists that arrive one by one",
+        "reduced motion, print and hidden-tab safe",
+        "light and dark, persisted; self-download"
+      ],
+      "thumb_source": "assets/tedandlisa-template-motion-website.html#/en/home"
     }
   ]
 }
