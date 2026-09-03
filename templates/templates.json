@@ -249,7 +249,7 @@
       "tagline": "Not a MonoMind template and not HTML — an editable PowerPoint file, built by a sister skill you install yourself.",
       "kind": "external",
       "type": "present",
-      "layout": "reflow",
+      "layout": "stage",
       "skill": "/lisa-ppt",
       "requires": "Lisa's PPT plugin (/plugin marketplace add monomind-ai-lab/lisa-ppt; /plugin install lisa-ppt@monomind-ppt)",
       "badge": "PPTX",
