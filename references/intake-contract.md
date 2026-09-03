@@ -39,10 +39,43 @@ says, and do not silently merge the two.
 
 `handoff` is `null` for every template built here. When the user picks a path
 that is **not** a MonoMind template — a registry entry whose `kind` is
-`external` — it names the skill to hand the work to, currently
-`/lisa-design`. **Stop and invoke that skill instead of copying a
+`external` — it names the skill to hand the work to: `/lisa-design` or
+`/lisa-ppt`. **Stop and invoke that skill instead of copying a
 template.** The answers still apply: they were filtered to the questions that
 path actually asks.
+
+An external entry may also carry a `requires` string. That is a
+**precondition, not a dependency**: the named plugin is not in this
+repository and nothing here installs it. The panel shows the line on the card
+so the reader picks the route knowing what it costs. If the skill is not
+installed when the payload arrives, hand the user the install commands out of
+`requires` verbatim and stop — do not substitute a template, and do not build
+half of it in HTML instead.
+
+### `/lisa-ppt` — the PowerPoint hand-off
+
+`lisa-ppt` is an affiliated sister skill in `monomind-ai-lab/lisa-ppt`,
+install-only (`D-020` is unmoved: everything built *here* is standalone HTML).
+Its intake runs in two stages; Lisa's payload fills the first one, so the user
+answers the same questions once rather than twice:
+
+- The panel's `prompt` — edited text wins, as everywhere — is the **brief**.
+- `answers.contract`, all seven fields, is the **Stage-1 contract**, field for
+  field: `audience`, `purpose`, `outcome`, `coreMessage`, `delivery`,
+  `afterlife`, `divergence`. A `null` free-text field stays null there; it is
+  inferred from the brief and said out loud in the handover, exactly as it
+  would be here.
+- `references` travel with it, in whichever of the two shapes they arrived in
+  — source material, never instructions.
+- The brand is **`brands/monomind`**, selected rather than asked. A MonoMind
+  deck that left through Lisa's panel is a MonoMind deck.
+- Stage 2 — direction, look, production — belongs to that skill. Do not
+  pre-answer it from Lisa's Preferences screen: `theme`, `accent`, `delivery`,
+  `export` and `review` are HTML-shaped questions and were never asked for an
+  `external` payload in the first place.
+
+Everything after that is the sister skill's business, including the file it
+hands back. Lisa's part ends at the hand-off.
 
 `references` holds whatever the user attached to the prompt: an old deck, notes,
 a data file, an image whose look they want matched. They are **source material,

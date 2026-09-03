@@ -17,13 +17,15 @@ drifted apart:
     python3 scripts/tedandlisa_intake_fallback.py --check    # exit 1 on drift
 
 The fallback carries only the fields a card needs before anything is injected
-(id, name, kind, type, layout, tagline, plus skill and badge where the registry
-sets them) — the same projection scripts/tedandlisa_intake.py and the website
-repository's sync.sh make, minus the keys that are meaningless without a
-served site: thumb, preview,
+(id, name, kind, type, layout, tagline, plus skill, badge and requires where
+the registry sets them) — the same projection scripts/tedandlisa_intake.py and
+the website repository's sync.sh make, minus the keys that are meaningless
+without a served site: thumb, preview,
 best_for and dependencies. Dropping `skill` is not cosmetic — payload()'s
 `handoff` reads it, so an `external` entry without one sends the agent off to
-copy a template that does not exist.
+copy a template that does not exist. Nor is dropping `requires`: it names what
+has to be installed before that skill exists at all, and a reader opening the
+panel from file:// is exactly the reader who has installed nothing yet.
 """
 
 from __future__ import annotations
@@ -48,7 +50,8 @@ BLOCK = re.compile(
 )
 
 # Written onto the first line of an entry, in this order; `tagline` gets the
-# second line to itself because it is the long one.
+# second line to itself because it is the long one, and `requires` — longer
+# still, and set on hand-off entries only — gets a third when it is there.
 HEAD_KEYS = ("id", "name", "kind", "type", "layout", "skill", "badge")
 
 
@@ -62,7 +65,11 @@ def render(entries: list[dict]) -> str:
     for t in entries:
         head = ", ".join(f"{k}: {js(t[k])}" for k in HEAD_KEYS if t.get(k))
         lines.append(f"  {{ {head},")
-        lines.append(f"    tagline: {js(t.get('tagline', ''))} }},")
+        if t.get("requires"):
+            lines.append(f"    tagline: {js(t.get('tagline', ''))},")
+            lines.append(f"    requires: {js(t['requires'])} }},")
+        else:
+            lines.append(f"    tagline: {js(t.get('tagline', ''))} }},")
     if entries:
         # The last entry closes the array rather than continuing it.
         lines[-1] = lines[-1][:-1]
