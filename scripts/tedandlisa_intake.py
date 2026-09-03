@@ -61,7 +61,7 @@ def load_templates() -> list[dict]:
     for t in entries:
         card = {k: t.get(k) for k in
                 ("id", "name", "tagline", "kind", "type", "layout", "best_for", "dependencies",
-                 "languages", "preview", "skill", "badge", "requires")}
+                 "languages", "preview", "skill", "badge")}
         if card.get("preview"):
             card["preview"] = PREVIEW_BASE + pathlib.PurePosixPath(card["preview"]).name
         thumb = ROOT / t.get("thumb", "")

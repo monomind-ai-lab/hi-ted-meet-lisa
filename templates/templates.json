@@ -242,26 +242,6 @@
         "light and dark, persisted; self-download"
       ],
       "thumb_source": "assets/tedandlisa-template-motion-website.html#/en/home"
-    },
-    {
-      "id": "lisa-ppt",
-      "name": "Lisa's PPT",
-      "tagline": "Not a MonoMind template and not HTML — an editable PowerPoint file, built by a sister skill you install yourself.",
-      "kind": "external",
-      "type": "present",
-      "layout": "stage",
-      "skill": "/lisa-ppt",
-      "requires": "Lisa's PPT plugin (/plugin marketplace add monomind-ai-lab/lisa-ppt; /plugin install lisa-ppt@monomind-ppt)",
-      "badge": "PPTX",
-      "best_for": "A deck that has to arrive as a .pptx — someone will open it in PowerPoint or Keynote and edit it, or the file itself is what was asked for.",
-      "navigation": "PowerPoint's own. This is a file, not a page.",
-      "languages": "One language per file — PowerPoint carries no language switch.",
-      "dependencies": "Nothing here. The sister plugin is installed separately and does the whole build.",
-      "features": [
-        "editable .pptx",
-        "the MonoMind brand pack, brands/monomind",
-        "takes Lisa's brief and contract as its Stage-1 answers"
-      ]
     }
   ]
 }
