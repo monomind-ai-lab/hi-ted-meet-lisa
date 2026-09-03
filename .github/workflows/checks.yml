@@ -36,6 +36,13 @@ jobs:
       - name: Run the apply-script test suite
         run: python3 scripts/test_tedandlisa_apply.py
 
+      - name: Run the registry-index test suite
+        # context_index.py reads the registries in `project-context/`, which is
+        # untracked (`D-023`) and so absent here — these tests run against
+        # inline fixtures in a temp dir instead, covering both status forms and
+        # the unreadable-status gate. Stdlib only.
+        run: python3 scripts/test_context_index.py
+
       - name: Install Chrome for the rendered checks
         id: setup-chrome
         uses: browser-actions/setup-chrome@v1
