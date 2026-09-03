@@ -86,13 +86,7 @@ The prompt carries the brief. Everything else comes from the intake panel.
 3. **Copy the chosen template — or hand off.** Resolve `answers.template`
    through `templates/templates.json`. If the entry's `kind` is `external`,
    the payload's `handoff` names another skill: stop and invoke it, carrying
-   the answers. An entry that also carries `requires` names a plugin that
-   is **not installed by anything here** — `lisa-ppt` is the one today. If it
-   is missing, hand the user the commands in `requires` verbatim and stop;
-   never fall back to a template they did not pick.
-   `/lisa-ppt` takes the brief and all seven fields of `answers.contract` as
-   its Stage-1 contract and builds on `brands/monomind` — the shape is in
-   `references/intake-contract.md`. Otherwise duplicate the entry's file **with `cp`** (or by
+   the answers. Otherwise duplicate the entry's file **with `cp`** (or by
    downloading the raw file on the no-install route) — **never read the whole
    template into context and retype it**, and never author from a blank file.
    Every template fences its authorable regions in `LISA:CONTENT-START` /
@@ -216,24 +210,6 @@ machine-translate nothing, but every reader-visible string is written once per
 language. To add a template, use `/lisa-new-template`. When none is the right
 shape, `/lisa-design` drives the vendored Slides AI pipeline with MonoMind
 branding — see `skills/lisa-design/SKILL.md`.
-
-Two registry entries are `kind: external` and build nothing here:
-
-| Entry | Skill | Where it lives |
-| --- | --- | --- |
-| `slide-design` | `/lisa-design` | `vendor/slides-ai-plugin`, in this repository |
-| `lisa-ppt` | `/lisa-ppt` | `monomind-ai-lab/lisa-ppt` — a **separate** plugin the user installs |
-
-`lisa-ppt` is the PowerPoint route, and it is affiliated rather than bundled:
-`D-020` still holds and every deliverable built *here* is one standalone HTML
-file. Nothing in this repository vendors, downloads, or generates a `.pptx`.
-The card in the panel says so, and its `requires` field carries the two
-install commands:
-
-```
-/plugin marketplace add monomind-ai-lab/lisa-ppt
-/plugin install lisa-ppt@monomind-ppt
-```
 
 ## Verification checklist
 

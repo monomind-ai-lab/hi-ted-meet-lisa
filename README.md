@@ -195,8 +195,9 @@ panel. The deck is about [YOUR SUBJECT], for [AUDIENCE].
 Want a look the house style does not cover? The gallery's handoff card passes
 the work to [`lisa-design`](skills/lisa-design/), which drives a
 vendored Slides AI pipeline with MonoMind branding applied. Need an editable
-`.pptx` instead of a web page? A second handoff card passes it to **Lisa's
-PPT** — a separate plugin you install yourself, in its own repository.
+`.pptx` instead of a web page? That is **Lisa's PPT** — not a template here
+and not a choice in this panel, but a separate, affiliated product you install
+yourself, from its own repository.
 
 
 ---
@@ -424,14 +425,10 @@ vendored or downloaded from here.
 /plugin install lisa-ppt@monomind-ppt
 ```
 
-Then it is a card in Lisa's own gallery, badged `PPTX`. Pick it and Lisa
-stops: she hands `/lisa-ppt` your brief and your Purpose answers as its
-Stage-1 contract, and selects the MonoMind brand pack. You answer the
-Purpose questions once, not twice.
-
-The card is in the gallery whether or not the plugin is installed, and says
-what it needs. Picking it without installing gets you the two commands above,
-not a silent fallback to something you did not ask for.
+Then `/lisa-ppt` is its own command, with its own intake. It is **not** one
+of Lisa's templates and never appears in her gallery: Lisa answers for HTML,
+Lisa's PPT answers for PowerPoint, and you pick the product rather than
+picking a card. The two share a house style, not a question flow.
 
 ## ✅ Add your own template
 
@@ -470,9 +467,9 @@ carry the machinery, never the material.
 - **A bundled design reviewer**, so the review works without a separate install.
 - **`lisa-design`** — a branded wrapper over the vendored Slides AI
   pipeline, for decks that need a different look or animation.
-- **A gallery card for `lisa-ppt`**, the affiliated PowerPoint plugin — the
-  handoff and the install line, not the pipeline. That lives in its own
-  repository.
+- **A marketplace listing for `lisa-ppt`**, the affiliated PowerPoint product,
+  so anyone holding Lisa's marketplace can find it. The listing only — no
+  card, no handoff, no pipeline. All of that lives in its own repository.
 
 
 
