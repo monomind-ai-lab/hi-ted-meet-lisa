@@ -21,12 +21,6 @@ as they are.
 | `/lisa-brand [url \| screenshot \| assets]` | Read a brand into a `design.md` and a one-page A4 brand book — colours, fonts, mark, tagline, taken from a site or a screenshot, confirmed with you, never invented. The `design.md` is what the intake's "Extract it from my brand" style option feeds a build with. |
 | `/lisa-motion [file] [what to animate]` | Animate a finished file without a library: reveals, a typewriter, count-ups, a marquee, from the motion pattern library — CSS and the Web Animations API only. |
 
-One more sits in the gallery but not in this plugin:
-
-| Command | When it is the right one |
-| --- | --- |
-| `/lisa-ppt [brief]` | An editable PowerPoint file instead of HTML. It is a **separate plugin** — Lisa shows the card and hands over the brief and the Purpose answers, and builds none of it. Install it first: `/plugin marketplace add monomind-ai-lab/lisa-ppt` then `/plugin install lisa-ppt@monomind-ppt`. |
-
 ## The two intake routes
 
 `/lisa` takes its settings through a short visual panel, not an interview.
