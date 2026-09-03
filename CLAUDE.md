@@ -58,12 +58,8 @@ switch, check for console errors and horizontal overflow at 375px).
 ## Architecture
 
 **Independent template systems, not variations of one look.** The registry
-carries the first-party templates, plus two external entries that build
-nothing here: `slide-design`, which hands off to `/lisa-design`, and
-`lisa-ppt`, which hands off to `/lisa-ppt` — a **separate, install-only
-plugin** in `monomind-ai-lab/lisa-ppt`. Nothing here vendors it, downloads
-it, or makes a `.pptx`; `D-020` is unchanged. Each first-party template is a
-single self-contained HTML file
+carries the first-party templates (plus the external `slide-design` entry
+that hands off to `/lisa-design`). Each is a single self-contained HTML file
 with its own design tokens, chrome, scripts, and language mechanism — they
 differ in shape, navigation, and how they translate, so a change to one has no
 bearing on the others. Three of them show how far apart the systems sit:
@@ -114,6 +110,15 @@ rewrites each card's `preview` to the hosted URL (so the gallery's "Preview"
 links open over the network, in a new tab rather than the framing overlay), and
 `tedandlisa_thumbs.py` screenshots the hosted page when the local file is
 absent. Both paths that used to be local now need a connection.
+
+**PowerPoint is a separate product, not a template.** Lisa's PPT lives in
+[`monomind-ai-lab/lisa-ppt`](https://github.com/monomind-ai-lab/lisa-ppt):
+affiliated, install-only, with its own command and its own intake, surfaced on
+the website as its own page. Nothing here vendors it, downloads it, or makes a
+`.pptx` (`D-020` is unchanged), and it is deliberately **not** a registry entry
+— it must never become a card in the gallery answering Lisa's HTML question
+flow. `.claude-plugin/marketplace.json` lists it so it can be found; that
+listing is the whole of the wiring on this side.
 
 **The generation flow spans several files by design:** `SKILL.md` drives the
 process → `scripts/tedandlisa_intake.py` serves `assets/tedandlisa-intake.html`

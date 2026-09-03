@@ -17,7 +17,7 @@
         "source": "github",
         "repo": "monomind-ai-lab/lisa-ppt"
       },
-      "description": "Lisa's PPT — the sister skill that builds an editable PowerPoint file. Affiliated, never bundled: it lives in its own repository and installs itself. Listed here so anyone holding Lisa's marketplace can find it; its own marketplace, monomind-ppt, stays the route the intake panel names."
+      "description": "Lisa's PPT — the sister skill that builds an editable PowerPoint file. Affiliated, never bundled: it lives in its own repository and installs itself. Listed here so anyone holding Lisa's marketplace can find it; its own marketplace, monomind-ppt, stays the install route. It is not one of Lisa's templates and is never a card in her intake panel."
     }
   ]
 }
