@@ -241,6 +241,7 @@
         "reduced motion, print and hidden-tab safe",
         "light and dark, persisted; self-download"
       ],
+      "preview": "previews/motion-website.html",
       "thumb_source": "assets/tedandlisa-template-motion-website.html#/en/home"
     }
   ]
