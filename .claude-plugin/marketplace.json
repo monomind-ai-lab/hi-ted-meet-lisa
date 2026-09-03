@@ -10,6 +10,14 @@
       "name": "hi-ted-meet-lisa",
       "source": "./",
       "description": "Turns a brief into a finished, self-contained HTML deck, web document, diagram, or site. One file, no build step."
+    },
+    {
+      "name": "lisa-ppt",
+      "source": {
+        "source": "github",
+        "repo": "monomind-ai-lab/lisa-ppt"
+      },
+      "description": "Lisa's PPT — the sister skill that builds an editable PowerPoint file. Affiliated, never bundled: it lives in its own repository and installs itself. Listed here so anyone holding Lisa's marketplace can find it; its own marketplace, monomind-ppt, stays the route the intake panel names."
     }
   ]
 }

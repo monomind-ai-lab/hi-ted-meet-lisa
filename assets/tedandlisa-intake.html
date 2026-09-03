@@ -407,6 +407,22 @@ h1 { font-family: var(--font-display); font-size: clamp(28px, 4.4vw, 40px); line
 .tpl .note { display: block; font-size: var(--text-sm); color: var(--muted-inv); margin-top: 2px; }
 .tpl .dep { display: block; font-family: var(--font-mono); font-size: var(--text-xs);
   color: var(--muted-inv); margin-top: var(--space-2); }
+/* `requires` — what has to be installed before this card can be picked at
+   all. Only a `kind: external` entry has one, and it is a precondition, not a
+   credit: `.dep` says what a template loads once it is built, this says what
+   the reader has to do first. So it is one step louder than `.dep` and no
+   more — the same quiet mono voice, boxed on the accent hairline so the eye
+   reads it as a condition. `overflow-wrap: anywhere` because the text is an
+   install command with no spaces to break on, and a card is narrow. */
+.tpl .req { display: block; margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3); border: 1px solid var(--accent-hair);
+  border-radius: var(--radius-sm); background: rgba(0,0,0,0.22);
+  font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.5;
+  color: var(--muted-inv); overflow-wrap: anywhere; }
+/* A span, not a <b>: `.tpl b` is the card's name and is block-level at
+   --text-base, which this must not inherit. */
+.tpl .req .reqlabel { color: var(--fg-inv); }
+.tpl[aria-checked="true"] .req { border-color: var(--accent); }
 /* What the template is *for* — the `type` axis, which is presentation only
    and never reaches the payload. Deliberately the quietest thing on the
    card: mono, small, muted, no fill. It is a flag you read after the name,
@@ -1003,7 +1019,15 @@ var UI = {
     tagAny: "choose any",
     defaultMark: "default",
     previewLink: "Preview ↗",
+    /* The thumbnail slot when a card has no picture. A registry entry that
+       sets `badge` puts that there instead — a hand-off entry has no template
+       file to shoot, so the slot carries what the route produces (`PPTX`)
+       rather than an apology for the missing image. */
     noshot: "no preview",
+    /* Prefixes a card's `requires` line and opens the same clause in its
+       accessible name. Kept to one word: the registry string that follows it
+       is already a sentence with two commands in it. */
+    requiresLabel: "Needs",
     /* The `type` axis — what a template is *for*. Keyed by the registry's own
        type ids, so a card's flag and its filter button are one string and can
        never drift apart. Missing entry falls back to the raw id. */
@@ -1102,6 +1126,7 @@ var UI = {
     defaultMark: "기본값",
     previewLink: "미리보기 ↗",
     noshot: "미리보기 없음",
+    requiresLabel: "필요:",
     types: { present: "발표용", read: "읽기용",
              diagram: "다이어그램용", site: "사이트용" },
     layouts: { reflow: "\u2194 어떤 화면에도 맞춰 흐름",
@@ -1189,6 +1214,7 @@ var UI = {
     defaultMark: "預設",
     previewLink: "預覽 ↗",
     noshot: "沒有預覽",
+    requiresLabel: "需要：",
     types: { present: "上台用", read: "細讀用",
              diagram: "圖解用", site: "上線用" },
     layouts: { reflow: "\u2194 隨螢幕自動重排",
@@ -1274,9 +1300,10 @@ var L10N = {
       Preferences: "파일을 어떻게 만들고 내보낼 것인가. 모두 합리적인 기본값이 " +
                    "있으니, 신경 쓰지 않는 항목은 그대로 두면 됩니다."
     },
-    /* [name, tagline, best_for, dependencies] — the last two come off the
-       registry entry rather than the option, which is why they live here
-       and not under q.template.o. */
+    /* [name, tagline, best_for, dependencies, requires] — everything but the
+       first two comes off the registry entry rather than the option, which is
+       why they live here and not under q.template.o. `requires` is the fifth
+       and is set on hand-off entries only. */
     tpl: {
       "monomind-deck": ["MonoMind 덱",
         "가로로 넘기는 프레젠테이션 덱, 짙은 잉크와 액센트 헤일로.",
@@ -1324,6 +1351,16 @@ var L10N = {
         "프로그램의 정문. 프로젝트 웹사이트와 같은 형태로, 책상 앞에서 읽히고 읽히기 전에 " +
         "훑어집니다 — 다만 연출된 순간 하나를 두고, 그다음은 절제합니다.",
         "Google Fonts만 — 애니메이션 라이브러리 없음."],
+      /* 다섯 번째 문자열은 `requires`입니다 — 여기 있는 유일한 카드입니다.
+         설치 명령은 파일명·명령어와 마찬가지로 원문 그대로 둡니다. */
+      "lisa-ppt": ["Lisa's PPT",
+        "MonoMind 템플릿도 아니고 HTML도 아닙니다 — 직접 설치하는 자매 스킬이 만드는, " +
+        "편집 가능한 PowerPoint 파일.",
+        "결과물이 .pptx여야 하는 덱 — 누군가 PowerPoint나 Keynote에서 열어 고치거나, " +
+        "파일 자체가 요청받은 것일 때.",
+        "여기에는 없습니다. 자매 플러그인을 따로 설치하면 그쪽이 전부 만듭니다.",
+        "Lisa's PPT 플러그인 (/plugin marketplace add monomind-ai-lab/lisa-ppt; " +
+        "/plugin install lisa-ppt@monomind-ppt)"],
     },
     q: {
       template: {
@@ -1632,6 +1669,16 @@ var L10N = {
         "專案網站同一個形態，在桌前讀，也常常是先掃過再讀 — 只是多了一個編排過的瞬間，" +
         "之後就收斂。",
         "只用 Google Fonts — 沒有動效函式庫。"],
+      /* 第五個字串是 `requires` — 目前只有這張卡片有。
+         安裝指令和檔名、命令一樣，原文照留。 */
+      "lisa-ppt": ["Lisa's PPT",
+        "不是 MonoMind 範本，也不是 HTML — 由你自己安裝的姊妹技能產生的、" +
+        "可編輯的 PowerPoint 檔案。",
+        "非得交出 .pptx 的簡報 — 有人要在 PowerPoint 或 Keynote 裡打開來改，" +
+        "或者那個檔案本身就是對方要的東西。",
+        "這裡沒有。姊妹外掛另外安裝，整份簡報由它產生。",
+        "Lisa's PPT 外掛 (/plugin marketplace add monomind-ai-lab/lisa-ppt; " +
+        "/plugin install lisa-ppt@monomind-ppt)"],
     },
     q: {
       template: {
@@ -1899,9 +1946,11 @@ function tplace(q, o) {
   return (e && e.p && e.p[o.id]) || o.placeholder;
 }
 function tqplace(q) { var e = LQ(q.id); return (e && e.placeholder) || q.placeholder; }
-/* Template cards: [name, tagline, best_for, dependencies]. The last two are
-   registry fields read straight off the entry, so they are indexed here
-   rather than reached through the option. */
+/* Template cards: [name, tagline, best_for, dependencies, requires]. All but
+   the first two are registry fields read straight off the entry, so they are
+   indexed here rather than reached through the option. `requires` is index 4
+   and exists on hand-off entries only; every other card falls straight
+   through to `undefined` and draws nothing. */
 function tplText(id, i, fallback) {
   var d = L(), e = d && d.tpl && d.tpl[id];
   return (e && e[i]) || fallback;
@@ -1949,7 +1998,10 @@ var TEMPLATES = CTX.templates || [
   { id: "paper-brief", name: "Paper brief", kind: "slides", type: "read", layout: "reflow",
     tagline: "Light paper slides paced in chapters — mega numbers, bar charts, decision boxes." },
   { id: "motion-website", name: "Motion website", kind: "document", type: "site", layout: "reflow",
-    tagline: "Project website with the motion layer: the hero rises in sequence, the command types itself, cards light up under the pointer — CSS and WAAPI only, no library." }
+    tagline: "Project website with the motion layer: the hero rises in sequence, the command types itself, cards light up under the pointer — CSS and WAAPI only, no library." },
+  { id: "lisa-ppt", name: "Lisa's PPT", kind: "external", type: "present", layout: "stage", skill: "/lisa-ppt", badge: "PPTX",
+    tagline: "Not a MonoMind template and not HTML — an editable PowerPoint file, built by a sister skill you install yourself.",
+    requires: "Lisa's PPT plugin (/plugin marketplace add monomind-ai-lab/lisa-ppt; /plugin install lisa-ppt@monomind-ppt)" }
 ];
 
 /* Display order for the filter row. A type the registry does not use gets no
@@ -2557,6 +2609,9 @@ function cardsHtml(q) {
       var tag  = tplText(o.id, 1, o.note || "");
       var best = tplText(o.id, 2, t.best_for);
       var deps = tplText(o.id, 3, t.dependencies);
+      /* Only a `kind: external` entry sets this; everything built here needs
+         nothing installed, so the line is absent rather than empty. */
+      var req  = tplText(o.id, 4, t.requires);
       var ty   = typeOf(o.id);
       var lo   = layoutOf(o.id);
       var preview = t.preview
@@ -2567,7 +2622,11 @@ function cardsHtml(q) {
          a stray word: a screen reader hears "Evidence deck, to present" the
          way a sighted reader sees the name with its flag under it. */
       var aria = (ty ? name + ", " + typeLabel(ty) : name) +
-                 (lo ? ", " + layoutLabel(lo) : "");
+                 (lo ? ", " + layoutLabel(lo) : "") +
+                 /* A precondition has to be spoken. Everything else inside the
+                    button is decoration an aria-label may swallow; this is the
+                    one line a reader cannot afford to miss. */
+                 (req ? ". " + ui("requiresLabel") + " " + req : "");
       return '<div class="tplcell">' +
         '<button type="button" class="tpl" role="radio" aria-checked="' + on + '"' +
         ' aria-label="' + esc(aria) + '" data-q="' + q.id + '" data-o="' + o.id + '">' +
@@ -2584,6 +2643,8 @@ function cardsHtml(q) {
         (ty ? '<span class="ttype">' + esc(typeLabel(ty)) + '</span>' : "") +
         (lo ? '<span class="tlayout">' + esc(layoutLabel(lo)) + '</span>' : "") +
         (deps ? '<span class="dep">' + esc(deps) + '</span>' : "") +
+        (req ? '<span class="req"><span class="reqlabel">' +
+               esc(ui("requiresLabel")) + '</span> ' + esc(req) + '</span>' : "") +
         '</span></span></button>' + preview + '</div>';
     }).join("") + '</div>';
 }
