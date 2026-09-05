@@ -310,6 +310,25 @@ html[data-theme="light"] .slide.is-photo {
   justify-content: safe center;
 }
 
+/* Stacked boxes: the vertical rhythm the flow containers do not supply.
+   .slide, .dg-canvas and .dg-frame are plain columns with no gap, and the
+   boxes below carry no margin of their own -- they were written to sit in a
+   container that spaces them (.grid-2/3/4, .dg-flag-row, .wf-track all carry
+   a gap) or after a connector that does (.dg-arrow, .dg-loop keep their own
+   margins). Write one straight after another, as a deck naturally does, and
+   there is nothing between them at all: the two boxes sit flush, sharing an
+   edge. Scoped to box-after-box on purpose -- a blanket rule on the children
+   would add a margin to grid items too, where it shifts one card out of its
+   row rather than spacing it, and would fight the connectors for the gap
+   they already own. --space-5 sits between the small-card grid gap
+   (--space-4) and the large-card one (--space-6), which is the range a
+   full-width stack reads correctly at. */
+.slide     > :is(.dg-frame, .dg-flag, .qcard, .plate) + :is(.dg-frame, .dg-flag, .qcard, .plate),
+.dg-canvas > :is(.dg-frame, .dg-flag, .qcard, .plate) + :is(.dg-frame, .dg-flag, .qcard, .plate),
+.dg-frame  > :is(.dg-frame, .dg-flag, .qcard, .plate) + :is(.dg-frame, .dg-flag, .qcard, .plate) {
+  margin-top: var(--space-5);
+}
+
 .dg-frame {
   position: relative;
   border: 1px solid var(--border);
