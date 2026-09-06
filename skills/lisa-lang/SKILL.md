@@ -63,9 +63,17 @@ Ask; never guess which one was meant.
 
 5. **Give every language a reachable control.** Extend the language switch —
    toggle buttons, the `langToggle` chip cycle, whatever this file uses — so
-   each new language can actually be selected. Count controls against
-   languages by hand, the same rule as `/lisa` step 8: content nobody can
-   reach is the same as not writing it.
+   each new language can actually be selected. Then prove it rather than
+   counting by hand, the same rule as `/lisa` step 8:
+
+   ```sh
+   python3 scripts/check_languages.py FILE --languages en,ko,…
+   ```
+
+   The list is every language the file should now carry — the ones it had
+   plus the ones you just added. Content nobody can reach is the same as not
+   writing it, and a control for a language you did not add is the same
+   defect pointing the other way.
 
 ## Verify
 

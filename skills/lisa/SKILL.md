@@ -149,11 +149,21 @@ The prompt carries the brief. Everything else comes from the intake panel.
    as `style: designmd`. Every question asked always arrives answered; a
    missing key is a malformed payload, not permission to guess.
 
-8. **Verify** — checklist below. Count the language controls against the
-   `languages` answer by hand: content nobody can reach is the same as not
-   writing it. In a sandbox the browser checks cannot run: say which you
-   skipped rather than implying a clean pass, and tell the reader how — serve
-   over http, look for console errors and horizontal overflow at 375px.
+8. **Verify** — checklist below. **Do not count the language controls by
+   hand** — run them against the answer:
+
+   ```sh
+   python3 scripts/check_languages.py OUT.html --intake intake.json
+   ```
+
+   The authority is `answers.languages`, never the file. It fails a chosen
+   language nothing selects (content nobody can reach is the same as not
+   writing it) **and** an unchosen language the file still offers — a
+   leftover control that shows untranslated text or does nothing. Exit 1 is a
+   finding to fix; exit 2 is the browser failing, not the file. In a sandbox
+   the browser checks cannot run: say which you skipped rather than implying a
+   clean pass, and tell the reader how — serve over http, look for console
+   errors and horizontal overflow at 375px.
 
 9. **Review as scheduled.** `answers.review` decides when the design pass
    (`references/design-review.md`) runs: **`after`** (the default) — deliver

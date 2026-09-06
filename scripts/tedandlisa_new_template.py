@@ -150,6 +150,7 @@ def register(args) -> int:
         "best_for": args.best_for or "",
         "navigation": args.navigation or "",
         "languages": args.languages or "",
+        "language_tags": [t.strip() for t in (args.language_tags or "en").split(",") if t.strip()],
         "dependencies": args.dependencies or "",
         "features": args.feature or [],
     })
@@ -187,7 +188,13 @@ def main() -> int:
     r.add_argument("--patterns")
     r.add_argument("--best-for", dest="best_for")
     r.add_argument("--navigation")
-    r.add_argument("--languages")
+    r.add_argument("--languages", help="prose for the gallery card")
+    r.add_argument("--language-tags", dest="language_tags",
+                   help="the same statement in the intake's tag space, e.g. "
+                        "en,ko — what scripts/check_languages.py --registry "
+                        "holds the file to in CI. Defaults to en; a skeleton "
+                        "that carries a second language must say so here or "
+                        "the gate will call the extra one unchosen.")
     r.add_argument("--dependencies")
     r.add_argument("--feature", action="append")
 
