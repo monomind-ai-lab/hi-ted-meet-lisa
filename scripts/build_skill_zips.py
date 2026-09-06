@@ -51,8 +51,9 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 # Copied into every bundle: the four directories the skills actually read,
 # plus the licence files, because a ZIP is a redistribution.
-# `vendor/` matters: /lisa-design reads vendor/slides-ai-plugin/, so an
-# uploaded bundle without it is a skill that cannot run.
+# `vendor/` matters: /lisa-design reads vendor/slides-ai-plugin/ and
+# /lisa-diagram reads vendor/archify/, so an uploaded bundle without it is a
+# skill that cannot run.
 PAYLOAD_DIRS = ("assets", "references", "scripts", "templates")
 
 # Carried only by the bundles that actually use them, and at their original
@@ -64,10 +65,10 @@ PAYLOAD_DIRS = ("assets", "references", "scripts", "templates")
 # excess, and a bundle whose contents you cannot account for is not one to
 # ship. An uploaded /lisa therefore runs the tooling-free floor of
 # references/design-review.md, which is a supported tier, not a breakage.
-# `vendor/` is here rather than in PAYLOAD_DIRS because only /lisa-design reads
-# it, and it carries three SKILL.md files of its own — which an upload cannot
-# take (see ONE_SKILL_MD below). /lisa names it once, in a descriptive table
-# row, and never reads it.
+# `vendor/` is here rather than in PAYLOAD_DIRS because only the two handoff
+# skills read it, and it carries four SKILL.md files of its own — which an
+# upload cannot take (see ONE_SKILL_MD below). /lisa names it once, in a
+# descriptive table row, and never reads it.
 EXTRA_PAYLOAD = {
     "lisa-design": ("vendor",),
 }
@@ -97,6 +98,11 @@ NOT_UPLOADABLE = {
                    "the bundle past 200 files besides. Without it the skill "
                    "is the same floor an uploaded /lisa already runs. Use "
                    "the plugin or a checkout.",
+    "lisa-diagram": "drives the vendored Archify compiler, which carries a "
+                    "SKILL.md of its own — an upload permits exactly one. It "
+                    "also needs Node to run at all, which a hosted upload does "
+                    "not have, so even a bundle that passed would be a skill "
+                    "that cannot finish. Use the plugin or a checkout.",
 }
 
 # Built for completeness, but say plainly which ones are worth uploading. A

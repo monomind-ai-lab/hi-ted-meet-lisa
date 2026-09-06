@@ -260,10 +260,11 @@ skill still cannot drift apart, they just ship on their own schedules now.
 The templates, chosen at the start of the intake. They are not variations of
 one look — they differ in shape, navigation, and how they handle language.
 
-The intake gallery offers a ninth card beside them, listed here for the same
-reason it appears there: you are choosing how the deck gets made, not first
-choosing between two menus. It is not a template, and nothing in this
-repository builds it — see [when a template is the wrong shape](#-when-a-template-is-the-wrong-shape).
+The intake gallery offers two more cards beside them, listed here for the same
+reason they appear there: you are choosing how the file gets made, not first
+choosing between two menus. Neither is a template, and neither is built from
+markup here — see [when a template is the wrong shape](#-when-a-template-is-the-wrong-shape)
+and [when the diagram is the deliverable](#-when-the-diagram-is-the-deliverable).
 
 | Template | Shape | Language | Preview |
 | --- | --- | --- | --- |
@@ -277,12 +278,14 @@ repository builds it — see [when a template is the wrong shape](#-when-a-templ
 | **Evidence deck** | Dark full-bleed slides that argue from numbers — tables, stat rows, verdict bars | English and Korean written inline, toggled instantly — works offline | [Live preview →](https://html.monomind.one/previews/evidence-deck) |
 | **Paper brief** | Light paper slides paced in chapters — mega numbers, bar charts, decision boxes | Traditional Chinese and English written inline; opens in Chinese | [Live preview →](https://html.monomind.one/previews/paper-brief) |
 | **Slide design** — *a handoff, not a template* | Twelve style presets and animated HTML | One language per deck — the presets carry no toggle | [Live preview →](https://html.monomind.one/previews/slide-design) |
+| **Explorable diagram** — *a handoff, not a template* | A compiled, validated system map you search, focus and trace — five diagram types, before/after delta | One authored language per artifact; labels are never machine-translated | *preview pending* |
 
-All nine have a live preview linked from the intake gallery, so you can look
-before you choose.
+Nine of the eleven have a live preview linked from the intake gallery, so you
+can look before you choose; Motion website's and Explorable diagram's are
+pending.
 
 Every card also carries a **layout mark**, from the registry's `layout`
-property. All nine entries today are `reflow` — the file re-lays its content
+property. All eleven entries today are `reflow` — the file re-lays its content
 out for whatever screen opens it, readable at a phone width. A template can
 instead be registered as `stage`: authored on a fixed 1920×1080 canvas that
 scales uniformly to the viewport and letterboxes on other aspect ratios, never
@@ -296,7 +299,7 @@ rendered at its canvas and letterboxed rather than reflowed at 375px.
 
 Each template has a pattern reference in `references/` giving
 verbatim markup for every component, plus the rules that are easy to get wrong.
-The handoff has none — it is not built from markup here.
+The two handoffs have none — neither is built from markup here.
 
 A template is a **scaffold, not a cage**. Agents extend it — new components, new
 slide shapes — in the template's own design tokens. What they may not rewrite is
@@ -409,6 +412,49 @@ Every deliverable stays a standalone HTML file; the pipeline's `.pptx` output is
 retired here. Because the story is just about Ted and Lisa, not about Peter
 Parker and Tony.
 
+## ✅ When the diagram is the deliverable
+
+Lisa draws diagrams two ways, and the difference is worth knowing before you
+pick.
+
+`architecture` and `mermaid-master` are **drawn**. An agent writes the SVG by
+hand in MonoMind's own look, the file loads nothing, and the drawing sits
+inside a larger deck or document. That is the right answer for a figure that
+illustrates an argument.
+
+```text
+/lisa-diagram
+```
+
+This wraps [Archify](https://github.com/tt-a1i/archify) (MIT), and it is
+**compiled**. You describe the system as typed JSON; a validator refuses a
+diagram whose geometry or facts do not hold; the compiler emits one
+self-contained HTML file whose reader can search a node, focus it, trace what
+reaches it, compare two versions as a before/after delta, and export PNG, SVG
+or WebM. Five shapes — architecture, workflow, sequence, data-flow, lifecycle.
+
+Reach for it when the diagram *is* the deliverable: a real system mapped and
+checked rather than illustrated. The specification is the editable source and
+the HTML is output — never hand-edit the artifact, because every node position
+and arrow route in it is solver output that was checked as a whole.
+
+The files are copied into `vendor/archify/`, so a plugin install carries the
+compiler. It needs **Node 18 or newer** — the only path in this repository that
+wants Node, and it still needs no `npm install`. Do not edit anything under
+`vendor/`; `vendor/archify/VENDORED.md` records the tag it came from and what
+was deliberately left out.
+
+Two honest limits. An artifact carries **one** authored language, and the
+renderer never translates labels — the viewer's own chrome speaks English or
+Simplified Chinese, and there is no inline dual-language toggle here the way
+`web-document` has one. And **colour is semantic**: it encodes component type,
+so an accent answer does not repaint it. This is the one card in the gallery a
+brand does not land on, which is exactly why the other ten do.
+
+Archify and the `architecture` template share an ancestor — both trace back to
+Cocoon AI's generator — which is why they look like relatives. `NOTICE` records
+both chains.
+
 ## ✅ When it has to be PowerPoint
 
 Sometimes the file itself is the deliverable: someone will open it in
@@ -467,6 +513,8 @@ carry the machinery, never the material.
 - **A bundled design reviewer**, so the review works without a separate install.
 - **`lisa-design`** — a branded wrapper over the vendored Slides AI
   pipeline, for decks that need a different look or animation.
+- **`lisa-diagram`** — a wrapper over the vendored Archify compiler, for a
+  diagram that has to be validated, explorable, or grounded in real code.
 - **A marketplace listing for `lisa-ppt`**, the affiliated PowerPoint product,
   so anyone holding Lisa's marketplace can find it. The listing only — no
   card, no handoff, no pipeline. All of that lives in its own repository.
