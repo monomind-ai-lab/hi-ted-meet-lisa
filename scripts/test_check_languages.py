@@ -65,7 +65,8 @@ class Judge(unittest.TestCase):
         self.assertEqual(judge(found(["en", "ko"], [CTRL_EN, CTRL_KO]), ["en", "ko"]), [])
 
     def test_single_language_with_no_control_is_silent(self):
-        # The archify artifact and a trimmed MonoMind deck both look like this.
+        # A MonoMind deck built English-only looks like this: apply_languages
+        # deletes the switch outright, so there is nothing left to offer.
         self.assertEqual(judge(found(["en"]), ["en"]), [])
 
     def test_chosen_but_unreachable(self):
