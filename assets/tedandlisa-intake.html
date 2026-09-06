@@ -2312,12 +2312,14 @@ function layoutLabel(lo) { return (ui("layouts") || {})[lo] || lo; }
 
 /* The one place `type` reaches an answer, and only as a *default*: the
    contract's delivery question starts from what the template is for. A shape
-   you present (`present`, and the external handoff, which is a deck by any
-   route) assumes a presenter; every other purpose — `read`, `diagram`,
-   `site` — assumes a reader. Re-derived on each template pick until the
-   reader chooses for themselves; documented in references/intake-contract.md. */
+   you present (`present`) assumes a presenter; every other purpose — `read`,
+   `diagram`, `site` — assumes a reader. `kind` does not enter into it any
+   more: `external` used to short-circuit to `presenter` because the only
+   external entry was a deck, and `archify` — an external diagram you read —
+   made that assumption wrong. An external handoff now follows its own `type`
+   like everything else. Re-derived on each template pick until the reader
+   chooses for themselves; documented in references/intake-contract.md. */
 function deliveryDefault(id) {
-  if (kindOf(id) === "external") { return "presenter"; }
   return typeOf(id) === "present" ? "presenter" : "reader";
 }
 

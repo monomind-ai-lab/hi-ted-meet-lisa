@@ -136,11 +136,13 @@ like any chapter. Every field is always present.
   `report` `mobilize` `record`, in the order picked. Defaults to `["inform"]`.
   It can be empty, which reads the same as null above.
 - `delivery` — `presenter` \| `reader` \| `hybrid` \| `recorded`. The panel
-  defaults it from the chosen template's registry `type`: `present` — and the
-  `external` handoff, a deck by any route — gives `presenter`; `read`,
-  `diagram` and `site` give `reader`. It is re-derived on every template pick
-  until the user chooses, so a payload carrying the default still names it —
-  read this field, never the template, for how the file will be used.
+  defaults it from the chosen template's registry `type`: `present` gives
+  `presenter`; `read`, `diagram` and `site` give `reader`. `kind` does not
+  enter into it — an `external` handoff follows its own `type` like every
+  other entry, so `slide-design` gives `presenter` and `archify` gives
+  `reader`. It is re-derived on every template pick until the user chooses, so
+  a payload carrying the default still names it — read this field, never the
+  template, for how the file will be used.
 - `afterlife` — `share` (default) \| `approval` \| `review` \| `archive` \|
   `handoff` \| `reuse`.
 - `divergence` — `close` \| `moderate` (default) \| `free`: how far the
