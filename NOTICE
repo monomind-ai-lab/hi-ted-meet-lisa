@@ -94,33 +94,6 @@ became clear that submodules do not travel with a plugin install.
              by the wrapper skill in skills/lisa-design/.
 
 --------------------------------------------------------------------------
-Archify — vendor/archify/ (vendored)
---------------------------------------------------------------------------
-Copied into this repository at tag v2.16.0, commit c826e6c (2026-08-30).
-Drives /lisa-diagram: a renderer and validator that compiles typed JSON into
-a self-contained interactive HTML diagram. Copied rather than installed for
-the same reason as the plugin above — a submodule does not travel with a
-plugin install.
-
-Note the shared ancestry: Archify is itself based on Cocoon AI's Architecture
-Diagram Generator, which the architecture template above is separately derived
-from. The two entries describe the same upstream reached two different ways —
-one rewritten by hand as a MonoMind template, one vendored as a compiler.
-
-  Upstream:  https://github.com/tt-a1i/archify
-  Author:    tt-a1i
-  Version:   2.16.0
-  License:   MIT
-  Text:      vendor/archify/LICENSE
-  Changes:   None to the copied files. Upstream's test suite, rendered example
-             HTML, two code generators, self-update scripts, lockfile and
-             release metadata are deliberately not copied; see
-             vendor/archify/VENDORED.md for the full list and why. Omitting
-             the two generators is what keeps the copy install-free: their
-             output is committed upstream, so Archify's own ajv and
-             simple-icons devDependencies are never needed here.
-
---------------------------------------------------------------------------
 Design System Toolkit — skills/lisa-brand/, references/brand-extraction.md,
                         assets/lisa-brand-book-a4.html
 --------------------------------------------------------------------------

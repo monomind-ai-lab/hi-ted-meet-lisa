@@ -1328,12 +1328,6 @@ var L10N = {
         "프로그램의 정문. 프로젝트 웹사이트와 같은 형태로, 책상 앞에서 읽히고 읽히기 전에 " +
         "훑어집니다 — 다만 연출된 순간 하나를 두고, 그다음은 절제합니다.",
         "Google Fonts만 — 애니메이션 라이브러리 없음."],
-      "archify": ["탐색형 다이어그램",
-        "MonoMind 템플릿이 아닙니다 — 컴파일되고 검증된 다이어그램, 검색하고 경로를 따라갈 수 있습니다.",
-        "다이어그램 자체가 결과물일 때 — 그려 보이는 그림이 아니라, 실제 시스템을 옮기고 " +
-        "검증한 지도. 여기서 색은 브랜드가 아니라 의미를 나타냅니다. 데스크톱 우선.",
-        "vendor/archify에 포함되어 있습니다. Node 18 이상이 필요하고 — 여기서 유일합니다 — " +
-        "npm install은 없습니다. JetBrains Mono는 Google Fonts."],
     },
     q: {
       template: {
@@ -1642,12 +1636,6 @@ var L10N = {
         "專案網站同一個形態，在桌前讀，也常常是先掃過再讀 — 只是多了一個編排過的瞬間，" +
         "之後就收斂。",
         "只用 Google Fonts — 沒有動效函式庫。"],
-      "archify": ["可探索的圖",
-        "不是 MonoMind 範本 — 一張編譯過、驗證過的圖，可以搜尋，也可以追蹤路徑。",
-        "圖本身就是成果的時候 — 不是畫來示意，而是把真實系統測繪並驗證過的地圖。這裡的" +
-        "顏色承載的是意義，不是品牌。以桌機為先。",
-        "已隨附於 vendor/archify。需要 Node 18 以上 — 這裡唯一需要的 — 而且不用 " +
-        "npm install。JetBrains Mono 來自 Google Fonts。"],
     },
     q: {
       template: {
@@ -1965,9 +1953,7 @@ var TEMPLATES = CTX.templates || [
   { id: "paper-brief", name: "Paper brief", kind: "slides", type: "read", layout: "reflow",
     tagline: "Light paper slides paced in chapters — mega numbers, bar charts, decision boxes." },
   { id: "motion-website", name: "Motion website", kind: "document", type: "site", layout: "reflow",
-    tagline: "Project website with the motion layer: the hero rises in sequence, the command types itself, cards light up under the pointer — CSS and WAAPI only, no library." },
-  { id: "archify", name: "Explorable diagram", kind: "external", type: "diagram", layout: "reflow", skill: "/lisa-diagram", badge: "HTML",
-    tagline: "Not a MonoMind template — a compiled, validated diagram you can search and trace." }
+    tagline: "Project website with the motion layer: the hero rises in sequence, the command types itself, cards light up under the pointer — CSS and WAAPI only, no library." }
 ];
 
 /* Display order for the filter row. A type the registry does not use gets no
@@ -2328,11 +2314,12 @@ function layoutLabel(lo) { return (ui("layouts") || {})[lo] || lo; }
    contract's delivery question starts from what the template is for. A shape
    you present (`present`) assumes a presenter; every other purpose — `read`,
    `diagram`, `site` — assumes a reader. `kind` does not enter into it any
-   more: `external` used to short-circuit to `presenter` because the only
-   external entry was a deck, and `archify` — an external diagram you read —
-   made that assumption wrong. An external handoff now follows its own `type`
-   like everything else. Re-derived on each template pick until the reader
-   chooses for themselves; documented in references/intake-contract.md. */
+   more: `external` used to short-circuit to `presenter`, which was only ever
+   true because the one external entry happened to be a deck. A handoff that
+   is read rather than presented would have been answered wrong before the
+   reader said anything, so an external entry now follows its own `type` like
+   every other. Re-derived on each template pick until the reader chooses for
+   themselves; documented in references/intake-contract.md. */
 function deliveryDefault(id) {
   return typeOf(id) === "present" ? "presenter" : "reader";
 }
