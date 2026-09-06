@@ -43,6 +43,14 @@ python3 scripts/tedandlisa_thumbs.py [--only ID]
 # when the two have drifted apart.
 python3 scripts/tedandlisa_intake_fallback.py [--check]
 
+# Check a finished file's language controls against what the intake asked
+# for. The authority is answers.languages, never the file: every chosen
+# language must be reachable from the file's own chrome, and nothing else.
+# Drives headless Chrome (check_overflow.py's harness); exit 1 on a finding,
+# 2 on a harness failure.
+python3 scripts/check_languages.py FILE --languages en,ko
+python3 scripts/check_languages.py FILE --intake intake.json
+
 # Build the per-skill upload bundles for the Claude and ChatGPT settings
 # panels (Claude Code and Codex install the plugin instead, and need none
 # of this). Writes dist/<skill>.zip; --check validates without writing.
@@ -53,7 +61,10 @@ There is no automated test suite. Verification is manual and browser-based —
 see the checklists in `skills/lisa/SKILL.md` and
 `skills/lisa-new-template/SKILL.md`
 (open the output `file://` or over `http://`, exercise navigation/menu/language
-switch, check for console errors and horizontal overflow at 375px).
+switch, check for console errors and horizontal overflow at 375px). Two
+gates are scripted rather than eyeballed: `check_overflow.py` for rendered
+overflow, and `check_languages.py` for the language controls against the
+intake's own `languages` answer.
 
 ## Architecture
 
@@ -76,7 +87,7 @@ bearing on the others. Three of them show how far apart the systems sit:
   diagram-first slides on light paper (`--paper`/`--ink`/one orange accent),
   hash-routed as `#lang/route` with a visual index; diagrams are already-
   rendered inline SVG, so there is no mermaid runtime and no CDN. Every slide
-  exists twice (`s-en-NN` / `s-zh-NN`) so text inside a diagram translates too,
+  exists twice (`s-en-NN` / `s-ko-NN`) so text inside a diagram translates too,
   which means `ROUTES`, `TITLES`, and the sections must stay in agreement.
 
 `templates/templates.json` is the registry both the intake panel and

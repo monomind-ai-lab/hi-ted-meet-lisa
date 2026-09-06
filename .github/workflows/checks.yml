@@ -36,6 +36,12 @@ jobs:
       - name: Run the apply-script test suite
         run: python3 scripts/test_tedandlisa_apply.py
 
+      - name: Run the language-gate test suite
+        # The pure half of check_languages.py: the rules that turn what a
+        # reader can reach into findings. The browser half needs Chrome and
+        # runs at handover, not here.
+        run: python3 scripts/test_check_languages.py
+
       - name: Run the registry-index test suite
         # context_index.py reads the registries in `project-context/`, which is
         # untracked (`D-023`) and so absent here — these tests run against
