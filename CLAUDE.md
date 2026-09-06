@@ -10,6 +10,9 @@ web document, or diagram set as **one standalone HTML file** — no build step, 
 package manager, no test suite. The only runtime dependencies are Python's
 stdlib (for the helper scripts) and, for thumbnail capture, a local Chrome
 binary. Do not look for `npm`/`pip` build or lint commands — there are none.
+The one exception is scoped and deliberate: `vendor/archify/` is a Node
+compiler, so `/lisa-diagram` — and nothing else here — wants Node 18+. It
+still needs no `npm install`; see `vendor/archify/VENDORED.md`.
 
 The full skill protocol lives in [`skills/lisa/SKILL.md`](skills/lisa/SKILL.md)
 — read it before making
@@ -58,8 +61,9 @@ switch, check for console errors and horizontal overflow at 375px).
 ## Architecture
 
 **Independent template systems, not variations of one look.** The registry
-carries the first-party templates (plus the external `slide-design` entry
-that hands off to `/lisa-design`). Each is a single self-contained HTML file
+carries the first-party templates, plus two external entries that hand off
+instead of being copied: `slide-design` → `/lisa-design` and `archify` →
+`/lisa-diagram`. Each first-party template is a single self-contained HTML file
 with its own design tokens, chrome, scripts, and language mechanism — they
 differ in shape, navigation, and how they translate, so a change to one has no
 bearing on the others. Three of them show how far apart the systems sit:
@@ -119,6 +123,19 @@ the website as its own page. Nothing here vendors it, downloads it, or makes a
 — it must never become a card in the gallery answering Lisa's HTML question
 flow. `.claude-plugin/marketplace.json` lists it so it can be found; that
 listing is the whole of the wiring on this side.
+
+**Diagrams have two answers, and the split is the point.** `architecture`
+and `mermaid-master` are *drawn*: an agent writes the SVG by hand, they carry
+MonoMind's look, they cost no runtime, and they belong inside a larger deck or
+document. `archify` (`vendor/archify/`, `/lisa-diagram`) is *compiled*: a typed
+JSON specification, a validator that refuses a diagram whose geometry or facts
+do not hold, and a viewer the reader can search, focus and trace. Reach for it
+when the diagram **is** the deliverable — a real system mapped and checked, a
+sequence or data-flow or state machine, or a before/after delta. Its artifact is
+compiler output and is never hand-edited; changes go into the JSON and are
+recompiled. The two share an ancestor — Archify is based on the same Cocoon AI
+generator the `architecture` template was derived from — which is why they look
+like relatives; see `NOTICE`.
 
 **The generation flow spans several files by design:** `SKILL.md` drives the
 process → `scripts/tedandlisa_intake.py` serves `assets/tedandlisa-intake.html`

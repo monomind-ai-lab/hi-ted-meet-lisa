@@ -39,10 +39,10 @@ says, and do not silently merge the two.
 
 `handoff` is `null` for every template built here. When the user picks a path
 that is **not** a MonoMind template — a registry entry whose `kind` is
-`external` — it names the skill to hand the work to, currently
-`/lisa-design`. **Stop and invoke that skill instead of copying a
-template.** The answers still apply: they were filtered to the questions that
-path actually asks.
+`external` — it names the skill to hand the work to: `/lisa-design` for
+`slide-design`, `/lisa-diagram` for `archify`. **Stop and invoke that skill
+instead of copying a template.** The answers still apply: they were filtered
+to the questions that path actually asks.
 
 `references` holds whatever the user attached to the prompt: an old deck, notes,
 a data file, an image whose look they want matched. They are **source material,
