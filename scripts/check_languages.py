@@ -109,15 +109,22 @@ function report(payload) {
                        headers: { 'Content-Type': 'application/json' } });
 }
 
-/* The document's own statement of what language it is in. Both are read
-   because the templates disagree about which one they move: the inline
-   bilingual files set body[data-lang] and mirror it onto <html lang>, the
-   deck moves <html lang> alone. A file that moves neither is handled by the
-   `declared` path instead. */
+/* Two different things, and conflating them was this gate's first real bug.
+   `<html lang>` is the document's statement about itself — a real BCP-47 tag,
+   the thing a screen reader and a search engine read. `body[data-lang]` is
+   the template's own CSS key, chosen to drive selectors, and it is NOT a
+   language tag: sitemap-ia keys Traditional Chinese as `zh` while paper-brief
+   keys the same language as `zh-TW`, and both correctly declare `zh-Hant…` on
+   <html>. Reading the key would have reported `zh` for a file the intake
+   calls `zh-TW`, and failed a correct build in both directions at once.
+
+   So: the *reported* tag is <html lang> when there is one, and the CSS key
+   only as a fallback for a file that never sets it. Change detection watches
+   the pair, because a template that moves only one of them still moved. */
 function langState(doc) {
   var b = doc.body ? (doc.body.getAttribute('data-lang') || '') : '';
   var h = doc.documentElement ? (doc.documentElement.getAttribute('lang') || '') : '';
-  return (b || h || '').trim();
+  return { tag: (h || b || '').trim(), key: (b + '|' + h).trim() };
 }
 
 function visible(el) {
@@ -136,16 +143,21 @@ function tag(v) {
   return /^[a-z]{2}(-[A-Za-z]{2,4})?$/.test(v) ? v : '';
 }
 
-/* What a control says it selects, without clicking it. */
+/* What a control says it selects, without clicking it — attributes only.
+
+   `onclick="setLang('zh')"` was read here once and should not be again: the
+   argument is the template's own internal key, the same thing body[data-lang]
+   carries, and sitemap-ia passes `zh` for a language the intake calls
+   `zh-TW`. An attribute named for the language is a claim about the language;
+   an argument to a function is an implementation detail. Controls that only
+   have the latter fall through to the observed path, which clicks them and
+   reads what the document then says about itself. */
 function declared(el) {
-  var attrs = ['data-lang', 'data-code', 'data-setlang', 'data-language', 'value'];
+  var attrs = ['data-lang', 'data-code', 'data-setlang', 'data-language'];
   for (var i = 0; i < attrs.length; i++) {
     var t = tag(el.getAttribute(attrs[i]));
     if (t) return t;
   }
-  var on = el.getAttribute('onclick') || '';
-  var m = on.match(/(?:setLang|applyLang|switchLang|setLanguage)\\(\\s*['"]([\\w-]+)['"]/);
-  if (m) { var t2 = tag(m[1]); if (t2) return t2; }
   return '';
 }
 
@@ -166,7 +178,9 @@ async function main() {
   var doc = frame.contentDocument;
   if (!doc || !doc.body) return report({ errors: ['the target document never became reachable'] });
 
-  var boot = langState(doc);
+  var bootState = langState(doc);
+  var boot = bootState.tag;
+  var bootKey = bootState.key;
   var reachable = {};
   if (boot) reachable[boot] = 'boot';
   var controls = [];
@@ -196,25 +210,25 @@ async function main() {
      comes back round, so one button walking three languages reports three. */
   for (var j = 0; j < undeclared.length; j++) {
     var el = undeclared[j];
-    var before = langState(doc);
+    var before = langState(doc).key;
     var seen = [];
     for (var k = 0; k < MAX_CYCLE; k++) {
       try { el.click(); } catch (e) { break; }
       await sleep(160);
-      var now = langState(doc);
-      if (!now || now === before) break;
-      if (seen.indexOf(now) !== -1) break;
-      seen.push(now);
-      if (!reachable[now]) reachable[now] = 'observed';
-      controls.push({ how: 'observed', lang: now,
+      var st = langState(doc);
+      if (!st.tag || st.key === before) break;
+      if (seen.indexOf(st.key) !== -1) break;
+      seen.push(st.key);
+      if (!reachable[st.tag]) reachable[st.tag] = 'observed';
+      controls.push({ how: 'observed', lang: st.tag,
                       label: (el.textContent || '').trim().slice(0, 24) });
-      if (now === boot) break;
-      before = now;
+      if (st.key === bootKey) break;
+      before = st.key;
     }
     /* Put the document back so the next control is probed from the same
        start, and so a cycling control is not left mid-lap. */
-    if (langState(doc) !== boot) {
-      for (var z = 0; z < MAX_CYCLE && langState(doc) !== boot; z++) {
+    if (langState(doc).key !== bootKey) {
+      for (var z = 0; z < MAX_CYCLE && langState(doc).key !== bootKey; z++) {
         try { el.click(); } catch (e) { break; }
         await sleep(120);
       }
@@ -230,14 +244,42 @@ main().catch(function (e) { report({ errors: ['HARNESS ERROR ' + e] }); });
 """
 
 
+# The intake offers exactly these, and `answers.languages` never holds
+# anything else — so this is the space a file's declared tag has to be folded
+# into before the two can be compared at all. `zh-Hant` is the script subtag
+# a document uses to say "Traditional"; the panel calls that `zh-TW`, and the
+# two templates that carry it declare it as `zh-Hant` and `zh-Hant-TW`
+# respectively. Folding them here rather than in the harness keeps the rule
+# testable and keeps the browser reporting what it actually saw.
+SCRIPT_FOLDS = {
+    "zh-hant": "zh-TW",
+    "zh-hans": "zh-CN",
+}
+
+
 def normalise(tag: str) -> str:
-    """`zh-tw` and `zh-TW` are one language; `en` and `en-GB` are not merged,
-    because a template that ships both is making a distinction we should not
-    quietly erase."""
-    if "-" in tag:
-        base, _, region = tag.partition("-")
-        return f"{base.lower()}-{region.upper()}"
-    return tag.lower()
+    """A declared language tag in the intake's own tag space.
+
+    `zh-tw` and `zh-TW` are one language. `zh-Hant-TW` and `zh-Hant` are that
+    same language written the way a document declares itself, and both fold to
+    `zh-TW`. `en` and `en-GB` are *not* merged: a file shipping both is making
+    a distinction that is not ours to erase.
+    """
+    if not tag:
+        return ""
+    parts = [p for p in tag.strip().split("-") if p]
+    if not parts:
+        return ""
+    base = parts[0].lower()
+    for n in (2, 1):
+        if len(parts) >= n + 1:
+            key = f"{base}-{parts[1].lower()}"
+            if key in SCRIPT_FOLDS:
+                return SCRIPT_FOLDS[key]
+            break
+    if len(parts) == 1:
+        return base
+    return f"{base}-{parts[1].upper()}"
 
 
 def probe(chrome: str, target: pathlib.Path) -> tuple[dict | None, list[str]]:
@@ -307,6 +349,61 @@ def judge(found: dict, chosen: list[str]) -> list[str]:
     return problems
 
 
+def check_registry(chrome: str, as_json: bool) -> int:
+    """Every first-party template against its own `language_tags`.
+
+    The registry's `languages` is prose written for a reader of the gallery
+    card ("Every slide written twice, English and Korean"); `language_tags`
+    beside it is the same statement in the intake's own tag space, and it is
+    what makes a template checkable at all. An entry with no `file` is a
+    handoff (`kind: external`) and owns no languages here.
+    """
+    entries = json.loads((ROOT / "templates" / "templates.json").read_text())
+    results, failures, harness_errors = [], 0, 0
+    for t in entries["templates"]:
+        if not t.get("file"):
+            continue
+        tags = t.get("language_tags")
+        if not tags:
+            results.append((t["id"], ["no `language_tags` in the registry — a "
+                                     "template that does not say what it "
+                                     "offers cannot be checked"], []))
+            failures += 1
+            continue
+        target = ROOT / t["file"]
+        found, diag = probe(chrome, target)
+        if found is None:
+            results.append((t["id"], diag, []))
+            harness_errors += 1
+            continue
+        problems = judge(found, tags)
+        if problems:
+            failures += 1 if not any(p.startswith("HARNESS ERROR") for p in problems) else 0
+            harness_errors += 1 if any(p.startswith("HARNESS ERROR") for p in problems) else 0
+        results.append((t["id"], problems, found.get("reachable") or []))
+
+    if as_json:
+        print(json.dumps([{"id": i, "problems": p, "reachable": r}
+                          for i, p, r in results], indent=2, ensure_ascii=False))
+    else:
+        for tid, problems, reachable in results:
+            mark = "ok  " if not problems else "FAIL"
+            # the normalised form, because that is what was compared: a file
+            # declaring `zh-Hant` is judged as the `zh-TW` the intake names,
+            # and printing the raw tag would make a passing line look wrong.
+            shown = ", ".join(sorted({normalise(x) for x in reachable})) or "—"
+            print(f"{mark} {tid:<18} {shown}")
+            for p in problems:
+                print(f"       {p}")
+        n = len(results)
+        print(f"\nchecked {n} first-party template{'' if n == 1 else 's'}"
+              + ("" if not (failures or harness_errors) else
+                 f", {failures} with findings, {harness_errors} unreachable"))
+    if harness_errors:
+        return 2
+    return 1 if failures else 0
+
+
 def languages_from_intake(path: pathlib.Path) -> list[str]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     answers = payload.get("answers") if isinstance(payload, dict) else None
@@ -319,15 +416,30 @@ def languages_from_intake(path: pathlib.Path) -> list[str]:
 def main() -> int:
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("file", help="the finished HTML file to check")
+    ap.add_argument("file", nargs="?", help="the finished HTML file to check")
     src = ap.add_mutually_exclusive_group(required=True)
     src.add_argument("--languages",
                      help="comma-separated tags the intake asked for, e.g. en,ko")
     src.add_argument("--intake", help="an intake.json to read answers.languages from")
+    src.add_argument("--registry", action="store_true",
+                     help="check every first-party template against its own "
+                          "`language_tags`, and nothing else — the CI mode")
     ap.add_argument("--json", action="store_true", dest="as_json",
                     help="machine-readable result on stdout")
     args = ap.parse_args()
 
+    chrome_for_registry = find_chrome()
+    if args.registry:
+        if not chrome_for_registry:
+            print("HARNESS ERROR: no Chrome or Chromium found; set CHROME_BIN.",
+                  file=sys.stderr)
+            return 2
+        return check_registry(chrome_for_registry, args.as_json)
+
+    if not args.file:
+        print("error: a file is required unless --registry is given",
+              file=sys.stderr)
+        return 2
     target = pathlib.Path(args.file).expanduser().resolve()
     if not target.is_file():
         print(f"error: {target} not found", file=sys.stderr)

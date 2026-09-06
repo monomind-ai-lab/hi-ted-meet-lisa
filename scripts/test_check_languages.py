@@ -41,6 +41,24 @@ class Normalise(unittest.TestCase):
         # that offers only Simplified pass a Traditional request.
         self.assertNotEqual(normalise("zh"), normalise("zh-TW"))
 
+    def test_a_script_subtag_folds_to_the_tag_the_intake_uses(self):
+        # How the two Chinese templates actually declare themselves:
+        # sitemap-ia sets <html lang="zh-Hant-TW">, paper-brief "zh-Hant".
+        # The intake only ever says zh-TW, so both have to arrive there or a
+        # correct build fails in both directions at once.
+        self.assertEqual(normalise("zh-Hant-TW"), "zh-TW")
+        self.assertEqual(normalise("zh-Hant"), "zh-TW")
+        self.assertEqual(normalise("zh-Hans-CN"), "zh-CN")
+
+    def test_an_ordinary_region_is_left_alone(self):
+        # The fold table must not swallow tags it was not written for.
+        self.assertEqual(normalise("en-GB"), "en-GB")
+        self.assertEqual(normalise("pt-br"), "pt-BR")
+
+    def test_empty_and_junk_do_not_raise(self):
+        self.assertEqual(normalise(""), "")
+        self.assertEqual(normalise("-"), "")
+
 
 class Judge(unittest.TestCase):
     def test_exact_match_is_silent(self):

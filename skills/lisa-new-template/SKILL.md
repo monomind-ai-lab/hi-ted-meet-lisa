@@ -101,8 +101,16 @@ confirm before doing it.
      --file assets/tedandlisa-template-ID.html --kind slides|document \
      --type present|read|diagram|site --layout reflow|stage \
      --tagline "..." --patterns references/slide-patterns-ID.md \
-     --best-for "..." --dependencies "..."
+     --best-for "..." --dependencies "..." --language-tags en,ko
    ```
+
+   `--language-tags` is the skeleton's languages in the **intake's** tag space
+   (`en`, `ko`, `zh-TW`, `ja`, `es`) — not the template's internal CSS key,
+   which is a different thing and is often shorter. It defaults to `en`.
+   `scripts/check_languages.py --registry` holds every template to this list
+   in CI, in both directions, so a skeleton that kept a second language and
+   did not say so here fails the build, and so does one that says so and
+   dropped it.
 
    `--kind` is the **shape** and decides which intake questions are asked
    (`D-007`, `D-017`). `--type` is what the template is **for** — it is the

@@ -94,7 +94,14 @@ bearing on the others. Three of them show how far apart the systems sit:
 `tedandlisa_new_template.py register` read/write; each entry points at its file,
 its pattern-reference doc (`references/slide-patterns*.md` — verbatim,
 known-good markup for every component), and its thumbnail in
-`templates/thumbs/`. Three classifying fields sit beside those: `kind`
+`templates/thumbs/`. Two fields say what a template speaks and they are not
+interchangeable: `languages` is prose for the gallery card ("Every slide
+written twice, English and Korean") and `language_tags` is the same statement
+in the intake's own tag space (`["en", "ko"]`). Only the second is checkable,
+and `scripts/check_languages.py --registry` holds every first-party template
+to it in CI. Neither is the template's internal CSS key — `sitemap-ia` keys
+Traditional Chinese as `zh` and `paper-brief` keys it as `zh-TW`, while both
+declare `zh-Hant…` on `<html>` and both are `zh-TW` to the intake. Three classifying fields sit beside those: `kind`
 (`slides` / `document` / `external`) is the shape and is machinery — it
 decides which intake questions are asked; `type` (`present` / `read` /
 `diagram` / `site`) is what the template is for — the gallery's flag and
