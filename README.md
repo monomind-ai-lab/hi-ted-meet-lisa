@@ -444,10 +444,12 @@ wants Node, and it still needs no `npm install`. Do not edit anything under
 `vendor/`; `vendor/archify/VENDORED.md` records the tag it came from and what
 was deliberately left out.
 
-One honest limit: an artifact carries **one** authored language, and the
-renderer never translates labels. The viewer's own chrome speaks English or
-Simplified Chinese. There is no inline dual-language toggle here the way
-`web-document` has one.
+Two honest limits. An artifact carries **one** authored language, and the
+renderer never translates labels — the viewer's own chrome speaks English or
+Simplified Chinese, and there is no inline dual-language toggle here the way
+`web-document` has one. And **colour is semantic**: it encodes component type,
+so an accent answer does not repaint it. This is the one card in the gallery a
+brand does not land on, which is exactly why the other ten do.
 
 Archify and the `architecture` template share an ancestor — both trace back to
 Cocoon AI's generator — which is why they look like relatives. `NOTICE` records

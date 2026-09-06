@@ -253,7 +253,7 @@
       "layout": "reflow",
       "skill": "/lisa-diagram",
       "badge": "HTML",
-      "best_for": "A diagram that is the deliverable — a real system mapped and checked, not illustrated. Desktop first.",
+      "best_for": "A diagram that is the deliverable — a real system mapped and checked, not illustrated. Colour carries meaning here, not brand. Desktop first.",
       "navigation": "Pan and zoom the canvas; search a node, focus it, trace upstream and downstream, play guided views.",
       "languages": "One authored language per artifact — the renderer never translates labels. The viewer's own UI is English or Simplified Chinese.",
       "dependencies": "Vendored at vendor/archify. Needs Node 18 or newer — the only path here that does — and no npm install. Google Fonts for JetBrains Mono.",
