@@ -5,7 +5,7 @@ The panel is a standalone HTML file, so it also works when opened straight from
 disk -- in that mode it falls back to a copy-paste payload. This runner is the
 convenient path: it serves the panel over loopback, waits for the browser to
 POST the answers to /intake, writes them to a file, and exits. The gallery's
-"Preview" links point at the hosted previews on html.monomind.one, so they —
+"Preview" links point at the hosted previews on www.hitedmeetlisa.cc, so they —
 and only they — need a network connection.
 
     python3 scripts/tedandlisa_intake.py --prompt "a deck about X" --out intake.json
@@ -33,13 +33,13 @@ REGISTRY = ROOT / "templates" / "templates.json"
 # The registry names each preview by its repository-relative path
 # ("previews/<id>.html"), but the previews themselves now live in the website
 # repository (monomind-ai-lab/ted-and-lisa) and are only published at
-# html.monomind.one. This runner therefore has nothing local to serve, so it
+# www.hitedmeetlisa.cc. This runner therefore has nothing local to serve, so it
 # rewrites each card's `preview` to the hosted copy below. Behaviour change on
 # purpose: the gallery's "Preview" links now need a network connection, where
 # they used to open a file served from this checkout. The panel already treats
 # an absolute http(s) preview as external — it opens in a real new tab instead
 # of the framing overlay — so no change to the panel is needed.
-PREVIEW_BASE = "https://html.monomind.one/previews/"
+PREVIEW_BASE = "https://www.hitedmeetlisa.cc/previews/"
 MAX_BODY = 64 * 1024 * 1024  # generous: backgrounds arrive as base64 data URIs
 
 

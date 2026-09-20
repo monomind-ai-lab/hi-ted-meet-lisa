@@ -333,7 +333,7 @@ leaves it alone; "Made with" is meant to translate.
 ```html
 <p class="colophon reveal">
   <a href="https://monomind.one/?ref=deck-mark" target="_blank" rel="noopener noreferrer">monomind ai lab</a>
-  <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer"><span class="en">Made with <span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></span><span class="ko"><span class="notranslate" translate="no">Hi Ted, Meet Lisa</span>로 제작</span></a>
+  <a href="https://www.hitedmeetlisa.cc/?ref=file" target="_blank" rel="noopener noreferrer"><span class="en">Made with <span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></span><span class="ko"><span class="notranslate" translate="no">Hi Ted, Meet Lisa</span>로 제작</span></a>
 </p>
 ```
 

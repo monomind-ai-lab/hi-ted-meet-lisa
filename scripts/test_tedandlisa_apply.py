@@ -170,8 +170,9 @@ class ApplyTemplates(unittest.TestCase):
             out, r'<button[^>]*id="(btnHtml|deck-menu-html)"',
             "%s: self-download control survived" % template)
 
-        # credit: the colophon line is gone everywhere
-        self.assertNotIn("html.monomind.one/?ref=file", out,
+        # credit: the colophon line is gone everywhere (current-host marker;
+        # test_credit_false_strips_legacy_marker below covers the old host)
+        self.assertNotIn("www.hitedmeetlisa.cc/?ref=file", out,
                          "%s: colophon survived" % template)
 
         # accent
@@ -235,6 +236,28 @@ class ApplyDetails(unittest.TestCase):
         self.assertNotIn('<div class="lang-switch', out)
         self.assertNotIn('id="google_translate_element"', out)
         self.assertNotIn("googleTranslateElementInit", out)
+
+    def test_credit_false_strips_legacy_marker(self):
+        """Files generated before the service moved to www.hitedmeetlisa.cc
+        still carry the old html.monomind.one colophon link. credit: false
+        must keep recognising that marker so already-distributed files can
+        still have their credit line removed."""
+        dst = self._copy("monomind-deck")
+        current = dst.read_text(encoding="utf-8")
+        self.assertIn("www.hitedmeetlisa.cc/?ref=file", current,
+                       "fixture template no longer carries the current "
+                       "marker — update this test's premise")
+        legacy = current.replace("www.hitedmeetlisa.cc/?ref=file",
+                                  "html.monomind.one/?ref=file")
+        dst.write_text(legacy, encoding="utf-8")
+        a = self._answers({"template": "monomind-deck", "credit": False})
+        proc = run_apply(a, dst)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        out = dst.read_text(encoding="utf-8")
+        self.assertNotIn("html.monomind.one/?ref=file", out,
+                         "legacy colophon survived")
+        self.assertNotIn("Hi Ted, Meet Lisa</span></a></p>", out,
+                         "legacy colophon markup survived")
 
     def test_monomind_deck_language_trim_and_terms(self):
         dst = self._copy("monomind-deck")

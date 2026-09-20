@@ -1,7 +1,7 @@
 # Hi Ted, Meet Lisa
 
 <p align="left">
-  <img src="https://html.monomind.one/assets/tedmeetslisa.jpg" alt="Hi Ted, Meet Lisa — Turn ideas into compelling slide decks" style="width: 100%; max-width: 100%;">
+  <img src="https://www.hitedmeetlisa.cc/assets/tedmeetslisa.jpg" alt="Hi Ted, Meet Lisa — Turn ideas into compelling slide decks" style="width: 100%; max-width: 100%;">
 </p>
 
 > **Turn ideas into compelling slide decks — one standalone HTML file, no build step.**
@@ -27,7 +27,7 @@ edit at any time.
 
 ## ✅ Start here
 
-**No terminal? Start at the website.** [html.monomind.one](https://html.monomind.one)
+**No terminal? Start at the website.** [www.hitedmeetlisa.cc](https://www.hitedmeetlisa.cc)
 is the whole front door in a browser: preview every template live, answer the
 intake panel, and copy one paste-ready prompt for any coding agent — Claude
 Code, Codex, Pi, OpenCode, Hermes, or anything else that reads a public URL.
@@ -50,7 +50,7 @@ codex plugin marketplace add monomind-ai-lab/hi-ted-meet-lisa
 **Using the Claude or ChatGPT app instead?** You can, but know what you give
 up. Those sandboxes have no browser and no way to serve a port to you, so the
 intake panel cannot open itself — you answer it at
-[html.monomind.one/intake.html](https://html.monomind.one/intake.html) and
+[www.hitedmeetlisa.cc/intake.html](https://www.hitedmeetlisa.cc/intake.html) and
 paste the payload back, and you watch a blank screen while the file is built
 rather than the build itself. The plugin is the better experience by a
 distance. If you still want it: those panels take a skill as a ZIP, one at a
@@ -165,12 +165,12 @@ Explains all of this from inside the conversation: the commands, the two
 intake routes, the Preferences screen, and the key URLs — in your language.
 
 **Just trying it once?** You do not have to install anything. The
-[website](https://html.monomind.one) hands you a finished prompt — or paste
+[website](https://www.hitedmeetlisa.cc) hands you a finished prompt — or paste
 this to any agent that can read a URL:
 
 ```text
 Build me a deck using https://github.com/monomind-ai-lab/hi-ted-meet-lisa.
-Read and follow https://html.monomind.one/SKILL.md, starting with its intake
+Read and follow https://www.hitedmeetlisa.cc/SKILL.md, starting with its intake
 panel. The deck is about [YOUR SUBJECT], for [AUDIENCE].
 ```
 
@@ -220,7 +220,7 @@ Hi Ted, Meet Lisa answers those directly:
 ---
 
 <p align="left">
-  <img src="https://html.monomind.one/assets/tedlisaidea.jpg" alt="When Ted meets Lisa, ideas come to life in HTML" style="width: 100%; max-width: 100%;">
+  <img src="https://www.hitedmeetlisa.cc/assets/tedlisaidea.jpg" alt="When Ted meets Lisa, ideas come to life in HTML" style="width: 100%; max-width: 100%;">
 </p>
 
 ---
@@ -233,7 +233,7 @@ together. An agent uses them to produce a deck without asking you to run
 anything yourself.
 
 Its public face lives next door.
-[html.monomind.one](https://html.monomind.one) is built from
+[www.hitedmeetlisa.cc](https://www.hitedmeetlisa.cc) is built from
 [`monomind-ai-lab/ted-and-lisa`](https://github.com/monomind-ai-lab/ted-and-lisa),
 which holds the landing page and the live previews. That build checks this
 repository out and reads the template registry, the gallery thumbnails, the
@@ -246,7 +246,7 @@ skill still cannot drift apart, they just ship on their own schedules now.
    skill under `skills/` — `/lisa`, `/lisa-design`, `/lisa-review`,
    `/lisa-lang`, `/lisa-new-template`, `/lisa-brand`, `/lisa-motion`, and `/lisa-help` —
    whether installed as a plugin or symlinked.
-2. Any other agent can be pointed at <https://html.monomind.one/SKILL.md>
+2. Any other agent can be pointed at <https://www.hitedmeetlisa.cc/SKILL.md>
    directly; it is plain Markdown and carries the whole procedure. That URL is
    a deploy artifact the website build copies from `skills/lisa/SKILL.md`, so
    it stays put however this repository is rearranged.
@@ -267,16 +267,16 @@ repository builds it — see [when a template is the wrong shape](#-when-a-templ
 
 | Template | Shape | Language | Preview |
 | --- | --- | --- | --- |
-| **MonoMind deck** | Horizontal slides, one idea each, read across a room | Google Translate, loaded only when a reader picks another language | [Live preview →](https://html.monomind.one/previews/monomind-deck) |
-| **Web document** | Hash-routed pages that scroll, read at desk distance | English and Korean written inline, toggled instantly — works offline | [Live preview →](https://html.monomind.one/previews/web-document) |
-| **Multi-page Diagrams** | Diagram-first on light paper, one drawing per slide | Every slide written twice, so diagram labels translate too | [Live preview →](https://html.monomind.one/previews/mermaid-master) |
-| **Architecture diagram** | System diagrams on slate, where colour means something — one view or several | Both languages inline, including the labels inside the drawing | [Live preview →](https://html.monomind.one/previews/architecture) |
-| **Sitemap & IA proposal** | Pages that argue a site structure, plus the navigation wired up to click through | Both languages written inline | [Live preview →](https://html.monomind.one/previews/sitemap-ia) |
-| **Project website** | Sticky nav and hash-routed pages — a project's public face, skimmed before it is read | English and Korean written inline, toggled instantly — works offline | [Live preview →](https://html.monomind.one/previews/project-website) |
+| **MonoMind deck** | Horizontal slides, one idea each, read across a room | Google Translate, loaded only when a reader picks another language | [Live preview →](https://www.hitedmeetlisa.cc/previews/monomind-deck) |
+| **Web document** | Hash-routed pages that scroll, read at desk distance | English and Korean written inline, toggled instantly — works offline | [Live preview →](https://www.hitedmeetlisa.cc/previews/web-document) |
+| **Multi-page Diagrams** | Diagram-first on light paper, one drawing per slide | Every slide written twice, so diagram labels translate too | [Live preview →](https://www.hitedmeetlisa.cc/previews/mermaid-master) |
+| **Architecture diagram** | System diagrams on slate, where colour means something — one view or several | Both languages inline, including the labels inside the drawing | [Live preview →](https://www.hitedmeetlisa.cc/previews/architecture) |
+| **Sitemap & IA proposal** | Pages that argue a site structure, plus the navigation wired up to click through | Both languages written inline | [Live preview →](https://www.hitedmeetlisa.cc/previews/sitemap-ia) |
+| **Project website** | Sticky nav and hash-routed pages — a project's public face, skimmed before it is read | English and Korean written inline, toggled instantly — works offline | [Live preview →](https://www.hitedmeetlisa.cc/previews/project-website) |
 | **Motion website** | Project website with the motion layer — the hero rises in sequence, the command types itself, cards light up; CSS and WAAPI, no library | English and Korean written inline, toggled instantly — works offline | *preview pending* |
-| **Evidence deck** | Dark full-bleed slides that argue from numbers — tables, stat rows, verdict bars | English and Korean written inline, toggled instantly — works offline | [Live preview →](https://html.monomind.one/previews/evidence-deck) |
-| **Paper brief** | Light paper slides paced in chapters — mega numbers, bar charts, decision boxes | Traditional Chinese and English written inline; opens in Chinese | [Live preview →](https://html.monomind.one/previews/paper-brief) |
-| **Slide design** — *a handoff, not a template* | Twelve style presets and animated HTML | One language per deck — the presets carry no toggle | [Live preview →](https://html.monomind.one/previews/slide-design) |
+| **Evidence deck** | Dark full-bleed slides that argue from numbers — tables, stat rows, verdict bars | English and Korean written inline, toggled instantly — works offline | [Live preview →](https://www.hitedmeetlisa.cc/previews/evidence-deck) |
+| **Paper brief** | Light paper slides paced in chapters — mega numbers, bar charts, decision boxes | Traditional Chinese and English written inline; opens in Chinese | [Live preview →](https://www.hitedmeetlisa.cc/previews/paper-brief) |
+| **Slide design** — *a handoff, not a template* | Twelve style presets and animated HTML | One language per deck — the presets carry no toggle | [Live preview →](https://www.hitedmeetlisa.cc/previews/slide-design) |
 
 All nine have a live preview linked from the intake gallery, so you can look
 before you choose.

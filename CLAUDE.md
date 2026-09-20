@@ -123,7 +123,7 @@ the site and must keep their paths. Nothing here builds or deploys the site.
 The registry's `preview` and `thumb_source` values still name the previews by
 their canonical `previews/<id>.html` path — the path the website builds from —
 and the two scripts that consume them resolve that to
-`https://html.monomind.one/previews/<id>.html` instead: the intake runner
+`https://www.hitedmeetlisa.cc/previews/<id>.html` instead: the intake runner
 rewrites each card's `preview` to the hosted URL (so the gallery's "Preview"
 links open over the network, in a new tab rather than the framing overlay), and
 `tedandlisa_thumbs.py` screenshots the hosted page when the local file is

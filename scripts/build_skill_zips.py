@@ -33,7 +33,7 @@ Not in the payload: the public website. `site/`, `functions/` and the nine
 preview decks under `previews/` moved to monomind-ai-lab/ted-and-lisa, so
 there is nothing left in this repository to leave out. `previews/` was never
 purely a website artifact — the intake runner used to serve those decks to the
-panel's "Preview" links — but it points them at html.monomind.one now, so a
+panel's "Preview" links — but it points them at www.hitedmeetlisa.cc now, so a
 bundle without them is still a bundle that works. `.git/` is left out too:
 14 MB of history the panels have no use for.
 """

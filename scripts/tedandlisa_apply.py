@@ -45,7 +45,10 @@ import sys
 # ────────────────────────────────────────────────────────────────────
 
 LIGHT_MARKER = 'html[data-theme="light"]'
-CREDIT_MARKER = "html.monomind.one/?ref=file"
+# The colophon now links to the current host, but files already generated
+# under the old one still carry the legacy marker — recognise both so
+# credit: false keeps working on files distributed before the domain moved.
+CREDIT_MARKERS = ("www.hitedmeetlisa.cc/?ref=file", "html.monomind.one/?ref=file")
 
 # ids of the eight first-party templates (registry: templates/templates.json)
 KNOWN = {
@@ -857,16 +860,24 @@ def apply_credit(ed, template, credit, rep):
     removed = 0
     while True:
         spans = ed.comment_spans()
-        pos, search = -1, 0
-        while True:
-            cand = ed.text.find(CREDIT_MARKER, search)
-            if cand == -1:
+        # Earliest non-commented hit across both the current and legacy
+        # markers — a file can only carry one in practice, but this stays
+        # correct either way and independent of marker order/length.
+        pos = -1
+        for marker in CREDIT_MARKERS:
+            search = 0
+            cand = -1
+            while True:
+                c = ed.text.find(marker, search)
+                if c == -1:
+                    break
+                if ed.in_comment(c, spans):
+                    search = c + 1
+                    continue
+                cand = c
                 break
-            if ed.in_comment(cand, spans):
-                search = cand + 1
-                continue
-            pos = cand
-            break
+            if cand != -1 and (pos == -1 or cand < pos):
+                pos = cand
         if pos == -1:
             break
         a_start = ed.text.rfind("<a", 0, pos)

@@ -341,7 +341,7 @@ its Chinese wording — with the product name identical in both and wrapped
 `notranslate` so a reader's browser translation leaves it alone.
 
 ```html
-<span><a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer"><span class="zh">以 <span class="notranslate" translate="no">Hi Ted, Meet Lisa</span> 製作</span><span class="en">Made with <span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></span></a></span>
+<span><a href="https://www.hitedmeetlisa.cc/?ref=file" target="_blank" rel="noopener noreferrer"><span class="zh">以 <span class="notranslate" translate="no">Hi Ted, Meet Lisa</span> 製作</span><span class="en">Made with <span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></span></a></span>
 ```
 
 ## The intake answers this template cannot take at face value

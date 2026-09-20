@@ -193,7 +193,7 @@ ships by default; remove the span (only) when the intake answered
 `credit: false`.
 
 ```html
-<span class="mono"><a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener"><span class="en">Made with Hi Ted, Meet Lisa</span><span class="zh">以 Hi Ted, Meet Lisa 製作</span></a></span>
+<span class="mono"><a href="https://www.hitedmeetlisa.cc/?ref=file" target="_blank" rel="noopener"><span class="en">Made with Hi Ted, Meet Lisa</span><span class="zh">以 Hi Ted, Meet Lisa 製作</span></a></span>
 ```
 
 ## Dependencies
