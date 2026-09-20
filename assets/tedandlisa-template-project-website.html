@@ -1381,6 +1381,14 @@ document.querySelectorAll('[data-copy-root]').forEach(function(root){
   var KEY = 'monomind-doc-theme';
   var tBtn = document.getElementById('btnTheme');
 
+  /* An opaque origin — a page served under `Content-Security-Policy:
+     sandbox` with no allow-same-origin, a private window, a partitioned
+     frame — makes localStorage throw on first touch rather than return
+     null, which would take this whole block down. Read and write go
+     through these; a host that cannot remember the theme still toggles it. */
+  function recall(k){ try { return localStorage.getItem(k); } catch(e) { return null; } }
+  function remember(k, v){ try { localStorage.setItem(k, v); } catch(e) {} }
+
   function applyTheme(t){
     if(t === 'light') root.setAttribute('data-theme', 'light');
     else root.removeAttribute('data-theme');
@@ -1393,13 +1401,12 @@ document.querySelectorAll('[data-copy-root]').forEach(function(root){
     }
   }
   if(tBtn){
-    var saved = null;
-    try { saved = localStorage.getItem(KEY); } catch(e) {}
+    var saved = recall(KEY);
     applyTheme(saved || (root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'));
     tBtn.addEventListener('click', function(){
       var next = (root.getAttribute('data-theme') === 'light') ? 'dark' : 'light';
       applyTheme(next);
-      try { localStorage.setItem(KEY, next); } catch(e) {}
+      remember(KEY, next);
     });
   }
 

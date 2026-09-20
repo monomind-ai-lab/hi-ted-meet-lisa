@@ -329,6 +329,17 @@ footer a { color: inherit; }
   var body = document.body;
   var $ = function (id) { return document.getElementById(id); };
 
+  /* ---- remembering ----
+     Storage throws rather than fails on an opaque origin — a page served
+     under `Content-Security-Policy: sandbox` with no allow-same-origin, a
+     private window, a partitioned frame — so the first touch of
+     localStorage would take this whole block down. Both directions go
+     through these two, and a host that refuses to remember simply gets the
+     defaults the markup already carries. Both languages are written into
+     this file, so nothing here needs storage to work. */
+  function recall(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+  function remember(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+
   /* ---- theme ---- */
   var THEME_KEY = 'monomind-arch-theme';
   var tBtn = $('btnTheme');
@@ -342,13 +353,12 @@ footer a { color: inherit; }
     }
   }
   if (tBtn) {
-    var saved = null;
-    try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+    var saved = recall(THEME_KEY);
     applyTheme(saved || (root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'));
     tBtn.addEventListener('click', function () {
       var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
       applyTheme(next);
-      try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+      remember(THEME_KEY, next);
     });
   }
 
@@ -362,13 +372,13 @@ footer a { color: inherit; }
     if (en) { en.classList.toggle('active', l === 'en'); }
     if (ko) { ko.classList.toggle('active', l === 'ko'); }
   }
-  try { applyLang(localStorage.getItem(LANG_KEY) || 'en'); } catch (e) { applyLang('en'); }
+  applyLang(recall(LANG_KEY) || 'en');
   ['en', 'ko'].forEach(function (l) {
     var b = $('btn' + l.charAt(0).toUpperCase() + l.slice(1));
     if (b) {
       b.addEventListener('click', function () {
         applyLang(l);
-        try { localStorage.setItem(LANG_KEY, l); } catch (e) {}
+        remember(LANG_KEY, l);
       });
     }
   });

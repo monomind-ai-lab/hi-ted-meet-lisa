@@ -688,6 +688,14 @@ window.__deckGo = function (i) { __deck.goTo(i); };
   var $ = function (id) { return document.getElementById(id); };
   var body = document.body;
   var LANG_KEY = "monomind-paper-lang";
+
+  /* 不透明來源（`Content-Security-Policy: sandbox` 但沒有 allow-same-origin
+     的頁面、無痕視窗、被分割的 iframe）下，localStorage 不是失敗而是丟出
+     例外，未加保護的存取會讓整個區塊停擺。讀寫一律走這兩個函式；兩種語言
+     都寫在檔案裡，所以切換照常，只是記不住選擇。 */
+  function recall(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+  function remember(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+
   /* code -> the suffix used on data-* attributes, class names and button ids */
   var LANGS = [
     { code: "zh-TW", key: "zh", htmlLang: "zh-Hant", btn: "btnZh" },
@@ -737,7 +745,7 @@ window.__deckGo = function (i) { __deck.goTo(i); };
       var b = $(o.btn);
       if (b) { b.setAttribute("aria-pressed", String(o.code === L.code)); }
     });
-    try { localStorage.setItem(LANG_KEY, L.code); } catch (e) {}
+    remember(LANG_KEY, L.code);
   }
   function currentLang() { return body.getAttribute("data-lang") || LANGS[0].code; }
 
@@ -746,8 +754,7 @@ window.__deckGo = function (i) { __deck.goTo(i); };
     if (b) { b.addEventListener("click", function () { applyLang(o.code); }); }
   });
 
-  var saved = null;
-  try { saved = localStorage.getItem(LANG_KEY); } catch (e) {}
+  var saved = recall(LANG_KEY);
   applyLang(saved || body.getAttribute("data-lang") || LANGS[0].code);
 
   /* ---- 選單 ------------------------------------------------------------- */

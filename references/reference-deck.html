@@ -1637,6 +1637,14 @@ question. Show me the proposed plan and wait for my approval before making chang
       var KEY      = 'od-deck-pos';
       var active   = 0;
 
+      /* Remembering the slide is a courtesy, never a precondition for the
+         deck working. On an opaque origin — a sandboxed share URL with no
+         allow-same-origin — touching localStorage throws rather than
+         returning null, so both directions are wrapped and the deck simply
+         starts at slide 1. */
+      function readPos()    { try { return localStorage.getItem(KEY); } catch (_) { return null; } }
+      function writePos(v)  { try { localStorage.setItem(KEY, v); } catch (_) {} }
+
       function scrollContainers() {
         return [document.scrollingElement, document.documentElement, document.body]
           .filter(Boolean)
@@ -1696,7 +1704,7 @@ question. Show me the proposed plan and wait for my approval before making chang
         active = i;
         if (counter)  counter.textContent  = (i + 1) + ' / ' + slides.length;
         if (progress) progress.style.width = (((i + 1) / slides.length) * 100) + '%';
-        try { localStorage.setItem(KEY, String(i)); } catch (_) {}
+        writePos(String(i));
       }
       function go(i) {
         var next = Math.max(0, Math.min(slides.length - 1, i));
@@ -1738,7 +1746,7 @@ question. Show me the proposed plan and wait for my approval before making chang
 
       // restore last-seen position
       try {
-        var saved = parseInt(localStorage.getItem(KEY) || '0', 10);
+        var saved = parseInt(readPos() || '0', 10);
         if (!isNaN(saved) && saved >= 0 && saved < slides.length) {
           setActive(saved);
           resetVerticalScroll();
@@ -1873,14 +1881,39 @@ question. Show me the proposed plan and wait for my approval before making chang
       the button state read that stale value: the deck came back Korean.
       Kill every scope, then keep exactly one host-only cookie.
     */
+    /*
+      Storage throws rather than fails on an opaque origin — a page served
+      under `Content-Security-Policy: sandbox` with no allow-same-origin, a
+      private window, a partitioned frame. The first unguarded touch of
+      `document.cookie` took this block down before the handlers were even
+      attached, so every access goes through these four. The switch is
+      still inert where cookies are refused (the translator needs one);
+      it is now quietly inert instead of throwing.
+    */
+    function readCookies() {
+      try { return document.cookie || ''; } catch (e) { return ''; }
+    }
+    function writeCookie(value) {
+      try { document.cookie = value; return true; } catch (e) { return false; }
+    }
+    function readStored(key) {
+      try { return localStorage.getItem(key) || ''; } catch (e) { return ''; }
+    }
+    function writeStored(key, value) {
+      try {
+        if (value === null) localStorage.removeItem(key);
+        else localStorage.setItem(key, value);
+      } catch (e) {}
+    }
+
     function killCookies() {
       var kill = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
-      document.cookie = kill;
+      writeCookie(kill);
       var parts = location.hostname.split('.');
       for (var i = 0; i < parts.length - 1; i++) {
         var d = parts.slice(i).join('.');
-        document.cookie = kill + '; domain=' + d;
-        document.cookie = kill + '; domain=.' + d;
+        writeCookie(kill + '; domain=' + d);
+        writeCookie(kill + '; domain=.' + d);
       }
     }
     /*
@@ -1892,10 +1925,10 @@ question. Show me the proposed plan and wait for my approval before making chang
     */
     var LANG_KEY = 'tedandlisa-lang';
     function storedLang() {
-      try { return localStorage.getItem(LANG_KEY) || ''; } catch (e) { return ''; }
+      return readStored(LANG_KEY);
     }
     function cookieLang() {
-      var m = document.cookie.match(/(?:^|;\s*)googtrans=\/en\/([^;]+)/);
+      var m = readCookies().match(/(?:^|;\s*)googtrans=\/en\/([^;]+)/);
       return m ? decodeURIComponent(m[1]) : 'en';
     }
     function currentLang() {
@@ -1903,11 +1936,8 @@ question. Show me the proposed plan and wait for my approval before making chang
     }
     function setLang(code) {
       killCookies();
-      try {
-        if (code === 'en') localStorage.removeItem(LANG_KEY);
-        else localStorage.setItem(LANG_KEY, code);
-      } catch (e) {}
-      if (code !== 'en') document.cookie = 'googtrans=/en/' + code + '; path=/';
+      writeStored(LANG_KEY, code === 'en' ? null : code);
+      if (code !== 'en') writeCookie('googtrans=/en/' + code + '; path=/');
       location.reload();
     }
 
@@ -1924,7 +1954,7 @@ question. Show me the proposed plan and wait for my approval before making chang
       // after each run, which would poison the next load.
       killCookies();
       if (cur !== 'en') {
-        document.cookie = 'googtrans=/en/' + cur + '; path=/';
+        writeCookie('googtrans=/en/' + cur + '; path=/');
         protect();
         var sc = document.createElement('script');
         sc.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
