@@ -1816,7 +1816,9 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
           */
           btn.setAttribute('aria-disabled', 'true');
           btn.setAttribute('aria-describedby', NOTE_ID);
-          btn.setAttribute('title', NO_COOKIE_NOTE);
+          /* No `title`: it would put a native tooltip on top of the note
+             saying the same sentence, and have some screen readers read the
+             reason twice. The note is the one explanation, for both. */
           btn.addEventListener('mouseenter', show);
           btn.addEventListener('mouseleave', hide);
           btn.addEventListener('focus', show);
