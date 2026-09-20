@@ -1106,9 +1106,21 @@ a.brand-mark:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 .lang-switch button:hover { color: var(--fg-inv); }
 .lang-switch button.active { background: var(--glass-hi-2); color: var(--fg-inv); }
 /* Where the host blocks cookies the machine-translated options cannot work.
-   They stay in place, visibly out of service, rather than looking live. */
-.lang-switch button[disabled] { cursor: not-allowed; opacity: 0.38; text-decoration: line-through; }
-.lang-switch button[disabled]:hover { color: var(--muted-inv); }
+   They stay in place, visibly out of service, rather than looking live.
+   Marked with aria-disabled rather than `disabled` so they keep their place
+   in the tab order — the reason has to be reachable from the keyboard. */
+.lang-switch button[aria-disabled="true"] {
+  cursor: not-allowed; opacity: 0.38; text-decoration: line-through;
+}
+.lang-switch button[aria-disabled="true"]:hover { color: var(--muted-inv); }
+/* The note is on demand, not a banner. A shared deck is read by its
+   audience, not its author, and a standing system message over every slide
+   is worse than the thing it explains — so it is asked for (hover, focus,
+   tap) and it goes away again. Hidden by opacity, never display or
+   visibility: it stays in the accessibility tree for the aria-describedby
+   on each unavailable option, and being `position: fixed` it cannot move
+   anything when it appears. Reduced motion is already honoured by the
+   global rule above, which forces every transition-duration to 1ms. */
 .lang-note {
   position: fixed; z-index: 10; margin: 0;
   bottom: calc(var(--space-6) + 40px); left: 50%; transform: translateX(-50%);
@@ -1119,7 +1131,9 @@ a.brand-mark:focus-visible { outline: none; box-shadow: var(--focus-ring); }
   background: var(--glass-hi); border: 1px solid var(--glass-hair);
   border-radius: var(--radius-sm); padding: 7px var(--space-3);
   -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+  opacity: 0; pointer-events: none; transition: opacity 140ms ease;
 }
+.lang-note[data-shown="true"] { opacity: 1; }
 /* Google Translate chrome stays out of the deck */
 #google_translate_element { display: none; }
 iframe.skiptranslate, .goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame,
@@ -1756,29 +1770,75 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
       literal in this deck (L-001) so a browser-level translation cannot
       rewrite the instruction that explains itself.
     */
+    var NOTE_ID = 'lang-note';
+    var NOTE_LINGER_MS = 4000;
     var NO_COOKIE_NOTE =
       'Translation needs cookies, which this host blocks — download the ' +
       'file to use it.';
     function markTranslationUnavailable() {
-      document.querySelectorAll('.lang-switch').forEach(function (sw) {
+      var switches = document.querySelectorAll('.lang-switch');
+      if (!switches.length) return;
+
+      /* One note, named once, pointed at by every unavailable option's
+         aria-describedby. It is created hidden. */
+      var note = document.getElementById(NOTE_ID);
+      if (!note) {
+        note = document.createElement('p');
+        note.id = NOTE_ID;
+        note.className = 'lang-note notranslate';
+        note.setAttribute('translate', 'no');
+        note.setAttribute('role', 'note');
+        note.textContent = NO_COOKIE_NOTE;
+        switches[0].parentNode.insertBefore(note, switches[0]);
+      }
+
+      var lingerTimer = null;
+      function clearLinger() {
+        if (lingerTimer) { clearTimeout(lingerTimer); lingerTimer = null; }
+      }
+      function show() { clearLinger(); note.setAttribute('data-shown', 'true'); }
+      function hide() { clearLinger(); note.removeAttribute('data-shown'); }
+      /* A touch screen has no pointer to leave and no focus to lose, so a
+         tap has to take the note back down itself. */
+      function flash() { show(); lingerTimer = setTimeout(hide, NOTE_LINGER_MS); }
+
+      switches.forEach(function (sw) {
         sw.setAttribute('data-translate-unavailable', 'true');
         sw.querySelectorAll('button').forEach(function (btn) {
           var isEn = btn.getAttribute('data-lang') === 'en';
           btn.classList.toggle('active', isEn);
           if (isEn) return;
-          btn.disabled = true;
+          /*
+            aria-disabled, not the `disabled` property: a disabled button
+            leaves the tab order, and then the one explanation of why it is
+            out of service is unreachable by keyboard. It stays focusable
+            and the click is refused below instead.
+          */
           btn.setAttribute('aria-disabled', 'true');
+          btn.setAttribute('aria-describedby', NOTE_ID);
           btn.setAttribute('title', NO_COOKIE_NOTE);
+          btn.addEventListener('mouseenter', show);
+          btn.addEventListener('mouseleave', hide);
+          btn.addEventListener('focus', show);
+          btn.addEventListener('blur', hide);
+          btn.addEventListener('click', function (e) {
+            /* Refuse the switch, answer the question. stopPropagation keeps
+               the dismiss-on-click-elsewhere handler below from undoing the
+               reveal in the same event. */
+            e.preventDefault();
+            e.stopPropagation();
+            flash();
+          });
         });
-        var parent = sw.parentNode;
-        if (!parent || parent.querySelector('.lang-note')) return;
-        var note = document.createElement('p');
-        note.className = 'lang-note notranslate';
-        note.setAttribute('translate', 'no');
-        note.setAttribute('role', 'note');
-        note.textContent = NO_COOKIE_NOTE;
-        parent.insertBefore(note, sw);
       });
+
+      /* Anywhere else puts it away. Escape listens in the capture phase
+         because the deck and its menu both handle keys there first. */
+      document.addEventListener('click', hide);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') hide();
+      }, true);
+
       console.info('Hi Ted, Meet Lisa: ' + NO_COOKIE_NOTE);
     }
 
