@@ -51,6 +51,16 @@ python3 scripts/tedandlisa_intake_fallback.py [--check]
 python3 scripts/check_languages.py FILE --languages en,ko
 python3 scripts/check_languages.py FILE --intake intake.json
 
+# Check that the copy a file's Share control would publish is really a copy
+# of it. On file:// a page cannot read itself, so Publish link rebuilds the
+# file from the DOM; this gate dirties the file, publishes it against a stub
+# receiver (nothing contacts htmlbyme.com), opens the result fresh, and fails
+# on a copy that boots elsewhere, carries a runtime-injected node or an open
+# menu, loses a content fence, or is not byte-stable on a second publish.
+# Headless Chrome, same exit convention: 1 is a finding, 2 is the harness.
+python3 scripts/check_share_roundtrip.py FILE
+python3 scripts/check_share_roundtrip.py --registry
+
 # Build the per-skill upload bundles for the Claude and ChatGPT settings
 # panels (Claude Code and Codex install the plugin instead, and need none
 # of this). Writes dist/<skill>.zip; --check validates without writing.
@@ -64,7 +74,9 @@ see the checklists in `skills/lisa/SKILL.md` and
 switch, check for console errors and horizontal overflow at 375px). Two
 gates are scripted rather than eyeballed: `check_overflow.py` for rendered
 overflow, and `check_languages.py` for the language controls against the
-intake's own `languages` answer.
+intake's own `languages` answer. A third, `check_share_roundtrip.py`, opens
+the file a template's Share control would publish and holds it to the
+original.
 
 ## Architecture
 
@@ -155,6 +167,48 @@ and opens with a `LISA:CONTENT-MAP` header naming those regions plus the few
 out-of-fence edit points (`<title>`, nav labels, script arrays). Agents `cp`
 the template file and edit only the fenced regions — everything outside is
 load-bearing chrome and embedded artwork, never to be retyped.
+
+**The Share block is two fenced regions and nothing else.** Every first-party
+template carries a **Share** control — a small menu in that template's own
+idiom whose one action, **Publish link**, hands the finished file to
+[htmlbyme.com](https://htmlbyme.com): a separate, free MonoMind service that
+hosts one HTML file behind a public link for 15 days. The two products are
+independent. Lisa never calls that service's API, carries no key, and knows
+nothing about it beyond two constants at the top of each share script
+(`PUBLISH_URL`, `PUBLISH_ORIGIN`) so a fork can repoint them. The document
+travels through `window.opener` and `postMessage` with the receiving origin
+pinned on every message, the person confirms the publish on htmlbyme.com's own
+page, and a returned link is refused unless it starts
+`https://link.htmlbyme.com/` and is rendered as text. Nothing is sent anywhere
+until that click and that confirmation.
+
+The contract for the block itself:
+
+- It is exactly **two** `LISA:SHARE-START` / `LISA:SHARE-END` regions per
+  template — the control's `<style>` in `<head>`, and its markup plus one
+  `<script>` inside the chrome — and **nothing outside them refers to anything
+  inside them**. `share: false` at the intake deletes both regions (plus the
+  sentence naming them in the `LISA:CONTENT-MAP` header) and the file is what
+  it was before the control existed. `scripts/tedandlisa_apply.py` does it,
+  `scripts/test_tedandlisa_apply.py` holds it to "not one string left".
+- The script sits **in the chrome, before the template's first other
+  `<script>`**, because that is the last moment at which `<html>`, `<body>`
+  and `<title>` still carry what the author wrote. It captures that baseline
+  and a published copy is restored to it, which is why the copy boots on the
+  first screen in the default language and theme however far in the author was.
+- The pattern is shared; the values are not. Class names, ids, tokens, panel
+  geometry, icon weight and every visible string belong to the template
+  (`D-007`) — inline `.en`/`.ko`/`.zh` spans where the template writes its
+  languages inline, `notranslate` protection where it machine-translates.
+- Anything a template injects at runtime carries `data-lisa-runtime`; the
+  snapshot strips those nodes, and the gate asserts none reaches the payload.
+  `[data-lisa-share="root"|"toggle"|"panel"|"publish"|"copy"|"result"]` are
+  machinery hooks, not design: the gate and the apply script read them.
+- Where the hand-off cannot work — the file is being read on
+  `link.htmlbyme.com`, or on any http(s) host where `window.origin` is
+  `"null"` — the menu offers **Copy link** instead of Publish, because a
+  sandboxed popup can never hold the other half (`D-057`: say so rather than
+  fail quietly).
 
 **Load-bearing machinery must not be rewritten**, only extended: script block 1
 in the MonoMind deck template, and the hash router + diagram viewer in the

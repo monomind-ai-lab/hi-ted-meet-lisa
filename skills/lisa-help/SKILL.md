@@ -46,8 +46,24 @@ so it can be clicked straight through, and the build reads it before writing.
 The panel asks content questions first, then one **Preferences** screen just
 before Ready: `languages`, `noTranslate` (terms translation must not touch),
 `theme` (dark / light / toggle), `style`, `accent`, `delivery` (CDN or fully
-standalone), `export` (a self-download control), `credit` (the colophon), and
-`review`.
+standalone), `export` (a self-download control), `credit` (the colophon), `share` (the
+Share button), and `review`.
+
+## The Share button
+
+Every first-party template ships a small **Share** menu in its own chrome. It
+has one action — **Publish link** — which hands that single HTML file to
+[htmlbyme.com](https://htmlbyme.com), a separate free MonoMind service that
+hosts one file behind a public link and deletes it after 15 days. The file
+does not call that service: clicking opens htmlbyme.com in a new tab, the file
+is offered to it, and **you confirm there**. Until that confirmation nothing
+has left the file, and a copy being read on a sandboxed host offers Copy link
+instead, because the hand-off cannot work there.
+
+Publishing is public and temporary: anyone with the link can read it, and the
+link stops working after 15 days. If that is not wanted, answer `share: off`
+at the intake — the control, its styles and its script are removed entirely,
+which is how a corporate or brand pack ships.
 
 ## Review scheduling
 
