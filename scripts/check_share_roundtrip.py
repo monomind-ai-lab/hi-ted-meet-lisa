@@ -50,7 +50,9 @@ difference outside the documented allow-list below; a second generation that
 differs from the first; a payload over 10 MB; a message accepted from the
 wrong origin or the wrong window; a second `htmlbyme:ready` left unanswered,
 or answered with different bytes; a link shown that did not come from
-`https://link.htmlbyme.com/`; a popup-blocked click that offers no fallback.
+`https://link.htmlbyme.com/`; a popup-blocked click that says nothing, or that
+points at the publish page as if it were a second route — it is not, the
+window is the only way a file reaches it.
 
 **The allow-list.** Two subtrees are excluded from the DOM comparison, and
 both are excluded because they are output rather than content:
@@ -786,8 +788,12 @@ def check_handoff(run: dict) -> list[str]:
             problems.append(f"a hostile answer ({case.get('name')}) was shown as a link")
         if case.get("images"):
             problems.append(f"a hostile answer ({case.get('name')}) injected an element")
+        # A returned link is the only link the result area ever renders, and
+        # it must carry LINK_PREFIX. PUBLISH_URL used to be exempted here
+        # because the popup-blocked fallback offered it; it no longer does,
+        # and nothing else should put it on screen either.
         for h in hrefs:
-            if h and not h.startswith(LINK_PREFIX) and h != PUBLISH_URL:
+            if h and not h.startswith(LINK_PREFIX):
                 problems.append(f"a hostile answer ({case.get('name')}) left an "
                                 f"unexpected link: {h!r}")
     if run.get("xss"):
@@ -805,8 +811,18 @@ def check_handoff(run: dict) -> list[str]:
         problems.append(f"{run['listenersLeft']} message listener(s) left registered "
                         "after the exchange finished")
     blocked = run.get("popupBlocked") or {}
-    if PUBLISH_URL not in (blocked.get("hrefs") or []):
-        problems.append("a blocked popup offered no fallback link to " + PUBLISH_URL)
+    # htmlbyme.com has no upload form, no drop zone and no file picker: the
+    # window this page opens is the only way a file ever reaches it. So a
+    # blocked popup has exactly one true thing to say — how to let the window
+    # open — and offering the publish page as a link would be telling the
+    # reader to go somewhere that cannot take their file.
+    if not (blocked.get("text") or "").strip():
+        problems.append("a blocked popup said nothing at all")
+    if blocked.get("hidden"):
+        problems.append("a blocked popup left the result area hidden")
+    if PUBLISH_URL in (blocked.get("hrefs") or []):
+        problems.append("a blocked popup linked to " + PUBLISH_URL + " as a "
+                        "manual route — that page cannot take a file on its own")
     return problems
 
 

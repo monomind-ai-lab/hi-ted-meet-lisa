@@ -616,10 +616,11 @@ footer .mono a{color:inherit} /* the colophon link stays as quiet as the line it
        whole hand-off. */
     try { w = window.open(PUBLISH_URL, "_blank"); } catch (e) { w = null; }
     if (!w) {
-      clear();
-      result.appendChild(line("Your browser blocked the new tab. Open this page and drop the file onto it:",
-                              "브라우저가 새 탭을 막았습니다. 아래 페이지를 열고 파일을 올려 주세요:"));
-      result.appendChild(linkTo(PUBLISH_URL));
+      /* There is no second route: htmlbyme.com only ever receives a file
+         through this window, so the only thing to say is how to let the
+         window open. */
+      say("Your browser blocked the new tab. Allow pop-ups for this page, then press Publish link again.",
+          "브라우저가 새 탭을 막았습니다. 이 페이지의 팝업을 허용한 뒤 ‘링크로 공개’를 다시 눌러 주세요.");
       return null;
     }
     busy = true;

@@ -683,10 +683,11 @@ body[data-lang="en"] .deck-share-result{letter-spacing:.02em;line-height:1.55}
        whole hand-off. */
     try { w = window.open(PUBLISH_URL, "_blank"); } catch (e) { w = null; }
     if (!w) {
-      clear();
-      result.appendChild(line("瀏覽器擋下了新分頁。請開啟下面這一頁，再把檔案放上去：",
-                              "Your browser blocked the new tab. Open this page and drop the file onto it:"));
-      result.appendChild(linkTo(PUBLISH_URL));
+      /* There is no second route: htmlbyme.com only ever receives a file
+         through this window, so the only thing to say is how to let the
+         window open. */
+      say("瀏覽器擋下了新分頁。請允許這一頁顯示彈出式視窗，再按一次「發布連結」。",
+          "Your browser blocked the new tab. Allow pop-ups for this page, then press Publish link again.");
       return null;
     }
     busy = true;

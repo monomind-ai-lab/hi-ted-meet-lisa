@@ -237,7 +237,7 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
       copySub: "This page’s own address",
       note: "Public link · expires in 15 days · free, by MonoMind",
       waiting: "Confirm in the htmlbyme.com tab, and the link comes back here.",
-      blocked: "Your browser blocked the new tab. Open this page and drop the file onto it:",
+      blocked: "Your browser blocked the new tab. Allow pop-ups for this page, then press Publish link again.",
       slow: "Still waiting — finish in the htmlbyme.com tab and the link will appear there.",
       unreadable: "This page's own source could not be read.",
       refused: function (prefix) {
@@ -262,7 +262,7 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
       copySub: "지금 보고 있는 주소",
       note: "공개 링크 · 15일 뒤 만료 · MonoMind 무료 제공",
       waiting: "htmlbyme.com 탭에서 확인하면 링크가 여기로 돌아옵니다.",
-      blocked: "브라우저가 새 탭을 막았습니다. 아래 페이지를 열고 파일을 올려 주세요:",
+      blocked: "브라우저가 새 탭을 막았습니다. 이 페이지의 팝업을 허용한 뒤 ‘링크로 공개’를 다시 눌러 주세요.",
       slow: "아직 기다리는 중입니다 — htmlbyme.com 탭에서 마치면 링크가 그곳에 나타납니다.",
       unreadable: "이 페이지의 원본을 읽지 못했습니다.",
       refused: function (prefix) {
@@ -470,11 +470,10 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
        whole hand-off. */
     try { w = window.open(PUBLISH_URL, "_blank"); } catch (e) { w = null; }
     if (!w) {
-      show(function (S) {
-        clear();
-        result.appendChild(line(S.blocked));
-        result.appendChild(linkTo(PUBLISH_URL));
-      });
+      /* There is no second route: htmlbyme.com only ever receives a file
+         through this window, so the only thing to say is how to let the
+         window open. */
+      say(function (S) { return S.blocked; });
       return null;
     }
     busy = true;

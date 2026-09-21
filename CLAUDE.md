@@ -209,6 +209,16 @@ The contract for the block itself:
   `"null"` — the menu offers **Copy link** instead of Publish, because a
   sandboxed popup can never hold the other half (`D-057`: say so rather than
   fail quietly).
+- **This hand-off is the only public way in.** htmlbyme.com carries no upload
+  form, no drop zone, no file picker of its own, and no password feature: a
+  file reaches it through the window this control opens, or not at all. So the
+  popup-blocked branch says how to let the window open — allow pop-ups, press
+  **Publish link** again — and must never offer the publish page as a manual
+  route, because that page cannot take a file by itself. The gate asserts both
+  halves: the branch says something, and it links nowhere. The file picker
+  *inside* the file (the third source, offered when the page is
+  machine-translated) is a different thing and stays — it still hands its bytes
+  over through the same window.
 - **Protocol v1.1, pinned on both sides:** the file answers **every**
   `htmlbyme:ready` that passes the source and origin checks, for as long as
   the exchange is open — not only the first. Reloading the receiving tab used

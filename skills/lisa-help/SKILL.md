@@ -60,6 +60,11 @@ is offered to it, and **you confirm there**. Until that confirmation nothing
 has left the file, and a copy being read on a sandboxed host offers Copy link
 instead, because the hand-off cannot work there.
 
+That button is the only way in. htmlbyme.com has no upload page, no drop zone
+and no password — a file gets there through the tab Publish link opens, or not
+at all. If the browser blocks that tab, allow pop-ups for the page and press
+**Publish link** again; there is nowhere else to take the file by hand.
+
 Publishing is public and temporary: anyone with the link can read it, and the
 link stops working after 15 days. If that is not wanted, answer `share: off`
 at the intake — the control, its styles and its script are removed entirely,

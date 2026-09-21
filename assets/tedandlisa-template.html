@@ -1736,10 +1736,11 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
        whole hand-off. */
     try { w = window.open(PUBLISH_URL, "_blank"); } catch (e) { w = null; }
     if (!w) {
-      clear();
-      result.appendChild(line("Your browser blocked the new tab. Open this " +
-                              "page and drop the file onto it:"));
-      result.appendChild(linkTo(PUBLISH_URL));
+      /* There is no second route: htmlbyme.com only ever receives a file
+         through this window, so the only thing to say is how to let the
+         window open. */
+      say("Your browser blocked the new tab. Allow pop-ups for this " +
+          "page, then press Publish link again.");
       return null;
     }
     busy = true;
