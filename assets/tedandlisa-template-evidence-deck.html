@@ -668,6 +668,15 @@ window.__deckGo = function (i) { __deck.goTo(i); };
   var LANG_KEY = "monomind-evidence-lang";
   var LANGS = ["en", "ko"];
 
+  /* Storage throws rather than fails on an opaque origin — a page served
+     under `Content-Security-Policy: sandbox` with no allow-same-origin, a
+     private window, a partitioned frame — so an unguarded touch would take
+     this whole block down with it. Every read and write goes through these
+     two. Both languages are written into this file, so the switch works
+     either way; only the remembering is lost. */
+  function recall(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+  function remember(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+
   /* Strings the reader sees that are not text nodes — titles and labels. */
   var UI = {
     en: { nav: "Slide navigation", dot: "Go to slide ", menu: "Menu" },
@@ -706,7 +715,7 @@ window.__deckGo = function (i) { __deck.goTo(i); };
       var b = $("btn" + code.charAt(0).toUpperCase() + code.slice(1));
       if (b) { b.setAttribute("aria-pressed", String(code === l)); }
     });
-    try { localStorage.setItem(LANG_KEY, l); } catch (e) {}
+    remember(LANG_KEY, l);
   }
   function currentLang() { return body.getAttribute("data-lang") || LANGS[0]; }
 
@@ -715,8 +724,7 @@ window.__deckGo = function (i) { __deck.goTo(i); };
     if (b) { b.addEventListener("click", function () { applyLang(code); }); }
   });
 
-  var saved = null;
-  try { saved = localStorage.getItem(LANG_KEY); } catch (e) {}
+  var saved = recall(LANG_KEY);
   applyLang(saved || body.getAttribute("data-lang") || LANGS[0]);
 
   /* ---- menu ------------------------------------------------------------- */

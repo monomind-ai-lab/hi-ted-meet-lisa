@@ -1105,6 +1105,35 @@ a.brand-mark:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 }
 .lang-switch button:hover { color: var(--fg-inv); }
 .lang-switch button.active { background: var(--glass-hi-2); color: var(--fg-inv); }
+/* Where the host blocks cookies the machine-translated options cannot work.
+   They stay in place, visibly out of service, rather than looking live.
+   Marked with aria-disabled rather than `disabled` so they keep their place
+   in the tab order — the reason has to be reachable from the keyboard. */
+.lang-switch button[aria-disabled="true"] {
+  cursor: not-allowed; opacity: 0.38; text-decoration: line-through;
+}
+.lang-switch button[aria-disabled="true"]:hover { color: var(--muted-inv); }
+/* The note is on demand, not a banner. A shared deck is read by its
+   audience, not its author, and a standing system message over every slide
+   is worse than the thing it explains — so it is asked for (hover, focus,
+   tap) and it goes away again. Hidden by opacity, never display or
+   visibility: it stays in the accessibility tree for the aria-describedby
+   on each unavailable option, and being `position: fixed` it cannot move
+   anything when it appears. Reduced motion is already honoured by the
+   global rule above, which forces every transition-duration to 1ms. */
+.lang-note {
+  position: fixed; z-index: 10; margin: 0;
+  bottom: calc(var(--space-6) + 40px); left: 50%; transform: translateX(-50%);
+  max-width: min(430px, calc(100vw - 48px));
+  font-family: var(--font-mono); font-size: 10px; line-height: 1.5;
+  letter-spacing: 0.04em; text-align: center; text-wrap: pretty;
+  color: var(--muted-inv);
+  background: var(--glass-hi); border: 1px solid var(--glass-hair);
+  border-radius: var(--radius-sm); padding: 7px var(--space-3);
+  -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+  opacity: 0; pointer-events: none; transition: opacity 140ms ease;
+}
+.lang-note[data-shown="true"] { opacity: 1; }
 /* Google Translate chrome stays out of the deck */
 #google_translate_element { display: none; }
 iframe.skiptranslate, .goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame,
@@ -1117,6 +1146,16 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
 @media (max-width: 760px) {
   .lang-switch { left: max(16px, env(safe-area-inset-left)); transform: none;
     bottom: max(16px, env(safe-area-inset-bottom)); }
+  /* Sized in vw, never with `right` or a percentage. This deck's body is a
+     horizontal scroll-snap track, so the containing block a fixed element
+     resolves `right`/`%` against is the whole strip (1500px against a 375
+     layout viewport — the same displacement L-003 recorded for the counter
+     and the switch). `100vw` is the one unit that still reads the viewport,
+     and the switch above stays put for the same reason: it sets `left` and
+     takes its width from its content. */
+  .lang-note { left: max(16px, env(safe-area-inset-left));
+    max-width: calc(100vw - 32px); transform: none; text-align: left;
+    bottom: calc(max(16px, env(safe-area-inset-bottom)) + 44px); }
 }
 
 /* ─── deck menu (beside the brand mark) ──────────────────────────── */
@@ -1396,6 +1435,14 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
       var KEY      = 'od-deck-pos';
       var active   = 0;
 
+      /* Remembering the slide is a courtesy, never a precondition for the
+         deck working. On an opaque origin — a sandboxed share URL with no
+         allow-same-origin — touching localStorage throws rather than
+         returning null, so both directions are wrapped and the deck simply
+         starts at slide 1. */
+      function readPos()    { try { return localStorage.getItem(KEY); } catch (_) { return null; } }
+      function writePos(v)  { try { localStorage.setItem(KEY, v); } catch (_) {} }
+
       function scrollContainers() {
         return [document.scrollingElement, document.documentElement, document.body]
           .filter(Boolean)
@@ -1455,7 +1502,7 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
         active = i;
         if (counter)  counter.textContent  = (i + 1) + ' / ' + slides.length;
         if (progress) progress.style.width = (((i + 1) / slides.length) * 100) + '%';
-        try { localStorage.setItem(KEY, String(i)); } catch (_) {}
+        writePos(String(i));
       }
       function go(i) {
         var next = Math.max(0, Math.min(slides.length - 1, i));
@@ -1497,7 +1544,7 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
 
       // restore last-seen position
       try {
-        var saved = parseInt(localStorage.getItem(KEY) || '0', 10);
+        var saved = parseInt(readPos() || '0', 10);
         if (!isNaN(saved) && saved >= 0 && saved < slides.length) {
           setActive(saved);
           resetVerticalScroll();
@@ -1635,14 +1682,57 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
       the button state read that stale value: the deck came back Korean.
       Kill every scope, then keep exactly one host-only cookie.
     */
+    /*
+      Storage is not merely unavailable in some hosts — it throws. A page
+      served under `Content-Security-Policy: sandbox` without
+      `allow-same-origin` has an opaque origin, and the FIRST touch of
+      `document.cookie` or `localStorage` raises SecurityError rather than
+      returning empty. An unguarded read therefore took the whole switch
+      down with it: the handlers below never got attached and three buttons
+      sat there looking live. Every access in this block goes through these
+      four, so a blocked host is a quiet, reported condition.
+    */
+    function readCookies() {
+      try { return document.cookie || ''; } catch (e) { return ''; }
+    }
+    function writeCookie(value) {
+      try { document.cookie = value; return true; } catch (e) { return false; }
+    }
+    function readStored(key) {
+      try { return localStorage.getItem(key) || ''; } catch (e) { return ''; }
+    }
+    function writeStored(key, value) {
+      try {
+        if (value === null) localStorage.removeItem(key);
+        else localStorage.setItem(key, value);
+      } catch (e) {}
+    }
+    /*
+      Reading is what throws on an opaque origin, so the probe starts there;
+      the round-trip write then catches the hosts that accept a cookie and
+      drop it (cookies switched off, a partitioned third-party frame). One
+      probe cookie, expired again in the same turn, on a switch that already
+      writes cookies freely.
+    */
+    function cookiesWork() {
+      var probe = 'tedandlisa-probe';
+      try {
+        if (typeof document.cookie !== 'string') return false;
+        document.cookie = probe + '=1; path=/; SameSite=Lax';
+        var ok = document.cookie.indexOf(probe + '=1') !== -1;
+        document.cookie = probe + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+        return ok;
+      } catch (e) { return false; }
+    }
+
     function killCookies() {
       var kill = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
-      document.cookie = kill;
+      writeCookie(kill);
       var parts = location.hostname.split('.');
       for (var i = 0; i < parts.length - 1; i++) {
         var d = parts.slice(i).join('.');
-        document.cookie = kill + '; domain=' + d;
-        document.cookie = kill + '; domain=.' + d;
+        writeCookie(kill + '; domain=' + d);
+        writeCookie(kill + '; domain=.' + d);
       }
     }
     /*
@@ -1654,10 +1744,10 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
     */
     var LANG_KEY = 'tedandlisa-lang';
     function storedLang() {
-      try { return localStorage.getItem(LANG_KEY) || ''; } catch (e) { return ''; }
+      return readStored(LANG_KEY);
     }
     function cookieLang() {
-      var m = document.cookie.match(/(?:^|;\s*)googtrans=\/en\/([^;]+)/);
+      var m = readCookies().match(/(?:^|;\s*)googtrans=\/en\/([^;]+)/);
       return m ? decodeURIComponent(m[1]) : 'en';
     }
     function currentLang() {
@@ -1665,12 +1755,93 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
     }
     function setLang(code) {
       killCookies();
-      try {
-        if (code === 'en') localStorage.removeItem(LANG_KEY);
-        else localStorage.setItem(LANG_KEY, code);
-      } catch (e) {}
-      if (code !== 'en') document.cookie = 'googtrans=/en/' + code + '; path=/';
+      writeStored(LANG_KEY, code === 'en' ? null : code);
+      if (code !== 'en') writeCookie('googtrans=/en/' + code + '; path=/');
       location.reload();
+    }
+
+    /*
+      English is written into the file; every other language on this switch
+      is Google's, and Google's needs a cookie to survive the reload. Where
+      the host refuses cookies — a sandboxed share URL with no
+      allow-same-origin, a private window, a partitioned frame — say so on
+      the control instead of leaving buttons that click and do nothing, and
+      never ask for the translator. The note is protected like every other
+      literal in this deck (L-001) so a browser-level translation cannot
+      rewrite the instruction that explains itself.
+    */
+    var NOTE_ID = 'lang-note';
+    var NOTE_LINGER_MS = 4000;
+    var NO_COOKIE_NOTE =
+      'Translation needs cookies, which this host blocks — download the ' +
+      'file to use it.';
+    function markTranslationUnavailable() {
+      var switches = document.querySelectorAll('.lang-switch');
+      if (!switches.length) return;
+
+      /* One note, named once, pointed at by every unavailable option's
+         aria-describedby. It is created hidden. */
+      var note = document.getElementById(NOTE_ID);
+      if (!note) {
+        note = document.createElement('p');
+        note.id = NOTE_ID;
+        note.className = 'lang-note notranslate';
+        note.setAttribute('translate', 'no');
+        note.setAttribute('role', 'note');
+        note.textContent = NO_COOKIE_NOTE;
+        switches[0].parentNode.insertBefore(note, switches[0]);
+      }
+
+      var lingerTimer = null;
+      function clearLinger() {
+        if (lingerTimer) { clearTimeout(lingerTimer); lingerTimer = null; }
+      }
+      function show() { clearLinger(); note.setAttribute('data-shown', 'true'); }
+      function hide() { clearLinger(); note.removeAttribute('data-shown'); }
+      /* A touch screen has no pointer to leave and no focus to lose, so a
+         tap has to take the note back down itself. */
+      function flash() { show(); lingerTimer = setTimeout(hide, NOTE_LINGER_MS); }
+
+      switches.forEach(function (sw) {
+        sw.setAttribute('data-translate-unavailable', 'true');
+        sw.querySelectorAll('button').forEach(function (btn) {
+          var isEn = btn.getAttribute('data-lang') === 'en';
+          btn.classList.toggle('active', isEn);
+          if (isEn) return;
+          /*
+            aria-disabled, not the `disabled` property: a disabled button
+            leaves the tab order, and then the one explanation of why it is
+            out of service is unreachable by keyboard. It stays focusable
+            and the click is refused below instead.
+          */
+          btn.setAttribute('aria-disabled', 'true');
+          btn.setAttribute('aria-describedby', NOTE_ID);
+          /* No `title`: it would put a native tooltip on top of the note
+             saying the same sentence, and have some screen readers read the
+             reason twice. The note is the one explanation, for both. */
+          btn.addEventListener('mouseenter', show);
+          btn.addEventListener('mouseleave', hide);
+          btn.addEventListener('focus', show);
+          btn.addEventListener('blur', hide);
+          btn.addEventListener('click', function (e) {
+            /* Refuse the switch, answer the question. stopPropagation keeps
+               the dismiss-on-click-elsewhere handler below from undoing the
+               reveal in the same event. */
+            e.preventDefault();
+            e.stopPropagation();
+            flash();
+          });
+        });
+      });
+
+      /* Anywhere else puts it away. Escape listens in the capture phase
+         because the deck and its menu both handle keys there first. */
+      document.addEventListener('click', hide);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') hide();
+      }, true);
+
+      console.info('Hi Ted, Meet Lisa: ' + NO_COOKIE_NOTE);
     }
 
     function init() {
@@ -1699,6 +1870,16 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
         );
         return;
       }
+      /*
+        Served, but with no usable cookie jar. The switch stays where it is,
+        marked out of service — see markTranslationUnavailable. Checked
+        before anything reads storage so the opaque-origin throw never
+        reaches the handlers.
+      */
+      if (!cookiesWork()) {
+        markTranslationUnavailable();
+        return;
+      }
       var cur = currentLang();
       document.querySelectorAll('.lang-switch button').forEach(function (btn) {
         if (btn.getAttribute('data-lang') === cur) btn.classList.add('active');
@@ -1711,7 +1892,7 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
       // after each run, which would poison the next load.
       killCookies();
       if (cur !== 'en') {
-        document.cookie = 'googtrans=/en/' + cur + '; path=/';
+        writeCookie('googtrans=/en/' + cur + '; path=/');
         protect();
         var sc = document.createElement('script');
         sc.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
@@ -1784,6 +1965,13 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
       var $ = function (id) { return document.getElementById(id); };
       var root = document.documentElement;
 
+      /* Storage throws, it does not merely fail, on an opaque origin (a
+         sandboxed share URL with no allow-same-origin). Both directions go
+         through these so the theme toggle still toggles where the choice
+         cannot be remembered. */
+      function readPref(key)      { try { return localStorage.getItem(key); } catch (e) { return null; } }
+      function writePref(key, v)  { try { localStorage.setItem(key, v); } catch (e) {} }
+
       /* ---- theme -------------------------------------------------------
          `theme: dark`  -> delete this section and the menu item.
          `theme: light` -> set data-theme="light" on <html> in the markup.
@@ -1803,13 +1991,12 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
          markup. The label is seeded from whatever theme is actually active, so
          it never offers the theme the reader is already looking at. */
       if (themeBtn) {
-        var saved = null;
-        try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+        var saved = readPref(THEME_KEY);
         applyTheme(saved || (root.getAttribute("data-theme") === "light" ? "light" : "dark"));
         themeBtn.addEventListener("click", function () {
           var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
           applyTheme(next);
-          try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+          writePref(THEME_KEY, next);
         });
       }
 
