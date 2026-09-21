@@ -483,7 +483,7 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
   }
 
   function handshake(w, pending) {
-    var sent = false, finished = false, timer = null;
+    var finished = false, timer = null;
 
     function finish() {
       if (finished) { return; }
@@ -500,8 +500,14 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
       var d = e.data;
       if (!d || typeof d !== "object") { return; }
 
-      if (d.type === "htmlbyme:ready" && !sent) {
-        sent = true;                   /* answered once, however often asked */
+      if (d.type === "htmlbyme:ready") {
+        /* Protocol v1.1: every ready that passes the source and origin
+           checks above is answered, not only the first. A reader who
+           reloads the htmlbyme tab would otherwise sit out the timeout
+           holding nothing. `pending` is one promise, built once per
+           click, so every answer carries the same bytes — and the
+           exchange still ends exactly once, on htmlbyme:published or
+           on the timeout, and the listener goes with it. */
         pending.then(function (html) {
           if (finished) { return; }
           w.postMessage({ type: "htmlbyme:document", v: 1, html: html,

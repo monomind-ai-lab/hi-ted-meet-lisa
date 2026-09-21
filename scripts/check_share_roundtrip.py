@@ -37,8 +37,10 @@ open.
 The stub receiver is the whole reason this is safe to run anywhere: nothing
 contacts htmlbyme.com, and nothing needs to. `window.open` is replaced with a
 fake window, the share script's own `message` listener is captured as it is
-registered, and the protocol is played back into it by hand — including six
-hostile answers that must be refused.
+registered, and the protocol is played back into it by hand — a first
+`htmlbyme:ready`, then a second standing in for the receiver being reloaded
+(protocol v1.1: it must be answered too, with the identical document), then
+seven hostile answers that must all be refused, then the real one.
 
 **What makes it fail.** A console error or an uncaught exception on either
 load; a payload that carries a `data-lisa-runtime` node or an open menu; a
@@ -46,7 +48,8 @@ payload missing the content fences or the content map; a published copy that
 boots somewhere other than where the original boots; any normalised DOM
 difference outside the documented allow-list below; a second generation that
 differs from the first; a payload over 10 MB; a message accepted from the
-wrong origin or the wrong window; a link shown that did not come from
+wrong origin or the wrong window; a second `htmlbyme:ready` left unanswered,
+or answered with different bytes; a link shown that did not come from
 `https://link.htmlbyme.com/`; a popup-blocked click that offers no fallback.
 
 **The allow-list.** Two subtrees are excluded from the DOM comparison, and
@@ -415,12 +418,18 @@ HARNESS_JS = r"""
                      generator: msg.generator, template: msg.template,
                      keys: Object.keys(msg).sort() };
       r.payload = typeof msg.html === "string" ? msg.html : null;
-      /* asked again, it must not answer again */
+      /* The receiver reloads: it comes back and says ready again. Protocol
+         v1.1 answers every ready until the exchange ends, so a second
+         document must arrive — and it must be the same document, because
+         it was built once per click and that one promise is reused. */
       deliver({ type: "htmlbyme:ready", v: 1 }, PUBLISH_ORIGIN, FAKE);
-      return sleep(200);
+      return waitFor(function () { return posted.length > 1; }, 4000);
     }).then(function () {
       if (r.fatal) { return null; }
-      r.postedAfterSecondReady = posted.length;
+      r.postedAfterReload = posted.length;
+      r.reloadPayloadIdentical = posted.length > 1
+        && posted[1].msg.html === posted[0].msg.html
+        && posted[1].target === posted[0].target;
       return hostileAnswers(r);
     }).then(function () {
       if (r.fatal) { return null; }
@@ -762,9 +771,15 @@ def check_handoff(run: dict) -> list[str]:
     if run.get("postTarget") != PUBLISH_ORIGIN:
         problems.append(f"the document was posted to {run.get('postTarget')!r}, "
                         f"not the pinned {PUBLISH_ORIGIN}")
-    if run.get("postedAfterSecondReady", 1) != 1:
-        problems.append("a second htmlbyme:ready produced a second document — "
-                        "the reply must happen once")
+    # Protocol v1.1: the receiver may reload and ask again, and must be
+    # answered — with the same document, to the same pinned origin.
+    if run.get("postedAfterReload", 0) < 2:
+        problems.append("a second htmlbyme:ready went unanswered — a reader who "
+                        "reloads the receiving tab is stranded until the timeout")
+    elif not run.get("reloadPayloadIdentical"):
+        problems.append("the second answer differed from the first: the document "
+                        "is built once per click and that one promise is reused, "
+                        "so the bytes and the target origin must be identical")
     for case in run.get("hostile") or []:
         hrefs = case.get("hrefs") or []
         if any(h and h.startswith(LINK_PREFIX) for h in hrefs):

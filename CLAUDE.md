@@ -209,6 +209,15 @@ The contract for the block itself:
   `"null"` — the menu offers **Copy link** instead of Publish, because a
   sandboxed popup can never hold the other half (`D-057`: say so rather than
   fail quietly).
+- **Protocol v1.1, pinned on both sides:** the file answers **every**
+  `htmlbyme:ready` that passes the source and origin checks, for as long as
+  the exchange is open — not only the first. Reloading the receiving tab used
+  to strand the hand-off until the 60 s timeout. The document is built once
+  per click and that one promise is reused, so every answer carries the same
+  bytes; the exchange still ends exactly once, on `htmlbyme:published` or on
+  the timeout, and the `message` listener is removed with it. The listener is
+  deliberately **not** removed when the share menu closes: a reader who clicks
+  away from the menu while confirming in the other tab must not lose the link.
 
 **Load-bearing machinery must not be rewritten**, only extended: script block 1
 in the MonoMind deck template, and the hash router + diagram viewer in the
