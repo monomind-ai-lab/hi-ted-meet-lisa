@@ -88,6 +88,18 @@ jobs:
         # so it sits after the install above.
         run: python3 scripts/check_languages.py --registry
 
+      - name: Check every template's Share hand-off and the copy it publishes
+        # On file:// a page cannot read itself, so Publish link rebuilds the
+        # file from the DOM. This opens each template, dirties it, publishes
+        # it against a stub receiver — nothing contacts htmlbyme.com, the
+        # protocol is played into the share script's own listener by hand,
+        # hostile answers included — then opens the published bytes fresh and
+        # holds them to the original. Three headless loads per template, so
+        # it sits after the other Chrome gates.
+        env:
+          CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: python3 scripts/check_share_roundtrip.py --registry
+
       - name: Check the intake panel's fallback list against the registry
         run: python3 scripts/tedandlisa_intake_fallback.py --check
 

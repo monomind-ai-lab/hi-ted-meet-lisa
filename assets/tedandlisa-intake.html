@@ -1557,6 +1557,14 @@ var L10N = {
         o: { keep: ["그대로 두기", "도구로 연결되는 조용한 한 줄."],
              off:  ["끄기", "만든 이의 표시 없이 나갑니다."] }
       },
+      share: {
+        q: "공유 버튼",
+        hint: "파일 자체의 크롬에 공유 메뉴를 하나 넣습니다. 동작은 하나 — htmlbyme.com에 올리기. " +
+              "htmlbyme.com은 HTML 파일 하나를 공개 링크로 15일 동안 호스팅하는 MonoMind의 별도 무료 " +
+              "서비스입니다. 누군가 직접 누르고 그쪽에서 확인하기 전까지는 파일이 어디로도 나가지 않습니다.",
+        o: { keep: ["그대로 두기", "작은 컨트롤 하나. 공개는 언제나 의도적인 클릭입니다."],
+             off:  ["끄기", "컨트롤과 스타일, 스크립트까지 모두 제거합니다."] }
+      },
       accent: {
         q: "메인 컬러",
         hint: "템플릿의 디자인 토큰을 통해서만 적용되므로, 액센트를 쓰는 모든 요소가 함께 " +
@@ -1857,6 +1865,14 @@ var L10N = {
         hint: "頁尾的「Made with Hi Ted, Meet Lisa」。留著，或是關掉。",
         o: { keep: ["留著", "安靜的一行，連回這個工具。"],
              off:  ["關掉", "檔案出去時不帶任何製作者的標記。"] }
+      },
+      share: {
+        q: "分享按鈕",
+        hint: "在檔案自己的介面上加一個分享選單，只有一個動作 — 發佈到 htmlbyme.com。" +
+              "htmlbyme.com 是 MonoMind 另外提供的免費服務，會把一份 HTML 檔案放在公開連結上 15 天。" +
+              "除非有人按下去、並在那邊確認，否則檔案不會送到任何地方。",
+        o: { keep: ["留著", "一個小控制項；發佈永遠是刻意按下的動作。"],
+             off:  ["關掉", "控制項、樣式和程式碼會一併移除。"] }
       },
       accent: {
         q: "主色",
@@ -2240,6 +2256,17 @@ var QUESTIONS = [
     type: "single", options: [
       { id: "keep", label: "Leave it", note: "One quiet line, linking to the tool.", def: true },
       { id: "off",  label: "Switch it off", note: "The file ships with no maker’s mark." } ] },
+
+  /* Asked for every shape too, and for the same reason the credit line is:
+     it is chrome that belongs to the reader of the finished file, and a
+     brand pack that ships without it is a supported choice rather than a
+     jailbreak. Nothing is sent anywhere until someone clicks Publish link
+     and then confirms on htmlbyme.com. */
+  { id: "share", chapter: "Preferences", q: "Share button",
+    hint: "A Share menu in the file’s own chrome, with one action: publish it to htmlbyme.com — a separate free MonoMind service that hosts one HTML file behind a public link for 15 days. Nothing leaves the file until someone clicks it and confirms there.",
+    type: "single", options: [
+      { id: "keep", label: "Leave it", note: "One small control; publishing is always a deliberate click.", def: true },
+      { id: "off",  label: "Switch it off", note: "The control, its styles and its script are removed entirely." } ] },
 
   { id: "review", chapter: "Preferences", q: "Design review", kinds: ["slides", "document"],
     hint: "A full design pass judges hierarchy, spacing, and contrast against the template's own rules; it takes several minutes. The structural checks — broken links, overflow, console errors — run on every build whichever you pick.",
@@ -3185,8 +3212,10 @@ function payload() {
       : { mode: state.menu },
     export: state.export,
     /* serialised as a boolean: the UI's option ids are a detail the
-       contract never sees. */
+       contract never sees. Same for `share`, the other piece of chrome
+       that is on by default and opt-out. */
     credit: state.credit !== "off",
+    share: state.share !== "off",
     review: state.review,
     /* Seven questions on the panel, one object in the payload. Free text is
        null when nothing was typed; every other value is an id, the same in

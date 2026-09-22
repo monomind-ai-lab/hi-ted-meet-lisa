@@ -6,6 +6,9 @@
        <title> in <head>
        body data-title-zh / data-title-en
        optional [HOME URL] / [REPOSITORY URL] menu items inside the commented-out chrome
+     Two LISA:SHARE-START/END regions carry the Share control — its <style> in
+     <head> and its markup + script inside the deck menu. They are deleted
+     together when the intake answers `share: false`, and are not authorable content.
      Everything else (head, CSS, chrome markup, scripts, artwork) is load-bearing:
      copy this file with cp, never retype it, and edit only what is named here. -->
 <html lang="zh-Hant">
@@ -259,6 +262,10 @@ ul.pts li:last-child{margin-bottom:0}
   padding:8px 10px;border:0;background:none;cursor:pointer;text-align:left;text-decoration:none;
   font-family:var(--font-body);font-size:12.5px;font-weight:400;line-height:1.4;color:var(--ink-soft);
   transition:background .15s,color .15s}
+/* hidden 必須贏過上面的 display：瀏覽器預設樣式表的 `[hidden]{display:none}`
+   會輸給 class 選擇器，所以在執行時被藏起來的選項 —— file:// 下的下載 HTML、
+   還沒展開的目錄 —— 仍然留在畫面上，和它的標記說的不一樣。 */
+.deck-menu-panel button[hidden],.deck-menu-panel a[hidden],.deck-menu-sub[hidden]{display:none}
 .deck-menu-panel button:hover,.deck-menu-panel a:hover{background:var(--decision-bg);color:var(--ink)}
 .deck-menu-panel button:focus-visible,.deck-menu-panel a:focus-visible{
   outline:2px solid var(--red);outline-offset:-2px;color:var(--ink)}
@@ -300,6 +307,55 @@ ul.pts li:last-child{margin-bottom:0}
   .bar .fill{width:var(--w)}
 }
 </style>
+<!-- LISA:SHARE-START styles — 分享控制項自己的樣式表，獨立成一個 <style>，
+     所以整個控制項就是兩個可以整段刪掉的區塊，沒有別的。intake 的
+     `share: false` 會把這一區與控制列裡的 markup+script 一起刪掉，兩個圍欄
+     以外沒有任何東西引用它們。所有值都用這份簡報自己的變數：它是
+     .deck-menu-panel 的一個選項，展開的面板是一個 .deck-menu-sub，和上面的
+     目錄同一個形狀。 -->
+<style>
+/* === 分享 / SHARE（一個選單項目，加上它展開的小面板） ===
+   在 320px 下，控制列已經是兩個物件寬 —— 語言切換與漢堡選單 —— 所以分享不
+   再加第三個。它放在這份版型本來就用來表示「打開一份小清單的控制項」的地
+   方：選單裡，目錄下面，展開自己的 .deck-menu-sub。外層用 display:contents，
+   面板的排版就和直接的子元素完全一樣，而整個控制項仍然是一個可刪的區塊。 */
+.deck-share{display:contents}
+.deck-share .deck-share-panel{display:none}
+.deck-share[data-open="true"] .deck-share-panel{display:flex}
+/* [hidden] 來自瀏覽器預設樣式表，會輸給 .deck-menu-panel button 這條作者規
+   則，所以「複製連結」需要自己的規則才留得住，直到沙箱複本把它顯示出來。 */
+.deck-share-panel button[hidden]{display:none}
+.deck-share-panel button{align-items:flex-start}
+.deck-share-panel svg{margin-top:1px}
+.deck-share-sub{display:block;margin-top:3px;font-size:9.5px;font-weight:400;
+  line-height:1.7;color:var(--ink-faint)}
+.deck-share-note{margin:3px 10px 6px;font-family:var(--font-body);font-size:10px;
+  line-height:1.8;color:var(--ink-faint);text-wrap:pretty}
+.deck-share-result{margin:0 10px 6px;font-family:var(--font-body);font-size:11px;
+  line-height:1.8;color:var(--ink-soft);text-wrap:pretty;overflow-wrap:anywhere}
+.deck-share-result[hidden]{display:none}
+.deck-share-result p{margin:0 0 4px}
+.deck-share-link{display:block;margin-bottom:4px;color:var(--blue)}
+.deck-share-result button{width:auto;margin-top:2px;padding:4px 9px;border:1px solid var(--rule);
+  background:none;color:var(--ink-soft);font-family:var(--font-body);font-size:10.5px;
+  cursor:pointer;transition:background .15s,color .15s}
+.deck-share-result button:hover{background:var(--decision-bg);color:var(--ink)}
+.deck-share-result button:focus-visible{outline:2px solid var(--red);outline-offset:-2px;color:var(--ink)}
+.deck-share-result input[type=file]{display:block;margin-top:7px;font-size:10px;
+  color:var(--ink-faint);max-width:100%}
+/* 中文是預設語言，所以字距留 0、行高留寬；英文那一份才拿回這份版型在微型
+   文字上慣用的字距，行高也收緊一點。 */
+body[data-lang="en"] .deck-share-sub,
+body[data-lang="en"] .deck-share-note,
+body[data-lang="en"] .deck-share-result{letter-spacing:.02em;line-height:1.55}
+/* 320px 時面板已經縮到最小寬度，所以這兩段縮排的文字讓出邊距，而不是讓出字。 */
+@media (max-width:420px){
+  .deck-share-note,.deck-share-result{margin-left:8px;margin-right:8px}
+}
+/* 讀者要印的是這份簡報，不是它的控制列。 */
+@media print{.deck-share{display:none !important}}
+</style>
+<!-- LISA:SHARE-END -->
 </head>
 <body data-lang="zh-TW" data-title-zh="[報告標題]｜[副標]" data-title-en="[REPORT TITLE] | [SUBTITLE]">
 
@@ -390,6 +446,496 @@ ul.pts li:last-child{margin-bottom:0}
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 3 2.6 15 0 18M12 3c-2.6 3-2.6 15 0 18"/></svg>
         <span class="zh">Read in English</span><span class="en">改看繁體中文</span>
       </button>
+
+<!-- LISA:SHARE-START markup+script — 分享控制項：選單裡的一個項目、它展開的
+     小面板，以及交給 htmlbyme.com 的那一次交接。由 intake 的 `share` 決定：
+     `share: false` 會刪掉這一區與 <head> 裡的 <style> 區，兩個圍欄以外沒有
+     任何東西提到它們。它放在選單裡而不是控制列裡，是因為控制列在 320px 已經
+     是兩個物件寬，而「打開一份小清單的控制項」正是上面的目錄。每一個讀者看得
+     到的字串都寫了兩種語言，和這份簡報其他地方一樣，由 body[data-lang] 決定
+     顯示哪一種。 -->
+      <div class="deck-share" id="deckShare" data-lisa-share="root" data-open="false">
+        <button type="button" role="menuitem" id="deckMenuShare"
+                aria-haspopup="true" aria-expanded="false" aria-controls="deckSharePanel"
+                data-lisa-share="toggle">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="17.5" cy="5.5" r="2.4"/><circle cx="6.5" cy="12" r="2.4"/><circle cx="17.5" cy="18.5" r="2.4"/><path d="m8.9 10.8 6.2-3.7m0 9.8-6.2-3.7"/></svg>
+          <span class="zh">分享</span><span class="en">Share</span>
+        </button>
+        <div class="deck-menu-sub deck-share-panel" id="deckSharePanel" role="none"
+             data-lisa-share="panel">
+          <button type="button" role="menuitem" id="deckSharePublish" data-lisa-share="publish">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.6 13.4a3.7 3.7 0 0 0 5.2 0l2.4-2.4a3.7 3.7 0 0 0-5.2-5.2l-1.2 1.2"/><path d="M13.4 10.6a3.7 3.7 0 0 0-5.2 0l-2.4 2.4a3.7 3.7 0 0 0 5.2 5.2l1.2-1.2"/></svg>
+            <span class="zh">發布連結<span class="deck-share-sub">發布到 htmlbyme.com</span></span><span class="en">Publish link<span class="deck-share-sub">Publish to htmlbyme.com</span></span>
+          </button>
+          <button type="button" role="menuitem" id="deckShareCopy" data-lisa-share="copy" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.4"/><path d="M15 5.6A1.6 1.6 0 0 0 13.4 4H5.6A1.6 1.6 0 0 0 4 5.6v7.8A1.6 1.6 0 0 0 5.6 15"/></svg>
+            <span class="zh">複製連結<span class="deck-share-sub">這一頁自己的網址</span></span><span class="en">Copy link<span class="deck-share-sub">This page&rsquo;s own address</span></span>
+          </button>
+          <p class="deck-share-note" role="none"><span class="zh">公開連結 &middot; 15 天後失效 &middot; 由 MonoMind 免費提供</span><span class="en">Public link &middot; expires in 15 days &middot; free, by MonoMind</span></p>
+          <div class="deck-share-result" id="deckShareResult" role="none"
+               data-lisa-share="result" aria-live="polite" hidden></div>
+        </div>
+<script>
+/*
+  分享 → 發布連結 / Share → Publish link.
+
+  完成的檔案交給 htmlbyme.com —— MonoMind 另一個免費服務，把一份 HTML 放在
+  公開連結後面 15 天 —— 連結再回到這裡。這個區塊不呼叫任何 API、不帶任何金
+  鑰：文件是透過 window.opener 與 postMessage 送出去的，每一則訊息都釘住接
+  收端的來源，而且要由人在 htmlbyme.com 自己的頁面上按下確認。在那之前，沒
+  有任何東西離開過這裡。
+
+  It sits in the chrome rather than at the foot of the file because the chrome
+  is parsed before the first <script> runs, so this is the last moment at
+  which <html>, <body> and <title> still carry what the author wrote — and,
+  here, the last moment at which the dots' and the menu's own aria-labels are
+  still the author's. That baseline is what a published copy is restored to,
+  which is why the copy opens on page 01 in 繁體中文 however far down the
+  brief the reader had scrolled.
+*/
+(function () {
+  "use strict";
+
+  /* A fork repoints these two, and nothing else names the host. */
+  var PUBLISH_URL    = "https://htmlbyme.com/publish";
+  var PUBLISH_ORIGIN = "https://htmlbyme.com";
+  /* The only prefix a returned link may carry. Anything else is refused. */
+  var LINK_PREFIX    = "https://link.htmlbyme.com/";
+  var SANDBOX_HOST   = "link.htmlbyme.com";
+  var TEMPLATE       = "paper-brief";
+  var HANDSHAKE_MS   = 60000;
+  var MAX_BYTES      = 10 * 1024 * 1024;
+
+  function attrsOf(el) {
+    var out = {}, a = el.attributes, i;
+    for (i = 0; i < a.length; i++) { out[a[i].name] = a[i].value; }
+    return out;
+  }
+  /* Two labels and the segment's pressed states are rewritten by applyLang on
+     every load, so they are read here — before the chrome's own script has
+     run — rather than copied into this block as strings. A brief whose
+     languages the intake changed still resets to its own default. */
+  function labelOf(id) {
+    var el = document.getElementById(id);
+    return el ? el.getAttribute("aria-label") : null;
+  }
+  function pressedIn(selector) {
+    var out = [], found = document.querySelectorAll(selector), i;
+    for (i = 0; i < found.length; i++) {
+      out.push({ id: found[i].id, value: found[i].getAttribute("aria-pressed") });
+    }
+    return out;
+  }
+  var BASE = { title: document.title, html: attrsOf(document.documentElement),
+               body: attrsOf(document.body),
+               dots: labelOf("navDots"), menu: labelOf("deckMenuBtn"),
+               seg: pressedIn("#langSeg button") };
+
+  var root       = document.getElementById("deckShare");
+  var toggle     = document.getElementById("deckMenuShare");
+  var panel      = document.getElementById("deckSharePanel");
+  var publishBtn = document.getElementById("deckSharePublish");
+  var copyBtn    = document.getElementById("deckShareCopy");
+  var result     = document.getElementById("deckShareResult");
+  if (!root || !toggle || !panel || !publishBtn || !copyBtn || !result) { return; }
+
+  function sandboxed() {
+    try {
+      if (location.hostname === SANDBOX_HOST) { return true; }
+      /* An opaque origin: the page is sandboxed, so any window it opens is
+         sandboxed too and can never hold the other half of the hand-off. */
+      return /^https?:$/.test(location.protocol) && window.origin === "null";
+    } catch (e) { return true; }
+  }
+  if (sandboxed()) { publishBtn.hidden = true; copyBtn.hidden = false; }
+
+  /* A browser translation rewrites every text node in place; publishing then
+     would publish the translation instead of the file. */
+  function translated() {
+    var c = document.documentElement.className || "";
+    return c.indexOf("translated-ltr") !== -1 || c.indexOf("translated-rtl") !== -1;
+  }
+
+  /* ---------- 選單 / the menu ----------
+     只管開與關。ArrowDown/ArrowUp 故意不在這裡處理：這些項目是
+     #deckMenuPanel 裡的 [role=menuitem]，控制列自己的方向鍵走訪已經包含它
+     們，就像它已經包含生成出來的目錄一樣。 */
+  function items() {
+    return Array.prototype.filter.call(panel.querySelectorAll("button"),
+                                       function (b) { return !b.hidden; });
+  }
+  function isOpen() { return root.getAttribute("data-open") === "true"; }
+  function setOpen(open) {
+    root.setAttribute("data-open", open ? "true" : "false");
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    if (open) { var first = items()[0]; if (first) { first.focus(); } }
+  }
+  toggle.addEventListener("click", function (e) { e.stopPropagation(); setOpen(!isOpen()); });
+  document.addEventListener("click", function (e) {
+    if (isOpen() && !root.contains(e.target)) { setOpen(false); }
+  });
+  /* Esc。控制列在 .deck-chrome 上用 capture 階段接鍵盤事件，而且在那裡就
+     stopPropagation，所以掛在這個控制項上的監聽永遠收不到；document 是
+     capture 會先經過的節點。它只回應「面板展開時、在這個控制項裡按下的
+     Esc」，而且只收起面板 —— 選單維持開著，和目錄展開時一樣。其他的 Esc，
+     包括下一次那一下，都會落回控制列自己的處理，由它關閉選單並把焦點還給
+     漢堡按鈕。 */
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape" || !isOpen() || !root.contains(e.target)) { return; }
+    setOpen(false);
+    toggle.focus();
+    e.stopPropagation();
+  }, true);
+
+  /* ---------- 面板上的字 / what the panel says ----------
+     兩種語言都寫成 .zh/.en 的 span：由 body[data-lang] 決定顯示哪一種，和這
+     份簡報其他每一個字串完全一樣。 */
+  function span(cls, text) {
+    var s = document.createElement("span");
+    s.className = cls;
+    s.textContent = text;
+    return s;
+  }
+  function clear() { result.textContent = ""; result.hidden = false; return result; }
+  function line(zh, en) {
+    var p = document.createElement("p");
+    p.appendChild(span("zh", zh));
+    p.appendChild(span("en", en));
+    return p;
+  }
+  function say(zh, en) { clear().appendChild(line(zh, en)); }
+  function linkTo(url) {
+    var a = document.createElement("a");
+    a.className = "deck-share-link";
+    a.href = url;               /* only ever PUBLISH_URL or a checked link */
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.textContent = url;        /* text, never markup */
+    return a;
+  }
+
+  /* ---------- 複製 / copying ---------- */
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+    /* The async Clipboard API is unavailable in an insecure or
+       permission-restricted context — a sandboxed share URL is one — so a
+       selection copy backs it up. */
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.setAttribute("data-lisa-runtime", "");
+      ta.style.cssText = "position:fixed;left:-9999px;top:0;opacity:0";
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (err) { ok = false; }
+      document.body.removeChild(ta);
+      if (ok) { resolve(); } else { reject(new Error("copy refused")); }
+    });
+  }
+  function copyButton(text) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("role", "menuitem");
+    b.setAttribute("data-lisa-runtime", "");
+    b.appendChild(span("zh", "複製"));
+    b.appendChild(span("en", "Copy"));
+    b.addEventListener("click", function () {
+      copyText(text).then(function () {
+        b.textContent = "";
+        b.appendChild(span("zh", "已複製"));
+        b.appendChild(span("en", "Copied"));
+      }, function () {
+        b.textContent = "";
+        b.appendChild(span("zh", "選取後按 ⌘C"));
+        b.appendChild(span("en", "Select it and ⌘C"));
+      });
+    });
+    return b;
+  }
+  copyBtn.addEventListener("click", function () {
+    copyText(location.href).then(
+      function () { say("已複製這一頁的網址。", "Copied this page's address."); },
+      function () { say("瀏覽器拒絕了複製 —— 網址就在網址列裡。",
+                        "Copying was refused — the address is in the address bar."); });
+  });
+
+  /* ---------- 交接 / the hand-off ---------- */
+  var busy = false;
+  publishBtn.addEventListener("click", function () { publish(); });
+
+  function publish() {
+    if (busy) { return; }
+    if (translated()) { refuseTranslated(); return; }
+    var w = openReceiver();
+    if (!w) { return; }
+    handshake(w, source());
+  }
+
+  function openReceiver() {
+    var w = null;
+    /* Opened synchronously inside the click: a window asked for after an
+       await is a window the browser blocks. No `noopener`/`noreferrer` —
+       the receiving page answers through window.opener, and that is the
+       whole hand-off. */
+    try { w = window.open(PUBLISH_URL, "_blank"); } catch (e) { w = null; }
+    if (!w) {
+      /* There is no second route: htmlbyme.com only ever receives a file
+         through this window, so the only thing to say is how to let the
+         window open. */
+      say("瀏覽器擋下了新分頁。請允許這一頁顯示彈出式視窗，再按一次「發布連結」。",
+          "Your browser blocked the new tab. Allow pop-ups for this page, then press Publish link again.");
+      return null;
+    }
+    busy = true;
+    say("在 htmlbyme.com 分頁按下確認，連結就會回到這裡。",
+        "Confirm in the htmlbyme.com tab, and the link comes back here.");
+    return w;
+  }
+
+  function handshake(w, pending) {
+    var finished = false, timer = null;
+
+    function finish() {
+      if (finished) { return; }
+      finished = true;
+      busy = false;
+      if (timer) { clearTimeout(timer); timer = null; }
+      window.removeEventListener("message", onMessage);
+    }
+
+    function onMessage(e) {
+      /* Both halves checked on every message: the window this page opened,
+         and the origin it was opened at. Neither is ever relaxed. */
+      if (finished || e.source !== w || e.origin !== PUBLISH_ORIGIN) { return; }
+      var d = e.data;
+      if (!d || typeof d !== "object") { return; }
+
+      if (d.type === "htmlbyme:ready") {
+        /* Protocol v1.1: every ready that passes the source and origin
+           checks above is answered, not only the first. A reader who
+           reloads the htmlbyme tab would otherwise sit out the timeout
+           holding nothing. `pending` is one promise, built once per
+           click, so every answer carries the same bytes — and the
+           exchange still ends exactly once, on htmlbyme:published or
+           on the timeout, and the listener goes with it. */
+        pending.then(function (html) {
+          if (finished) { return; }
+          w.postMessage({ type: "htmlbyme:document", v: 1, html: html,
+                          title: document.title,
+                          generator: "hi-ted-meet-lisa", template: TEMPLATE },
+                        PUBLISH_ORIGIN);
+        }, function (err) {
+          say(err && err.zh ? err.zh : "讀不到這一頁自己的原始檔。",
+              err && err.en ? err.en : "This page's own source could not be read.");
+          finish();
+        });
+        return;
+      }
+
+      if (d.type === "htmlbyme:published") {
+        var url = (typeof d.url === "string") ? d.url : "";
+        if (url.slice(0, LINK_PREFIX.length) !== LINK_PREFIX) {
+          /* Said and dropped, not acted on — and the exchange stays open, so
+             one malformed answer cannot cost the reader the real one. */
+          say("回應裡沒有 " + LINK_PREFIX + " 開頭的連結，所以略過了。",
+              "That answer carried no " + LINK_PREFIX + " link, so it was ignored.");
+          return;
+        }
+        published(url, d.expires_at);
+        finish();
+      }
+    }
+
+    window.addEventListener("message", onMessage);
+    timer = setTimeout(function () {
+      finish();
+      say("還在等 —— 在 htmlbyme.com 分頁完成之後，連結會出現在那一頁。",
+          "Still waiting — finish in the htmlbyme.com tab and the link will appear there.");
+    }, HANDSHAKE_MS);
+  }
+
+  function published(url, expiresAt) {
+    var when = expiresAt ? new Date(expiresAt) : null, days = null;
+    if (when && !isNaN(when.getTime())) {
+      days = Math.max(0, Math.round((when.getTime() - Date.now()) / 86400000));
+    }
+    clear();
+    result.appendChild(linkTo(url));
+    result.appendChild(days === null
+      ? line("拿到連結的人可以讀 15 天，之後連結就會失效。",
+             "Anyone with the link can read it for 15 days, then it expires.")
+      : line("拿到連結的人還可以讀 " + days + " 天，到 " + when.toLocaleDateString() +
+             " 為止。",
+             "Anyone with the link can read it for " + days + " more day" +
+             (days === 1 ? "" : "s") + ", until " + when.toLocaleDateString() + "."));
+    result.appendChild(copyButton(url));
+  }
+
+  function refuseTranslated() {
+    clear();
+    result.appendChild(line(
+      "這一頁現在是機器翻譯的狀態，直接發布上去的會是翻譯，不是檔案本身。請先切回原本的語言，或是在下面選擇已經存好的檔案。",
+      "This page is machine-translated right now, so publishing it would publish the translation instead of the file. Switch back to the original language first — or choose the saved file here and that is what goes up."));
+    picker();
+  }
+
+  function picker() {
+    var input = document.createElement("input");
+    input.type = "file";
+    input.accept = "text/html,.html,.htm";
+    input.setAttribute("data-lisa-runtime", "");
+    input.setAttribute("aria-label", "選擇要發布的 HTML 檔案");
+    input.addEventListener("change", function () {
+      var f = input.files && input.files[0];
+      if (!f || busy) { return; }
+      var w = openReceiver();
+      if (!w) { return; }
+      handshake(w, f.text().then(checkSize));
+    });
+    result.appendChild(input);
+  }
+
+  /* ---------- 送出去的位元組 / the bytes that are published ---------- */
+  function checkSize(html) {
+    var bytes;
+    try { bytes = new Blob([html]).size; } catch (e) { bytes = html.length; }
+    if (bytes > MAX_BYTES) {
+      var mb = (bytes / 1048576).toFixed(1);
+      throw { zh: "這個檔案是 " + mb + " MB，htmlbyme.com 最多接受 10 MB。",
+              en: "This file is " + mb + " MB, and htmlbyme.com takes up to 10 MB." };
+    }
+    return html;
+  }
+
+  function source() {
+    if (/^https?:$/.test(location.protocol)) {
+      /* Served: send the bytes that are on the server, not a rebuild of
+         them. A snapshot is the fallback, not the first choice. */
+      return fetch(location.href, { cache: "no-store", credentials: "omit" })
+        .then(function (r) {
+          if (!r.ok) { throw new Error("http " + r.status); }
+          return r.text();
+        })
+        .catch(function () { return snapshot(); })
+        .then(checkSize);
+    }
+    /* file:// forbids a page reading itself, so it is rebuilt from the DOM. */
+    return Promise.resolve(snapshot()).then(checkSize);
+  }
+
+  function snapshot() {
+    var clone = document.documentElement.cloneNode(true);
+    each(clone, "[data-lisa-runtime]", function (el) {
+      if (el.parentNode) { el.parentNode.removeChild(el); }
+    });
+    resetForExport(clone);
+    return prologue() + clone.outerHTML + "\n";
+  }
+
+  /* The doctype and the LISA:CONTENT-MAP header are children of the
+     document, not of <html>, so cloning documentElement loses them. */
+  function prologue() {
+    var out = "", n;
+    for (n = document.firstChild; n; n = n.nextSibling) {
+      if (n === document.documentElement) { break; }
+      if (n.nodeType === 10) { out += "<!DOCTYPE " + n.name + ">\n"; }
+      else if (n.nodeType === 8) { out += "<!--" + n.data + "-->\n"; }
+    }
+    return out;
+  }
+
+  function each(scope, selector, fn) {
+    var found = scope.querySelectorAll(selector), i;
+    for (i = 0; i < found.length; i++) { fn(found[i]); }
+  }
+  function restore(el, saved) {
+    var i, name;
+    for (i = el.attributes.length - 1; i >= 0; i--) {
+      name = el.attributes[i].name;
+      if (!Object.prototype.hasOwnProperty.call(saved, name)) { el.removeAttribute(name); }
+    }
+    for (name in saved) {
+      if (Object.prototype.hasOwnProperty.call(saved, name)) { el.setAttribute(name, saved[name]); }
+    }
+  }
+
+  /* 這份簡報在執行時寫進自己 DOM 的每一樣東西，都放回標記本來的樣子：發布出
+     去的複本必須像一份全新的檔案那樣開起來 —— 第 01 頁、繁體中文、進場動畫
+     還沒播過。 */
+  function resetForExport(clone) {
+    var body = clone.querySelector("body");
+    var title = clone.querySelector("title");
+    restore(clone, BASE.html);
+    if (body) { restore(body, BASE.body); }
+    if (title) { title.textContent = BASE.title; }
+
+    /* The HTML parser moves whitespace that follows </html> into the end of
+       <body>, so a file ending in a newline gains one inside its body on
+       every load — and a snapshot of a snapshot would grow a newline at a
+       time. Collapse it back to the one newline the file was written with. */
+    if (body) {
+      while (body.lastChild && body.lastChild.nodeType === 3 &&
+             !body.lastChild.nodeValue.trim()) {
+        body.removeChild(body.lastChild);
+      }
+      body.appendChild(document.createTextNode("\n"));
+    }
+
+    /* this control: closed, empty, offering what the markup offers */
+    each(clone, '[data-lisa-share="root"]', function (el) { el.setAttribute("data-open", "false"); });
+    each(clone, '[data-lisa-share="toggle"]', function (el) { el.setAttribute("aria-expanded", "false"); });
+    each(clone, '[data-lisa-share="publish"]', function (el) { el.removeAttribute("hidden"); });
+    each(clone, '[data-lisa-share="copy"]', function (el) { el.setAttribute("hidden", ""); });
+    each(clone, '[data-lisa-share="result"]', function (el) {
+      el.textContent = ""; el.setAttribute("hidden", "");
+    });
+
+    /* 簡報本身：控制器的 observer 會在每一頁捲進畫面時加上 .visible，進度條
+       的寬度也是它寫成內聯自訂屬性的 */
+    each(clone, ".slide", function (el) { el.classList.remove("visible"); });
+    each(clone, ".progress-bar", function (el) { el.removeAttribute("style"); });
+
+    /* 選單關起來，生成出來的目錄丟掉 */
+    each(clone, "#deckMenu", function (el) { el.setAttribute("data-open", "false"); });
+    each(clone, "#deckMenuBtn", function (el) { el.setAttribute("aria-expanded", "false"); });
+    each(clone, "#deckMenuContents", function (el) { el.setAttribute("aria-expanded", "false"); });
+    each(clone, "#deckContents", function (el) {
+      el.textContent = ""; el.setAttribute("hidden", "");
+    });
+
+    /* 語言切換每次載入都會改寫的三個標籤，回到這個檔案本來寫的字串 */
+    if (BASE.dots !== null) {
+      each(clone, "#navDots", function (el) { el.setAttribute("aria-label", BASE.dots); });
+    }
+    if (BASE.menu !== null) {
+      each(clone, "#deckMenuBtn", function (el) { el.setAttribute("aria-label", BASE.menu); });
+    }
+    BASE.seg.forEach(function (s) {
+      if (!s.id || s.value === null) { return; }
+      each(clone, "#" + s.id, function (el) { el.setAttribute("aria-pressed", s.value); });
+    });
+
+    /* `export` 會把下載 HTML 那一項貼回選單，連同在 file:// 下把自己藏起來的
+       處理程式一起；發布出去的複本是被伺服器送出來的，所以它回到標記原本的
+       樣子 */
+    each(clone, "#deckMenuHtml", function (el) { el.removeAttribute("hidden"); });
+
+    /* 把最後一個 class 拿掉會留下 class=""，但標記裡本來連這個屬性都沒有。
+       這一掃放在最後，在上面每一項重設都做完之後。 */
+    each(clone, '[class=""]', function (el) { el.removeAttribute("class"); });
+  }
+
+  /* The gate reads this; nothing in the brief does. It is the one seam that
+     lets scripts/check_share_roundtrip.py publish without a network. */
+  root.__lisaShareSnapshot = snapshot;
+})();
+</script>
+      </div>
+<!-- LISA:SHARE-END -->
 
       <!-- menu.items: "home" / "github" — 預設不出現，因為它們的網址預設是
            null，而指向空白的選項比沒有選項更糟。答案帶了網址時再貼回來：
@@ -661,6 +1207,8 @@ class SlidePresentation {
     this.slides.forEach((_,i)=>{
       const dot=document.createElement('button');
       dot.className='nav-dot'+(i===0?' active':'');
+      /* 每次載入都從頁面清單重新生成，所以它不會出現在發布出去的複本裡。 */
+      dot.setAttribute('data-lisa-runtime','');
       dot.setAttribute('aria-label','前往第 '+(i+1)+' 頁');
       dot.addEventListener('click',()=>this.goTo(i));
       nav.appendChild(dot);
@@ -807,6 +1355,8 @@ window.__deckGo = function (i) { __deck.goTo(i); };
         var b = document.createElement("button");
         b.type = "button";
         b.setAttribute("role", "menuitem");
+        /* 每次載入都從頁面生成，所以它不會出現在發布出去的複本裡。 */
+        b.setAttribute("data-lisa-runtime", "");
         var n = document.createElement("span");
         n.className = "mn";
         n.textContent = String(i + 1).length < 2 ? "0" + (i + 1) : String(i + 1);
