@@ -1063,7 +1063,7 @@ var UI = {
             "OpenCode, Hermes, or anything else that can read a public URL. " +
             "The agent reads the skill from GitHub, builds it, and hands back " +
             "one standalone HTML file. Nothing to install.",
-            "Paste it into your agent's chat — that is the whole job."],
+            "Paste it into your agent's chat — that is the whole job. Building takes a few minutes, and the prompt asks it to tell you where it is as it goes."],
       stopped: ["Prompt ready to paste.",
                 "The runner stopped answering, so nothing was handed over automatically. " +
                 "Paste this to Lisa instead and she picks up from here.",
@@ -1151,7 +1151,7 @@ var UI = {
             "OpenCode, Hermes, 그 밖에 공개 URL을 읽을 수 있는 무엇이든. 에이전트가 " +
             "GitHub에서 스킬을 읽고, 만들고, 독립 실행형 HTML 파일 하나를 건네줍니다. " +
             "설치할 것은 없습니다.",
-            "에이전트 대화창에 붙여넣으면, 그걸로 끝입니다."],
+            "에이전트 대화창에 붙여넣으면, 그걸로 끝입니다. 만드는 데 몇 분 걸리고, 프롬프트에 진행 상황을 알려 달라고 적어 두었습니다."],
       stopped: ["붙여넣을 프롬프트가 준비됐습니다.",
                 "러너가 응답을 멈춰서 자동으로 전달된 것은 없습니다. 대신 이걸 Lisa에게 " +
                 "붙여넣으면 여기서부터 이어서 진행합니다.",
@@ -1237,7 +1237,7 @@ var UI = {
             "複製起來，貼給任何一個 coding agent — Claude Code、Codex、Pi、OpenCode、" +
             "Hermes，或任何讀得到公開網址的工具。agent 會從 GitHub 讀取這個技能，把它做" +
             "出來，然後交回一個獨立的 HTML 檔案。沒有東西要安裝。",
-            "貼進 agent 的對話框 — 這樣就完成了。"],
+            "貼進 agent 的對話框 — 這樣就完成了。做起來要幾分鐘，prompt 裡已經請它一邊做一邊告訴你進度。"],
       stopped: ["prompt 已經可以貼上了。",
                 "runner 沒有回應，所以沒有自動交出去。把這個貼給 Lisa，她會從這裡接手。",
                 "貼給你執行 /lisa 的那個 agent。"],
@@ -3329,22 +3329,46 @@ function show(key, needsCopy, json) {
    English ids (references/intake-contract.md). The panel says what to do with
    the prompt in the reader's own language, four ways: the Ready title, its
    lead, the tooltip and the button. What travels with the answers is the
-   handover format, and translating that would change what the agent reads. */
+   handover format, and translating that would change what the agent reads.
+
+   THE PROGRESS LINE IS PART OF THE INSTRUCTION, not a nicety appended to it.
+   A build is minutes long, and the person pasting this has just come off a
+   panel that answered every question in seconds — they have no scale for how
+   long "building" should take, and an agent that goes quiet for six minutes
+   is indistinguishable from one that has died. SKILL.md asks for the same
+   thing at more length ("Say where you are, as you go"), but the prompt has
+   to ask too: it is the only part of this that reaches an agent which has not
+   fetched the skill yet, or has fetched it and is about to start work on the
+   strength of these five lines. */
 function webPrompt(json) {
   return "Build me a standalone HTML page using\n" +
          "https://github.com/monomind-ai-lab/hi-ted-meet-lisa.\n" +
          "Read and follow https://www.hitedmeetlisa.cc/SKILL.md. My intake\n" +
          "answers are below — apply them instead of asking again, and hand\n" +
-         "back one standalone HTML file.\n\n" + json;
+         "back one standalone HTML file.\n\n" +
+         "This takes a few minutes, so tell me where you are as you go:\n" +
+         "before you start, say how many screens and languages you are\n" +
+         "writing and roughly how long it will take; then one short line at\n" +
+         "each step — template copied, halfway through the first language,\n" +
+         "that language done and the next starting, answers applied, checks\n" +
+         "running. One line each, sent before the step rather than after it.\n\n" +
+         json;
 }
 
 /* The local variant. Both fallbacks below are reached only from a copy of this
    panel the reader opened themselves, so they are already running /lisa
    and the skill is on disk. webPrompt's "read SKILL.md from the web" line would
-   send their agent to fetch what it already has. */
+   send their agent to fetch what it already has — but the progress request is
+   repeated here all the same, because it is the thing the reader is about to
+   spend minutes wanting and the cheapest place to ask for it is the prompt in
+   their hand. */
 function localPrompt(json) {
   return "Here are my /lisa intake answers. Apply them instead of asking\n" +
-         "again, and hand back one standalone HTML file.\n\n" + json;
+         "again, and hand back one standalone HTML file.\n\n" +
+         "Tell me where you are as you go: an estimate before you start,\n" +
+         "then one short line per step — template copied, halfway through\n" +
+         "the first language, that language done and the next starting,\n" +
+         "answers applied, checks running.\n\n" + json;
 }
 
 function submit() {
