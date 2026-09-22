@@ -18,7 +18,7 @@ The design system is not yours to invent — it ships inside each template. Your
 job is to **fill the template with content**, not to restyle it.
 
 **No local copy?** This file is served at
-<https://html.monomind.one/SKILL.md> to agents with no checkout or plugin.
+<https://www.hitedmeetlisa.cc/SKILL.md> to agents with no checkout or plugin.
 Every path it names is fetchable at
 `https://raw.githubusercontent.com/monomind-ai-lab/hi-ted-meet-lisa/main/<path>`
 — same paths, raw files. Download the template that way instead of `cp`-ing
@@ -50,7 +50,7 @@ The prompt carries the brief. Everything else comes from the intake panel.
    hand over the hosted panel and wait. Say roughly this, adapted:
 
    > Lisa takes the brief through a short visual panel rather than a
-   > conversation: **https://html.monomind.one/intake** — put your brief
+   > conversation: **https://www.hitedmeetlisa.cc/intake** — put your brief
    > on the first screen, pick a template, answer as much or as little as you
    > like (every question has a default). The last step hands you a block of
    > text: paste it back here and I will build it.

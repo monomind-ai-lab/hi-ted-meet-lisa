@@ -205,7 +205,7 @@ Translate leaves it alone — "Made with" is meant to translate.
 
 ```html
 <p class="deck-colophon">Made with
-  <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer"><span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></a></p>
+  <a href="https://www.hitedmeetlisa.cc/?ref=file" target="_blank" rel="noopener noreferrer"><span class="notranslate" translate="no">Hi Ted, Meet Lisa</span></a></p>
 ```
 
 ## When unsure, default to

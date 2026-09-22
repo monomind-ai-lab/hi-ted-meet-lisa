@@ -13,7 +13,7 @@ panel falls back to a typographic card, so a missing thumbnail degrades the
 gallery rather than breaking it.
 
 The templates whose `thumb_source` is a preview under previews/ are captured
-from https://html.monomind.one/ — those files live in the website repository
+from https://www.hitedmeetlisa.cc/ — those files live in the website repository
 now — so re-capturing those needs a network connection.
 
 How a capture settles. Chrome is driven by command-line flags alone here — no
@@ -61,7 +61,7 @@ REGISTRY = ROOT / "templates" / "templates.json"
 # is not on disk is resolved to the published copy instead of skipped: headless
 # Chrome screenshots a URL exactly as it screenshots a file, so the only cost is
 # that re-capturing those nine thumbnails now needs a network connection.
-HOSTED_BASE = "https://html.monomind.one/"
+HOSTED_BASE = "https://www.hitedmeetlisa.cc/"
 
 CHROME_CANDIDATES = [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",

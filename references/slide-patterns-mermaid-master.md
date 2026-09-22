@@ -105,8 +105,8 @@ ships by default; remove the `<a>` (only) when the intake answered
 `credit: false`.
 
 ```html
-<footer><span>[DOCUMENT · VERSION · DATE]</span> <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener">Made with Hi Ted, Meet Lisa</a></footer>
-<footer><span>[문서 · 버전 · 날짜]</span> <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener">Hi Ted, Meet Lisa로 제작</a></footer>
+<footer><span>[DOCUMENT · VERSION · DATE]</span> <a href="https://www.hitedmeetlisa.cc/?ref=file" target="_blank" rel="noopener">Made with Hi Ted, Meet Lisa</a></footer>
+<footer><span>[문서 · 버전 · 날짜]</span> <a href="https://www.hitedmeetlisa.cc/?ref=file" target="_blank" rel="noopener">Hi Ted, Meet Lisa로 제작</a></footer>
 ```
 
 ## Dependencies

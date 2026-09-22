@@ -111,7 +111,7 @@ the intake answered `credit: false` — the `monomind ai lab` identity link
 before it belongs to the logo answer, not to this one.
 
 ```html
-&middot; <a href="https://html.monomind.one/?ref=file" target="_blank" rel="noopener noreferrer"><span class="en">Made with Hi Ted, Meet Lisa</span><span class="ko">Hi Ted, Meet Lisa로 제작</span></a>
+&middot; <a href="https://www.hitedmeetlisa.cc/?ref=file" target="_blank" rel="noopener noreferrer"><span class="en">Made with Hi Ted, Meet Lisa</span><span class="ko">Hi Ted, Meet Lisa로 제작</span></a>
 ```
 
 ## Dependencies

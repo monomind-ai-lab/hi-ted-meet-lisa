@@ -30,7 +30,7 @@ as they are.
   opens the panel in your browser and the answers **post straight back** — no
   copy-paste, and you watch the build happen.
 - **Hosted panel** — sandboxes with no browser to open:
-  <https://html.monomind.one/intake>. The last step hands you a block of text
+  <https://www.hitedmeetlisa.cc/intake>. The last step hands you a block of text
   to paste back into the conversation. Same payload either way.
 
 A short set of questions, how many depending on the template, every one with a default.
@@ -79,10 +79,10 @@ the draft is delivered first, then `/lisa-review` runs when you say so;
 
 ## Key URLs
 
-- <https://html.monomind.one> — the front door: live template previews, the
+- <https://www.hitedmeetlisa.cc> — the front door: live template previews, the
   intake panel, and a paste-ready prompt for any agent.
-- <https://html.monomind.one/intake> — the hosted intake panel.
-- <https://html.monomind.one/SKILL.md> — the full `/lisa` procedure, for
+- <https://www.hitedmeetlisa.cc/intake> — the hosted intake panel.
+- <https://www.hitedmeetlisa.cc/SKILL.md> — the full `/lisa` procedure, for
   agents with no install; every repository path it names is fetchable at
   `https://raw.githubusercontent.com/monomind-ai-lab/hi-ted-meet-lisa/main/<path>`.
 - <https://github.com/monomind-ai-lab/hi-ted-meet-lisa> — the repository;
