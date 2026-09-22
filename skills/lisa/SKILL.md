@@ -137,8 +137,8 @@ The prompt carries the brief. Everything else comes from the intake panel.
    ```
 
    It applies every mechanical answer — theme, menu, language-switch
-   trimming, noTranslate terms, export, credit, gradient backgrounds, accent
-   tokens — printing one line per answer: `APPLIED`, `SKIPPED (reason)`, or
+   trimming, noTranslate terms, export, credit, share, gradient backgrounds,
+   accent tokens — printing one line per answer: `APPLIED`, `SKIPPED (reason)`, or
    `NOT-MECHANICAL (left to the agent)`. Do by hand **only** the
    `NOT-MECHANICAL` rows and any `SKIPPED` row not already in the asked-for
    state, per `references/applying-answers.md` — the authority for what each
@@ -164,6 +164,20 @@ The prompt carries the brief. Everything else comes from the intake panel.
    the browser checks cannot run: say which you skipped rather than implying a
    clean pass, and tell the reader how — serve over http, look for console
    errors and horizontal overflow at 375px.
+
+   **If the file kept its Share control** (`share` was not answered `false`),
+   check that the copy it would publish is really a copy of it:
+
+   ```sh
+   python3 scripts/check_share_roundtrip.py OUT.html
+   ```
+
+   On `file://` a file cannot read itself, so Publish link rebuilds it from
+   the DOM. This gate dirties the file, publishes it against a stub receiver —
+   nothing contacts htmlbyme.com — opens the result fresh and fails when the
+   copy boots somewhere other than the original, carries a runtime-injected
+   node or an open menu, loses a content fence, or is not byte-stable on a
+   second publish. Same exit convention: 1 is a finding, 2 is the browser.
 
 9. **Review as scheduled.** `answers.review` decides when the design pass
    (`references/design-review.md`) runs: **`after`** (the default) — deliver
@@ -230,6 +244,9 @@ branding — see `skills/lisa-design/SKILL.md`.
       path, command, and product name in English**
 - [ ] Switching back to EN fully restores the original text
 - [ ] No `[PLACEHOLDER]` survives anywhere
+- [ ] Share opens, Escape closes it and focus returns, and the file it would
+      publish opens like the original — `check_share_roundtrip.py` answers the
+      second half; skip the row only when `share: false` removed the control
 - [ ] Readable at a phone width — a `layout: reflow` template re-lays out
       with nothing overflowing sideways; a `layout: stage` template is not
       expected to reflow: it letterboxes cleanly, the canvas scaled uniformly
@@ -252,6 +269,7 @@ branding — see `skills/lisa-design/SKILL.md`.
 | `assets/monomind-mark-white.svg` | The MonoMind mark, `currentColor`, with a `viewBox`. |
 | `scripts/tedandlisa_intake.py` | Serves the panel, captures the answers. Stdlib only. |
 | `scripts/tedandlisa_apply.py` | Applies the mechanical answers, reports the rest. |
+| `scripts/check_share_roundtrip.py` | The Share gate: publishes the file against a stub receiver and opens the copy it would hand over. |
 | `scripts/tedandlisa_new_template.py`, `_thumbs.py`, `_intake_fallback.py` | Registry, thumbnail, and panel-fallback maintenance. |
 | `skills/lisa-review/` | The design pass as its own command, `/lisa-review`. |
 | `skills/lisa-lang/` | Layers more languages onto a delivered file, `/lisa-lang`. |

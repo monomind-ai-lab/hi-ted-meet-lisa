@@ -7,6 +7,9 @@
        <title> in <head>
        the <h1> and .subtitle in the header (chrome controls sit between them)
        the footer meta line [PROJECT] · [VERSION] · [DATE]
+     Two LISA:SHARE-START/END regions carry the Share control — its <style> in
+     <head> and its markup + script in the header chrome. They are deleted
+     together when the intake answers `share: false`, and are not authorable content.
      Everything else (head, CSS, chrome markup, scripts, artwork) is load-bearing:
      copy this file with cp, never retype it, and edit only what is named here. -->
 <html lang="en">
@@ -95,6 +98,10 @@ h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.025em; }
   color: var(--muted); font-family: var(--mono); font-size: 11px; font-weight: 500;
   cursor: pointer; transition: background .15s, color .15s;
 }
+/* `hidden` has to win over the display above: the user-agent's own
+   `[hidden]{display:none}` loses to a class selector, so the self-download
+   the script hides on file:// stayed in the cluster with no handler attached. */
+.seg button[hidden] { display: none; }
 .seg button:last-child { border-right: 0; }
 .seg button:hover { background: var(--panel); color: var(--ink); }
 .seg button.active { background: var(--s-frontend); color: var(--ground); }
@@ -154,6 +161,69 @@ footer a { color: inherit; }
   .chrome { margin-left: 0; width: 100%; }
 }
 </style>
+<!-- LISA:SHARE-START styles — the Share control's own stylesheet, kept in its
+     own <style> so the whole control is two deletable regions and nothing
+     else. Intake-driven: `share: false` removes this region and the
+     markup+script region in the header chrome, and the file is what it was
+     without them. Written in this template's own tokens: the button is a
+     third .seg segment, the panel a slate card on the same hairline. -->
+<style>
+/* ── share (a third segment in .chrome) ─────────────────────────── */
+/* .seg clips its children so the segment reads as one object; this one
+   carries a popover, so it un-clips and becomes the panel's anchor. */
+.sharewrap { position: relative; overflow: visible; }
+/* Its button is the segment's only child but not its :last-child — the
+   panel follows it — so the divider rule has to be taken off by hand. */
+#btnShare { border-right: 0; }
+.sharewrap[data-open="true"] #btnShare { background: var(--panel); color: var(--ink); }
+.sharepanel {
+  display: none; position: absolute; top: calc(100% + 6px); right: 0;
+  width: min(300px, calc(100vw - 2rem)); flex-direction: column; gap: 2px;
+  padding: 6px; z-index: 20; background: var(--ground);
+  border: 1px solid var(--hairline); border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(2, 6, 23, 0.45);
+}
+html[data-theme="light"] .sharepanel { box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12); }
+.sharewrap[data-open="true"] .sharepanel { display: flex; }
+.sharepanel button {
+  display: flex; align-items: flex-start; gap: 8px; width: 100%;
+  padding: 9px 10px; border: 0; border-radius: 6px; background: transparent;
+  color: var(--muted); font-family: var(--mono); font-size: 11px; font-weight: 500;
+  line-height: 1.45; text-align: left; cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.sharepanel button:hover { background: var(--panel); color: var(--ink); }
+/* the same inset ring the segments already use */
+.sharepanel button:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--s-frontend); }
+.sharepanel button[hidden] { display: none; }
+.sharepanel svg { width: 14px; height: 14px; fill: none; stroke: currentColor;
+  stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; margin-top: 1px; }
+/* --faint is tuned for the footer's 0.72rem on the dark ground and lands
+   under 3:1 on the light one, so every small line in here takes --muted. */
+.sharesub { display: block; margin-top: 3px; font-size: 10px; font-weight: 400; color: var(--muted); }
+.sharenote { margin: 4px 10px 6px; font-family: var(--mono); font-size: 10px;
+  line-height: 1.55; color: var(--muted); text-wrap: pretty; }
+.shareout { margin: 2px 10px 6px; font-family: var(--mono); font-size: 10.5px;
+  line-height: 1.6; color: var(--muted); overflow-wrap: anywhere; text-wrap: pretty; }
+.shareout[hidden] { display: none; }
+.shareout p { margin: 0 0 5px; }
+.shareout a { display: block; margin-bottom: 5px; color: var(--s-frontend); }
+.shareout button { width: auto; padding: 4px 8px; font-size: 10px;
+  border: 1px solid var(--hairline); }
+.shareout input[type=file] { display: block; margin-top: 8px; font-family: var(--mono);
+  font-size: 10px; color: var(--muted); max-width: 100%; }
+/* Below 720px the chrome drops onto its own full-width row, left-aligned, and
+   the panel hangs from this segment's right edge — so the segment is pushed to
+   the end of that row and the panel can never reach past the viewport. */
+@media (max-width: 720px) { .sharewrap { margin-left: auto; } }
+/* The reader's print is of the diagram, not of its chrome — the same list
+   .chrome is already on. */
+@media print { .sharewrap, .sharepanel { display: none !important; } }
+/* This template has no global reduced-motion rule, so the one transition
+   added here carries its own. */
+@media (prefers-reduced-motion: reduce) { .sharepanel button { transition: none; } }
+</style>
+<!-- LISA:SHARE-END -->
 </head>
 <body data-lang="en">
 
@@ -184,6 +254,467 @@ footer a { color: inherit; }
           <button id="btnEn" class="active">EN</button>
           <button id="btnKo">한국어</button>
         </div>
+<!-- LISA:SHARE-START markup+script — the Share control: one more .seg in the
+     header chrome, its menu, and the hand-off to htmlbyme.com. Intake-driven
+     (`share`): `share: false` deletes this region and the <style> region in
+     <head>, and nothing outside the two fences names either. It is appended
+     to the cluster rather than inserted into it, so the file's own two
+     segments keep the order they shipped in and the panel hangs from the
+     right edge the cluster already ends at. Every visible string carries both
+     languages, like the rest of this file — body[data-lang] picks one. -->
+        <div class="seg sharewrap" id="shareWrap" data-lisa-share="root" data-open="false">
+          <button id="btnShare" type="button" aria-haspopup="true" aria-expanded="false"
+                  aria-controls="sharePanel" title="Share" aria-label="Share"
+                  data-lisa-share="toggle">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="17.5" cy="5.5" r="2.4"/><circle cx="6.5" cy="12" r="2.4"/><circle cx="17.5" cy="18.5" r="2.4"/><path d="m8.9 10.8 6.2-3.7m0 9.8-6.2-3.7"/></svg>
+            <span><span class="en">Share</span><span class="ko">공유</span></span>
+          </button>
+          <div class="sharepanel" id="sharePanel" role="menu" aria-labelledby="btnShare"
+               data-lisa-share="panel">
+            <button type="button" role="menuitem" id="btnPublish" data-lisa-share="publish">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.6 13.4a3.7 3.7 0 0 0 5.2 0l2.4-2.4a3.7 3.7 0 0 0-5.2-5.2l-1.2 1.2"/><path d="M13.4 10.6a3.7 3.7 0 0 0-5.2 0l-2.4 2.4a3.7 3.7 0 0 0 5.2 5.2l1.2-1.2"/></svg>
+              <span><span class="en">Publish link<span class="sharesub">Publish to htmlbyme.com</span></span><span class="ko">링크로 공개<span class="sharesub">htmlbyme.com에 올립니다</span></span></span>
+            </button>
+            <button type="button" role="menuitem" id="btnCopyLink" data-lisa-share="copy" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.4"/><path d="M15 5.6A1.6 1.6 0 0 0 13.4 4H5.6A1.6 1.6 0 0 0 4 5.6v7.8A1.6 1.6 0 0 0 5.6 15"/></svg>
+              <span><span class="en">Copy link<span class="sharesub">This page&rsquo;s own address</span></span><span class="ko">링크 복사<span class="sharesub">지금 보고 있는 주소</span></span></span>
+            </button>
+            <p class="sharenote" role="none"><span class="en">Public link &middot; expires in 15 days &middot; free, by MonoMind</span><span class="ko">공개 링크 &middot; 15일 뒤 만료 &middot; MonoMind 무료 제공</span></p>
+            <div class="shareout" id="shareOut" role="none" data-lisa-share="result" aria-live="polite" hidden></div>
+          </div>
+<script>
+/*
+  Share → Publish link.
+
+  The finished file is handed to htmlbyme.com — a separate, free MonoMind
+  service that hosts one HTML file behind a public link for 15 days — and the
+  link comes back here. Nothing in this block calls an API or carries a key:
+  the document travels through window.opener and postMessage with the
+  receiving origin pinned on every message, and the person confirms the
+  publish on htmlbyme.com's own page. Until they do, nothing has left here.
+
+  It sits in the header chrome rather than beside the script at the foot
+  because the chrome is parsed before the first <script> runs, so this is the
+  last moment at which <html>, <body> and <title> still carry what the author
+  wrote. That baseline is what a published copy is restored to, which is why
+  the copy opens in English on the dark theme however the reader had set this
+  one when they published it.
+*/
+(function () {
+  "use strict";
+
+  /* A fork repoints these two, and nothing else names the host. */
+  var PUBLISH_URL    = "https://htmlbyme.com/publish";
+  var PUBLISH_ORIGIN = "https://htmlbyme.com";
+  /* The only prefix a returned link may carry. Anything else is refused. */
+  var LINK_PREFIX    = "https://link.htmlbyme.com/";
+  var SANDBOX_HOST   = "link.htmlbyme.com";
+  var TEMPLATE       = "architecture";
+  var HANDSHAKE_MS   = 60000;
+  var MAX_BYTES      = 10 * 1024 * 1024;
+
+  function attrsOf(el) {
+    var out = {}, a = el.attributes, i;
+    for (i = 0; i < a.length; i++) { out[a[i].name] = a[i].value; }
+    return out;
+  }
+  var BASE = { title: document.title, html: attrsOf(document.documentElement),
+               body: attrsOf(document.body) };
+
+  var root       = document.getElementById("shareWrap");
+  var toggle     = document.getElementById("btnShare");
+  var panel      = document.getElementById("sharePanel");
+  var publishBtn = document.getElementById("btnPublish");
+  var copyBtn    = document.getElementById("btnCopyLink");
+  var result     = document.getElementById("shareOut");
+  if (!root || !toggle || !panel || !publishBtn || !copyBtn || !result) { return; }
+
+  function sandboxed() {
+    try {
+      if (location.hostname === SANDBOX_HOST) { return true; }
+      /* An opaque origin: the page is sandboxed, so any window it opens is
+         sandboxed too and can never hold the other half of the hand-off. */
+      return /^https?:$/.test(location.protocol) && window.origin === "null";
+    } catch (e) { return true; }
+  }
+  if (sandboxed()) { publishBtn.hidden = true; copyBtn.hidden = false; }
+
+  /* A browser translation rewrites every text node in place; publishing then
+     would publish the translation instead of the file. */
+  function translated() {
+    var c = document.documentElement.className || "";
+    return c.indexOf("translated-ltr") !== -1 || c.indexOf("translated-rtl") !== -1;
+  }
+
+  /* ---------- the menu ---------- */
+  function items() {
+    return Array.prototype.filter.call(panel.querySelectorAll("button"),
+                                       function (b) { return !b.hidden; });
+  }
+  function isOpen() { return root.getAttribute("data-open") === "true"; }
+  function setOpen(open) {
+    root.setAttribute("data-open", open ? "true" : "false");
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    if (open) { var first = items()[0]; if (first) { first.focus(); } }
+  }
+  toggle.addEventListener("click", function (e) { e.stopPropagation(); setOpen(!isOpen()); });
+  document.addEventListener("click", function (e) {
+    if (isOpen() && !root.contains(e.target)) { setOpen(false); }
+  });
+  root.addEventListener("keydown", function (e) {
+    var list, i;
+    if (e.key === "Escape") {
+      if (isOpen()) { setOpen(false); toggle.focus(); e.stopPropagation(); }
+    } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      if (!isOpen()) { setOpen(true); }
+      else {
+        list = items();
+        if (list.length) {
+          i = list.indexOf(document.activeElement);
+          i = (e.key === "ArrowDown") ? (i + 1) % list.length
+                                      : (i <= 0 ? list.length - 1 : i - 1);
+          list[i].focus();
+        }
+      }
+      e.preventDefault();
+    }
+  });
+
+  /* ---------- what the panel says ----------
+     Both languages, written as .en/.ko spans: body[data-lang] picks one,
+     exactly as it does for every other string in this file. */
+  function span(cls, text) {
+    var s = document.createElement("span");
+    s.className = cls;
+    s.textContent = text;
+    return s;
+  }
+  function clear() { result.textContent = ""; result.hidden = false; return result; }
+  function line(en, ko) {
+    var p = document.createElement("p");
+    p.appendChild(span("en", en));
+    p.appendChild(span("ko", ko));
+    return p;
+  }
+  function say(en, ko) { clear().appendChild(line(en, ko)); }
+  function linkTo(url) {
+    var a = document.createElement("a");
+    a.href = url;               /* only ever PUBLISH_URL or a checked link */
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.textContent = url;        /* text, never markup */
+    return a;
+  }
+
+  /* ---------- copying ---------- */
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+    /* The async Clipboard API is unavailable in an insecure or
+       permission-restricted context — a sandboxed share URL is one — so a
+       selection copy backs it up. */
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.setAttribute("data-lisa-runtime", "");
+      ta.style.cssText = "position:fixed;left:-9999px;top:0;opacity:0";
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (err) { ok = false; }
+      document.body.removeChild(ta);
+      if (ok) { resolve(); } else { reject(new Error("copy refused")); }
+    });
+  }
+  function copyButton(text) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("role", "menuitem");
+    b.setAttribute("data-lisa-runtime", "");
+    b.appendChild(span("en", "Copy"));
+    b.appendChild(span("ko", "복사"));
+    b.addEventListener("click", function () {
+      copyText(text).then(function () {
+        b.textContent = "";
+        b.appendChild(span("en", "Copied"));
+        b.appendChild(span("ko", "복사됨"));
+      }, function () {
+        b.textContent = "";
+        b.appendChild(span("en", "Select it and ⌘C"));
+        b.appendChild(span("ko", "선택 후 ⌘C"));
+      });
+    });
+    return b;
+  }
+  copyBtn.addEventListener("click", function () {
+    copyText(location.href).then(
+      function () { say("Copied this page's address.", "이 페이지 주소를 복사했습니다."); },
+      function () { say("Copying was refused — the address is in the address bar.",
+                        "복사가 거부되었습니다 — 주소는 주소창에 있습니다."); });
+  });
+
+  /* ---------- the hand-off ---------- */
+  var busy = false;
+  publishBtn.addEventListener("click", function () { publish(); });
+
+  function publish() {
+    if (busy) { return; }
+    if (translated()) { refuseTranslated(); return; }
+    var w = openReceiver();
+    if (!w) { return; }
+    handshake(w, source());
+  }
+
+  function openReceiver() {
+    var w = null;
+    /* Opened synchronously inside the click: a window asked for after an
+       await is a window the browser blocks. No `noopener`/`noreferrer` —
+       the receiving page answers through window.opener, and that is the
+       whole hand-off. */
+    try { w = window.open(PUBLISH_URL, "_blank"); } catch (e) { w = null; }
+    if (!w) {
+      /* There is no second route: htmlbyme.com only ever receives a file
+         through this window, so the only thing to say is how to let the
+         window open. */
+      say("Your browser blocked the new tab. Allow pop-ups for this page, then press Publish link again.",
+          "브라우저가 새 탭을 막았습니다. 이 페이지의 팝업을 허용한 뒤 ‘링크로 공개’를 다시 눌러 주세요.");
+      return null;
+    }
+    busy = true;
+    say("Confirm in the htmlbyme.com tab, and the link comes back here.",
+        "htmlbyme.com 탭에서 확인하면 링크가 여기로 돌아옵니다.");
+    return w;
+  }
+
+  function handshake(w, pending) {
+    var finished = false, timer = null;
+
+    function finish() {
+      if (finished) { return; }
+      finished = true;
+      busy = false;
+      if (timer) { clearTimeout(timer); timer = null; }
+      window.removeEventListener("message", onMessage);
+    }
+
+    function onMessage(e) {
+      /* Both halves checked on every message: the window this page opened,
+         and the origin it was opened at. Neither is ever relaxed. */
+      if (finished || e.source !== w || e.origin !== PUBLISH_ORIGIN) { return; }
+      var d = e.data;
+      if (!d || typeof d !== "object") { return; }
+
+      if (d.type === "htmlbyme:ready") {
+        /* Protocol v1.1: every ready that passes the source and origin
+           checks above is answered, not only the first. A reader who
+           reloads the htmlbyme tab would otherwise sit out the timeout
+           holding nothing. `pending` is one promise, built once per
+           click, so every answer carries the same bytes — and the
+           exchange still ends exactly once, on htmlbyme:published or
+           on the timeout, and the listener goes with it. */
+        pending.then(function (html) {
+          if (finished) { return; }
+          w.postMessage({ type: "htmlbyme:document", v: 1, html: html,
+                          title: document.title,
+                          generator: "hi-ted-meet-lisa", template: TEMPLATE },
+                        PUBLISH_ORIGIN);
+        }, function (err) {
+          say(err && err.en ? err.en : "This page's own source could not be read.",
+              err && err.ko ? err.ko : "이 페이지의 원본을 읽지 못했습니다.");
+          finish();
+        });
+        return;
+      }
+
+      if (d.type === "htmlbyme:published") {
+        var url = (typeof d.url === "string") ? d.url : "";
+        if (url.slice(0, LINK_PREFIX.length) !== LINK_PREFIX) {
+          /* Said and dropped, not acted on — and the exchange stays open, so
+             one malformed answer cannot cost the reader the real one. */
+          say("That answer carried no " + LINK_PREFIX + " link, so it was ignored.",
+              "응답에 " + LINK_PREFIX + " 링크가 없어 무시했습니다.");
+          return;
+        }
+        published(url, d.expires_at);
+        finish();
+      }
+    }
+
+    window.addEventListener("message", onMessage);
+    timer = setTimeout(function () {
+      finish();
+      say("Still waiting — finish in the htmlbyme.com tab and the link will appear there.",
+          "아직 기다리는 중입니다 — htmlbyme.com 탭에서 마치면 링크가 그곳에 나타납니다.");
+    }, HANDSHAKE_MS);
+  }
+
+  function published(url, expiresAt) {
+    var when = expiresAt ? new Date(expiresAt) : null, days = null;
+    if (when && !isNaN(when.getTime())) {
+      days = Math.max(0, Math.round((when.getTime() - Date.now()) / 86400000));
+    }
+    clear();
+    result.appendChild(linkTo(url));
+    result.appendChild(days === null
+      ? line("Anyone with the link can read it for 15 days, then it expires.",
+             "링크를 가진 사람은 15일 동안 읽을 수 있고, 그 뒤에는 만료됩니다.")
+      : line("Anyone with the link can read it for " + days + " more day" +
+             (days === 1 ? "" : "s") + ", until " + when.toLocaleDateString() + ".",
+             "링크를 가진 사람은 " + days + "일 더, " + when.toLocaleDateString() +
+             "까지 읽을 수 있습니다."));
+    result.appendChild(copyButton(url));
+  }
+
+  function refuseTranslated() {
+    clear();
+    result.appendChild(line(
+      "This page is machine-translated right now, so publishing it would publish the translation instead of the file. Switch back to the original language first — or choose the saved file here and that is what goes up.",
+      "지금 이 페이지는 기계 번역된 상태라, 그대로 올리면 파일 대신 번역본이 올라갑니다. 원래 언어로 되돌리거나, 저장해 둔 파일을 아래에서 고르세요."));
+    picker();
+  }
+
+  function picker() {
+    var input = document.createElement("input");
+    input.type = "file";
+    input.accept = "text/html,.html,.htm";
+    input.setAttribute("data-lisa-runtime", "");
+    input.setAttribute("aria-label", "Choose the saved HTML file to publish");
+    input.addEventListener("change", function () {
+      var f = input.files && input.files[0];
+      if (!f || busy) { return; }
+      var w = openReceiver();
+      if (!w) { return; }
+      handshake(w, f.text().then(checkSize));
+    });
+    result.appendChild(input);
+  }
+
+  /* ---------- the bytes that are published ---------- */
+  function checkSize(html) {
+    var bytes;
+    try { bytes = new Blob([html]).size; } catch (e) { bytes = html.length; }
+    if (bytes > MAX_BYTES) {
+      var mb = (bytes / 1048576).toFixed(1);
+      throw { en: "This file is " + mb + " MB, and htmlbyme.com takes up to 10 MB.",
+              ko: "이 파일은 " + mb + " MB이고, htmlbyme.com은 10 MB까지 받습니다." };
+    }
+    return html;
+  }
+
+  function source() {
+    if (/^https?:$/.test(location.protocol)) {
+      /* Served: send the bytes that are on the server, not a rebuild of
+         them. A snapshot is the fallback, not the first choice. */
+      return fetch(location.href, { cache: "no-store", credentials: "omit" })
+        .then(function (r) {
+          if (!r.ok) { throw new Error("http " + r.status); }
+          return r.text();
+        })
+        .catch(function () { return snapshot(); })
+        .then(checkSize);
+    }
+    /* file:// forbids a page reading itself, so it is rebuilt from the DOM. */
+    return Promise.resolve(snapshot()).then(checkSize);
+  }
+
+  function snapshot() {
+    var clone = document.documentElement.cloneNode(true);
+    each(clone, "[data-lisa-runtime]", function (el) {
+      if (el.parentNode) { el.parentNode.removeChild(el); }
+    });
+    resetForExport(clone);
+    return prologue() + clone.outerHTML + "\n";
+  }
+
+  /* The doctype and the LISA:CONTENT-MAP header are children of the
+     document, not of <html>, so cloning documentElement loses them. */
+  function prologue() {
+    var out = "", n;
+    for (n = document.firstChild; n; n = n.nextSibling) {
+      if (n === document.documentElement) { break; }
+      if (n.nodeType === 10) { out += "<!doctype " + n.name + ">\n"; }
+      else if (n.nodeType === 8) { out += "<!--" + n.data + "-->\n"; }
+    }
+    return out;
+  }
+
+  function each(scope, selector, fn) {
+    var found = scope.querySelectorAll(selector), i;
+    for (i = 0; i < found.length; i++) { fn(found[i]); }
+  }
+  function restore(el, saved) {
+    var i, name;
+    for (i = el.attributes.length - 1; i >= 0; i--) {
+      name = el.attributes[i].name;
+      if (!Object.prototype.hasOwnProperty.call(saved, name)) { el.removeAttribute(name); }
+    }
+    for (name in saved) {
+      if (Object.prototype.hasOwnProperty.call(saved, name)) { el.setAttribute(name, saved[name]); }
+    }
+  }
+
+  /* Everything this file writes into its own DOM at runtime, put back the way
+     the markup had it: a published copy has to boot like a fresh one, in
+     English, on the theme the author shipped. The diagram itself is static
+     SVG and is never touched, which is why this list is short. */
+  function resetForExport(clone) {
+    var body = clone.querySelector("body");
+    var title = clone.querySelector("title");
+    /* data-theme on <html>, lang on <html> and data-lang on <body> are all
+       written by the chrome script; the baseline takes every one of them. */
+    restore(clone, BASE.html);
+    if (body) { restore(body, BASE.body); }
+    if (title) { title.textContent = BASE.title; }
+
+    /* The HTML parser moves whitespace that follows </html> into the end of
+       <body>, so a file ending in a newline gains one inside its body on
+       every load — and a snapshot of a snapshot would grow a newline at a
+       time. Collapse it back to the one newline the file was written with. */
+    if (body) {
+      while (body.lastChild && body.lastChild.nodeType === 3 &&
+             !body.lastChild.nodeValue.trim()) {
+        body.removeChild(body.lastChild);
+      }
+      body.appendChild(document.createTextNode("\n"));
+    }
+
+    /* this control: closed, empty, offering what the markup offers */
+    each(clone, '[data-lisa-share="root"]', function (el) { el.setAttribute("data-open", "false"); });
+    each(clone, '[data-lisa-share="toggle"]', function (el) { el.setAttribute("aria-expanded", "false"); });
+    each(clone, '[data-lisa-share="publish"]', function (el) { el.removeAttribute("hidden"); });
+    each(clone, '[data-lisa-share="copy"]', function (el) { el.setAttribute("hidden", ""); });
+    each(clone, '[data-lisa-share="result"]', function (el) {
+      el.textContent = ""; el.setAttribute("hidden", "");
+    });
+
+    /* the language pair marks the language in flow, so it goes back to the
+       default the restored body[data-lang] now shows */
+    each(clone, "#btnEn", function (el) { el.classList.add("active"); });
+    each(clone, "#btnKo", function (el) { el.classList.remove("active"); });
+
+    /* the theme control renames itself on every toggle, and the export takes
+       itself off on file://; a published copy is served, so both go back to
+       what the markup says */
+    each(clone, "#btnHtml", function (el) { el.removeAttribute("hidden"); });
+    each(clone, "#btnTheme", function (el) {
+      el.setAttribute("title", "Theme");
+      el.setAttribute("aria-label", "Theme");
+    });
+
+    /* Taking the last class off an element leaves class="" behind, and the
+       markup had no attribute at all. Swept last, after every reset above. */
+    each(clone, '[class=""]', function (el) { el.removeAttribute("class"); });
+  }
+
+  /* The gate reads this; nothing in the document does. It is the one seam
+     that lets scripts/check_share_roundtrip.py publish without a network. */
+  root.__lisaShareSnapshot = snapshot;
+})();
+</script>
+        </div>
+<!-- LISA:SHARE-END -->
       </div>
     </div>
     <p class="subtitle"><span class="en">[One or two sentences: what this system is, and what the diagram is meant to settle.]</span><span class="ko">[한두 문장: 이 시스템이 무엇이고, 이 다이어그램이 무엇을 정리하는지.]</span></p>
@@ -329,6 +860,17 @@ footer a { color: inherit; }
   var body = document.body;
   var $ = function (id) { return document.getElementById(id); };
 
+  /* ---- remembering ----
+     Storage throws rather than fails on an opaque origin — a page served
+     under `Content-Security-Policy: sandbox` with no allow-same-origin, a
+     private window, a partitioned frame — so the first touch of
+     localStorage would take this whole block down. Both directions go
+     through these two, and a host that refuses to remember simply gets the
+     defaults the markup already carries. Both languages are written into
+     this file, so nothing here needs storage to work. */
+  function recall(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+  function remember(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+
   /* ---- theme ---- */
   var THEME_KEY = 'monomind-arch-theme';
   var tBtn = $('btnTheme');
@@ -342,13 +884,12 @@ footer a { color: inherit; }
     }
   }
   if (tBtn) {
-    var saved = null;
-    try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+    var saved = recall(THEME_KEY);
     applyTheme(saved || (root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'));
     tBtn.addEventListener('click', function () {
       var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
       applyTheme(next);
-      try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+      remember(THEME_KEY, next);
     });
   }
 
@@ -362,13 +903,13 @@ footer a { color: inherit; }
     if (en) { en.classList.toggle('active', l === 'en'); }
     if (ko) { ko.classList.toggle('active', l === 'ko'); }
   }
-  try { applyLang(localStorage.getItem(LANG_KEY) || 'en'); } catch (e) { applyLang('en'); }
+  applyLang(recall(LANG_KEY) || 'en');
   ['en', 'ko'].forEach(function (l) {
     var b = $('btn' + l.charAt(0).toUpperCase() + l.slice(1));
     if (b) {
       b.addEventListener('click', function () {
         applyLang(l);
-        try { localStorage.setItem(LANG_KEY, l); } catch (e) {}
+        remember(LANG_KEY, l);
       });
     }
   });
@@ -379,7 +920,13 @@ footer a { color: inherit; }
      it earns its place only when this page is being served. On file:// it hands
      you what is already on your disk — hide it. Same rule as the language
      switch. Nulled rather than returned: wiring after this block must still run. */
-  if (hBtn && location.protocol === 'file:') { hBtn.hidden = true; hBtn = null; }
+  /* Set both ways rather than only hidden: a file published from file:// is
+     served afterwards, and an init that only ever hides would leave the
+     control invisible in the copy. */
+  if (hBtn) {
+    hBtn.hidden = location.protocol === 'file:';
+    if (hBtn.hidden) { hBtn = null; }
+  }
   if (hBtn) {
     hBtn.addEventListener('click', function () {
       var clone = root.cloneNode(true);

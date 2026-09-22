@@ -50,10 +50,11 @@ LIGHT_MARKER = 'html[data-theme="light"]'
 # credit: false keeps working on files distributed before the domain moved.
 CREDIT_MARKERS = ("www.hitedmeetlisa.cc/?ref=file", "html.monomind.one/?ref=file")
 
-# ids of the eight first-party templates (registry: templates/templates.json)
+# ids of the nine first-party templates (registry: templates/templates.json)
 KNOWN = {
     "monomind-deck", "web-document", "mermaid-master", "architecture",
-    "sitemap-ia", "project-website", "evidence-deck", "paper-brief",
+    "sitemap-ia", "project-website", "motion-website", "evidence-deck",
+    "paper-brief",
 }
 
 # A string that survives every transform here, used only to warn when the
@@ -65,6 +66,9 @@ FINGERPRINT = {
     "architecture": "monomind-arch-theme",
     "sitemap-ia": "nav-primary-k4v9m2",
     "project-website": "data-nav-mobile",
+    # project-website with the motion layer: same chrome, same anchors,
+    # so only the motion library's own tokens tell the two apart.
+    "motion-website": "lm-textmask",
     "evidence-deck": "--sig-dim",
     "paper-brief": "--red-wash",
 }
@@ -76,6 +80,7 @@ THEME = {
     "web-document": {"dual": True, "control": "btnTheme"},
     "sitemap-ia": {"dual": True, "control": "btnTheme"},
     "project-website": {"dual": True, "control": "btnTheme"},
+    "motion-website": {"dual": True, "control": "btnTheme"},
     "architecture": {"dual": True, "control": "btnTheme"},
     "evidence-deck": {"dual": False, "ships": "dark"},
     "paper-brief": {"dual": False, "ships": "light"},
@@ -90,6 +95,7 @@ EXPORT_CONTROL = {
     "web-document": "btnHtml",
     "sitemap-ia": "btnHtml",
     "project-website": "btnHtml",
+    "motion-website": "btnHtml",
     "architecture": "btnHtml",
 }
 
@@ -105,6 +111,7 @@ CREDIT_SCOPE = {
     "web-document": "a",
     "sitemap-ia": "span",
     "project-website": "a",
+    "motion-website": "a",
     "architecture": "a+middot",
     "evidence-deck": "a",
     "paper-brief": "span",
@@ -123,6 +130,7 @@ MENU_FAMILY = {
     "web-document": "none",
     "sitemap-ia": "none",
     "project-website": "none",
+    "motion-website": "none",
     "architecture": "none",
     "mermaid-master": "none",
 }
@@ -179,7 +187,7 @@ def accent_edits(template: str, rgb) -> list[tuple[str, str, str]]:
         return [("root", "--primary", h),
                 ("root", "--primary-active", to_hex(darken(rgb, 0.20))),
                 ("root", "--primary-glow", to_hex(lighten(rgb, 0.18)))]
-    if template == "project-website":
+    if template in ("project-website", "motion-website"):
         return [("root", "--accent", h),
                 ("root", "--accent-strong", to_hex(darken(rgb, 0.20))),
                 ("root", "--glow", rgba(rgb, ".14")),
@@ -917,6 +925,40 @@ def apply_credit(ed, template, credit, rep):
         rep.skipped("credit=false", "colophon already absent")
 
 
+# share: the whole control — its stylesheet, its markup and its script — lives
+# inside LISA:SHARE-START/END comment pairs, and nothing outside them refers to
+# anything inside them. Removal is therefore the one transform here that needs
+# no per-template knowledge at all: delete the regions, and the file is what it
+# was before the control was added. The start marker must be followed by a
+# space, so the prose mention in each template's LISA:CONTENT-MAP header
+# ("LISA:SHARE-START/END") can never be mistaken for a region opening.
+SHARE_REGION = re.compile(
+    r"[ \t]*<!--\s*LISA:SHARE-START[ \t].*?LISA:SHARE-END\s*-->[ \t]*\n?",
+    re.S)
+
+# The same header names the regions in prose. That sentence is the one string
+# about the control that lives outside the fences, so it goes with them.
+SHARE_MAP_NOTE = re.compile(
+    r"[ \t]*Two LISA:SHARE-START/END regions.*?not authorable content\.\n",
+    re.S)
+
+
+def apply_share(ed, template, share, rep):
+    if share is True or share is None:
+        rep.applied("share=true", "Share control kept")
+        return
+    regions = len(SHARE_REGION.findall(ed.text))
+    if not regions:
+        rep.skipped("share=false", "no LISA:SHARE region — nothing to remove")
+        return
+    ed.text = SHARE_REGION.sub("", ed.text)
+    ed.text = SHARE_MAP_NOTE.sub("", ed.text)
+    ed.changed = True
+    rep.applied("share=false",
+                "removed %d LISA:SHARE region%s — the control, its styles and "
+                "its script" % (regions, "" if regions == 1 else "s"))
+
+
 def apply_backgrounds(ed, template, bg, rep):
     mode = bg.get("mode") if isinstance(bg, dict) else bg
     key = "backgrounds=%s" % mode
@@ -1038,7 +1080,7 @@ def apply_accent(ed, template, accent, rep):
 
 # answers this script owns; everything else is reported, not touched.
 MECHANICAL = ("theme", "export", "menu", "languages", "noTranslate",
-              "credit", "backgrounds", "accent")
+              "credit", "share", "backgrounds", "accent")
 
 # answers that are judgment calls by design (see the SKILL.md table).
 # `contract` — audience, purpose, outcome, core message, delivery, afterlife,
@@ -1139,6 +1181,8 @@ def main() -> int:
         apply_notranslate(ed, template, answers["noTranslate"], rep)
     if "credit" in answers:
         apply_credit(ed, template, answers["credit"], rep)
+    if "share" in answers:
+        apply_share(ed, template, answers["share"], rep)
     if "backgrounds" in answers:
         apply_backgrounds(ed, template, answers["backgrounds"], rep)
     if "accent" in answers:

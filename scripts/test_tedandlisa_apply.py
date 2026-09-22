@@ -3,12 +3,13 @@
 
 For every first-party template: copy it to a temp dir, apply a representative
 intake fixture (dark theme, pruned menu, English-only languages, no export,
-credit off, custom accent), and assert the mechanical transforms landed —
-theme block gone, menu chrome gone where the template makes that mechanical,
-no self-download control, no colophon line, accent token changed where mapped
-— while the file stays structurally whole (closing </html>, script count only
-moving where expected). Then apply the same answers again and require the
-result to be byte-identical.
+credit off, share off, custom accent), and assert the mechanical transforms
+landed — theme block gone, menu chrome gone where the template makes that
+mechanical, no self-download control, no colophon line, no Share control and
+not one string of it left, accent token changed where mapped — while the file
+stays structurally whole (closing </html>, script count only moving where
+expected). Then apply the same answers again and require the result to be
+byte-identical.
 
     python3 scripts/test_tedandlisa_apply.py
 """
@@ -35,6 +36,7 @@ TEMPLATES = {
     "architecture": "tedandlisa-template-architecture.html",
     "sitemap-ia": "tedandlisa-template-sitemap-ia.html",
     "project-website": "tedandlisa-template-project-website.html",
+    "motion-website": "tedandlisa-template-motion-website.html",
     "evidence-deck": "tedandlisa-template-evidence-deck.html",
     "paper-brief": "tedandlisa-template-paper-brief.html",
 }
@@ -43,7 +45,7 @@ ACCENT = "#e8590c"
 
 # templates that carry the html[data-theme="light"] block + a theme control
 DUAL_THEME = {"monomind-deck", "web-document", "sitemap-ia",
-              "project-website", "architecture"}
+              "project-website", "motion-website", "architecture"}
 
 # where the accent hex must land after apply (regex), or None for
 # architecture, whose colours are semantic and must NOT be repainted
@@ -52,6 +54,7 @@ ACCENT_TOKEN = {
     "web-document": r"--primary:\s*#e8590c",
     "sitemap-ia": r"--primary:\s*#e8590c",
     "project-website": r"--accent:\s*#e8590c",
+    "motion-website": r"--accent:\s*#e8590c",
     "evidence-deck": r"--sig:\s*#e8590c",
     "paper-brief": r"--red:\s*#e8590c",
     "mermaid-master": r"--accent:\s*#e8590c",
@@ -59,8 +62,20 @@ ACCENT_TOKEN = {
 }
 
 # expected change in the number of <script blocks: only the MonoMind deck
-# loses one (the Google Translate script goes with the English-only answer)
+# loses one (the Google Translate script goes with the English-only answer).
+# The Share regions are counted separately, from the file itself.
 SCRIPT_DELTA = {"monomind-deck": -1}
+
+# The whole Share control, both regions. Mirrors SHARE_REGION in the apply
+# script; kept as its own copy here so the test can fail when the two drift.
+SHARE_REGION = re.compile(
+    r"[ \t]*<!--\s*LISA:SHARE-START[ \t].*?LISA:SHARE-END\s*-->[ \t]*\n?",
+    re.S)
+
+# Nothing of the control may survive `share: false` — not the markup, not the
+# styles, not the script, and not one of its strings.
+SHARE_TRACES = ("LISA:SHARE", "data-lisa-share", "htmlbyme",
+                "__lisaShareSnapshot", "Publish link")
 
 
 def fixture(template: str) -> dict:
@@ -72,6 +87,7 @@ def fixture(template: str) -> dict:
         "noTranslate": ["Acme Corp", "release.tar.gz"],
         "export": [],
         "credit": False,
+        "share": False,
         "accent": ACCENT,
         "review": "after",
         "style": {"mode": "default", "designFile": None, "notes": None},
@@ -175,6 +191,12 @@ class ApplyTemplates(unittest.TestCase):
         self.assertNotIn("www.hitedmeetlisa.cc/?ref=file", out,
                          "%s: colophon survived" % template)
 
+        # share: the control and every trace of it are gone
+        for trace in SHARE_TRACES:
+            self.assertNotIn(trace, out,
+                             "%s: %r survived share=false" % (template, trace))
+        self.assertIn("share=false", report)
+
         # accent
         pattern = ACCENT_TOKEN[template]
         if pattern is None:
@@ -185,8 +207,10 @@ class ApplyTemplates(unittest.TestCase):
             self.assertRegex(out, pattern,
                              "%s: accent token not set" % template)
 
-        # script count only moves where expected
+        # script count only moves where expected: the answers above, plus
+        # however many <script mentions the Share regions themselves carried
         delta = SCRIPT_DELTA.get(template, 0)
+        delta -= sum(r.count("<script") for r in SHARE_REGION.findall(original))
         self.assertEqual(out.count("<script"),
                          original.count("<script") + delta,
                          "%s: unexpected script-count change" % template)
@@ -370,6 +394,70 @@ class ApplyDetails(unittest.TestCase):
         self.assertEqual(len(rows), 1, proc.stdout)
         self.assertIn("NOT-MECHANICAL", rows[0])
         self.assertNotIn("unknown answer key", proc.stdout)
+
+    def test_share_true_keeps_the_control_untouched(self):
+        for template in ("monomind-deck", "web-document"):
+            with self.subTest(template=template):
+                dst = self._copy(template)
+                before = dst.read_bytes()
+                a = self._answers({"template": template, "share": True})
+                proc = run_apply(a, dst)
+                self.assertEqual(proc.returncode, 0, proc.stderr)
+                self.assertEqual(before, dst.read_bytes(),
+                                 "share=true must not touch the file")
+                self.assertIn("share=true", proc.stdout)
+
+    def test_share_absent_is_the_same_as_share_true(self):
+        # a payload from before this answer existed must not lose the control
+        dst = self._copy("monomind-deck")
+        before = dst.read_bytes()
+        proc = run_apply(self._answers({"template": "monomind-deck"}), dst)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(before, dst.read_bytes())
+        self.assertNotIn("share=", proc.stdout)
+
+    def test_share_false_removal_is_total_and_idempotent(self):
+        dst = self._copy("web-document")
+        original = dst.read_text(encoding="utf-8")
+        self.assertIn("LISA:SHARE-START", original, "fixture has no control")
+        a = self._answers({"template": "web-document", "share": False})
+
+        proc = run_apply(a, dst)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        out = dst.read_text(encoding="utf-8")
+        for trace in SHARE_TRACES:
+            self.assertNotIn(trace, out, "%r survived" % trace)
+        # the sentence in the content map goes with the regions it names
+        self.assertNotIn("Two LISA:SHARE-START/END regions", out)
+        # and nothing else did: the content fences are all still there
+        self.assertEqual(out.count("<!-- LISA:CONTENT-START"),
+                         original.count("<!-- LISA:CONTENT-START"))
+        self.assertEqual(out.count("<!-- LISA:CONTENT-END"),
+                         original.count("<!-- LISA:CONTENT-END"))
+        self.assertIn("LISA:CONTENT-MAP", out)
+        self.assertTrue(out.rstrip().endswith("</html>"))
+
+        first = dst.read_bytes()
+        proc2 = run_apply(a, dst)
+        self.assertEqual(proc2.returncode, 0, proc2.stderr)
+        self.assertEqual(first, dst.read_bytes(), "second removal changed the file")
+        self.assertIn("SKIPPED", [l for l in proc2.stdout.splitlines()
+                                  if "share=false" in l][0])
+
+    def test_share_false_on_a_file_without_the_control_is_a_no_op(self):
+        # a file built before the Share control existed, or one it was
+        # already removed from: reported, never approximated
+        dst = self.tmp / "legacy.html"
+        legacy = SHARE_REGION.sub(
+            "", (ASSETS / TEMPLATES["architecture"]).read_text(encoding="utf-8"))
+        dst.write_text(legacy, encoding="utf-8")
+        before = dst.read_bytes()
+        a = self._answers({"template": "architecture", "share": False})
+        proc = run_apply(a, dst)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(before, dst.read_bytes())
+        row = [l for l in proc.stdout.splitlines() if "share=false" in l][0]
+        self.assertIn("SKIPPED", row)
 
     def test_handoff_payload_is_a_clean_no_op(self):
         dst = self._copy("monomind-deck")

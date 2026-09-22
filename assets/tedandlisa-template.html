@@ -6,6 +6,9 @@
      Named edit points outside the fences:
        <title> in <head>
        the known-terms TERMS regex in the translation-guard script (add product terms there)
+     Two LISA:SHARE-START/END regions carry the Share control — its <style> in
+     <head> and its markup + script in the chrome. They are deleted together
+     when the intake answers `share: false`, and are not authorable content.
      Everything else (head, CSS, chrome markup, scripts, artwork) is load-bearing:
      copy this file with cp, never retype it, and edit only what is named here. -->
 <html lang="en"><head>
@@ -1103,8 +1106,43 @@ a.brand-mark:focus-visible { outline: none; box-shadow: var(--focus-ring); }
   font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em;
   color: var(--muted-inv); padding: 7px var(--space-3); min-height: 32px;
 }
+/* `hidden` has to win over the `display: flex` above, and the user-agent's
+   own `[hidden] { display: none }` does not: a class selector outranks it.
+   Without this the switch that init() hides on file:// stayed on screen —
+   three buttons with no handlers attached, which is the exact failure
+   `D-057` rules out. Same rule for the menu panel's items below. */
+.lang-switch[hidden] { display: none; }
 .lang-switch button:hover { color: var(--fg-inv); }
 .lang-switch button.active { background: var(--glass-hi-2); color: var(--fg-inv); }
+/* Where the host blocks cookies the machine-translated options cannot work.
+   They stay in place, visibly out of service, rather than looking live.
+   Marked with aria-disabled rather than `disabled` so they keep their place
+   in the tab order — the reason has to be reachable from the keyboard. */
+.lang-switch button[aria-disabled="true"] {
+  cursor: not-allowed; opacity: 0.38; text-decoration: line-through;
+}
+.lang-switch button[aria-disabled="true"]:hover { color: var(--muted-inv); }
+/* The note is on demand, not a banner. A shared deck is read by its
+   audience, not its author, and a standing system message over every slide
+   is worse than the thing it explains — so it is asked for (hover, focus,
+   tap) and it goes away again. Hidden by opacity, never display or
+   visibility: it stays in the accessibility tree for the aria-describedby
+   on each unavailable option, and being `position: fixed` it cannot move
+   anything when it appears. Reduced motion is already honoured by the
+   global rule above, which forces every transition-duration to 1ms. */
+.lang-note {
+  position: fixed; z-index: 10; margin: 0;
+  bottom: calc(var(--space-6) + 40px); left: 50%; transform: translateX(-50%);
+  max-width: min(430px, calc(100vw - 48px));
+  font-family: var(--font-mono); font-size: 10px; line-height: 1.5;
+  letter-spacing: 0.04em; text-align: center; text-wrap: pretty;
+  color: var(--muted-inv);
+  background: var(--glass-hi); border: 1px solid var(--glass-hair);
+  border-radius: var(--radius-sm); padding: 7px var(--space-3);
+  -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+  opacity: 0; pointer-events: none; transition: opacity 140ms ease;
+}
+.lang-note[data-shown="true"] { opacity: 1; }
 /* Google Translate chrome stays out of the deck */
 #google_translate_element { display: none; }
 iframe.skiptranslate, .goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame,
@@ -1117,6 +1155,16 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
 @media (max-width: 760px) {
   .lang-switch { left: max(16px, env(safe-area-inset-left)); transform: none;
     bottom: max(16px, env(safe-area-inset-bottom)); }
+  /* Sized in vw, never with `right` or a percentage. This deck's body is a
+     horizontal scroll-snap track, so the containing block a fixed element
+     resolves `right`/`%` against is the whole strip (1500px against a 375
+     layout viewport — the same displacement L-003 recorded for the counter
+     and the switch). `100vw` is the one unit that still reads the viewport,
+     and the switch above stays put for the same reason: it sets `left` and
+     takes its width from its content. */
+  .lang-note { left: max(16px, env(safe-area-inset-left));
+    max-width: calc(100vw - 32px); transform: none; text-align: left;
+    bottom: calc(max(16px, env(safe-area-inset-bottom)) + 44px); }
 }
 
 /* ─── deck menu (beside the brand mark) ──────────────────────────── */
@@ -1162,6 +1210,10 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
   color: var(--fg-inv);
   transition: background var(--motion-fast) var(--ease-standard);
 }
+/* Same correction as .lang-switch[hidden]: the rule above sets display on a
+   class, so the user-agent's [hidden] rule loses and a hidden menu item —
+   the self-download on file:// — stayed in the panel. */
+.deck-menu-panel a[hidden], .deck-menu-panel button[hidden] { display: none; }
 .deck-menu-panel a:hover, .deck-menu-panel button:hover { background: var(--glass-hi); }
 .deck-menu-panel a:focus-visible, .deck-menu-panel button:focus-visible {
   outline: none; background: var(--glass-hi); box-shadow: var(--focus-ring); }
@@ -1191,6 +1243,85 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
     right: calc(max(16px, env(safe-area-inset-right)) + 46px + 8px); }
 }
 </style>
+<!-- LISA:SHARE-START styles — the Share control's own stylesheet, kept in its
+     own <style> so the whole control is two deletable regions and nothing
+     else. Intake-driven: `share: false` removes this region and the markup
+     region in the chrome below, and the file is byte-for-byte what it was
+     without them. Everything here is written in this deck's tokens — the
+     same glass, the same radii, the same 46px square as the menu button
+     beside it. -->
+<style>
+/* ─── share (a third square, beside the menu) ─────────────────────── */
+.deck-share { position: fixed; z-index: 12;
+  top: clamp(22px, 2.6vw, 34px);
+  right: calc(clamp(26px, 3.2vw, 44px) + 46px + 10px + 46px + 10px); }
+.deck-share-btn {
+  width: 46px; height: 46px; padding: 0;
+  display: grid; place-items: center;
+  color: var(--fg-inv); cursor: pointer;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-hair);
+  background: var(--glass-hi);
+  -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+  transition: background var(--motion-fast) var(--ease-standard);
+}
+.deck-share-btn:hover { background: var(--glass-hi-2); }
+.deck-share-btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.deck-share-panel {
+  position: absolute; top: calc(100% + 10px); right: 0; width: 296px;
+  display: none; flex-direction: column; padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-hair);
+  background: color-mix(in srgb, var(--fg) 92%, transparent);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.34);
+  -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+}
+.deck-share[data-open="true"] .deck-share-panel { display: flex; }
+.deck-share-panel button {
+  display: flex; align-items: flex-start; gap: var(--space-3);
+  width: 100%; padding: 11px var(--space-3); border: 0; border-radius: 12px;
+  background: none; cursor: pointer; text-align: left;
+  font-family: var(--font-body); font-size: 13.5px; font-weight: 500;
+  color: var(--fg-inv);
+  transition: background var(--motion-fast) var(--ease-standard);
+}
+.deck-share-panel button:hover { background: var(--glass-hi); }
+.deck-share-panel button:focus-visible {
+  outline: none; background: var(--glass-hi); box-shadow: var(--focus-ring); }
+.deck-share-panel button[hidden] { display: none; }
+.deck-share-panel svg { flex: 0 0 auto; margin-top: 1px; }
+.deck-share-sub { display: block; margin-top: 2px;
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 400;
+  letter-spacing: 0.04em; color: var(--muted-inv); }
+/* One honest line about what publishing does. It is microcopy, not a
+   warning banner — the same weight as the deck hint. */
+.deck-share-note { margin: var(--space-1) var(--space-3) var(--space-2);
+  font-family: var(--font-mono); font-size: 10px; line-height: 1.5;
+  letter-spacing: 0.04em; color: var(--muted-inv); text-wrap: pretty; }
+.deck-share-result { margin: 0 var(--space-3) var(--space-2);
+  font-family: var(--font-mono); font-size: 10.5px; line-height: 1.55;
+  letter-spacing: 0.03em; color: var(--fg-inv); text-wrap: pretty;
+  overflow-wrap: anywhere; }
+.deck-share-result[hidden] { display: none; }
+.deck-share-link { display: block; margin-bottom: 4px; color: var(--accent); }
+.deck-share-file { display: block; margin-top: var(--space-2);
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--muted-inv); }
+@media (max-width: 760px) {
+  .deck-share { top: max(16px, env(safe-area-inset-top));
+    right: calc(max(16px, env(safe-area-inset-right)) + 46px + 8px + 46px + 8px); }
+  /* `L-051`: this deck's body is the horizontal scroll-snap track, so a
+     fixed box must not take its width from `right` or a percentage — both
+     resolve against the whole strip, not the screen (1468px in a 375px
+     viewport, measured). Anchored with `left`, measured in `vw`. */
+  .deck-share-panel { position: fixed;
+    left: max(16px, env(safe-area-inset-left)); right: auto;
+    top: calc(max(16px, env(safe-area-inset-top)) + 46px + 10px);
+    width: calc(100vw - 32px); max-width: 320px; }
+}
+/* The reader's own print is of the deck, not of its chrome. */
+@media print { .deck-share { display: none !important; } }
+</style>
+<!-- LISA:SHARE-END -->
 </head>
 <body>
 
@@ -1375,6 +1506,498 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
     <button type="button" data-lang="zh-TW">ZH-TW</button>
   </div>
   <div id="google_translate_element" class="notranslate" aria-hidden="true"></div>
+<!-- LISA:SHARE-START markup+script — the Share control: one more square
+     beside the menu, its small menu, and the hand-off to htmlbyme.com.
+     Intake-driven (`share`): `share: false` deletes this region and the
+     <style> region in <head>, and nothing outside the two fences refers to
+     either, so the file is exactly what it was without them. -->
+  <div class="deck-share" id="deck-share" data-lisa-share="root" data-open="false">
+    <button class="deck-share-btn" type="button" id="deck-share-btn"
+            aria-haspopup="true" aria-expanded="false" aria-controls="deck-share-panel"
+            aria-label="Share" title="Share" data-lisa-share="toggle">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="17.5" cy="5.5" r="2.6" stroke="currentColor" stroke-width="1.7"/>
+        <circle cx="6.5" cy="12" r="2.6" stroke="currentColor" stroke-width="1.7"/>
+        <circle cx="17.5" cy="18.5" r="2.6" stroke="currentColor" stroke-width="1.7"/>
+        <path d="m8.9 10.8 6.2-3.7m0 9.8-6.2-3.7" stroke="currentColor"
+              stroke-width="1.7" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <div class="deck-share-panel" id="deck-share-panel" role="menu"
+         aria-labelledby="deck-share-btn" data-lisa-share="panel">
+      <button type="button" role="menuitem" id="deck-share-publish" data-lisa-share="publish">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M10.6 13.4a3.7 3.7 0 0 0 5.2 0l2.4-2.4a3.7 3.7 0 0 0-5.2-5.2l-1.2 1.2"
+                stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M13.4 10.6a3.7 3.7 0 0 0-5.2 0l-2.4 2.4a3.7 3.7 0 0 0 5.2 5.2l1.2-1.2"
+                stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+        <span>Publish link<span class="deck-share-sub">Publish to <span class="notranslate" translate="no">htmlbyme.com</span></span></span>
+      </button>
+      <button type="button" role="menuitem" id="deck-share-copy" data-lisa-share="copy" hidden>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="9" y="9" width="11" height="11" rx="2.4" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M15 5.6A1.6 1.6 0 0 0 13.4 4H5.6A1.6 1.6 0 0 0 4 5.6v7.8A1.6 1.6 0 0 0 5.6 15"
+                stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+        <span>Copy link<span class="deck-share-sub">This page&rsquo;s own address</span></span>
+      </button>
+      <p class="deck-share-note" role="none" data-lisa-share="microcopy">Public link &middot; expires in 15 days &middot; free, by <span class="notranslate" translate="no">MonoMind</span></p>
+      <div class="deck-share-result" id="deck-share-result" role="none"
+           data-lisa-share="result" aria-live="polite" hidden></div>
+    </div>
+<script>
+/*
+  Share → Publish link.
+
+  The finished file is handed to htmlbyme.com — a separate, free MonoMind
+  service that hosts one HTML file behind a public link for 15 days — and the
+  link comes back here. The two products stay independent: nothing in this
+  block calls an API, carries a key, or knows anything about that service
+  beyond the two constants below. The document travels through window.opener
+  and postMessage with the receiving origin pinned on every message, and the
+  person confirms the publish on htmlbyme.com's own page. Until they do,
+  nothing has left this file.
+
+  It sits here in the chrome rather than at the end of <body> for one reason:
+  every template parses its chrome before its first <script> runs, so this is
+  the last moment at which <html>, <body> and <title> still carry what the
+  author wrote. That baseline is what a published copy is restored to, which
+  is why the copy opens on the first screen in the default language however
+  far into the deck the author had scrolled when they clicked.
+*/
+(function () {
+  "use strict";
+
+  /* A fork repoints these two, and nothing else names the host. */
+  var PUBLISH_URL    = "https://htmlbyme.com/publish";
+  var PUBLISH_ORIGIN = "https://htmlbyme.com";
+  /* The only prefix a returned link may carry. Anything else is refused
+     rather than shown — a link is the one thing this block renders. */
+  var LINK_PREFIX    = "https://link.htmlbyme.com/";
+  var SANDBOX_HOST   = "link.htmlbyme.com";
+  var TEMPLATE       = "monomind-deck";
+  var HANDSHAKE_MS   = 60000;
+  var MAX_BYTES      = 10 * 1024 * 1024;
+
+  /* ---- the authored baseline ------------------------------------- */
+  function attrsOf(el) {
+    var out = {}, a = el.attributes, i;
+    for (i = 0; i < a.length; i++) { out[a[i].name] = a[i].value; }
+    return out;
+  }
+  var BASE = {
+    title: document.title,
+    html: attrsOf(document.documentElement),
+    body: attrsOf(document.body)
+  };
+
+  var root       = document.getElementById("deck-share");
+  var toggle     = document.getElementById("deck-share-btn");
+  var panel      = document.getElementById("deck-share-panel");
+  var publishBtn = document.getElementById("deck-share-publish");
+  var copyBtn    = document.getElementById("deck-share-copy");
+  var result     = document.getElementById("deck-share-result");
+  if (!root || !toggle || !panel || !publishBtn || !copyBtn || !result) { return; }
+
+  /* ---- where this copy is being read ----------------------------- */
+  function sandboxed() {
+    try {
+      if (location.hostname === SANDBOX_HOST) { return true; }
+      /* An opaque origin: the page is sandboxed, so any window it opens is
+         sandboxed too and can never hold the other half of the hand-off. */
+      return /^https?:$/.test(location.protocol) && window.origin === "null";
+    } catch (e) { return true; }
+  }
+  if (sandboxed()) { publishBtn.hidden = true; copyBtn.hidden = false; }
+
+  /* Chrome's own translation (and this deck's, once it has run) rewrites
+     every text node in place. Publishing then would publish the translation
+     in place of the file. */
+  function translated() {
+    var c = document.documentElement.className || "";
+    return c.indexOf("translated-ltr") !== -1 || c.indexOf("translated-rtl") !== -1;
+  }
+
+  /* ---- the menu --------------------------------------------------- */
+  function items() {
+    return Array.prototype.filter.call(panel.querySelectorAll("button"),
+                                       function (b) { return !b.hidden; });
+  }
+  function isOpen() { return root.getAttribute("data-open") === "true"; }
+  function setOpen(open) {
+    root.setAttribute("data-open", open ? "true" : "false");
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    if (open) { var first = items()[0]; if (first) { first.focus(); } }
+  }
+  toggle.addEventListener("click", function (e) { e.stopPropagation(); setOpen(!isOpen()); });
+  document.addEventListener("click", function (e) {
+    if (isOpen() && !root.contains(e.target)) { setOpen(false); }
+  });
+  /* The deck takes keys on window and document in the capture phase, so a
+     keystroke aimed at this menu is stopped here or it also drives the
+     slides — the same guard the deck menu uses two blocks down. */
+  root.addEventListener("keydown", function (e) {
+    var list, i;
+    if (e.key === "Escape") {
+      if (isOpen()) { setOpen(false); toggle.focus(); }
+    } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      if (!isOpen()) { setOpen(true); }
+      else {
+        list = items();
+        if (list.length) {
+          i = list.indexOf(document.activeElement);
+          i = (e.key === "ArrowDown") ? (i + 1) % list.length
+                                      : (i <= 0 ? list.length - 1 : i - 1);
+          list[i].focus();
+        }
+      }
+      e.preventDefault();
+    }
+    e.stopPropagation();
+  }, true);
+
+  /* ---- what the panel says ---------------------------------------- */
+  function clear() { result.textContent = ""; result.hidden = false; return result; }
+  function line(text) {
+    var p = document.createElement("p");
+    p.textContent = text;
+    return p;
+  }
+  function say(text) { clear().appendChild(line(text)); }
+  function linkTo(url) {
+    var a = document.createElement("a");
+    a.className = "deck-share-link";
+    a.href = url;                 /* only ever PUBLISH_URL or a checked link */
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.textContent = url;          /* text, never markup */
+    return a;
+  }
+
+  /* ---- copying ----------------------------------------------------- */
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+    /* The async Clipboard API is unavailable in an insecure or
+       permission-restricted context — a sandboxed share URL is exactly
+       that — so a selection copy backs it up. */
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.setAttribute("data-lisa-runtime", "");
+      ta.style.cssText = "position:fixed;left:-9999px;top:0;opacity:0;";
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (err) { ok = false; }
+      document.body.removeChild(ta);
+      if (ok) { resolve(); } else { reject(new Error("copy refused")); }
+    });
+  }
+  function copyButton(text, onDone) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("role", "menuitem");
+    b.setAttribute("data-lisa-runtime", "");
+    b.textContent = "Copy";
+    b.addEventListener("click", function () {
+      copyText(text).then(function () { b.textContent = "Copied"; },
+                          function () { b.textContent = "Select it and ⌘C"; });
+      if (onDone) { onDone(); }
+    });
+    return b;
+  }
+  copyBtn.addEventListener("click", function () {
+    copyText(location.href).then(
+      function () { say("Copied this page's address."); },
+      function () { say("Copying was refused — the address is in the address bar."); });
+  });
+
+  /* ---- the hand-off ------------------------------------------------ */
+  var busy = false;
+  publishBtn.addEventListener("click", function () { publish(); });
+
+  function publish() {
+    if (busy) { return; }
+    if (translated()) { refuseTranslated(); return; }
+    var w = openReceiver();
+    if (!w) { return; }
+    handshake(w, source());
+  }
+
+  function openReceiver() {
+    var w = null;
+    /* Opened synchronously inside the click: a window asked for after an
+       await is a window the browser blocks. No `noopener`/`noreferrer` —
+       the receiving page answers through window.opener, and that is the
+       whole hand-off. */
+    try { w = window.open(PUBLISH_URL, "_blank"); } catch (e) { w = null; }
+    if (!w) {
+      /* There is no second route: htmlbyme.com only ever receives a file
+         through this window, so the only thing to say is how to let the
+         window open. */
+      say("Your browser blocked the new tab. Allow pop-ups for this " +
+          "page, then press Publish link again.");
+      return null;
+    }
+    busy = true;
+    say("Confirm in the htmlbyme.com tab, and the link comes back here.");
+    return w;
+  }
+
+  function handshake(w, pending) {
+    var finished = false, timer = null;
+
+    function finish() {
+      if (finished) { return; }
+      finished = true;
+      busy = false;
+      if (timer) { clearTimeout(timer); timer = null; }
+      window.removeEventListener("message", onMessage);
+    }
+
+    function onMessage(e) {
+      /* Both halves checked on every message: the window this page opened,
+         and the origin it was opened at. Neither is ever relaxed. */
+      if (finished || e.source !== w || e.origin !== PUBLISH_ORIGIN) { return; }
+      var d = e.data;
+      if (!d || typeof d !== "object") { return; }
+
+      if (d.type === "htmlbyme:ready") {
+        /* Protocol v1.1: every ready that passes the source and origin
+           checks above is answered, not only the first. A reader who
+           reloads the htmlbyme tab would otherwise sit out the timeout
+           holding nothing. `pending` is one promise, built once per
+           click, so every answer carries the same bytes — and the
+           exchange still ends exactly once, on htmlbyme:published or
+           on the timeout, and the listener goes with it. */
+        pending.then(function (html) {
+          if (finished) { return; }
+          w.postMessage({ type: "htmlbyme:document", v: 1, html: html,
+                          title: document.title,
+                          generator: "hi-ted-meet-lisa", template: TEMPLATE },
+                        PUBLISH_ORIGIN);
+        }, function (err) {
+          say(err && err.message ? err.message : "This page's own source could not be read.");
+          finish();
+        });
+        return;
+      }
+
+      if (d.type === "htmlbyme:published") {
+        var url = (typeof d.url === "string") ? d.url : "";
+        if (url.slice(0, LINK_PREFIX.length) !== LINK_PREFIX) {
+          /* Said and dropped, not acted on — and the exchange stays open, so
+             one malformed answer cannot cost the reader the real one. */
+          say("That answer carried no " + LINK_PREFIX + " link, so it was ignored.");
+          return;
+        }
+        published(url, d.expires_at);
+        finish();
+      }
+    }
+
+    window.addEventListener("message", onMessage);
+    timer = setTimeout(function () {
+      finish();
+      say("Still waiting — finish in the htmlbyme.com tab and the link will appear there.");
+    }, HANDSHAKE_MS);
+  }
+
+  function published(url, expiresAt) {
+    clear();
+    result.appendChild(linkTo(url));
+    result.appendChild(line(expiry(expiresAt)));
+    result.appendChild(copyButton(url));
+  }
+
+  function expiry(raw) {
+    var when = raw ? new Date(raw) : null, days;
+    if (when && !isNaN(when.getTime())) {
+      days = Math.max(0, Math.round((when.getTime() - Date.now()) / 86400000));
+      return "Anyone with the link can read it for " + days + " more day" +
+             (days === 1 ? "" : "s") + ", until " + when.toLocaleDateString() + ".";
+    }
+    return "Anyone with the link can read it for 15 days, then it expires.";
+  }
+
+  function refuseTranslated() {
+    clear();
+    result.appendChild(line("This page is machine-translated right now, so " +
+      "publishing it would publish the translation instead of the file. " +
+      "Switch back to the original language first — or choose the saved " +
+      "file here and that is what goes up."));
+    picker();
+  }
+
+  function picker() {
+    var input = document.createElement("input");
+    input.type = "file";
+    input.accept = "text/html,.html,.htm";
+    input.className = "deck-share-file";
+    input.setAttribute("data-lisa-runtime", "");
+    input.setAttribute("aria-label", "Choose the saved HTML file to publish");
+    input.addEventListener("change", function () {
+      var f = input.files && input.files[0];
+      if (!f || busy) { return; }
+      var w = openReceiver();
+      if (!w) { return; }
+      handshake(w, f.text().then(checkSize));
+    });
+    result.appendChild(input);
+  }
+
+  /* ---- the bytes that are published -------------------------------- */
+  function checkSize(html) {
+    var bytes;
+    try { bytes = new Blob([html]).size; } catch (e) { bytes = html.length; }
+    if (bytes > MAX_BYTES) {
+      throw new Error("This file is " + (bytes / 1048576).toFixed(1) +
+                      " MB, and htmlbyme.com takes up to 10 MB.");
+    }
+    return html;
+  }
+
+  function source() {
+    if (/^https?:$/.test(location.protocol)) {
+      /* Served: send the bytes that are on the server, not a rebuild of
+         them. A snapshot is the fallback, not the first choice. */
+      return fetch(location.href, { cache: "no-store", credentials: "omit" })
+        .then(function (r) {
+          if (!r.ok) { throw new Error("http " + r.status); }
+          return r.text();
+        })
+        .catch(function () { return snapshot(); })
+        .then(checkSize);
+    }
+    /* file:// forbids a page reading itself, so it is rebuilt from the DOM. */
+    return Promise.resolve(snapshot()).then(checkSize);
+  }
+
+  function snapshot() {
+    var clone = document.documentElement.cloneNode(true);
+    each(clone, "[data-lisa-runtime]", function (el) {
+      if (el.parentNode) { el.parentNode.removeChild(el); }
+    });
+    resetForExport(clone);
+    return prologue() + clone.outerHTML + "\n";
+  }
+
+  /* The doctype and the LISA:CONTENT-MAP header are children of the
+     document, not of <html>, so cloning documentElement loses them. */
+  function prologue() {
+    var out = "", n;
+    for (n = document.firstChild; n; n = n.nextSibling) {
+      if (n === document.documentElement) { break; }
+      if (n.nodeType === 10) { out += "<!doctype " + n.name + ">\n"; }
+      else if (n.nodeType === 8) { out += "<!--" + n.data + "-->\n"; }
+    }
+    return out;
+  }
+
+  function each(scope, selector, fn) {
+    var found = scope.querySelectorAll(selector), i;
+    for (i = 0; i < found.length; i++) { fn(found[i]); }
+  }
+  function restore(el, saved) {
+    var i, name;
+    for (i = el.attributes.length - 1; i >= 0; i--) {
+      name = el.attributes[i].name;
+      if (!Object.prototype.hasOwnProperty.call(saved, name)) { el.removeAttribute(name); }
+    }
+    for (name in saved) {
+      if (Object.prototype.hasOwnProperty.call(saved, name)) { el.setAttribute(name, saved[name]); }
+    }
+  }
+
+  /* Everything this deck writes into its own DOM at runtime, put back the
+     way the markup had it. A published copy has to boot like a fresh one. */
+  function resetForExport(clone) {
+    var body = clone.querySelector("body");
+    var title = clone.querySelector("title");
+    restore(clone, BASE.html);
+    if (body) { restore(body, BASE.body); }
+    if (title) { title.textContent = BASE.title; }
+
+    /* The HTML parser moves whitespace that follows </html> into the end of
+       <body>, so a file ending in a newline gains one inside its body on
+       every load — and a snapshot of a snapshot would grow a newline at a
+       time. Collapse it back to the one newline the file was written with. */
+    if (body) {
+      while (body.lastChild && body.lastChild.nodeType === 3 &&
+             !body.lastChild.nodeValue.trim()) {
+        body.removeChild(body.lastChild);
+      }
+      body.appendChild(document.createTextNode("\n"));
+    }
+
+    /* this control: closed, empty, and offering what the markup offers */
+    each(clone, '[data-lisa-share="root"]', function (el) { el.setAttribute("data-open", "false"); });
+    each(clone, '[data-lisa-share="toggle"]', function (el) { el.setAttribute("aria-expanded", "false"); });
+    each(clone, '[data-lisa-share="publish"]', function (el) { el.removeAttribute("hidden"); });
+    each(clone, '[data-lisa-share="copy"]', function (el) { el.setAttribute("hidden", ""); });
+    each(clone, '[data-lisa-share="result"]', function (el) {
+      el.textContent = ""; el.setAttribute("hidden", "");
+    });
+
+    /* the deck menu, closed, with its generated contents thrown away */
+    each(clone, "#deck-menu", function (el) { el.setAttribute("data-open", "false"); });
+    each(clone, "#deck-menu-btn", function (el) { el.setAttribute("aria-expanded", "false"); });
+    each(clone, "#deck-menu-contents", function (el) { el.setAttribute("aria-expanded", "false"); });
+    each(clone, "#deck-contents", function (el) { el.textContent = ""; el.setAttribute("hidden", ""); });
+    each(clone, "#deck-theme-label", function (el) {
+      el.textContent = clone.getAttribute("data-theme") === "light" ? "Dark theme" : "Light theme";
+    });
+
+    /* two controls take themselves off on file://; a published copy is
+       served, so they go back where the markup put them */
+    each(clone, "#deck-menu-html", function (el) { el.removeAttribute("hidden"); });
+    each(clone, ".lang-switch", function (el) {
+      el.removeAttribute("hidden");
+      el.removeAttribute("data-translate-unavailable");
+    });
+    each(clone, ".lang-switch button", function (el) {
+      el.classList.remove("active");
+      el.removeAttribute("aria-disabled");
+      el.removeAttribute("aria-describedby");
+    });
+
+    /* progress, counter and the copy buttons, back to their first state */
+    each(clone, "#deck-progress", function (el) { el.removeAttribute("style"); });
+    each(clone, "#deck-counter", function (el) {
+      el.textContent = "1 / " + clone.querySelectorAll(".slide").length;
+    });
+    each(clone, ".copy-btn", function (el) { el.classList.remove("is-copied"); });
+    each(clone, ".copy-btn .copy-label", function (el) { el.textContent = "Copy"; });
+
+    /* whatever Google Translate left behind, and the guard's own wrappers:
+       the published file is the file, not the file plus one load */
+    each(clone, "#google_translate_element", function (el) { el.textContent = ""; });
+    each(clone, ".skiptranslate, #goog-gt-tt, .goog-te-banner-frame",
+         function (el) { if (el.parentNode) { el.parentNode.removeChild(el); } });
+    each(clone, 'script[src*="translate.google"]',
+         function (el) { if (el.parentNode) { el.parentNode.removeChild(el); } });
+    each(clone, "span.nt-term", function (el) {
+      if (el.parentNode) {
+        el.parentNode.replaceChild(document.createTextNode(el.textContent), el);
+      }
+    });
+
+    /* Taking the last class off an element leaves class="" behind, and the
+       markup had no attribute at all. Swept last, after every reset above. */
+    each(clone, '[class=""]', function (el) { el.removeAttribute("class"); });
+  }
+
+  /* The gate reads this; nothing in the deck does. It is the one seam that
+     lets scripts/check_share_roundtrip.py publish without a network. */
+  root.__lisaShareSnapshot = snapshot;
+})();
+</script>
+  </div>
+<!-- LISA:SHARE-END -->
 
   <script>
     /*
@@ -1395,6 +2018,14 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
       var progress = document.getElementById('deck-progress');
       var KEY      = 'od-deck-pos';
       var active   = 0;
+
+      /* Remembering the slide is a courtesy, never a precondition for the
+         deck working. On an opaque origin — a sandboxed share URL with no
+         allow-same-origin — touching localStorage throws rather than
+         returning null, so both directions are wrapped and the deck simply
+         starts at slide 1. */
+      function readPos()    { try { return localStorage.getItem(KEY); } catch (_) { return null; } }
+      function writePos(v)  { try { localStorage.setItem(KEY, v); } catch (_) {} }
 
       function scrollContainers() {
         return [document.scrollingElement, document.documentElement, document.body]
@@ -1455,7 +2086,7 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
         active = i;
         if (counter)  counter.textContent  = (i + 1) + ' / ' + slides.length;
         if (progress) progress.style.width = (((i + 1) / slides.length) * 100) + '%';
-        try { localStorage.setItem(KEY, String(i)); } catch (_) {}
+        writePos(String(i));
       }
       function go(i) {
         var next = Math.max(0, Math.min(slides.length - 1, i));
@@ -1497,7 +2128,7 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
 
       // restore last-seen position
       try {
-        var saved = parseInt(localStorage.getItem(KEY) || '0', 10);
+        var saved = parseInt(readPos() || '0', 10);
         if (!isNaN(saved) && saved >= 0 && saved < slides.length) {
           setActive(saved);
           resetVerticalScroll();
@@ -1635,14 +2266,57 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
       the button state read that stale value: the deck came back Korean.
       Kill every scope, then keep exactly one host-only cookie.
     */
+    /*
+      Storage is not merely unavailable in some hosts — it throws. A page
+      served under `Content-Security-Policy: sandbox` without
+      `allow-same-origin` has an opaque origin, and the FIRST touch of
+      `document.cookie` or `localStorage` raises SecurityError rather than
+      returning empty. An unguarded read therefore took the whole switch
+      down with it: the handlers below never got attached and three buttons
+      sat there looking live. Every access in this block goes through these
+      four, so a blocked host is a quiet, reported condition.
+    */
+    function readCookies() {
+      try { return document.cookie || ''; } catch (e) { return ''; }
+    }
+    function writeCookie(value) {
+      try { document.cookie = value; return true; } catch (e) { return false; }
+    }
+    function readStored(key) {
+      try { return localStorage.getItem(key) || ''; } catch (e) { return ''; }
+    }
+    function writeStored(key, value) {
+      try {
+        if (value === null) localStorage.removeItem(key);
+        else localStorage.setItem(key, value);
+      } catch (e) {}
+    }
+    /*
+      Reading is what throws on an opaque origin, so the probe starts there;
+      the round-trip write then catches the hosts that accept a cookie and
+      drop it (cookies switched off, a partitioned third-party frame). One
+      probe cookie, expired again in the same turn, on a switch that already
+      writes cookies freely.
+    */
+    function cookiesWork() {
+      var probe = 'tedandlisa-probe';
+      try {
+        if (typeof document.cookie !== 'string') return false;
+        document.cookie = probe + '=1; path=/; SameSite=Lax';
+        var ok = document.cookie.indexOf(probe + '=1') !== -1;
+        document.cookie = probe + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+        return ok;
+      } catch (e) { return false; }
+    }
+
     function killCookies() {
       var kill = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
-      document.cookie = kill;
+      writeCookie(kill);
       var parts = location.hostname.split('.');
       for (var i = 0; i < parts.length - 1; i++) {
         var d = parts.slice(i).join('.');
-        document.cookie = kill + '; domain=' + d;
-        document.cookie = kill + '; domain=.' + d;
+        writeCookie(kill + '; domain=' + d);
+        writeCookie(kill + '; domain=.' + d);
       }
     }
     /*
@@ -1654,10 +2328,10 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
     */
     var LANG_KEY = 'tedandlisa-lang';
     function storedLang() {
-      try { return localStorage.getItem(LANG_KEY) || ''; } catch (e) { return ''; }
+      return readStored(LANG_KEY);
     }
     function cookieLang() {
-      var m = document.cookie.match(/(?:^|;\s*)googtrans=\/en\/([^;]+)/);
+      var m = readCookies().match(/(?:^|;\s*)googtrans=\/en\/([^;]+)/);
       return m ? decodeURIComponent(m[1]) : 'en';
     }
     function currentLang() {
@@ -1665,12 +2339,96 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
     }
     function setLang(code) {
       killCookies();
-      try {
-        if (code === 'en') localStorage.removeItem(LANG_KEY);
-        else localStorage.setItem(LANG_KEY, code);
-      } catch (e) {}
-      if (code !== 'en') document.cookie = 'googtrans=/en/' + code + '; path=/';
+      writeStored(LANG_KEY, code === 'en' ? null : code);
+      if (code !== 'en') writeCookie('googtrans=/en/' + code + '; path=/');
       location.reload();
+    }
+
+    /*
+      English is written into the file; every other language on this switch
+      is Google's, and Google's needs a cookie to survive the reload. Where
+      the host refuses cookies — a sandboxed share URL with no
+      allow-same-origin, a private window, a partitioned frame — say so on
+      the control instead of leaving buttons that click and do nothing, and
+      never ask for the translator. The note is protected like every other
+      literal in this deck (L-001) so a browser-level translation cannot
+      rewrite the instruction that explains itself.
+    */
+    var NOTE_ID = 'lang-note';
+    var NOTE_LINGER_MS = 4000;
+    var NO_COOKIE_NOTE =
+      'Translation needs cookies, which this host blocks — download the ' +
+      'file to use it.';
+    function markTranslationUnavailable() {
+      var switches = document.querySelectorAll('.lang-switch');
+      if (!switches.length) return;
+
+      /* One note, named once, pointed at by every unavailable option's
+         aria-describedby. It is created hidden. */
+      var note = document.getElementById(NOTE_ID);
+      if (!note) {
+        note = document.createElement('p');
+        note.id = NOTE_ID;
+        note.className = 'lang-note notranslate';
+        /* Injected, not authored: a copy of this deck published elsewhere
+           must not carry this host's verdict about cookies. */
+        note.setAttribute('data-lisa-runtime', '');
+        note.setAttribute('translate', 'no');
+        note.setAttribute('role', 'note');
+        note.textContent = NO_COOKIE_NOTE;
+        switches[0].parentNode.insertBefore(note, switches[0]);
+      }
+
+      var lingerTimer = null;
+      function clearLinger() {
+        if (lingerTimer) { clearTimeout(lingerTimer); lingerTimer = null; }
+      }
+      function show() { clearLinger(); note.setAttribute('data-shown', 'true'); }
+      function hide() { clearLinger(); note.removeAttribute('data-shown'); }
+      /* A touch screen has no pointer to leave and no focus to lose, so a
+         tap has to take the note back down itself. */
+      function flash() { show(); lingerTimer = setTimeout(hide, NOTE_LINGER_MS); }
+
+      switches.forEach(function (sw) {
+        sw.setAttribute('data-translate-unavailable', 'true');
+        sw.querySelectorAll('button').forEach(function (btn) {
+          var isEn = btn.getAttribute('data-lang') === 'en';
+          btn.classList.toggle('active', isEn);
+          if (isEn) return;
+          /*
+            aria-disabled, not the `disabled` property: a disabled button
+            leaves the tab order, and then the one explanation of why it is
+            out of service is unreachable by keyboard. It stays focusable
+            and the click is refused below instead.
+          */
+          btn.setAttribute('aria-disabled', 'true');
+          btn.setAttribute('aria-describedby', NOTE_ID);
+          /* No `title`: it would put a native tooltip on top of the note
+             saying the same sentence, and have some screen readers read the
+             reason twice. The note is the one explanation, for both. */
+          btn.addEventListener('mouseenter', show);
+          btn.addEventListener('mouseleave', hide);
+          btn.addEventListener('focus', show);
+          btn.addEventListener('blur', hide);
+          btn.addEventListener('click', function (e) {
+            /* Refuse the switch, answer the question. stopPropagation keeps
+               the dismiss-on-click-elsewhere handler below from undoing the
+               reveal in the same event. */
+            e.preventDefault();
+            e.stopPropagation();
+            flash();
+          });
+        });
+      });
+
+      /* Anywhere else puts it away. Escape listens in the capture phase
+         because the deck and its menu both handle keys there first. */
+      document.addEventListener('click', hide);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') hide();
+      }, true);
+
+      console.info('Hi Ted, Meet Lisa: ' + NO_COOKIE_NOTE);
     }
 
     function init() {
@@ -1688,15 +2446,29 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
         Only this template needs the guard: every other Hi Ted, Meet Lisa
         template writes both languages inline and never machine-translates.
       */
-      if (location.protocol === 'file:') {
-        document.querySelectorAll('.lang-switch').forEach(function (el) {
-          el.hidden = true;
-        });
+      /* Set both ways rather than only hidden: a file published from
+         file:// is served afterwards, and an init that only ever hides
+         would leave the switch invisible in the copy. */
+      var onFile = location.protocol === 'file:';
+      document.querySelectorAll('.lang-switch').forEach(function (el) {
+        el.hidden = onFile;
+      });
+      if (onFile) {
         console.info(
           'Hi Ted, Meet Lisa: language switch hidden. Google Translate needs ' +
           'a cookie, and cookies do not persist on file:// — serve this file ' +
           'over http to switch languages.'
         );
+        return;
+      }
+      /*
+        Served, but with no usable cookie jar. The switch stays where it is,
+        marked out of service — see markTranslationUnavailable. Checked
+        before anything reads storage so the opaque-origin throw never
+        reaches the handlers.
+      */
+      if (!cookiesWork()) {
+        markTranslationUnavailable();
         return;
       }
       var cur = currentLang();
@@ -1711,7 +2483,7 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
       // after each run, which would poison the next load.
       killCookies();
       if (cur !== 'en') {
-        document.cookie = 'googtrans=/en/' + cur + '; path=/';
+        writeCookie('googtrans=/en/' + cur + '; path=/');
         protect();
         var sc = document.createElement('script');
         sc.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
@@ -1784,6 +2556,13 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
       var $ = function (id) { return document.getElementById(id); };
       var root = document.documentElement;
 
+      /* Storage throws, it does not merely fail, on an opaque origin (a
+         sandboxed share URL with no allow-same-origin). Both directions go
+         through these so the theme toggle still toggles where the choice
+         cannot be remembered. */
+      function readPref(key)      { try { return localStorage.getItem(key); } catch (e) { return null; } }
+      function writePref(key, v)  { try { localStorage.setItem(key, v); } catch (e) {} }
+
       /* ---- theme -------------------------------------------------------
          `theme: dark`  -> delete this section and the menu item.
          `theme: light` -> set data-theme="light" on <html> in the markup.
@@ -1803,13 +2582,12 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
          markup. The label is seeded from whatever theme is actually active, so
          it never offers the theme the reader is already looking at. */
       if (themeBtn) {
-        var saved = null;
-        try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+        var saved = readPref(THEME_KEY);
         applyTheme(saved || (root.getAttribute("data-theme") === "light" ? "light" : "dark"));
         themeBtn.addEventListener("click", function () {
           var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
           applyTheme(next);
-          try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+          writePref(THEME_KEY, next);
         });
       }
 
@@ -1825,6 +2603,8 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
           var b = document.createElement("button");
           b.type = "button";
           b.setAttribute("role", "menuitem");
+          /* Built from the slides on every load, so it is never published. */
+          b.setAttribute("data-lisa-runtime", "");
           b.innerHTML = '<span class="n">' + String(i + 1).padStart(2, "0") + "</span>";
           b.appendChild(document.createTextNode(" " + label.replace(/^\d+\s*/, "")));
           b.addEventListener("click", function () {
@@ -1849,7 +2629,13 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
          it earns its place only when this page is being served. On file:// it hands
          you what is already on your disk — hide it. Same rule as the language
          switch. Nulled rather than returned: wiring after this block must still run. */
-      if (htmlBtn && location.protocol === 'file:') { htmlBtn.hidden = true; htmlBtn = null; }
+      /* Set both ways for the same reason the language switch is: a deck
+         published from file:// is read over https, where this control has
+         a job again. */
+      if (htmlBtn) {
+        htmlBtn.hidden = location.protocol === 'file:';
+        if (htmlBtn.hidden) { htmlBtn = null; }
+      }
       if (htmlBtn) {
         htmlBtn.addEventListener("click", function () {
           var clone = document.documentElement.cloneNode(true);
