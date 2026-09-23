@@ -30,6 +30,53 @@ it; everything else reads the same.
 
 The prompt carries the brief. Everything else comes from the intake panel.
 
+## Say where you are, as you go
+
+A build takes minutes. The person who pressed the last button on the intake
+panel has no idea whether that is normal, and silence is the only thing they
+have to go on. **Narrating is not optional courtesy — it is part of the
+deliverable**, and it is the difference between a wait and a hang.
+
+**The rule: never let two phases pass without a line.** One short sentence,
+sent *before* the work, not after — "starting Korean" tells them something;
+"finished Korean" only tells them what they already waited through. Where the
+harness shows your tool calls the reader can see something is happening, but
+not what or how much is left; say the what and the how much anyway.
+
+The phases, and roughly what to say at each:
+
+| When | Say something like |
+| --- | --- |
+| Payload read (step 2) | "Fourteen slides, English then Korean, inline review — about six minutes. Starting now." |
+| Template copied (step 3) | "Copied the evidence-deck template. Writing the English pass." |
+| Long primary pass (step 4) | "Seven of fourteen written — through the market section." |
+| Primary language done (step 4) | "English is complete. Starting Korean — roughly another full pass." |
+| Each extra language (step 5) | "Korean done. Starting Traditional Chinese." |
+| Answers applied (step 7) | "Answers applied — theme, menu and accent. Two rows left by hand." |
+| Checks (step 8) | "Running the language and share checks." |
+| Review (step 9) | "Running the design pass before I hand it over." |
+| Handover | The file, what you assumed, what you skipped. |
+
+Three things make these lines worth reading rather than noise:
+
+1. **Anchor to a count whenever one exists.** "Seven of fourteen" is progress;
+   "still working" is not. The slide count, the language list and the review
+   setting all come from the payload, so the denominator is known before the
+   first line.
+2. **Give the estimate once, early, and then keep to it** — step 2 asks for
+   it. A single-language deck is a few minutes; each extra language is roughly
+   another full pass, because every reader-visible string is written again;
+   `review: inline` adds minutes more. If the work runs past the estimate, say
+   so in one line rather than letting it pass silently.
+3. **One line. Never a paragraph, never a checklist, never a recap** of what
+   the previous lines already said. The content goes in the file; these lines
+   only say where you are in it.
+
+The same applies when something goes sideways: a missing reference, a brief
+too thin to build the arc from, a `SKIPPED` row you had to do by hand. Say it
+at the moment it happens, in a sentence, and carry on — a surprise disclosed
+in the handover reads as something that was hidden.
+
 ## Procedure
 
 1. **Get the intake answers.** One question first: can you serve a page and
@@ -80,8 +127,11 @@ The prompt carries the brief. Everything else comes from the intake panel.
    **Estimate the wait out loud.** A single-language deck is a few minutes;
    each extra language adds roughly another build — every reader-visible
    string is written once per language — and `review: inline` adds minutes
-   more. One line, then start. If the brief is *still* thin — no title,
-   audience, or arc — ask once, then build; never before the panel.
+   more. One line, then start, and make it a real line: the slide count, the
+   languages in order, and the number of minutes. This is the first thing the
+   person hears after the panel and it sets what every later line is measured
+   against. If the brief is *still* thin — no title, audience, or arc — ask
+   once, then build; never before the panel.
 
 3. **Copy the chosen template — or hand off.** Resolve `answers.template`
    through `templates/templates.json`. If the entry's `kind` is `external`,
@@ -108,6 +158,13 @@ The prompt carries the brief. Everything else comes from the intake panel.
    figure you do not have stays `[FIGURE]` for the user to supply. Keep
    `data-screen-label` and `aria-label` sequential (`03 Table`) after adding
    or removing slides.
+
+   **This is the longest silence in the build, so break it.** A deck of more
+   than about eight screens gets a line at its halfway mark naming the count
+   and where you are — "Seven of fourteen written, through the market
+   section" — and a deck long enough to pass two such marks gets two. The
+   count is known from the payload before the first word is written, so there
+   is never a reason to say "still working" instead.
 
 5. **Add the other languages** only after the primary-language file is whole.
    For inline-language templates this is a second full pass over the fenced
@@ -190,10 +247,8 @@ The prompt carries the brief. Everything else comes from the intake panel.
     deck should be saved as a reusable template; if yes, ask for a name and
     write it to `~/.monomind/templates/NAME/`. Never save without being asked.
 
-**Say where you are as you go.** Where the harness shows your tool calls the
-reader already sees progress; where it shows nothing, emit one short line per
-phase — template copied, English done, starting Korean, answers applied,
-checks running. It is the difference between waiting and wondering.
+**Every step above has a line that goes with it** — see "Say where you are, as
+you go" before this Procedure. Two phases must never pass in silence.
 
 ## Scaffold, not a cage
 
