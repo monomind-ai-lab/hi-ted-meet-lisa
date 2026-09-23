@@ -17,7 +17,8 @@
 <title>[DECK TITLE] · MonoMind</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" data-lisa-font media="print" onload="this.media='all';this.onload=null">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"></noscript>
 <style>
 /* ═══════════════════════════════════════════════════════════════════
    Design tokens — tokens.css contract, pasted verbatim.
@@ -87,11 +88,72 @@
    Sans and mono = JetBrains Mono. The tokens.css font values are kept
    as the fallback tier so the contract still resolves if the webfont
    fails. No color, spacing, radius or elevation token is touched.
+
+   THE FALLBACK TIER MATTERS MORE HERE THAN IN ANY OTHER TEMPLATE, for
+   two reasons that compound.
+
+   First, the webfont link is deliberately non-blocking now, so the page
+   paints in the fallback face and swaps when Plus Jakarta Sans lands.
+   Whatever is named below is what a reader sees first — and everything
+   they see, if fonts.googleapis.com is slow or unreachable.
+
+   Second, and bigger: this deck is written in ONE language and every
+   other language on its switch is Google Translate rewriting the text
+   in place at read time. Plus Jakarta Sans has no Korean and no Chinese,
+   and no CJK webfont is loaded — so a translated deck is rendered
+   ENTIRELY by the system faces named here. They are not a degraded
+   state on that path; they are the typography.
+
+   Split into per-script groups so the regional ordering can change
+   without retyping the list. Noto Sans JP/KR/TC close each group for
+   Linux and Android, where none of the Apple or Microsoft faces exist.
    ═══════════════════════════════════════════════════════════════════ */
 :root {
-  --font-display: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
-  --font-body:    "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+  --fb-latin: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+  --fb-jp: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans JP";
+  --fb-ko: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR";
+  --fb-zh: "PingFang TC", "PingFang SC", "Microsoft JhengHei", "Microsoft YaHei",
+           "Noto Sans TC", "Noto Sans SC";
+
+  /* The default order, for a deck nobody has translated yet. */
+  --font-fallback: var(--fb-latin), var(--fb-jp), var(--fb-ko), var(--fb-zh), sans-serif;
+
+  --font-display: "Plus Jakarta Sans", Inter, system-ui, var(--font-fallback);
+  --font-body:    "Plus Jakarta Sans", Inter, system-ui, var(--font-fallback);
   --font-mono:    "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Regional ordering — Han unification made this necessary.
+
+   CJK Unified Ideographs are ONE Unicode block shared by Japanese,
+   Traditional Chinese and Simplified Chinese, and the three draw a
+   number of them differently — 直, 骨, 次, 說 among many others. A font
+   stack resolves per character, not per language: the first family in
+   the list that has a glyph wins, and it wins for every language.
+   Hiragino Sans is installed on every Mac, so with Japanese listed
+   first a Traditional Chinese deck would render its shared Han in
+   Japanese regional forms on the most common machine our readers have.
+   Nothing would look broken — it would just look subtly wrong to the
+   one person who can tell, which is the reader.
+
+   So the group order follows the language actually on screen.
+   `data-deck-lang` is set from the deck's own language switch on boot
+   (see the language block near the end of this file), NOT from `lang`:
+   Google Translate reads `lang` to decide what it is translating FROM,
+   and rewriting it would tell the widget the source is already Korean.
+   The attribute is runtime state, so `resetForExport` drops it from a
+   published copy along with everything else this deck writes about
+   itself.
+   ═══════════════════════════════════════════════════════════════════ */
+html[data-deck-lang="ko"] {
+  --font-fallback: var(--fb-latin), var(--fb-ko), var(--fb-jp), var(--fb-zh), sans-serif;
+}
+html[data-deck-lang^="zh"] {
+  --font-fallback: var(--fb-latin), var(--fb-zh), var(--fb-jp), var(--fb-ko), sans-serif;
+}
+html[data-deck-lang="ja"] {
+  --font-fallback: var(--fb-latin), var(--fb-jp), var(--fb-zh), var(--fb-ko), sans-serif;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1922,6 +1984,17 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
     if (body) { restore(body, BASE.body); }
     if (title) { title.textContent = BASE.title; }
 
+    /* The font link rewrites its OWN `media` to "all" as soon as the
+       stylesheet arrives, and `media` is a reflected attribute — so by
+       the time anyone presses Publish, the live DOM says "all" where the
+       file says "print". A copy restored from this clone would ship a
+       render-blocking stylesheet and stall its own first paint on
+       fonts.googleapis.com, which is the whole thing the attribute is
+       there to prevent. Put it back, exactly like every other piece of
+       runtime state below. (`onload` needs no help: the handler nulls
+       the IDL property, never the content attribute.) */
+    each(clone, "link[data-lisa-font]", function (el) { el.setAttribute("media", "print"); });
+
     /* The HTML parser moves whitespace that follows </html> into the end of
        <body>, so a file ending in a newline gains one inside its body on
        every load — and a snapshot of a snapshot would grow a newline at a
@@ -2472,6 +2545,19 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
         return;
       }
       var cur = currentLang();
+      /*
+        Tell the stylesheet which script is about to be on screen, so the
+        CJK fallback groups can be ordered for it — Han is unified across
+        Japanese and Chinese and the regional glyph shapes differ, so the
+        order is the difference between correct type and type that is
+        subtly foreign. See "Regional ordering" in the token block.
+
+        Deliberately NOT `lang`: the widget reads that to decide the
+        source language, and setting it to the target would tell Google
+        this page is already Korean. Runtime state, so `resetForExport`
+        takes it back off for a published copy.
+      */
+      document.documentElement.setAttribute('data-deck-lang', cur);
       document.querySelectorAll('.lang-switch button').forEach(function (btn) {
         if (btn.getAttribute('data-lang') === cur) btn.classList.add('active');
         btn.addEventListener('click', function (e) {

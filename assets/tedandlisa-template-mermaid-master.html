@@ -18,7 +18,8 @@
 <title>[DECK TITLE]</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet" data-lisa-font media="print" onload="this.media='all';this.onload=null">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{
   --paper:#f5f5f5; --paper-2:#ffffff; --ink:#2d3142; --muted:#4f5d75; --soft:#7a8399;
@@ -26,11 +27,31 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);}
-body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+:root{
+  /* ── the fallback tier ────────────────────────────────────────────
+     What renders while the webfont is in flight — the link is
+     non-blocking now — and what renders for good when
+     fonts.googleapis.com is slow or unreachable. Korean is written into
+     this file, so it is Korean that has to survive it.
+
+     Han is unified across Japanese and Chinese and the regional glyph
+     shapes differ (直, 骨, 次, 說), and a stack resolves per character:
+     the first family holding a glyph wins for every language. So the
+     CJK groups lead with this file's own script. Noto closes each group
+     for Linux and Android, which have none of the Apple or Microsoft
+     faces. */
+  --fb-latin: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+  --fb-jp: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans JP";
+  --fb-ko: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR";
+  --fb-zh: "PingFang TC", "PingFang SC", "Microsoft JhengHei", "Microsoft YaHei", "Noto Sans TC", "Noto Sans SC";
+  --font-fallback: var(--fb-latin), var(--fb-ko), var(--fb-jp), var(--fb-zh), sans-serif;
+  --font-fallback-mono: ui-monospace, "SF Mono", Menlo, Consolas, var(--fb-ko), var(--fb-jp), var(--fb-zh), monospace;
+}
+body{font-family:'Geist','Noto Sans KR',system-ui,var(--font-fallback);-webkit-font-smoothing:antialiased;}
 #deck{max-width:1200px;margin:0 auto;padding:3.5rem 2rem 6rem;}
 .slide{display:none;}
 .slide.active{display:block;}
-.slide[data-lang="ko"] svg text{font-family:'Noto Sans KR','Geist',sans-serif;}
+.slide[data-lang="ko"] svg text{font-family:'Noto Sans KR','Geist',var(--font-fallback);}
 .eyebrow{font-family:'Geist Mono',monospace;font-size:9px;font-weight:500;letter-spacing:0.18em;
   text-transform:uppercase;color:var(--muted);margin:0 0 0.6rem;}
 .slide h1{font-family:'Instrument Serif',serif;font-weight:400;font-size:1.9rem;line-height:1.15;
@@ -653,6 +674,17 @@ body{font-family:'Geist','Noto Sans KR',system-ui,sans-serif;-webkit-font-smooth
     restore(clone, BASE.html);
     if (body) { restore(body, BASE.body); }
     if (title) { title.textContent = BASE.title; }
+
+    /* The font link rewrites its OWN `media` to "all" as soon as the
+       stylesheet arrives, and `media` is a reflected attribute — so by
+       the time anyone presses Publish, the live DOM says "all" where the
+       file says "print". A copy restored from this clone would ship a
+       render-blocking stylesheet and stall its own first paint on
+       fonts.googleapis.com, which is the whole thing the attribute is
+       there to prevent. Put it back, exactly like every other piece of
+       runtime state below. (`onload` needs no help: the handler nulls
+       the IDL property, never the content attribute.) */
+    each(clone, "link[data-lisa-font]", function (el) { el.setAttribute("media", "print"); });
 
     /* The HTML parser moves whitespace that follows </html> into the end of
        <body>, so a file ending in a newline gains one inside its body on
