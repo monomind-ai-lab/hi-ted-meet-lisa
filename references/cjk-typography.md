@@ -23,16 +23,26 @@ fall through to Noto:
 | `mermaid-master` | Instrument Serif, Geist, Geist Mono | Noto Sans KR | `body` appends it; `.slide[data-lang="ko"] svg text` puts it first |
 | `evidence-deck` | Archivo Black, Space Grotesk, JetBrains Mono | Noto Sans KR | `body[data-lang="ko"]` re-points `--font-display` and `--font-body` to append it |
 | `paper-brief` | Archivo | Noto Sans TC | `--font-body` leads with it (the file opens in Chinese); `body[data-lang="en"]` puts Archivo first |
-| `monomind-deck` | Plus Jakarta Sans, JetBrains Mono | none | translated text renders in the reader's system CJK face |
+| `monomind-deck` | Plus Jakarta Sans, JetBrains Mono | none | translated text renders in the named system CJK faces — see below |
 
 The family is loaded by the same `<link>` as the Latin faces — this is the
 evidence deck's:
 
 ```html
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap"
+      rel="stylesheet" media="print" onload="this.media='all';this.onload=null" data-lisa-font>
+<noscript><link href="…same href…" rel="stylesheet"></noscript>
 ```
 
-and its language rule appends rather than replaces:
+`media="print"` is not a mistake: it is what stops the stylesheet holding the
+page's first paint. The browser still fetches it, at low priority, and the
+`onload` flips it live the moment it lands — so a reader whose network cannot
+reach fonts.googleapis.com gets the deck in its fallback faces immediately
+instead of a blank window. `data-lisa-font` is how the Share block puts
+`media="print"` back before publishing: `media` is a reflected attribute, so
+by then the live DOM says `"all"`, and a copy taken from it would block.
+
+Its language rule appends rather than replaces:
 
 ```css
 body[data-lang="ko"]{
@@ -44,10 +54,33 @@ body[data-lang="ko"]{
 Two rules follow from the pattern. **A font change is two edits** — the token
 *and* the `<link>`, per `references/applying-answers.md`: a CJK family named in
 a token but absent from the link renders in the system face with no error.
-**The weight has to be in the link too.** Archivo Black is a single 900; the
-evidence deck loads Noto Sans KR at 900 and pairs it with a `font-weight:900`
-rule so the Hangul does not read light beside it. A weight the link did not
-load is synthesised or snapped to the nearest one that was.
+**The weight has to be in the link too.** A weight the link did not load is
+snapped to the nearest one that was.
+
+### CJK families load two weights: 400 and 700
+
+Not the three to five they used to. A CJK family is not priced like a Latin
+one — Noto Sans KR is **1.78 MB across 124 slices** per weight, Noto Sans TC
+**2.14 MB across 105**, against roughly 30 KB for a Latin face. Loading five
+weights of Noto Sans TC, as `paper-brief` did, put over 10 MB of potential
+font behind one deck; what a reader actually pulls is far less (Google serves
+only the slices their text touches — about 82 KB of Korean, 159 KB of Chinese
+for a normal deck, per weight), but every extra weight multiplies that, and it
+buys distinctions most readers cannot see at body size.
+
+So the cap is regular and bold, and **nothing is synthesised** — 300 and 500
+resolve to 400, 900 resolves to 700. The one visible cost is a display weight
+that was carrying real contrast:
+
+> `evidence-deck` sets `body[data-lang="ko"] .mega{font-weight:900}` beside
+> Archivo Black, which is a true single-weight 900. That Hangul now renders at
+> 700 and reads a little lighter than the Latin it sits with. It is a
+> deliberate trade, not an oversight. Putting it back is one weight in that
+> template's `<link>` — `Noto+Sans+KR:wght@400;700;900` — and costs roughly
+> another 80 KB of slices on a Korean deck.
+
+Latin families keep their full weight ranges. They are small, and the
+reasoning above does not apply to them.
 
 ## Set these on every CJK run
 
@@ -80,9 +113,25 @@ load is synthesised or snapped to the nearest one that was.
 
 ## The MonoMind deck: translated output
 
-`monomind-deck` loads no CJK family; whatever Google Translate produces renders
-in the reader's system face, at the deck's Latin leading and tracking. Two
-documented failures live here:
+`monomind-deck` loads no CJK family, so whatever Google Translate produces
+renders in a system face at the deck's Latin leading and tracking. Which system
+face is no longer left to chance: the token block names `--fb-jp`, `--fb-ko`
+and `--fb-zh` explicitly — Hiragino, Apple SD Gothic Neo, PingFang, the
+Microsoft equivalents, Noto last for Linux and Android — and reorders them so
+the script on screen leads.
+
+That reordering is not decoration. **Han is one Unicode block shared by
+Japanese, Traditional Chinese and Simplified Chinese**, and the three draw a
+number of characters differently (直, 骨, 次, 說). A stack resolves per
+character: whichever family holds a glyph first wins, for every language. With
+Japanese ahead of Chinese — and Hiragino Sans on every Mac — a Chinese reader
+would get Japanese regional forms and nothing would look broken to anyone but
+them. So the deck's own switch writes `data-deck-lang` on `<html>` at boot and
+the stylesheet hoists the matching group. Deliberately not `lang`: Google
+Translate reads that to decide the **source** language, and setting it to the
+target would tell the widget the page is already translated.
+
+Two documented failures live here:
 
 - **Translated CJK runs flush against protected spans (`L-002`).** The
   translator drops the space either side of a `notranslate` identifier —

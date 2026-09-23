@@ -18,7 +18,8 @@
 <title>[報告標題]｜[副標]</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;600;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;600;800;900&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet" data-lisa-font media="print" onload="this.media='all';this.onload=null">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;600;800;900&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet"></noscript>
 <style>
 /* ===========================================
    主題變數 — 改這裡就能改整份簡報的外觀
@@ -42,8 +43,25 @@
   --invert-soft:#a8a8a8;
   --chrome-bg:rgba(255,255,255,.86);
 
-  --font-display:'Archivo','Noto Sans TC',sans-serif;
-  --font-body:'Noto Sans TC','Archivo',sans-serif;
+  /* ── the fallback tier ────────────────────────────────────────────
+     What renders while the webfont is in flight — the link is
+     non-blocking now — and what renders for good when
+     fonts.googleapis.com is slow or unreachable. This deck is Traditional Chinese only, so the Chinese face is the one that matters.
+
+     Han is unified across Japanese and Chinese and the regional glyph
+     shapes differ (直, 骨, 次, 說), and a stack resolves per character:
+     the first family holding a glyph wins for every language. So the
+     CJK groups lead with this file's own script. Noto closes each group
+     for Linux and Android, which have none of the Apple or Microsoft
+     faces. */
+  --fb-latin: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+  --fb-jp: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans JP";
+  --fb-ko: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR";
+  --fb-zh: "PingFang TC", "PingFang SC", "Microsoft JhengHei", "Microsoft YaHei", "Noto Sans TC", "Noto Sans SC";
+  --font-fallback: var(--fb-latin), var(--fb-zh), var(--fb-jp), var(--fb-ko), sans-serif;
+  --font-fallback-mono: ui-monospace, "SF Mono", Menlo, Consolas, var(--fb-zh), var(--fb-jp), var(--fb-ko), monospace;
+  --font-display:'Archivo','Noto Sans TC',var(--font-fallback);
+  --font-body:'Noto Sans TC','Archivo',var(--font-fallback);
 
   --title-size:clamp(2.1rem,6.4vw,5.2rem);
   --h2-size:clamp(1.32rem,3.45vw,2.65rem);
@@ -77,7 +95,7 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--ink);heigh
    the display face rather than in the Latin of a CJK font. */
 body[data-lang="zh-TW"] .en{display:none !important}
 body[data-lang="en"] .zh{display:none !important}
-body[data-lang="en"]{--font-body:'Archivo','Noto Sans TC',sans-serif}
+body[data-lang="en"]{--font-body:'Archivo','Noto Sans TC',var(--font-fallback)}
 
 /* === 投影片基底（不可更動） === */
 .slide{
@@ -872,6 +890,17 @@ body[data-lang="en"] .deck-share-result{letter-spacing:.02em;line-height:1.55}
     restore(clone, BASE.html);
     if (body) { restore(body, BASE.body); }
     if (title) { title.textContent = BASE.title; }
+
+    /* The font link rewrites its OWN `media` to "all" as soon as the
+       stylesheet arrives, and `media` is a reflected attribute — so by
+       the time anyone presses Publish, the live DOM says "all" where the
+       file says "print". A copy restored from this clone would ship a
+       render-blocking stylesheet and stall its own first paint on
+       fonts.googleapis.com, which is the whole thing the attribute is
+       there to prevent. Put it back, exactly like every other piece of
+       runtime state below. (`onload` needs no help: the handler nulls
+       the IDL property, never the content attribute.) */
+    each(clone, "link[data-lisa-font]", function (el) { el.setAttribute("media", "print"); });
 
     /* The HTML parser moves whitespace that follows </html> into the end of
        <body>, so a file ending in a newline gains one inside its body on
